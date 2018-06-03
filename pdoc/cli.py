@@ -16,7 +16,6 @@ import pkgutil
 import re
 import subprocess
 import sys
-import tempfile
 
 import pdoc
 
@@ -27,7 +26,6 @@ except NameError:
     xrange = range
 
 version_suffix = "%d.%d" % (sys.version_info[0], sys.version_info[1])
-default_http_dir = path.join(tempfile.gettempdir(), "pdoc-%s" % version_suffix)
 
 parser = argparse.ArgumentParser(
     description="Automatically generate API docs for Python modules.",
@@ -110,12 +108,6 @@ aa(
     help="When set, pdoc will run as an HTTP server providing documentation "
     "of all installed modules. Only modules found in PYTHONPATH will be "
     "listed.",
-)
-aa(
-    "--http-dir",
-    type=str,
-    default=default_http_dir,
-    help="The directory to cache HTML documentation when running as an HTTP " "server.",
 )
 aa(
     "--http-host",
@@ -468,7 +460,6 @@ def cli():
     if args.http:
         args.html = True
         args.external_links = True
-        args.html_dir = args.http_dir
         args.overwrite = True
         args.link_prefix = "/"
 
