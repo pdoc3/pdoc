@@ -34,6 +34,7 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
 )
 aa = parser.add_argument
+aa('--version', action='version', version='%(prog)s ' + pdoc.__version__)
 aa(
     "module_name",
     type=str,
@@ -451,10 +452,6 @@ def process_html_out(impath):
 
 def cli():
     """ Command-line entry point """
-
-    if args.version:
-        print(pdoc.__version__)
-        sys.exit(0)
 
     # We close stdin because some modules, upon import, are not very polite
     # and block on stdin.
