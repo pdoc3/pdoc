@@ -122,7 +122,6 @@ aa(
     help="The port on which to run the HTTP server.",
 )
 aa("--http-html", action="store_true", help="Internal use only. Do not set.")
-args = parser.parse_args()
 
 
 class WebDoc(BaseHTTPRequestHandler):
@@ -442,8 +441,10 @@ def process_html_out(impath):
         print(out)
 
 
-def cli():
+def main(_args=None):
     """ Command-line entry point """
+    global args
+    args = _args or parser.parse_args()
 
     # We close stdin because some modules, upon import, are not very polite
     # and block on stdin.
@@ -558,4 +559,4 @@ def cli():
 
 
 if __name__ == "__main__":
-    cli()
+    main(parser.parse_args())

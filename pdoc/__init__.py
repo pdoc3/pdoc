@@ -309,22 +309,7 @@ def import_module(module_name):
     changed on disk cannot be re-imported in the same process and have
     its documentation updated.
     """
-    if import_path != sys.path:
-        # Such a kludge. Only restrict imports if the `import_path` has
-        # been changed. We don't want to always restrict imports, since
-        # providing a path to `imp.find_module` stops it from searching
-        # in special locations for built ins or frozen modules.
-        #
-        # The problem here is that this relies on the `sys.path` not being
-        # independently changed since the initialization of this module.
-        # If it is changed, then some packages may fail.
-        #
-        # Any other options available?
-
-        # Raises an exception if the parent module cannot be imported.
-        # This hopefully ensures that we only explicitly import modules
-        # contained in `pdoc.import_path`.
-        imp.find_module(module_name.split(".")[0], import_path)
+    imp.find_module(module_name.split(".")[0], sys.path)
 
     if module_name in sys.modules:
         return sys.modules[module_name]
@@ -658,6 +643,7 @@ class Module(Doc):
             dobj = self.find_ident(refname)
             if isinstance(dobj, External):
                 continue
+            assert isinstance(docstring, str), (type(docstring), docstring)
             dobj.docstring = inspect.cleandoc(docstring)
 
     def text(self):
