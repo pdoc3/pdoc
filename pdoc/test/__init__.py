@@ -43,7 +43,8 @@ def run(*args, _check=True, **kwargs) -> int:
     params = list(filter(None, chain.from_iterable(params)))
     _args = parser.parse_args([*params, *args])
     try:
-        main(_args)
+        returncode = main(_args)
+        return returncode or 0
     except SystemExit as e:
         return e.code
 
@@ -143,16 +144,29 @@ class CliTest(unittest.TestCase):
                     self._basic_html_assertions(expected_files)
                     self._check_files(include_patterns, exclude_patterns)
 
+        filenames_files = {
+            ('module.py',): [EXAMPLE_MODULE, EXAMPLE_MODULE + '/module.m.html'],
+            ('module.py', 'subpkg2'): [f for f in self.PUBLIC_FILES
+                                       if 'module' in f or 'subpkg2' in f or f == EXAMPLE_MODULE],
+        }
         with chdir(TESTS_BASEDIR):
-            with self.subTest(filename='module.py'):
-                with run_html(EXAMPLE_MODULE + '/module.py'):
-                    self._basic_html_assertions(['__init__', '__init__/index.html'])
-                    self._check_files(include_patterns, exclude_patterns)
+            for filenames, expected_files in filenames_files.items():
+                with self.subTest(filename=','.join(filenames)):
+                    with run_html(*(os.path.join(EXAMPLE_MODULE, f) for f in filenames)):
+                        self._basic_html_assertions(expected_files)
+                        self._check_files(include_patterns, exclude_patterns)
+
+    def test_html_multiple_files(self):
+        with chdir(TESTS_BASEDIR):
+            with run_html(EXAMPLE_MODULE + '/module.py', EXAMPLE_MODULE + '/subpkg2'):
+                self._basic_html_assertions(
+                    [f for f in self.PUBLIC_FILES
+                     if 'module' in f or 'subpkg2' in f or f == EXAMPLE_MODULE])
 
     def test_html_identifier(self):
         for package in ('', '._private'):
             with self.subTest(package=package):
-                with run_html(EXAMPLE_MODULE + package, 'A', html_no_source=None):
+                with run_html(EXAMPLE_MODULE + package, filter='A', html_no_source=None):
                     self._check_files(['A'], ['CONST', 'B docstring'])
 
     def test_html_ref_links(self):
@@ -213,10 +227,6 @@ class CliTest(unittest.TestCase):
             self._check_files(['/foobar/' + EXAMPLE_MODULE])
 
     def test_text(self):
-        with redirect_streams() as (stdout, _):
-            run(EXAMPLE_MODULE)
-            out = stdout.getvalue()
-
         include_patterns = [
             'CONST docstring',
             'var docstring',
@@ -251,22 +261,68 @@ class CliTest(unittest.TestCase):
             'Hidden',
         ]
 
-        header = 'Module {}\n{:-<{}}'.format(EXAMPLE_MODULE, '',
-                                             len('Module ') + len(EXAMPLE_MODULE))
-        self.assertIn(header, out)
-        for pattern in include_patterns:
-            self.assertIn(pattern, out)
-        for pattern in exclude_patterns:
-            self.assertNotIn(pattern, out)
+        with self.subTest(package=EXAMPLE_MODULE):
+            with redirect_streams() as (stdout, _):
+                run(EXAMPLE_MODULE)
+                out = stdout.getvalue()
+
+            header = 'Module {}\n{:-<{}}'.format(EXAMPLE_MODULE, '',
+                                                 len('Module ') + len(EXAMPLE_MODULE))
+            self.assertIn(header, out)
+            for pattern in include_patterns:
+                self.assertIn(pattern, out)
+            for pattern in exclude_patterns:
+                self.assertNotIn(pattern, out)
+
+        with chdir(TESTS_BASEDIR):
+            for files in (('module.py',),
+                          ('module.py', 'subpkg2')):
+                with self.subTest(filename=','.join(files)):
+                    with redirect_streams() as (stdout, _):
+                        run(*(os.path.join(EXAMPLE_MODULE, f) for f in files))
+                        out = stdout.getvalue()
+                    for f in files:
+                        header = 'Module {}.{}'.format(EXAMPLE_MODULE, os.path.splitext(f)[0])
+                        self.assertIn(header, out)
 
     def test_text_identifier(self):
         with redirect_streams() as (stdout, _):
-            run(EXAMPLE_MODULE, 'A')
+            run(EXAMPLE_MODULE, filter='A')
             out = stdout.getvalue()
         self.assertIn('A', out)
         self.assertIn('Descendents\n    -----------\n    example_pkg.B', out)
         self.assertNotIn('CONST', out)
         self.assertNotIn('B docstring', out)
+
+
+class ApiTest(unittest.TestCase):
+    def test_module(self):
+        modules = {
+            EXAMPLE_MODULE: ('', ('module', 'subpkg', 'subpkg2')),
+            os.path.join(EXAMPLE_MODULE, 'subpkg2'): ('.subpkg2', ('subpkg2.module',)),
+        }
+        with chdir(TESTS_BASEDIR):
+            for module, (name_suffix, submodules) in modules.items():
+                with self.subTest(module=module):
+                    m = pdoc.Module(pdoc.import_module(module))
+                    self.assertEqual(m.name, EXAMPLE_MODULE + name_suffix)
+                    self.assertEqual(sorted(m.name for m in m.submodules()),
+                                     [EXAMPLE_MODULE + '.' + m for m in submodules])
+
+    def test_import_filename(self):
+        old_sys_path = sys.path.copy()
+        sys.path.clear()
+        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
+            pdoc.import_module('index')
+        sys.path = old_sys_path
+
+    def test_module_allsubmodules(self):
+        for allsubmodules in (False, True):
+            with self.subTest(allsubmodules=allsubmodules):
+                m = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + '.subpkg'),
+                                allsubmodules=allsubmodules)
+                self.assertEqual(sorted(m.name for m in m.submodules()),
+                                 [EXAMPLE_MODULE + '.subpkg._private'] * int(allsubmodules))
 
 
 class HttpTest(unittest.TestCase):
@@ -282,7 +338,8 @@ class HttpTest(unittest.TestCase):
 
     def test_http(self):
         host, port = 'localhost', randint(9000, 12000)
-        cmd = 'pdoc --http --http-host {} --http-port {}'.format(host, port).split()
+        cmd = 'pdoc --http --http-host {} --http-port {} pdoc {}'.format(
+            host, port, EXAMPLE_MODULE).split()
 
         with self._timeout(10):
             with subprocess.Popen(cmd, stderr=subprocess.PIPE) as proc:

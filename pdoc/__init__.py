@@ -181,7 +181,7 @@ License
 """
 from __future__ import absolute_import, division, print_function
 import ast
-import imp
+import importlib.util
 import inspect
 import os
 import os.path as path
@@ -297,25 +297,55 @@ def text(module_name, docfilter=None, allsubmodules=False):
     return mod.text()
 
 
-def import_module(module_name):
+def import_module(module: str):
     """
-    Imports a module. A single point of truth for importing modules to
-    be documented by `pdoc`. In particular, it makes sure that the top
-    module in `module_name` can be imported by using only the paths in
-    `pdoc.import_path`.
-
-    If a module has already been imported, then its corresponding entry
-    in `sys.modules` is returned. This means that modules that have
-    changed on disk cannot be re-imported in the same process and have
-    its documentation updated.
+    Return module object matching `module` specification (either a python
+    module path or a filesystem path to file/directory).
     """
-    imp.find_module(module_name.split(".")[0], sys.path)
+    if isinstance(module, Module):
+        module = module.module
+    if isinstance(module, str):
+        try:
+            module = importlib.import_module(module)
+        except ImportError:
+            pass
+        except Exception as e:
+            raise ImportError('Error importing {!r}: {}'.format(module, e))
 
-    if module_name in sys.modules:
-        return sys.modules[module_name]
+    if inspect.ismodule(module):
+        if module.__name__.startswith(__name__):
+            # If this is pdoc itself, return without reloading.
+            # Otherwise most `isinstance(..., pdoc.Doc)` calls won't
+            # work correctly.
+            return module
+        return importlib.reload(module)
+
+    # Try to load it as a filename
+    if path.exists(module) and module.endswith('.py'):
+        filename = module
+    elif path.exists(module + '.py'):
+        filename = module + '.py'
+    elif path.exists(path.join(module, '__init__.py')):
+        filename = path.join(module, '__init__.py')
     else:
-        __import__(module_name)
-        return sys.modules[module_name]
+        raise ValueError('File or module {!r} not found'.format(module))
+
+    # If the path is relative, the whole of it is a python module path.
+    # If the path is absolute, only the basename is.
+    module_name = path.splitext(module)[0]
+    if path.isabs(module):
+        module_name = path.basename(module_name)
+    else:
+        module_name = path.splitdrive(module_name)[1]
+    module_name = module_name.replace(path.sep, '.')
+
+    spec = importlib.util.spec_from_file_location(module_name, filename)
+    module = importlib.util.module_from_spec(spec)
+    try:
+        module.__loader__.exec_module(module)
+    except Exception as e:
+        raise ImportError('Error importing {!r}: {}'.format(filename, e))
+    return module
 
 
 def _source(obj):
@@ -348,34 +378,6 @@ def _get_tpl(name):
         locs = [path.join(p, name.lstrip("/")) for p in _template_path]
         raise IOError(2, "No template at any of: %s" % ", ".join(locs))
     return t
-
-
-def _eprint(*args, **kwargs):
-    """Print to stderr."""
-    kwargs["file"] = sys.stderr
-    print(*args, **kwargs)
-
-
-def _safe_import(module_name):
-    """
-    A function for safely importing `module_name`, where errors are
-    suppressed and `stdout` and `stderr` are redirected to a null
-    device. The obligation is on the caller to close `stdin` in order
-    to avoid impolite modules from blocking on `stdin` when imported.
-    """
-
-    class _Null(object):
-        def write(self, *_):
-            pass
-
-    sout, serr = sys.stdout, sys.stderr
-    sys.stdout, sys.stderr = _Null(), _Null()
-    try:
-        m = import_module(module_name)
-    except:
-        m = None
-    sys.stdout, sys.stderr = sout, serr
-    return m
 
 
 def _var_docstrings(tree, module, cls=None, init=False):
@@ -586,30 +588,21 @@ class Module(Doc):
                 # Catch all for variables.
                 self.doc[name] = Variable(name, self, "", cls=None)
 
-        # Now scan the directory if this is a package for all modules.
-        if not hasattr(self.module, "__path__") and not hasattr(
-            self.module, "__file__"
-        ):
-            pkgdir = []
-        else:
-            pkgdir = getattr(
-                self.module, "__path__", [path.dirname(self.module.__file__)]
-            )
-        if self.is_package():
-            for (_, root, _) in pkgutil.iter_modules(pkgdir):
+        # If the module is a package, scan the directory for submodules
+        if self.is_package:
+            loc = getattr(self.module, "__path__", [path.dirname(self.module.__file__)])
+            for _, root, _ in pkgutil.iter_modules(loc):
                 # Ignore if this module was already doc'd.
                 if root in self.doc:
                     continue
 
                 # Ignore if it isn't exported, unless we've specifically
                 # requested to document all submodules.
-                if not self._allsubmodules and not self.__is_exported(
-                    root, self.module
-                ):
+                if not self._allsubmodules and not self.__is_exported(root, self.module):
                     continue
 
                 fullname = "%s.%s" % (self.name, root)
-                m = _safe_import(fullname)
+                m = import_module(fullname)
                 if m is None:
                     continue
                 self.doc[root] = self.__new_submodule(root, m)
@@ -681,12 +674,12 @@ class Module(Doc):
         )
         return t.strip()
 
+    @property
     def is_package(self):
         """
-        Returns `True` if this module is a package.
+        `True` if this module is a package.
 
-        Works by checking if `__package__` is not `None` and whether it
-        has the `__path__` attribute.
+        Works by checking whether the module has a `__path__` attribute.
         """
         return hasattr(self.module, "__path__")
 

@@ -18,6 +18,7 @@ import subprocess
 import sys
 
 import pdoc
+from pdoc import import_module
 
 # `xrange` is `range` with Python3.
 try:
@@ -34,22 +35,24 @@ parser = argparse.ArgumentParser(
 aa = parser.add_argument
 aa('--version', action='version', version='%(prog)s ' + pdoc.__version__)
 aa(
-    "module_name",
+    "modules",
     type=str,
-    nargs="?",
+    metavar='MODULE',
+    nargs="+",
     help="The Python module name. This may be an import path resolvable in "
     "the current environment, or a file path to a Python module or "
     "package.",
 )
 aa(
-    "ident_name",
+    "--filter",
     type=str,
-    nargs="?",
-    help="When specified, only identifiers containing the name given "
-    "will be shown in the output. Search is case sensitive. "
-    "Has no effect when --http is set.",
+    metavar='STRING',
+    default=None,
+    help="Comma-separated list of filters. When specified, "
+         "only identifiers containing the specified string "
+         "will be shown in the output. Search is case sensitive. "
+         "Has no effect when --http is set.",
 )
-aa("--version", action="store_true", help="Print the version of pdoc and exit.")
 aa("--html", action="store_true", help="When set, the output will be HTML formatted.")
 aa(
     "--html-dir",
@@ -346,7 +349,7 @@ def last_modified(fp):
 
 def module_file(m):
     mbase = path.join(args.html_dir, *m.name.split("."))
-    if m.is_package():
+    if m.is_package:
         return path.join(mbase, pdoc.html_package_name)
     else:
         return "%s%s" % (mbase, pdoc.html_module_suffix)
@@ -365,7 +368,7 @@ def quit_if_exists(m):
 
     # If this is a package, make sure the package directory doesn't exist
     # either.
-    if m.is_package():
+    if m.is_package:
         check_file(path.dirname(f))
 
 
@@ -453,9 +456,6 @@ def main(_args=None):
     except:
         pass
 
-    if not args.http and args.module_name is None:
-        _eprint("No module name specified.")
-        sys.exit(1)
     if args.template_dir is not None:
         pdoc.tpl_lookup.directories.insert(0, args.template_dir)
     if args.http:
@@ -470,10 +470,6 @@ def main(_args=None):
         pdoc.import_path = pypath.split(path.pathsep)
 
     if args.http:
-        if args.module_name is not None:
-            _eprint("Module names cannot be given with --http set.")
-            sys.exit(1)
-
         # Run the HTTP server.
         httpd = HTTPServer((args.http_host, args.http_port), WebDoc)
         print(
@@ -486,76 +482,28 @@ def main(_args=None):
         sys.exit(0)
 
     docfilter = None
-    if args.ident_name and len(args.ident_name.strip()) > 0:
-        search = args.ident_name.strip()
+    if args.filter and args.filter.strip():
+        def docfilter(obj, _filters=args.filter.strip().split(',')):
+            return any(f in obj.refname or
+                       isinstance(obj, pdoc.Class) and (f in obj.doc or
+                                                        f in obj.doc_init)
+                       for f in _filters)
 
-        def docfilter(o):
-            rname = o.refname
-            if rname.find(search) > -1 or search.find(o.name) > -1:
-                return True
-            if isinstance(o, pdoc.Class):
-                return search in o.doc or search in o.doc_init
-            return False
+    # Support loading modules specified as python paths relative to cwd
+    sys.path.append(os.getcwd())
 
-    # Try to do a real import first. I think it's better to prefer
-    # import paths over files. If a file is really necessary, then
-    # specify the absolute path, which is guaranteed not to be a
-    # Python import path.
-    try:
-        module = pdoc.import_module(args.module_name)
-    except Exception as e:
-        module = None
+    modules = [pdoc.Module(import_module(module),
+                           docfilter=docfilter, allsubmodules=args.all_submodules)
+               for module in args.modules]
 
-    # Get the module that we're documenting. Accommodate for import paths,
-    # files and directories.
-    if module is None:
-        isdir = path.isdir(args.module_name)
-        isfile = path.isfile(args.module_name)
-        if isdir or isfile:
-            fp = path.realpath(args.module_name)
-            module_name = path.basename(fp)
-            if isdir:
-                fp = path.join(fp, "__init__.py")
-            else:
-                module_name, _ = path.splitext(module_name)
-
-            # Use a special module name to avoid import conflicts.
-            # It is hidden from view via the `Module` class.
-            with open(fp) as f:
-                module = imp.load_source("__pdoc_file_module__", fp, f)
-                if isdir:
-                    module.__path__ = [path.realpath(args.module_name)]
-                module.__pdoc_module_name = module_name
+    for module in modules:
+        if args.html:
+            quit_if_exists(module)
+            html_out(module, args.html)
         else:
-            module = pdoc.import_module(args.module_name)
-    module = pdoc.Module(module, docfilter=docfilter, allsubmodules=args.all_submodules)
-
-    # Plain text?
-    if not args.html and not args.all_submodules:
-        output = module.text()
-        try:
-            print(output)
-        except IOError as e:
-            # This seems to happen for long documentation.
-            # This is obviously a hack. What's the real cause? Dunno.
-            if e.errno == 32:
-                pass
-            else:
-                raise e
-        sys.exit(0)
-
-    # HTML output depends on whether the module being documented is a package
-    # or not. If not, then output is written to {MODULE_NAME}.html in
-    # `html-dir`. If it is a package, then a directory called {MODULE_NAME}
-    # is created, and output is written to {MODULE_NAME}/index.html.
-    # Submodules are written to {MODULE_NAME}/{MODULE_NAME}.m.html and
-    # subpackages are written to {MODULE_NAME}/{MODULE_NAME}/index.html. And
-    # so on... The same rules apply for `http_dir` when `pdoc` is run as an
-    # HTTP server.
-    if not args.http:
-        quit_if_exists(module)
-        html_out(module, args.html)
-        sys.exit(0)
+            sys.stdout.write(module.text())
+            # Two blank lines between two modules' texts
+            sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
 
 
 if __name__ == "__main__":

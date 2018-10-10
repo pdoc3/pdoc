@@ -103,7 +103,7 @@
     url = (base[len('../'):] if base.startswith('../') else
            '' if base == '..' else
            base)
-    if m.is_package():
+    if m.is_package:
       index = pdoc.html_package_name
       url = url + '/' + index if url else index
     else:
