@@ -71,6 +71,7 @@ class CliTest(unittest.TestCase):
         'example_pkg/module.m.html',
         'example_pkg/_private',
         'example_pkg/_private/index.html',
+        'example_pkg/_private/module.m.html',
         'example_pkg/subpkg',
         'example_pkg/subpkg/_private.m.html',
         'example_pkg/subpkg/index.html',
@@ -196,10 +197,6 @@ class CliTest(unittest.TestCase):
                 self.assertEqual(returncode, 0)
                 self.assertEqual(stderr.getvalue(), '')
 
-    def test_all_submodules(self):
-        with run_html(EXAMPLE_MODULE, all_submodules=None):
-            self._basic_html_assertions(expected_files=self.ALL_FILES)
-
     def test_external_links(self):
         with run_html(EXAMPLE_MODULE):
             self._basic_html_assertions()
@@ -317,13 +314,9 @@ class ApiTest(unittest.TestCase):
         sys.path = old_sys_path
 
     def test_module_allsubmodules(self):
-        for allsubmodules in (False, True):
-            with self.subTest(allsubmodules=allsubmodules):
-                m = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + '.subpkg'),
-                                allsubmodules=allsubmodules)
-                self.assertEqual(sorted(m.name for m in m.submodules()),
-                                 [EXAMPLE_MODULE + '.subpkg._private'] * int(allsubmodules))
-
+        m = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + '._private'))
+        self.assertEqual(sorted(m.name for m in m.submodules()),
+                         [EXAMPLE_MODULE + '._private.module'])
 
 class HttpTest(unittest.TestCase):
     @contextmanager

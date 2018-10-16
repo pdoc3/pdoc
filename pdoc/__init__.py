@@ -239,7 +239,6 @@ object's `directories` attribute.
 def html(
     module_name,
     docfilter=None,
-    allsubmodules=False,
     external_links=False,
     link_prefix="",
     source=True,
@@ -254,10 +253,6 @@ def html(
     `True` or `False`. If `False`, that object will not be included in
     the output.
 
-    If `allsubmodules` is `True`, then every submodule of this module
-    that can be found will be included in the documentation, regardless
-    of whether `__all__` contains it.
-
     If `external_links` is `True`, then identifiers to external modules
     are always turned into links.
 
@@ -268,15 +263,13 @@ def html(
     every Python object whenever possible. This can dramatically
     decrease performance when documenting large modules.
     """
-    mod = Module(
-        import_module(module_name), docfilter=docfilter, allsubmodules=allsubmodules
-    )
+    mod = Module(import_module(module_name), docfilter=docfilter)
     return mod.html(
         external_links=external_links, link_prefix=link_prefix, source=source
     )
 
 
-def text(module_name, docfilter=None, allsubmodules=False):
+def text(module_name, docfilter=None):
     """
     Returns the documentation for the module `module_name` in plain
     text format. The module must be importable.
@@ -286,14 +279,8 @@ def text(module_name, docfilter=None, allsubmodules=False):
     argument function that takes a documentation object and returns
     True of False. If False, that object will not be included in the
     output.
-
-    If `allsubmodules` is `True`, then every submodule of this module
-    that can be found will be included in the documentation, regardless
-    of whether `__all__` contains it.
     """
-    mod = Module(
-        import_module(module_name), docfilter=docfilter, allsubmodules=allsubmodules
-    )
+    mod = Module(import_module(module_name), docfilter=docfilter)
     return mod.text()
 
 
@@ -520,7 +507,7 @@ class Module(Doc):
         it was imported. It is always an absolute import path.
         """
 
-    def __init__(self, module, docfilter=None, allsubmodules=False, supermodule=None):
+    def __init__(self, module, docfilter=None, supermodule=None):
         """
         Creates a `Module` documentation object given the actual
         module Python object.
@@ -531,17 +518,12 @@ class Module(Doc):
         `pdoc.Module.variables` and `pdoc.Module.submodules`. The
         filter is propagated to the analogous methods on a `pdoc.Class`
         object.
-
-        If `allsubmodules` is `True`, then every submodule of this
-        module that can be found will be included in the
-        documentation, regardless of whether `__all__` contains it.
         """
         name = getattr(module, "__pdoc_module_name", module.__name__)
         super(Module, self).__init__(name, module, inspect.getdoc(module))
 
         self._filtering = docfilter is not None
         self._docfilter = (lambda _: True) if docfilter is None else docfilter
-        self._allsubmodules = allsubmodules
         self.supermodule = supermodule
 
         self.doc = {}
@@ -596,9 +578,8 @@ class Module(Doc):
                 if root in self.doc:
                     continue
 
-                # Ignore if it isn't exported, unless we've specifically
-                # requested to document all submodules.
-                if not self._allsubmodules and not self.__is_exported(root, self.module):
+                # Ignore if it isn't exported
+                if not self.__is_exported(root, self.module):
                     continue
 
                 fullname = "%s.%s" % (self.name, root)
@@ -876,7 +857,6 @@ class Module(Doc):
         return Module(
             obj,
             docfilter=self._docfilter,
-            allsubmodules=self._allsubmodules,
             supermodule=self,
         )
 

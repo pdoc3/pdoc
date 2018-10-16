@@ -73,12 +73,6 @@ aa(
     help="Overwrites any existing HTML files instead of producing an error.",
 )
 aa(
-    "--all-submodules",
-    action="store_true",
-    help="When set, every submodule will be included, regardless of whether "
-    "__all__ is set and contains the submodule.",
-)
-aa(
     "--external-links",
     action="store_true",
     help="When set, identifiers to external modules are turned into links. "
@@ -419,8 +413,6 @@ def process_html_out(impath):
     ]
     if args.external_links:
         cmd.append("--external-links")
-    if args.all_submodules:
-        cmd.append("--all-submodules")
     if args.only_pypath:
         cmd.append("--only-pypath")
     if args.html_no_source:
@@ -493,7 +485,7 @@ def main(_args=None):
     sys.path.append(os.getcwd())
 
     modules = [pdoc.Module(import_module(module),
-                           docfilter=docfilter, allsubmodules=args.all_submodules)
+                           docfilter=docfilter)
                for module in args.modules]
 
     for module in modules:
