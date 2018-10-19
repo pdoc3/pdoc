@@ -477,8 +477,7 @@ def main(_args=None):
     if args.filter and args.filter.strip():
         def docfilter(obj, _filters=args.filter.strip().split(',')):
             return any(f in obj.refname or
-                       isinstance(obj, pdoc.Class) and (f in obj.doc or
-                                                        f in obj.doc_init)
+                       isinstance(obj, pdoc.Class) and f in obj.doc
                        for f in _filters)
 
     # Support loading modules specified as python paths relative to cwd

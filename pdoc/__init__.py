@@ -188,6 +188,9 @@ import os.path as path
 import pkgutil
 import re
 import sys
+from copy import copy
+from itertools import tee
+from warnings import warn
 
 from mako.lookup import TemplateLookup
 from mako.exceptions import TopLevelLookupException
@@ -326,12 +329,26 @@ def import_module(module: str):
         module_name = path.splitdrive(module_name)[1]
     module_name = module_name.replace(path.sep, '.')
 
-    spec = importlib.util.spec_from_file_location(module_name, filename)
+    spec = importlib.util.spec_from_file_location(module_name, path.abspath(filename))
     module = importlib.util.module_from_spec(spec)
     try:
         module.__loader__.exec_module(module)
     except Exception as e:
         raise ImportError('Error importing {!r}: {}'.format(filename, e))
+
+    # For some reason, `importlib.util.module_from_spec` doesn't add
+    # the module into `sys.modules`, and this later fails when
+    # `inspect.getsource` tries to retrieve the module in AST parsing
+    try:
+        if sys.modules[module_name].__file__ != module.__file__:
+            warn("Module {!r} in sys.modules loaded from {!r}. "
+                 "Now reloaded from {!r}.".format(module_name,
+                                                  sys.modules[module_name].__file__,
+                                                  module.__file__))
+    except KeyError:  # Module not yet in sys.modules
+        pass
+    sys.modules[module_name] = module
+
     return module
 
 
@@ -367,45 +384,105 @@ def _get_tpl(name):
     return t
 
 
-def _var_docstrings(tree, module, cls=None, init=False):
-    """
-    Extracts variable docstrings given `tree` as the abstract syntax,
-    `module` as a `pdoc.Module` containing `tree` and an option `cls`
-    as a `pdoc.Class` corresponding to the tree. In particular, `cls`
-    should be specified when extracting docstrings from a class or an
-    `__init__` method. Finally, `init` should be `True` when searching
-    the AST of an `__init__` method so that `_var_docstrings` will only
-    accept variables starting with `self.` as instance variables.
+def _pairwise(iterable):
+    """s -> (s0,s1), (s1,s2), (s2, s3), ..."""
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)
 
-    A dictionary mapping variable name to a `pdoc.Variable` object is
-    returned.
+
+def _var_docstrings(doc_obj: 'Doc', *, _init_tree: ast.AST = None) -> dict:
     """
+    Extracts docstrings for variables of `doc_obj`
+    (either a `pdoc.Module` or `pdoc.Class`).
+
+    Returns a dict mapping variable names to `pdoc.Variable` objects.
+
+    For `pdoc.Class` objects, the dict contains class' instance
+    variables (defined as `self.something` in class' `__init__`),
+    recognized by `Variable.instance_var == True`.
+    """
+    assert isinstance(doc_obj, (Module, Class))
+
+    if _init_tree:
+        tree = _init_tree
+    else:
+        try:
+            tree = ast.parse(inspect.getsource(doc_obj.obj))
+        except (OSError, TypeError, SyntaxError):
+            warn("Couldn't get/parse source of '{!r}'".format(doc_obj))
+            return {}
+        if isinstance(doc_obj, Class):
+            tree = tree.body[0]  # ast.parse creates a dummy ast.Module wrapper we don't need
+
     vs = {}
-    children = list(ast.iter_child_nodes(tree))
-    for i, child in enumerate(children):
-        if isinstance(child, ast.Assign) and len(child.targets) == 1:
-            if not init and isinstance(child.targets[0], ast.Name):
-                name = child.targets[0].id
-            elif (
-                isinstance(child.targets[0], ast.Attribute)
-                and isinstance(child.targets[0].value, ast.Name)
-                and child.targets[0].value.id == "self"
-            ):
-                name = child.targets[0].attr
-            else:
-                continue
-            if not _is_exported(name) and name not in getattr(module, "__all__", []):
-                continue
 
-            docstring = ""
-            if (
-                i + 1 < len(children)
-                and isinstance(children[i + 1], ast.Expr)
-                and isinstance(children[i + 1].value, ast.Str)
-            ):
-                docstring = children[i + 1].value.s
+    cls = None
+    module = doc_obj
+    module_all = getattr(module.obj, '__all__', None)
 
-            vs[name] = Variable(name, module, docstring, cls=cls)
+    if isinstance(doc_obj, Class):
+        cls = doc_obj
+        module = doc_obj.module
+        module_all = None  # If documenting a class, we needn't look into __all__
+
+        # For classes, first add instance variables defined in __init__
+        if not _init_tree:
+            try:
+                # Recursive call with just the __init__ tree
+                vs = _var_docstrings(
+                    doc_obj, _init_tree=next(
+                        node for node in tree.body
+                        if (isinstance(node, ast.FunctionDef) and
+                            node.name == '__init__')))
+            except StopIteration:
+                pass
+
+    if module_all is not None:
+        module_all = set(module_all)
+
+    try:
+        ast_AnnAssign = ast.AnnAssign
+    except AttributeError:  # Python < 3.6
+        ast_AnnAssign = type(None)
+    ast_Assignments = (ast.Assign, ast_AnnAssign)
+
+    for assign_node, str_node in _pairwise(ast.iter_child_nodes(tree)):
+        if not (isinstance(assign_node, ast_Assignments) and
+                isinstance(str_node, ast.Expr) and
+                isinstance(str_node.value, ast.Str)):
+            continue
+
+        if isinstance(assign_node, ast.Assign) and len(assign_node.targets) == 1:
+            target = assign_node.targets[0]
+        elif isinstance(assign_node, ast_AnnAssign):
+            target = assign_node.target
+            # TODO: use annotation
+        else:
+            continue
+
+        if not _init_tree and isinstance(target, ast.Name):
+            name = target.id
+        elif (_init_tree and
+              isinstance(target, ast.Attribute) and
+              isinstance(target.value, ast.Name) and
+              target.value.id == 'self'):
+            name = target.attr
+        else:
+            continue
+
+        if not _is_exported(name):
+            continue
+
+        if module_all is not None and name not in module_all:
+            continue
+
+        docstring = inspect.cleandoc(str_node.value.s).strip()
+        if not docstring:
+            continue
+
+        vs[name] = Variable(name, module, docstring,
+                            cls=cls, instance_var=bool(_init_tree))
     return vs
 
 
@@ -491,12 +568,6 @@ class Doc(object):
     def __lt__(self, other):
         return self.name < other.name
 
-    def is_empty(self):
-        """
-        Returns true if the docstring for this object is empty.
-        """
-        return len(self.docstring.strip()) == 0
-
 
 class Module(Doc):
     """
@@ -538,40 +609,29 @@ class Module(Doc):
         identifier names to documentation objects.
         """
 
-        vardocs = {}
-        try:
-            tree = ast.parse(inspect.getsource(self.module))
-            vardocs = _var_docstrings(tree, self, cls=None)
-        except:
-            pass
-        self._declared_variables = vardocs.keys()
+        # Populate self.doc with this module's public members
+        if hasattr(self.obj, '__all__'):
+            module_all = set(self.obj.__all__)
+            public_objs = [(name, inspect.unwrap(obj))
+                           for name, obj in inspect.getmembers(self.obj)
+                           if name in module_all]
+        else:
+            def is_from_this_module(obj):
+                mod = inspect.getmodule(obj)
+                return mod is None or mod.__name__ in self.obj.__name__
 
-        public = self.__public_objs()
-        for name, obj in public.items():
-            # Skip any identifiers that already have doco.
-            if name in self.doc and not self.doc[name].is_empty():
-                continue
+            public_objs = [(name, inspect.unwrap(obj))
+                           for name, obj in inspect.getmembers(self.obj)
+                           if (_is_exported(name) and
+                               is_from_this_module(obj))]
 
-            # Functions and some weird builtins?, plus methods, classes,
-            # modules and module level variables.
-            if inspect.isfunction(obj) or inspect.isbuiltin(obj):
-                self.doc[name] = Function(name, self, obj)
-            elif inspect.ismethod(obj):
+        for name, obj in public_objs:
+            if inspect.isroutine(obj):
                 self.doc[name] = Function(name, self, obj)
             elif inspect.isclass(obj):
                 self.doc[name] = Class(name, self, obj)
-            elif inspect.ismodule(obj):
-                # Only document modules that are submodules or are forcefully
-                # exported by __all__.
-                if obj is not self.module and (
-                    self.__is_exported(name, obj) or self.is_submodule(obj.__name__)
-                ):
-                    self.doc[name] = self.__new_submodule(name, obj)
-            elif name in vardocs:
-                self.doc[name] = vardocs[name]
-            else:
-                # Catch all for variables.
-                self.doc[name] = Variable(name, self, "", cls=None)
+
+        self.doc.update(_var_docstrings(self))
 
         # If the module is a package, scan the directory for submodules
         if self.is_package:
@@ -582,14 +642,13 @@ class Module(Doc):
                     continue
 
                 # Ignore if it isn't exported
-                if not self.__is_exported(root, self.module):
+                if not _is_exported(root):
                     continue
 
+                assert self.refname == self.name
                 fullname = "%s.%s" % (self.name, root)
                 m = import_module(fullname)
-                if m is None:
-                    continue
-                self.doc[root] = self.__new_submodule(root, m)
+                self.doc[root] = Module(m, docfilter=self._docfilter, supermodule=self)
 
         # Now see if we can grab inheritance relationships between classes.
         for docobj in self.doc.values():
@@ -808,61 +867,6 @@ class Module(Doc):
         """
         return self.name != name and name.startswith(self.name)
 
-    def __is_exported(self, name, module):
-        """
-        Returns `True` if and only if `pdoc` considers `name` to be
-        a public identifier for this module where `name` was defined
-        in the Python module `module`.
-
-        If this module has an `__all__` attribute, then `name` is
-        considered to be exported if and only if it is a member of
-        this module's `__all__` list.
-
-        If `__all__` is not set, then whether `name` is exported or
-        not is heuristically determined. Firstly, if `name` starts
-        with an underscore, it will not be considered exported.
-        Secondly, if `name` was defined in a module other than this
-        one, it will not be considered exported. In all other cases,
-        `name` will be considered exported.
-        """
-        if hasattr(self.module, "__all__"):
-            return name in self.module.__all__
-        if not _is_exported(name):
-            return False
-        if module is not None and self.module.__name__ != module.__name__:
-            return name in self._declared_variables
-        return True
-
-    def __public_objs(self):
-        """
-        Returns a dictionary mapping a public identifier name to a
-        Python object.
-        """
-        members = dict(inspect.getmembers(self.module))
-        return dict(
-            [
-                (name, obj)
-                for name, obj in members.items()
-                if self.__is_exported(name, inspect.getmodule(obj))
-            ]
-        )
-
-    def __new_submodule(self, name, obj):
-        """
-        Create a new submodule documentation object for this `obj`,
-        which must by a Python module object and pass along any
-        settings in this module.
-        """
-        # Forcefully set the module name so that it is always the absolute
-        # import path. We can't rely on `obj.__name__`, since it doesn't
-        # necessarily correspond to the public exported name of the module.
-        obj.__dict__["__pdoc_module_name"] = "%s.%s" % (self.refname, name)
-        return Module(
-            obj,
-            docfilter=self._docfilter,
-            supermodule=self,
-        )
-
 
 class Class(Doc):
     """
@@ -882,70 +886,77 @@ class Class(Doc):
         self.doc = {}
         """A mapping from identifier name to a `pdoc.Doc` objects."""
 
-        self.doc_init = {}
-        """
-        A special version of `pdoc.Class.doc` that contains
-        documentation for instance variables found in the `__init__`
-        method.
-        """
+        self.doc.update(_var_docstrings(self))
+        # TODO see if __init__ can be forced out with __pdoc__
 
-        public = self.__public_objs()
-        try:
-            # First try and find docstrings for class variables.
-            # Then move on to finding docstrings for instance variables.
-            # This must be optional, since not all modules have source
-            # code available.
-            cls_ast = ast.parse(inspect.getsource(self.cls)).body[0]
-            self.doc = _var_docstrings(cls_ast, self.module, cls=self)
+        def forced_out(name, _pdoc_overrides=getattr(self.module.obj, '__pdoc__', {}).get):
+            return _pdoc_overrides(self.name + '.' + name, False) is None
 
-            for n in cls_ast.body if "__init__" in public else []:
-                if isinstance(n, ast.FunctionDef) and n.name == "__init__":
-                    self.doc_init = _var_docstrings(n, self.module, cls=self, init=True)
-                    break
-        except:
-            pass
+        public_objs = [(name, inspect.unwrap(obj))
+                       for name, obj in inspect.getmembers(self.obj)
+                       # Filter only *own* members. The rest are inherited
+                       # in Class._fill_inheritance()
+                       if (name in self.obj.__dict__ and
+                           (_is_exported(name) or name == '__init__') and
+                           not forced_out(name))]
 
         # Convert the public Python objects to documentation objects.
-        for name, obj in public.items():
-            # Skip any identifiers that already have doco.
-            if name in self.doc and not self.doc[name].is_empty():
+        for name, obj in public_objs:
+            if name in self.doc and self.doc[name].docstring:
                 continue
-            if name in self.doc_init:
-                # Let instance members override class members.
-                continue
-
-            if inspect.ismethod(obj):
+            if inspect.ismethod(obj) or inspect.isfunction(obj):
                 self.doc[name] = Function(
-                    name, self.module, obj.__func__, cls=self, method=True
-                )
-            elif inspect.isfunction(obj):
-                self.doc[name] = Function(
-                    name, self.module, obj, cls=self, method=False
-                )
-            elif isinstance(obj, property):
-                docstring = getattr(obj, "__doc__", "")
-                self.doc_init[name] = Variable(name, self.module, docstring, cls=self)
-            elif not inspect.isbuiltin(obj) and not inspect.isroutine(obj):
-                if name in getattr(self.cls, "__slots__", []):
-                    self.doc_init[name] = Variable(name, self.module, "", cls=self)
-                else:
-                    self.doc[name] = Variable(name, self.module, "", cls=self)
+                    name, self.module, obj, cls=self,
+                    method=not self._method_type(self.obj, name))
+            elif (inspect.isdatadescriptor(obj) or
+                  inspect.isgetsetdescriptor(obj) or
+                  inspect.ismemberdescriptor(obj)):
+                self.doc[name] = Variable(
+                    name, self.module, inspect.getdoc(obj),
+                    obj=getattr(obj, 'fget', obj),
+                    cls=self, instance_var=True)
+            elif not inspect.isroutine(obj):
+                self.doc[name] = Variable(
+                    name, self.module,
+                    docstring=isinstance(obj, type) and inspect.getdoc(obj) or "",
+                    cls=self,
+                    instance_var=name in getattr(self.obj, "__slots__", ()))
 
-    @property
-    def source(self):
-        return _source(self.cls)
+    @staticmethod
+    def _method_type(cls: type, name: str):
+        """
+        Returns `None` if the method `name` of class `cls`
+        is a regular method. Otherwise, it returns
+        `classmethod` or `staticmethod`, as appropriate.
+        """
+        func = getattr(cls, name, None)
+        if inspect.ismethod(func):
+            # If the function is already bound, it's a classmethod.
+            # Regular methods are not bound before initialization.
+            return classmethod
+        for c in inspect.getmro(cls):
+            if name in c.__dict__:
+                if isinstance(c.__dict__[name], staticmethod):
+                    return staticmethod
+                return None
+        raise RuntimeError("{}.{} not found".format(cls, name))
 
     @property
     def refname(self):
         return "%s.%s" % (self.module.refname, self.cls.__name__)
+
+    def _filter_doc_objs(self, filter_func=lambda x: True):
+        return sorted(obj for obj in self.doc.values()
+                      if filter_func(obj) and
+                         self.module._docfilter(obj))  # TODO check if this needed
 
     def class_variables(self):
         """
         Returns all documented class variables in the class, sorted
         alphabetically as a list of `pdoc.Variable`.
         """
-        p = lambda o: isinstance(o, Variable) and self.module._docfilter(o)
-        return sorted(filter(p, self.doc.values()))
+        return self._filter_doc_objs(
+            lambda var: isinstance(var, Variable) and not var.instance_var)
 
     def instance_variables(self):
         """
@@ -954,8 +965,8 @@ class Class(Doc):
         are attributes of `self` defined in a class's `__init__`
         method.
         """
-        p = lambda o: isinstance(o, Variable) and self.module._docfilter(o)
-        return sorted(filter(p, self.doc_init.values()))
+        return self._filter_doc_objs(
+            lambda var: isinstance(var, Variable) and var.instance_var)
 
     def methods(self):
         """
@@ -993,46 +1004,21 @@ class Class(Doc):
         variables are only discoverable by traversing the abstract
         syntax tree.
         """
-        mro = [c for c in self.module.mro(self) if c != self and isinstance(c, Class)]
+        mro = [c for c in self.module.mro(self) if isinstance(c, Class)]
 
-        def search(d, fdoc):
-            for c in mro:
-                doc = fdoc(c)
-                if d.name in doc and isinstance(d, type(doc[d.name])):
-                    return doc[d.name]
-            return None
-
-        for fdoc in (lambda c: c.doc_init, lambda c: c.doc):
-            for d in fdoc(self).values():
-                dinherit = search(d, fdoc)
-                if dinherit is not None:
-                    d.inherits = dinherit
-
-        # Since instance variables aren't part of a class's members,
-        # we need to manually deduce inheritance. Oh lawdy.
-        for c in mro:
-            for name in filter(lambda n: n not in self.doc_init, c.doc_init):
-                d = c.doc_init[name]
-                self.doc_init[name] = Variable(d.name, d.module, "", cls=self)
-                self.doc_init[name].inherits = d
-
-    def __public_objs(self):
-        """
-        Returns a dictionary mapping a public identifier name to a
-        Python object. This counts the `__init__` method as being
-        public.
-        """
-        _pdoc = getattr(self.module.module, "__pdoc__", {})
-
-        def forced_out(name):
-            return _pdoc.get("%s.%s" % (self.name, name), False) is None
-
-        def exported(name):
-            exported = name == "__init__" or _is_exported(name)
-            return not forced_out(name) and exported
-
-        idents = dict(inspect.getmembers(self.cls))
-        return dict([(n, o) for n, o in idents.items() if exported(n)])
+        super_members = {}
+        for cls in mro:
+            for name, dobj in cls.doc.items():
+                if name not in super_members and dobj.docstring:
+                    super_members[name] = dobj
+        for name, parent_dobj in super_members.items():
+            if name not in self.doc:
+                self.doc[name] = copy(parent_dobj)
+            dobj = self.doc[name]
+            if (dobj.obj is parent_dobj.obj or
+                    not dobj.docstring or
+                    dobj.docstring == parent_dobj.docstring):
+                dobj.inherits = parent_dobj
 
 
 class Function(Doc):
@@ -1176,18 +1162,24 @@ class Variable(Doc):
     module, class and instance variables.
     """
 
-    def __init__(self, name, module, docstring, cls=None):
+    def __init__(self, name, module, docstring, *, obj=None, cls=None, instance_var=False):
         """
         Same as `pdoc.Doc.__init__`, except `cls` should be provided
         as a `pdoc.Class` object when this is a class or instance
         variable.
         """
-        super(Variable, self).__init__(name, module, None, docstring)
+        super(Variable, self).__init__(name, module, obj, docstring)
 
         self.cls = cls
         """
         The `podc.Class` object if this is a class or instance
         variable. If not, this is None.
+        """
+
+        self.instance_var = instance_var
+        """
+        True if variable is some class' instance variable (as
+        opposed to class variable).
         """
 
     @property
