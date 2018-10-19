@@ -541,6 +541,9 @@ class Doc(object):
         The cleaned docstring for this object.
         """
 
+    def __repr__(self):
+        return '<{} {!r}>'.format(self.__class__.__name__, self.refname)
+
     @property
     def source(self):
         """

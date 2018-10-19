@@ -302,6 +302,7 @@ class ApiTest(unittest.TestCase):
             for module, (name_suffix, submodules) in modules.items():
                 with self.subTest(module=module):
                     m = pdoc.Module(pdoc.import_module(module))
+                    self.assertEqual(repr(m), "<Module '{}'>".format(m.obj.__name__))
                     self.assertEqual(m.name, EXAMPLE_MODULE + name_suffix)
                     self.assertEqual(sorted(m.name for m in m.submodules()),
                                      [EXAMPLE_MODULE + '.' + m for m in submodules])
