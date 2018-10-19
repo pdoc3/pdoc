@@ -437,7 +437,7 @@ class Doc(object):
     a class's ancestor list.)
     """
 
-    def __init__(self, name, module, docstring):
+    def __init__(self, name, module, obj, docstring=None):
         """
         Initializes a documentation object, where `name` is the public
         identifier name, `module` is a `pdoc.Module` object, and
@@ -454,10 +454,14 @@ class Doc(object):
         The identifier name for this object.
         """
 
-        self.docstring = inspect.cleandoc(docstring or "")
+        self.obj = obj
         """
-        The docstring for this object. It has already been cleaned
-        by `inspect.cleandoc`.
+        The raw python object.
+        """
+
+        self.docstring = (docstring or inspect.getdoc(obj) or '').strip()
+        """
+        The cleaned docstring for this object.
         """
 
     @property
@@ -519,8 +523,7 @@ class Module(Doc):
         filter is propagated to the analogous methods on a `pdoc.Class`
         object.
         """
-        name = getattr(module, "__pdoc_module_name", module.__name__)
-        super(Module, self).__init__(name, module, inspect.getdoc(module))
+        super(Module, self).__init__(module.__name__, module, module)
 
         self._filtering = docfilter is not None
         self._docfilter = (lambda _: True) if docfilter is None else docfilter
@@ -871,7 +874,7 @@ class Class(Doc):
         Same as `pdoc.Doc.__init__`, except `class_obj` must be a
         Python class object. The docstring is gathered automatically.
         """
-        super(Class, self).__init__(name, module, inspect.getdoc(class_obj))
+        super(Class, self).__init__(name, module, class_obj)
 
         self.cls = class_obj
         """The class Python object."""
@@ -1048,7 +1051,7 @@ class Function(Doc):
         `method` should be `True` when the function is a method. In
         all other cases, it should be `False`.
         """
-        super(Function, self).__init__(name, module, inspect.getdoc(func_obj))
+        super(Function, self).__init__(name, module, func_obj)
 
         self.func = func_obj
         """The Python function object."""
@@ -1179,7 +1182,7 @@ class Variable(Doc):
         as a `pdoc.Class` object when this is a class or instance
         variable.
         """
-        super(Variable, self).__init__(name, module, docstring)
+        super(Variable, self).__init__(name, module, None, docstring)
 
         self.cls = cls
         """
@@ -1235,7 +1238,7 @@ class External(Doc):
         Initializes an external identifier with `name`, where `name`
         should be a fully qualified name.
         """
-        super(External, self).__init__(name, None, "")
+        super(External, self).__init__(name, None, None)
 
     @property
     def source(self):
