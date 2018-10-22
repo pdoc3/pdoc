@@ -219,24 +219,41 @@ found in `import_path` will not be imported. By default, it is set to a
 copy of `sys.path` at initialization.
 """
 
-_template_path = [path.join(path.dirname(__file__), "templates")]
-"""
-A list of paths to search for Mako templates used to produce the
-plain text and HTML output. Each path is tried until a template is
-found.
-"""
-if os.getenv("XDG_CONFIG_HOME"):
-    _template_path.insert(0, path.join(os.getenv("XDG_CONFIG_HOME"), "pdoc"))
-
 __pdoc__ = {}
+
 tpl_lookup = TemplateLookup(
-    directories=_template_path, cache_args={"cached": True, "cache_type": "memory"}
+    cache_args=dict(cached=True,
+                    cache_type='memory'),
+    directories=[path.join(path.dirname(__file__), "templates")],
 )
 """
 A `mako.lookup.TemplateLookup` object that knows how to load templates
 from the file system. You may add additional paths by modifying the
 object's `directories` attribute.
 """
+if os.getenv("XDG_CONFIG_HOME"):
+    tpl_lookup.directories.insert(0, path.join(os.getenv("XDG_CONFIG_HOME"), "pdoc"))
+
+
+def _render_template(template_name, **kwargs):
+    """
+    Returns the Mako template with the given name.  If the template
+    cannot be found, a nicer error message is displayed.
+    """
+    try:
+        t = tpl_lookup.get_template(template_name)
+    except TopLevelLookupException:
+        raise OSError(
+            "No template found at any of: {}".format(
+                ', '.join(path.join(p, template_name.lstrip("/"))
+                          for p in tpl_lookup.directories)))
+    try:
+        return t.render(**kwargs).strip()
+    except Exception:
+        from mako import exceptions
+        print(exceptions.text_error_template().render(),
+              file=sys.stderr)
+        raise
 
 
 def html(
@@ -245,7 +262,8 @@ def html(
     external_links=False,
     link_prefix="",
     source=True,
-):
+    **kwargs
+) -> str:
     """
     Returns the documentation for the module `module_name` in HTML
     format. The module must be importable.
@@ -267,12 +285,13 @@ def html(
     decrease performance when documenting large modules.
     """
     mod = Module(import_module(module_name), docfilter=docfilter)
-    return mod.html(
-        external_links=external_links, link_prefix=link_prefix, source=source
-    )
+    return mod.html(external_links=external_links,
+                    link_prefix=link_prefix,
+                    source=source,
+                    **kwargs)
 
 
-def text(module_name, docfilter=None):
+def text(module_name, docfilter=None, **kwargs) -> str:
     """
     Returns the documentation for the module `module_name` in plain
     text format. The module must be importable.
@@ -284,7 +303,7 @@ def text(module_name, docfilter=None):
     output.
     """
     mod = Module(import_module(module_name), docfilter=docfilter)
-    return mod.text()
+    return mod.text(**kwargs)
 
 
 def import_module(module: str):
@@ -369,19 +388,6 @@ def _source(obj):
         return inspect.getsourcelines(obj)[0]
     except:
         return []
-
-
-def _get_tpl(name):
-    """
-    Returns the Mako template with the given name.  If the template
-    cannot be found, a nicer error message is displayed.
-    """
-    try:
-        t = tpl_lookup.get_template(name)
-    except TopLevelLookupException:
-        locs = [path.join(p, name.lstrip("/")) for p in _template_path]
-        raise IOError(2, "No template at any of: %s" % ", ".join(locs))
-    return t
 
 
 def _pairwise(iterable):
@@ -685,13 +691,12 @@ class Module(Doc):
             assert isinstance(docstring, str), (type(docstring), docstring)
             dobj.docstring = inspect.cleandoc(docstring)
 
-    def text(self):
+    def text(self, **kwargs):
         """
         Returns the documentation for this module as plain text.
         """
-        t = _get_tpl("/text.mako")
-        text, _ = re.subn("\n\n\n+", "\n\n", t.render(module=self).strip())
-        return text
+        txt = _render_template('/text.mako', module=self, **kwargs)
+        return re.sub("\n\n\n+", "\n\n", txt)
 
     def html(self, external_links=False, link_prefix="", source=True, **kwargs):
         """
@@ -710,15 +715,12 @@ class Module(Doc):
 
         `kwargs` is passed to the `mako` render function.
         """
-        t = _get_tpl("/html.mako")
-        t = t.render(
-            module=self,
-            external_links=external_links,
-            link_prefix=link_prefix,
-            show_source_code=source,
-            **kwargs
-        )
-        return t.strip()
+        return _render_template('/html.mako',
+                                module=self,
+                                external_links=external_links,
+                                link_prefix=link_prefix,
+                                show_source_code=source,
+                                **kwargs)
 
     @property
     def is_package(self):

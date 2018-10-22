@@ -483,11 +483,10 @@ def main(_args=None):
     # Support loading modules specified as python paths relative to cwd
     sys.path.append(os.getcwd())
 
-    modules = [pdoc.Module(import_module(module),
-                           docfilter=docfilter)
-               for module in args.modules]
-
-    for module in modules:
+    for module in args.modules:
+        module = pdoc.Module(import_module(module),
+                             docfilter=docfilter,
+                             allsubmodules=args.all_submodules)
         if args.html:
             quit_if_exists(module)
             html_out(module, args.html)
