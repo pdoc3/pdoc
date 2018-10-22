@@ -167,36 +167,30 @@
   % if show_source_code and d.source is not None and len(d.source) > 0:
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('${sourceid(d)}', this);">Show source &equiv;</a></p>
   <div id="${sourceid(d)}" class="source">
-    ${decode(clean_source_lines(d.source))}
+    ${decode(clean_source_lines(d.source.split('\n')))}
   </div>
   % endif
 </%def>
 
 <%def name="show_desc(d, limit=None)">
   <%
-  inherits = (hasattr(d, 'inherits')
-           and (len(d.docstring) == 0
-            or d.docstring == d.inherits.docstring))
+  inherits = (' inherited'
+              if d.inherits and (not d.docstring or d.docstring == d.inherits.docstring) else
+              '')
   docstring = (d.inherits.docstring if inherits else d.docstring).strip()
   if limit is not None:
     docstring = glimpse(docstring, limit)
   %>
-  % if len(docstring) > 0:
-  % if inherits:
-    <div class="desc inherited">${docstring | mark}</div>
-  % else:
-    <div class="desc">${docstring | mark}</div>
-  % endif
-  % endif
+  <div class="desc${inherits}">${docstring | mark}</div>
   % if not isinstance(d, pdoc.Module):
   <div class="source_cont">${show_source(d)}</div>
   % endif
 </%def>
 
 <%def name="show_inheritance(d)">
-  % if hasattr(d, 'inherits'):
+  % if d.inherits:
     <p class="inheritance">
-     <strong>Inheritance:</strong>
+     <strong>Inherited from:</strong>
      % if hasattr(d.inherits, 'cls'):
        <code>${link(d.inherits.cls.refname)}</code>.<code>${link(d.inherits.refname)}</code>
      % else:
@@ -246,7 +240,7 @@
   <%def name="show_func(f)">
   <div class="item">
     <div class="name def" id="${f.refname}">
-    <p>${f.funcdef()} ${ident(f.name)}(</p><p>${f.spec() | h})</p>
+    <p>${f.funcdef()} ${ident(f.name)}(</p><p>${", ".join(f.params()) | h})</p>
     </div>
     ${show_inheritance(f)}
     ${show_desc(f)}
@@ -296,7 +290,7 @@
       smethods = c.functions()
       inst_vars = c.instance_variables()
       methods = c.methods()
-      mro = c.module.mro(c)
+      mro = c.mro()
       %>
       <div class="item">
       <p id="${c.refname}" class="name">class ${ident(c.name)}</p>

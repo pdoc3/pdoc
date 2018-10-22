@@ -19,6 +19,12 @@ class A:
     def overridden(self):
         """A.overridden docstring"""
 
+    def overridden_same_docstring(self):
+        """A.overridden_same_docstring docstring"""
+
+    def inherited(self):  # Inherited in B
+        """A.inherited docstring"""
+
 
 class B(A, int):
     """
@@ -80,6 +86,9 @@ class B(A, int):
 
     assert overridden.__doc__ is None
     __pdoc__['B.overridden'] = 'B.overridden docstring'
+
+    def overridden_same_docstring(self):
+        pass
 
 
 class Hidden:

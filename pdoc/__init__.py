@@ -179,7 +179,6 @@ License
 
 [AGPL-3.0]: https://www.gnu.org/licenses/agpl-3.0.html
 """
-from __future__ import absolute_import, division, print_function
 import ast
 import importlib.util
 import inspect
@@ -189,7 +188,7 @@ import pkgutil
 import re
 import sys
 from copy import copy
-from itertools import tee
+from itertools import chain, tee
 from warnings import warn
 
 from mako.lookup import TemplateLookup
@@ -371,25 +370,6 @@ def import_module(module: str):
     return module
 
 
-def _source(obj):
-    """
-    Returns the source code of the Python object `obj` as a list of
-    lines. This tries to extract the source from the special
-    `__wrapped__` attribute if it exists. Otherwise, it falls back
-    to `inspect.getsourcelines`.
-
-    If neither works, then the empty list is returned.
-    """
-    try:
-        return inspect.getsourcelines(obj.__wrapped__)[0]
-    except:
-        pass
-    try:
-        return inspect.getsourcelines(obj)[0]
-    except:
-        return []
-
-
 def _pairwise(iterable):
     """s -> (s0,s1), (s1,s2), (s2, s3), ..."""
     a, b = tee(iterable)
@@ -477,7 +457,7 @@ def _var_docstrings(doc_obj: 'Doc', *, _init_tree: ast.AST = None) -> dict:
         else:
             continue
 
-        if not _is_exported(name):
+        if not _is_public(name):
             continue
 
         if module_all is not None and name not in module_all:
@@ -492,7 +472,7 @@ def _var_docstrings(doc_obj: 'Doc', *, _init_tree: ast.AST = None) -> dict:
     return vs
 
 
-def _is_exported(ident_name):
+def _is_public(ident_name):
     """
     Returns `True` if `ident_name` matches the export criteria for an
     identifier name.
@@ -503,7 +483,7 @@ def _is_exported(ident_name):
     return not ident_name.startswith("_")
 
 
-class Doc(object):
+class Doc:
     """
     A base class for all documentation objects.
 
@@ -528,8 +508,7 @@ class Doc(object):
         """
         self.module = module
         """
-        The module documentation object that this object was defined
-        in.
+        The module documentation object that this object is defined in.
         """
 
         self.name = name
@@ -547,32 +526,45 @@ class Doc(object):
         The cleaned docstring for this object.
         """
 
+        self.inherits = None  # type: Union[Class, Function, Variable]
+        """
+        The Doc object (Class, Function, or Variable) this object inherits from,
+        if any.
+        """
+
     def __repr__(self):
         return '<{} {!r}>'.format(self.__class__.__name__, self.refname)
 
     @property
     def source(self):
         """
-        Returns the source code of the Python object `obj` as a list of
-        lines. This tries to extract the source from the special
-        `__wrapped__` attribute if it exists. Otherwise, it falls back
-        to `inspect.getsourcelines`.
-
-        If neither works, then the empty list is returned.
+        Cleaned (dedented) source code of the Python object. If not
+        available, an empty string.
         """
-        assert False, "subclass responsibility"
+        try:
+            lines, _ = inspect.getsourcelines(self.obj)
+        except (ValueError, TypeError, OSError):
+            return ''
+        return inspect.cleandoc(''.join(['\n'] + lines))
 
     @property
     def refname(self):
         """
-        Returns an appropriate reference name for this documentation
-        object. Usually this is its fully qualified path. Every
-        documentation object must provide this property.
-
-        e.g., The refname for this property is
-        <code>pdoc.Doc.refname</code>.
+        Reference name of this documentation
+        object, usually its fully qualified path
+        (e.g. <code>pdoc.Doc.refname</code>). Every
+        documentation object provides this property.
         """
-        assert False, "subclass responsibility"
+        # Ok for Module and External, the rest need it overriden
+        return self.name
+
+    @property
+    def qualname(self):
+        """
+        Module-relative "qualified" name of this documentation
+        object, used for show (e.g. <code>Doc.qualname</code>).
+        """
+        return getattr(self.obj, '__qualname__', self.name)
 
     def __lt__(self, other):
         return self.name < other.name
@@ -603,11 +595,11 @@ class Module(Doc):
         filter is propagated to the analogous methods on a `pdoc.Class`
         object.
         """
-        super(Module, self).__init__(module.__name__, module, module)
+        super().__init__(module.__name__, self, module)
 
-        self._filtering = docfilter is not None
-        self._docfilter = (lambda _: True) if docfilter is None else docfilter
+        self._docfilter = docfilter or (lambda _: True)
         self.supermodule = supermodule
+        self._submodules = []
 
         self.doc = {}
         """A mapping from identifier name to a documentation object."""
@@ -631,7 +623,7 @@ class Module(Doc):
 
             public_objs = [(name, inspect.unwrap(obj))
                            for name, obj in inspect.getmembers(self.obj)
-                           if (_is_exported(name) and
+                           if (_is_public(name) and
                                is_from_this_module(obj))]
 
         for name, obj in public_objs:
@@ -644,41 +636,42 @@ class Module(Doc):
 
         # If the module is a package, scan the directory for submodules
         if self.is_package:
-            loc = getattr(self.module, "__path__", [path.dirname(self.module.__file__)])
+            loc = getattr(self.module, "__path__", [path.dirname(self.obj.__file__)])
             for _, root, _ in pkgutil.iter_modules(loc):
                 # Ignore if this module was already doc'd.
                 if root in self.doc:
                     continue
 
                 # Ignore if it isn't exported
-                if not _is_exported(root):
+                if not _is_public(root):
                     continue
 
                 assert self.refname == self.name
                 fullname = "%s.%s" % (self.name, root)
                 m = import_module(fullname)
-                self.doc[root] = Module(m, docfilter=self._docfilter, supermodule=self)
+
+                submodule = Module(m, docfilter=self._docfilter, supermodule=self)
+                self._submodules.append(submodule)
+                self.doc[root] = submodule
+            self._submodules.sort()
 
         # Now see if we can grab inheritance relationships between classes.
         for docobj in self.doc.values():
             if isinstance(docobj, Class):
                 docobj._fill_inheritance()
 
-        # Build the reference name dictionary.
-        for basename, docobj in self.doc.items():
+        # Build the reference name dictionary of the module
+        for docobj in self.doc.values():
             self.refdoc[docobj.refname] = docobj
             if isinstance(docobj, Class):
-                for v in docobj.class_variables():
-                    self.refdoc[v.refname] = v
-                for v in docobj.instance_variables():
-                    self.refdoc[v.refname] = v
-                for f in docobj.methods():
-                    self.refdoc[f.refname] = f
-                for f in docobj.functions():
-                    self.refdoc[f.refname] = f
+                self.refdoc.update((obj.refname, obj)
+                                   for obj in chain(docobj.class_variables(),
+                                                    docobj.instance_variables(),
+                                                    docobj.methods(),
+                                                    docobj.functions()))
 
         # Finally look for more docstrings in the __pdoc__ override.
-        for name, docstring in getattr(self.module, "__pdoc__", {}).items():
+        for name, docstring in getattr(self.obj, "__pdoc__", {}).items():
             refname = "%s.%s" % (self.refname, name)
             if docstring is None:
                 self.doc.pop(name, None)
@@ -729,79 +722,27 @@ class Module(Doc):
 
         Works by checking whether the module has a `__path__` attribute.
         """
-        return hasattr(self.module, "__path__")
+        return hasattr(self.obj, "__path__")
 
-    @property
-    def source(self):
-        return _source(self.module)
-
-    @property
-    def refname(self):
-        return self.name
-
-    def mro(self, cls):
-        """
-        Returns a method resolution list of ancestor documentation objects
-        for `cls`, which must be a documentation object.
-
-        The list will contain objects belonging to `pdoc.Class` or
-        `pdoc.External`. Objects belonging to the former are exported
-        classes either in this module or in one of its sub-modules.
-        """
-        return [
-            self.find_class(c)
-            for c in inspect.getmro(cls.cls)
-            if c not in (cls.cls, object)
-        ]
-
-    def descendents(self, cls):
-        """
-        Returns a descendent list of documentation objects for `cls`,
-        which must be a documentation object.
-
-        The list will contain objects belonging to `pdoc.Class` or
-        `pdoc.External`. Objects belonging to the former are exported
-        classes either in this module or in one of its sub-modules.
-        """
-        if cls.cls == type or not hasattr(cls.cls, "__subclasses__"):
-            # Is this right?
-            return []
-
-        downs = cls.cls.__subclasses__()
-        return list(map(lambda c: self.find_class(c), downs))
-
-    def is_public(self, name):
-        """
-        Returns `True` if and only if an identifier with name `name` is
-        part of the public interface of this module. While the names
-        of sub-modules are included, identifiers only exported by
-        sub-modules are not checked.
-
-        `name` should be a fully qualified name, e.g.,
-        <code>pdoc.Module.is_public</code>.
-        """
-        return name in self.refdoc
-
-    def find_class(self, cls):
+    def find_class(self, cls: type):
         """
         Given a Python `cls` object, try to find it in this module
         or in any of the exported identifiers of the submodules.
         """
         for doc_cls in self.classes():
-            if cls is doc_cls.cls:
+            if cls is doc_cls.obj:
                 return doc_cls
         for module in self.submodules():
             doc_cls = module.find_class(cls)
             if not isinstance(doc_cls, External):
                 return doc_cls
-        return External("%s.%s" % (cls.__module__, cls.__name__))
+        return External("%s.%s" % (cls.__module__, cls.__qualname__))
 
-    def find_ident(self, name, _seen=None):
+    def find_ident(self, name: str):
         """
-        Searches this module and **all** of its sub/super-modules for an
-        identifier with name `name` in its list of exported
-        identifiers according to `pdoc`. Note that unexported
-        sub-modules are searched.
+        Searches this module and **all** of its public sub/super-modules
+        for an identifier with name `name` in its list of exported
+        identifiers according to `pdoc`.
 
         A bare identifier (without `.` separators) will only be checked
         for in this module.
@@ -810,67 +751,62 @@ class Module(Doc):
         returned. If one cannot be found, then an instance of
         `External` is returned populated with the given identifier.
         """
-        _seen = _seen or set()
-        if self in _seen:
-            return None
-        _seen.add(self)
+        # Without dot only look in the current module
+        if '.' not in name:
+            return self.doc.get(name) or External(name)
 
-        if name == self.refname:
-            return self
-        if name in self.refdoc:
-            return self.refdoc[name]
-        for module in self.submodules():
-            o = module.find_ident(name, _seen=_seen)
-            if not isinstance(o, (External, type(None))):
-                return o
-        # Traverse also up-level super-modules
+        for module in chain((self,),
+                            self._submodules_recursive(),
+                            self._supermodules_recursive()):
+            if name == module.refname:
+                return module
+            if name in module.refdoc:
+                return module.refdoc[name]
+
+        return External(name)
+
+    def _submodules_recursive(self):
+        yield from self._submodules
+        for module in self._submodules:
+            yield from module._submodules_recursive()
+
+    def _supermodules_recursive(self):
         module = self.supermodule
         while module is not None:
-            o = module.find_ident(name, _seen=_seen)
-            if not isinstance(o, (External, type(None))):
-                return o
+            yield module
             module = module.supermodule
-        return External(name)
+
+    def _filter_doc_objs(self, type: type = Doc):
+        return sorted(obj for obj in self.doc.values()
+                      if isinstance(obj, type) and self._docfilter(obj))
 
     def variables(self):
         """
         Returns all documented module level variables in the module
         sorted alphabetically as a list of `pdoc.Variable`.
         """
-        p = lambda o: isinstance(o, Variable) and self._docfilter(o)
-        return sorted(filter(p, self.doc.values()))
+        return self._filter_doc_objs(Variable)
 
     def classes(self):
         """
         Returns all documented module level classes in the module
         sorted alphabetically as a list of `pdoc.Class`.
         """
-        p = lambda o: isinstance(o, Class) and self._docfilter(o)
-        return sorted(filter(p, self.doc.values()))
+        return self._filter_doc_objs(Class)
 
     def functions(self):
         """
         Returns all documented module level functions in the module
         sorted alphabetically as a list of `pdoc.Function`.
         """
-        p = lambda o: isinstance(o, Function) and self._docfilter(o)
-        return sorted(filter(p, self.doc.values()))
+        return self._filter_doc_objs(Function)
 
     def submodules(self):
         """
         Returns all documented sub-modules in the module sorted
         alphabetically as a list of `pdoc.Module`.
         """
-        p = lambda o: isinstance(o, Module) and self._docfilter(o)
-        return sorted(filter(p, self.doc.values()))
-
-    def is_submodule(self, name):
-        """
-        Returns `True` if and only if `name` starts with the full
-        import path of `self` and has length at least one greater than
-        `len(self.name)`.
-        """
-        return self.name != name and name.startswith(self.name)
+        return [m for m in self._submodules if self._docfilter(m)]
 
 
 class Class(Doc):
@@ -883,16 +819,12 @@ class Class(Doc):
         Same as `pdoc.Doc.__init__`, except `class_obj` must be a
         Python class object. The docstring is gathered automatically.
         """
-        super(Class, self).__init__(name, module, class_obj)
-
-        self.cls = class_obj
-        """The class Python object."""
+        super().__init__(name, module, class_obj)
 
         self.doc = {}
         """A mapping from identifier name to a `pdoc.Doc` objects."""
 
         self.doc.update(_var_docstrings(self))
-        # TODO see if __init__ can be forced out with __pdoc__
 
         def forced_out(name, _pdoc_overrides=getattr(self.module.obj, '__pdoc__', {}).get):
             return _pdoc_overrides(self.name + '.' + name, False) is None
@@ -902,7 +834,7 @@ class Class(Doc):
                        # Filter only *own* members. The rest are inherited
                        # in Class._fill_inheritance()
                        if (name in self.obj.__dict__ and
-                           (_is_exported(name) or name == '__init__') and
+                           (_is_public(name) or name == '__init__') and
                            not forced_out(name))]
 
         # Convert the public Python objects to documentation objects.
@@ -948,7 +880,30 @@ class Class(Doc):
 
     @property
     def refname(self):
-        return "%s.%s" % (self.module.refname, self.cls.__name__)
+        return self.module.name + '.' + self.qualname
+
+    def mro(self):
+        """
+        Returns a list of ancestor (superclass) documentation objects
+        in method resolution order.
+
+        The list will contain objects of type `pdoc.Class`
+        if the types are documented, and `pdoc.External` otherwise.
+        """
+        return [self.module.find_class(c)
+                for c in inspect.getmro(self.obj)
+                if c not in (self.obj, object)]
+
+    def subclasses(self):
+        """
+        Returns a list of subclasses of this class that are visible to the
+        Python interpreter (obtained from type.__subclasses__()).
+
+        The objects in the list are of type `pdoc.Class` if available,
+        and `pdoc.External` otherwise.
+        """
+        return [self.module.find_class(c)
+                for c in self.obj.__subclasses__()]
 
     def _filter_doc_objs(self, filter_func=lambda x: True):
         return sorted(obj for obj in self.doc.values()
@@ -981,20 +936,16 @@ class Class(Doc):
 
         Unfortunately, this also includes class methods.
         """
-        p = lambda o: (
-            isinstance(o, Function) and o.method and self.module._docfilter(o)
-        )
-        return sorted(filter(p, self.doc.values()))
+        return self._filter_doc_objs(
+            lambda f: isinstance(f, Function) and f.method)
 
     def functions(self):
         """
         Returns all documented static functions as `pdoc.Function`
         objects in the class, sorted alphabetically.
         """
-        p = lambda o: (
-            isinstance(o, Function) and not o.method and self.module._docfilter(o)
-        )
-        return sorted(filter(p, self.doc.values()))
+        return self._filter_doc_objs(
+            lambda f: isinstance(f, Function) and not f.method)
 
     def _fill_inheritance(self):
         """
@@ -1009,7 +960,7 @@ class Class(Doc):
         variables are only discoverable by traversing the abstract
         syntax tree.
         """
-        mro = [c for c in self.module.mro(self) if isinstance(c, Class)]
+        mro = [c for c in self.mro() if isinstance(c, Class)]
 
         super_members = {}
         for cls in mro:
@@ -1042,49 +993,29 @@ class Function(Doc):
         `method` should be `True` when the function is a method. In
         all other cases, it should be `False`.
         """
-        super(Function, self).__init__(name, module, func_obj)
-
-        self.func = func_obj
-        """The Python function object."""
+        super().__init__(name, module, func_obj)
 
         self.cls = cls
         """
-        The `pdoc.Class` documentation object if this is a method. If
-        not, this is None.
+        The `pdoc.Class` documentation object if the function is a method.
+        If not, this is None.
         """
 
         self.method = method
         """
-        Whether this function is a method or not.
+        Whether this function is a normal bound method.
 
-        In particular, static class methods have this set to False.
+        In particular, static and class methods have this set to False.
         """
-
-    @property
-    def source(self):
-        return _source(self.func)
-
-    @property
-    def refname(self):
-        if self.cls is None:
-            return "%s.%s" % (self.module.refname, self.name)
-        else:
-            return "%s.%s" % (self.cls.refname, self.name)
 
     def funcdef(self):
         """
         Generates the string of keywords used to define the function, for example `def` or
         `async def`.
         """
-        keywords = []
+        return 'async def' if self._is_async else 'def'
 
-        if self._is_async():
-            keywords.append("async")
-
-        keywords.append("def")
-
-        return " ".join(keywords)
-
+    @property
     def _is_async(self):
         """
         Returns whether is function is asynchronous, either as a coroutine or an async
@@ -1093,19 +1024,11 @@ class Function(Doc):
         try:
             # Both of these are required because coroutines aren't classified as async
             # generators and vice versa.
-            return inspect.iscoroutinefunction(self.func) or inspect.isasyncgenfunction(
-                self.func
-            )
+            obj = inspect.unwrap(self.obj)
+            return (inspect.iscoroutinefunction(obj) or
+                    inspect.isasyncgenfunction(obj))
         except AttributeError:
             return False
-
-    def spec(self):
-        """
-        Returns a nicely formatted spec of the function's parameter
-        list as a string. This includes argument lists, keyword
-        arguments and default values.
-        """
-        return ", ".join(self.params())
 
     def params(self):
         """
@@ -1113,27 +1036,20 @@ class Function(Doc):
         parameter of this function. This includes argument lists,
         keyword arguments and default values.
         """
-
-        def fmt_param(el):
-            if isinstance(el, str) or isinstance(el, unicode):
-                return el
-            else:
-                return "(%s)" % (", ".join(map(fmt_param, el)))
-
         try:
-            getspec = getattr(inspect, "getfullargspec", inspect.getargspec)
-            s = getspec(self.func)
+            s = inspect.getfullargspec(inspect.unwrap(self.obj))
         except TypeError:
             # I guess this is for C builtin functions?
             return ["..."]
 
+        # TODO: Optionally skip non-public "_params"
         params = []
         for i, param in enumerate(s.args):
             if s.defaults is not None and len(s.args) - i <= len(s.defaults):
                 defind = len(s.defaults) - (len(s.args) - i)
                 params.append("%s=%s" % (param, repr(s.defaults[defind])))
             else:
-                params.append(fmt_param(param))
+                params.append(param)
         if s.varargs is not None:
             params.append("*%s" % s.varargs)
 
@@ -1155,10 +1071,11 @@ class Function(Doc):
 
     def __lt__(self, other):
         # Push __init__ to the top.
-        if "__init__" in (self.name, other.name):
-            return self.name != other.name and self.name == "__init__"
-        else:
-            return self.name < other.name
+        return self.name == '__init__' or super().__lt__(other)
+
+    @property
+    def refname(self):
+        return (self.cls.refname if self.cls else self.module.refname) + '.' + self.name
 
 
 class Variable(Doc):
@@ -1173,7 +1090,7 @@ class Variable(Doc):
         as a `pdoc.Class` object when this is a class or instance
         variable.
         """
-        super(Variable, self).__init__(name, module, obj, docstring)
+        super().__init__(name, module, obj, docstring)
 
         self.cls = cls
         """
@@ -1188,15 +1105,14 @@ class Variable(Doc):
         """
 
     @property
-    def source(self):
-        return []
+    def qualname(self):
+        if self.cls:
+            return self.cls.qualname + '.' + self.name
+        return self.name
 
     @property
     def refname(self):
-        if self.cls is None:
-            return "%s.%s" % (self.module.refname, self.name)
-        else:
-            return "%s.%s" % (self.cls.refname, self.name)
+        return (self.cls.refname if self.cls else self.module.refname) + '.' + self.name
 
 
 class External(Doc):
@@ -1235,12 +1151,4 @@ class External(Doc):
         Initializes an external identifier with `name`, where `name`
         should be a fully qualified name.
         """
-        super(External, self).__init__(name, None, None)
-
-    @property
-    def source(self):
-        return []
-
-    @property
-    def refname(self):
-        return self.name
+        super().__init__(name, None, None)

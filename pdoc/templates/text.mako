@@ -12,14 +12,14 @@
       return (' ' * spaces) + new.strip()
 
   def docstring(d):
-      if len(d.docstring) == 0 and hasattr(d, 'inherits'):
+      if not d.docstring and d.inherits:
           return d.inherits.docstring
       else:
           return d.docstring
 %>
 
 <%def name="function(func)" filter="trim">
-${func.name}(${func.spec()})
+${func.name}(${", ".join(func.params())})
 ${docstring(func) | indent}
 </%def>
 
@@ -39,8 +39,8 @@ ${cls.docstring | indent}
   static_methods = cls.functions()
   inst_vars = cls.instance_variables()
   methods = cls.methods()
-  mro = cls.module.mro(cls)
-  descendents = cls.module.descendents(cls)
+  mro = cls.mro()
+  subclasses = cls.subclasses()
 %>
 % if len(mro) > 0:
     Ancestors (in MRO)
@@ -50,10 +50,10 @@ ${cls.docstring | indent}
     % endfor
 
 % endif
-% if len(descendents) > 0:
+% if len(subclasses) > 0:
     Descendents
     -----------
-    % for c in descendents:
+    % for c in subclasses:
     ${c.refname}
     % endfor
 
@@ -103,7 +103,7 @@ ${capture(function, m) | indent}
 
 Module ${module.name}
 -------${'-' * len(module.name)}
-% if not module._filtering:
+% if not module._docfilter:
 ${module.docstring}
 % endif
 

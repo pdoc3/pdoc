@@ -106,6 +106,8 @@ class CliTest(unittest.TestCase):
             'foreign var docstring',
             'A',
             'A.overridden docstring',
+            'A.overridden_same_docstring docstring',
+            'A.inherited',
             'B docstring',
             'B.overridden docstring',
             'builtins.int',
@@ -231,6 +233,8 @@ class CliTest(unittest.TestCase):
             'foreign var docstring',
             'A',
             'A.overridden docstring',
+            'A.overridden_same_docstring docstring',
+            'A.inherited',
             'B docstring',
             'B.overridden docstring',
             'builtins.int',
@@ -318,6 +322,69 @@ class ApiTest(unittest.TestCase):
         m = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + '._private'))
         self.assertEqual(sorted(m.name for m in m.submodules()),
                          [EXAMPLE_MODULE + '._private.module'])
+
+    def test_refname(self):
+        mod = EXAMPLE_MODULE + '.' + 'subpkg'
+        module = pdoc.Module(pdoc.import_module(mod))
+        var = module.doc['var']
+        cls = module.doc['B']
+        nested_cls = cls.doc['C']
+        cls_var = cls.doc['var']
+        method = cls.doc['f']
+
+        self.assertEqual(pdoc.External('foo').refname, 'foo')
+        self.assertEqual(module.refname, mod)
+        self.assertEqual(var.refname, mod + '.var')
+        self.assertEqual(cls.refname, mod + '.B')
+        self.assertEqual(nested_cls.refname, mod + '.B.C')
+        self.assertEqual(cls_var.refname, mod + '.B.var')
+        self.assertEqual(method.refname, mod + '.B.f')
+
+        # Inherited method's refname points to class' implicit copy
+        self.assertEqual(cls.doc['inherited'].refname, mod + '.B.inherited')
+
+    def test_qualname(self):
+        module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        var = module.doc['var']
+        cls = module.doc['B']
+        nested_cls = cls.doc['C']
+        cls_var = cls.doc['var']
+        method = cls.doc['f']
+
+        self.assertEqual(pdoc.External('foo').qualname, 'foo')
+        self.assertEqual(module.qualname, EXAMPLE_MODULE)
+        self.assertEqual(var.qualname, 'var')
+        self.assertEqual(cls.qualname, 'B')
+        self.assertEqual(nested_cls.qualname, 'B.C')
+        self.assertEqual(cls_var.qualname, 'B.var')
+        self.assertEqual(method.qualname, 'B.f')
+
+    def test__pdoc__dict(self):
+        module = pdoc.import_module(EXAMPLE_MODULE)
+        old__pdoc__ = module.__pdoc__
+        module.__pdoc__ = {'B': None}
+        mod = pdoc.Module(module)
+        self.assertIn('A', mod.doc)
+        self.assertNotIn('B', mod.doc)
+        module.__pdoc__ = old__pdoc__
+
+    def test_find_ident(self):
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        self.assertIsInstance(mod.find_ident('subpkg'), pdoc.Module)
+        mod = pdoc.Module(pdoc)
+        self.assertIsInstance(mod.find_ident('subpkg'), pdoc.External)
+
+    def test_inherits(self):
+        module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        a = module.doc['A']
+        b = module.doc['B']
+        self.assertEqual(b.doc['inherited'].inherits,
+                         a.doc['inherited'])
+        self.assertEqual(b.doc['overridden_same_docstring'].inherits,
+                         a.doc['overridden_same_docstring'])
+        self.assertEqual(b.doc['overridden'].inherits,
+                         None)
+
 
 class HttpTest(unittest.TestCase):
     @contextmanager
