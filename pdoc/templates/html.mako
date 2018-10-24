@@ -212,7 +212,7 @@
       <td><a href="${link_prefix}${name}">${name}</a></td>
       <td>
       % if len(desc.strip()) > 0:
-        <div class="desc">${desc | mark}</div>
+        <div class="desc">${desc | glimpse, mark}</div>
       % endif
       </td>
     </tr>
@@ -247,7 +247,7 @@
   </div>
   </%def>
 
-  % if 'http_server' in context.keys() and http_server:
+  % if 'http_server' in context.keys():
     <p id="nav">
       <a href="/">All packages</a>
       <% parts = module.name.split('.')[:-1] %>

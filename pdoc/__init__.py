@@ -211,13 +211,6 @@ html_package_name = "index.html"
 The file name to use for a package's `__init__.py` module.
 """
 
-import_path = sys.path[:]
-"""
-A list of paths to restrict imports to. Any module that cannot be
-found in `import_path` will not be imported. By default, it is set to a
-copy of `sys.path` at initialization.
-"""
-
 __pdoc__ = {}
 
 tpl_lookup = TemplateLookup(

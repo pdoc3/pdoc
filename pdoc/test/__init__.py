@@ -190,12 +190,12 @@ class CliTest(unittest.TestCase):
     def test_overwrite(self):
         with run_html(EXAMPLE_MODULE):
             with redirect_streams() as (stdout, stderr):
-                returncode = run(EXAMPLE_MODULE, _check=False, html=None)
+                returncode = run(EXAMPLE_MODULE, _check=False, html=None, html_dir=os.getcwd())
                 self.assertNotEqual(returncode, 0)
                 self.assertNotEqual(stderr.getvalue(), '')
 
             with redirect_streams() as (stdout, stderr):
-                returncode = run(EXAMPLE_MODULE, html=None, overwrite=None)
+                returncode = run(EXAMPLE_MODULE, html=None, overwrite=None, html_dir=os.getcwd())
                 self.assertEqual(returncode, 0)
                 self.assertEqual(stderr.getvalue(), '')
 
@@ -400,7 +400,7 @@ class HttpTest(unittest.TestCase):
     def test_http(self):
         host, port = 'localhost', randint(9000, 12000)
         cmd = 'pdoc --http --http-host {} --http-port {} pdoc {}'.format(
-            host, port, EXAMPLE_MODULE).split()
+            host, port, os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)).split()
 
         with self._timeout(10):
             with subprocess.Popen(cmd, stderr=subprocess.PIPE) as proc:
@@ -416,6 +416,7 @@ class HttpTest(unittest.TestCase):
                         with urlopen(url, timeout=3) as resp:
                             html = resp.read()
                             self.assertIn(b'Module pdoc provides types and functions', html)
+                            self.assertNotIn(b'gzip', html)
                     with self.subTest(url='/' + EXAMPLE_MODULE):
                         with urlopen(url + 'pdoc', timeout=3) as resp:
                             html = resp.read()
