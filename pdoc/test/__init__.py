@@ -399,8 +399,8 @@ class HttpTest(unittest.TestCase):
 
     def test_http(self):
         host, port = 'localhost', randint(9000, 12000)
-        cmd = 'pdoc --http --http-host {} --http-port {} pdoc {}'.format(
-            host, port, os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)).split()
+        cmd = 'pdoc --http :{} pdoc {}'.format(
+            port, os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)).split()
 
         with self._timeout(10):
             with subprocess.Popen(cmd, stderr=subprocess.PIPE) as proc:

@@ -80,24 +80,26 @@ aa(
          "No link prefix results in all links being relative. "
          "No effect when combined with --http.",
 )
+
+DEFAULT_HOST, DEFAULT_PORT = 'localhost', 8080
+
+
+def _check_host_port(s):
+    if s and ':' not in s:
+        raise argparse.ArgumentTypeError(
+            "'{}' doesn't match '[HOST]:[PORT]'. "
+            "Specify `--http :` to use default hostname and port.".format(s))
+    return s
+
+
 aa(
     "--http",
-    action="store_true",
+    default='',
+    type=_check_host_port,
+    metavar='HOST:PORT',
     help="When set, pdoc will run as an HTTP server providing documentation "
-    "of all installed modules. Only modules found in PYTHONPATH will be "
-    "listed.",
-)
-aa(
-    "--http-host",
-    type=str,
-    default="localhost",
-    help="The host on which to run the HTTP server.",
-)
-aa(
-    "--http-port",
-    type=int,
-    default=8080,
-    help="The port on which to run the HTTP server.",
+         "for specified modules. If you just want to use the default hostname "
+         "and port ({}:{}), set the parameter to :.".format(DEFAULT_HOST, DEFAULT_PORT),
 )
 
 
@@ -283,11 +285,14 @@ def main(_args=None):
 
         # Run the HTTP server.
         WebDoc.args = args  # Pass params to HTTPServer xP
-        httpd = HTTPServer((args.http_host, args.http_port), WebDoc)
-        print(
-            "pdoc server ready at http://%s:%d" % (args.http_host, args.http_port),
-            file=sys.stderr,
-        )
+
+        host, _, port = args.http.partition(':')
+        host = host or DEFAULT_HOST
+        port = int(port or DEFAULT_PORT)
+
+        print('Starting pdoc server on {}:{}'.format(host, port), file=sys.stderr)
+        httpd = HTTPServer((host, port), WebDoc)
+        print("pdoc server ready at http://%s:%d" % (host, port), file=sys.stderr)
         try:
             httpd.serve_forever()
         finally:
