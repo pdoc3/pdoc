@@ -109,15 +109,6 @@
     padding: 15px 30px;
   }
 
-  .codehilite {
-    margin: 0 30px 10px 30px;
-  }
-
-    .codehilite pre {
-      margin: 0;
-    }
-    .codehilite .err { background: #ff3300; color: #fff !important; } 
-
   table#module-list {
     font-size: 110%;
   }
@@ -215,39 +206,26 @@
         margin: 0 0 10px 0;
       }
 
-    .source_cont {
-      margin: 0;
-      padding: 0;
-    }
-
-    .source_link a {
-      background: #ffc300;
+    .source summary {
+      background: #ffc;
       font-weight: 400;
-      font-size: .75em;
+      font-size: .8em;
+      width: 11em;
       text-transform: uppercase;
-      color: #fff;
-      text-shadow: 1px 1px 0 #f4b700;
-      
-      padding: 3px 8px;
-      border-radius: 2px;
-      transition: background .3s ease-in-out;
+      padding: 0px 8px;
+      border: 1px solid #fd6;
+      border-radius: 5px;
+      cursor: pointer;
     }
-      .source_link a:hover {
-        background: #FF7200;
-        text-shadow: none;
-        transition: background .3s ease-in-out;
-      }
+    .source summary:hover { background: #fe9 !important }
+    .source { margin-left: 8px }
+    .source[open] summary { background: #fda }
 
-    .source {
-      display: none;
-      max-height: 600px;
+    .source pre {
+      max-height: 500px;
       overflow-y: scroll;
       margin-bottom: 15px;
     }
-
-      .source .codehilite {
-        margin: 0;
-      }
 
   .desc h1, .desc h2, .desc h3 {
     font-size: 100% !important;

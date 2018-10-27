@@ -56,5 +56,8 @@ setup(
             "pytest-xdist>=1.22,<2",
         }
     },
-    install_requires=["mako", "markdown", "pygments"],
+    install_requires=[
+        "mako",
+        "markdown",
+    ],
 )

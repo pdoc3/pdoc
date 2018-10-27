@@ -5,57 +5,17 @@
   import sys
 
   import markdown
-  try:
-    import pygments
-    import pygments.formatters
-    import pygments.lexers
-    use_pygments = True
-  except ImportError:
-    use_pygments = False
 
   import pdoc
 
   # From language reference, but adds '.' to allow fully qualified names.
   pyident = re.compile('^[a-zA-Z_][a-zA-Z0-9_.]+$')
-  indent = re.compile('^\s*')
 
   # Whether we're showing the module list or a single module.
   module_list = 'modules' in context.keys()
 
-  def decode(s):
-    if sys.version_info[0] < 3 and isinstance(s, str):
-      return s.decode('utf-8', 'ignore')
-    return s
-
   def ident(s):
     return '<span class="ident">%s</span>' % s
-
-  def sourceid(dobj):
-    return 'source-%s' % dobj.refname
-
-  def clean_source_lines(lines):
-    """
-    Cleans the source code so that pygments can render it well.
-
-    Returns one string with all of the source code.
-    """
-    base_indent = len(indent.match(lines[0]).group(0))
-    base_indent = 0
-    for line in lines:
-      if len(line.strip()) > 0:
-        base_indent = len(indent.match(lines[0]).group(0))
-        break
-    lines = [line[base_indent:] for line in lines]
-    if not use_pygments:  # :-(
-      return '<pre><code>%s</code></pre>' % (''.join(lines))
-
-    if sys.version_info[0] < 3:
-        pylex = pygments.lexers.PythonLexer()
-    else:
-        pylex = pygments.lexers.Python3Lexer()
-
-    htmlform = pygments.formatters.HtmlFormatter(cssclass='codehilite')
-    return pygments.highlight(''.join(lines), pylex, htmlform)
 
   def linkify(match):
     matched = match.group(0)
@@ -72,8 +32,6 @@
       s, _ = re.subn('`[^`]+`', linkify, s)
 
     extensions = []
-    if use_pygments:
-      extensions = ['markdown.extensions.codehilite(linenums=False)']
     s = markdown.markdown(s.strip(), extensions=extensions)
     return s
 
@@ -164,12 +122,12 @@
     return '<a href="%s">%s</a>' % (url, name)
 %>
 <%def name="show_source(d)">
-  % if show_source_code and d.source is not None and len(d.source) > 0:
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('${sourceid(d)}', this);">Show source &equiv;</a></p>
-  <div id="${sourceid(d)}" class="source">
-    ${decode(clean_source_lines(d.source.split('\n')))}
-  </div>
-  % endif
+    % if show_source_code and d.source:
+        <details class="source">
+            <summary>Source code</summary>
+            <pre><code class="python">${d.source | h}}</code></pre>
+        </details>
+    %endif
 </%def>
 
 <%def name="show_desc(d, limit=None)">
@@ -183,7 +141,7 @@
   %>
   <div class="desc${inherits}">${docstring | mark}</div>
   % if not isinstance(d, pdoc.Module):
-  <div class="source_cont">${show_source(d)}</div>
+  ${show_source(d)}
   % endif
 </%def>
 
@@ -430,37 +388,19 @@
 
   <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
   <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+  % if show_source_code:
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+  %endif
 
   <%namespace name="css" file="css.mako" />
 
   <style type="text/css">
   ${css.pdoc()}
   </style>
-
-  % if use_pygments:
-  <style type="text/css">
-  ${pygments.formatters.HtmlFormatter().get_style_defs('.codehilite')}
-  </style>
-  % endif
-
   <style type="text/css">
   ${css.post()}
   </style>
 
-  <script type="text/javascript">
-  function toggle(id, $link) {
-    $node = document.getElementById(id);
-    if (!$node)
-    return;
-    if (!$node.style.display || $node.style.display == 'none') {
-    $node.style.display = 'block';
-    $link.innerHTML = 'Hide source &nequiv;';
-    } else {
-    $node.style.display = 'none';
-    $link.innerHTML = 'Show source &equiv;';
-    }
-  }
-  </script>
 </head>
 <body>
 <a href="#" id="top">Top</a>
@@ -483,5 +423,9 @@
     </p>
   </footer>
 </div>
+% if show_source_code:
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad()</script>
+% endif
 </body>
 </html>
