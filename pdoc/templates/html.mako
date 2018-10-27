@@ -429,10 +429,9 @@
   % endif
 
   <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
+  <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+
   <%namespace name="css" file="css.mako" />
-  <style type="text/css">
-  ${css.pre()}
-  </style>
 
   <style type="text/css">
   ${css.pdoc()}
