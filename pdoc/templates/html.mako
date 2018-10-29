@@ -1,4 +1,8 @@
-## -*- coding: utf-8 -*-
+<%!
+    # Template configuration
+    html_lang = 'en'
+    show_inherited_members = True
+%>
 <%
   import os
   import re
@@ -13,9 +17,6 @@
 
   # Whether we're showing the module list or a single module.
   module_list = 'modules' in context.keys()
-
-  def ident(s):
-    return '<span class="ident">%s</span>' % s
 
   def linkify(match):
     matched = match.group(0)
@@ -121,8 +122,10 @@
       return refname
     return '<a href="%s">%s</a>' % (url, name)
 %>
+<%def name="ident(name)"><span class="ident">${name}</span></%def>
+
 <%def name="show_source(d)">
-    % if show_source_code and d.source:
+    % if show_source_code and d.source and d.obj is not getattr(d.inherits, 'obj', None):
         <details class="source">
             <summary>Source code</summary>
             <pre><code class="python">${d.source | h}}</code></pre>
@@ -132,57 +135,50 @@
 
 <%def name="show_desc(d, limit=None)">
   <%
-  inherits = (' inherited'
+  inherits = (' class="inherited"'
               if d.inherits and (not d.docstring or d.docstring == d.inherits.docstring) else
               '')
-  docstring = (d.inherits.docstring if inherits else d.docstring).strip()
+  docstring = d.inherits.docstring if inherits else d.docstring
   if limit is not None:
     docstring = glimpse(docstring, limit)
   %>
-  <div class="desc${inherits}">${docstring | mark}</div>
+  % if d.inherits:
+      <p class="inheritance">
+          <em>Inherited from:</em>
+          % if hasattr(d.inherits, 'cls'):
+              <code>${link(d.inherits.cls.refname)}</code>.<code>${link(d.inherits.refname)}</code>
+          % else:
+              <code>${link(d.inherits.refname)}</code>
+          % endif
+      </p>
+  % endif
+  <div${inherits}>${docstring | mark}</div>
   % if not isinstance(d, pdoc.Module):
   ${show_source(d)}
-  % endif
-</%def>
-
-<%def name="show_inheritance(d)">
-  % if d.inherits:
-    <p class="inheritance">
-     <strong>Inherited from:</strong>
-     % if hasattr(d.inherits, 'cls'):
-       <code>${link(d.inherits.cls.refname)}</code>.<code>${link(d.inherits.refname)}</code>
-     % else:
-       <code>${link(d.inherits.refname)}</code>
-     % endif
-    </p>
   % endif
 </%def>
 
 <%def name="show_module_list(modules)">
 <h1>Python module list</h1>
 
-% if len(modules) == 0:
+% if not modules:
   <p>No modules found.</p>
 % else:
-  <table id="module-list">
+  <dl id="http-server-module-list">
   % for name, desc in modules:
-    <tr>
-      <td><a href="${link_prefix}${name}">${name}</a></td>
-      <td>
-      % if len(desc.strip()) > 0:
-        <div class="desc">${desc | glimpse, mark}</div>
-      % endif
-      </td>
-    </tr>
+      <div class="flex">
+      <dt><a href="${link_prefix}${name}">${name}</a></dt>
+      <dd>${desc | glimpse, mark}</dd>
+      </div>
   % endfor
-  </table>
+  </dl>
 % endif
 </%def>
 
-<%def name="show_column_list(items, numcols=3)">
-  <ul>
+<%def name="show_column_list(items)">
+  <ul class="${'two-column' if len(items) >= 6 else ''}">
   % for item in items:
-    <li class="mono">${item}</li>
+    <li><code>${link(item.refname)}</code></li>
   % endfor
   </ul>
 </%def>
@@ -196,118 +192,124 @@
   %>
 
   <%def name="show_func(f)">
-  <div class="item">
-    <div class="name def" id="${f.refname}">
-    <p>${f.funcdef()} ${ident(f.name)}(</p><p>${", ".join(f.params()) | h})</p>
-    </div>
-    ${show_inheritance(f)}
-    ${show_desc(f)}
-  </div>
+    <dt id="${f.refname}"><code class="name flex">
+        <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${', '.join(f.params()) | h})</span>
+    </code></dt>
+    <dd>${show_desc(f)}</dd>
   </%def>
 
+  <header>
   % if 'http_server' in context.keys():
-    <p id="nav">
+    <nav class="http-server-breadcrumbs">
       <a href="/">All packages</a>
       <% parts = module.name.split('.')[:-1] %>
       % for i, m in enumerate(parts):
         <% parent = '.'.join(parts[:i+1]) %>
         :: <a href="/${parent.replace('.', '/')}">${parent}</a>
       % endfor
-    </p>
+    </nav>
   % endif
-
-  <header id="section-intro">
-  <h1 class="title"><span class="name">${module.name}</span> module</h1>
-  ${module.docstring | mark}
-  ${show_source(module)}
+  <h1 class="title"><code>${module.name}</code> module</h1>
   </header>
 
-  <section id="section-items">
-    % if len(variables) > 0:
-    <h2 class="section-title" id="header-variables">Module variables</h2>
-    % for v in variables:
-      <div class="item">
-      <p id="${v.refname}" class="name">var ${ident(v.name)}</p>
-      ${show_desc(v)}
-      </div>
-    % endfor
-    % endif
+  <section id="section-intro">
+  ${module.docstring | mark}
+  ${show_source(module)}
+  </section>
 
-    % if len(functions) > 0:
+  <section>
+    % if submodules:
+    <h2 class="section-title" id="header-submodules">Sub-modules</h2>
+    <dl>
+    % for m in submodules:
+      <dt><code class="name">${link(m.refname)}</code></dt>
+      <dd>${show_desc(m, limit=300)}</dd>
+    % endfor
+    </dl>
+    % endif
+  </section>
+
+  <section>
+    % if variables:
+    <h2 class="section-title" id="header-variables">Global variables</h2>
+    <dl>
+    % for v in variables:
+      <dt id="${v.refname}"><code class="name">var ${ident(v.name)}</code></dt>
+      <dd>${show_desc(v)}</dd>
+    % endfor
+    </dl>
+    % endif
+  </section>
+
+  <section>
+    % if functions:
     <h2 class="section-title" id="header-functions">Functions</h2>
+    <dl>
     % for f in functions:
       ${show_func(f)}
     % endfor
+    </dl>
     % endif
+  </section>
 
-    % if len(classes) > 0:
+  <section>
+    % if classes:
     <h2 class="section-title" id="header-classes">Classes</h2>
+    <dl>
     % for c in classes:
       <%
-      class_vars = c.class_variables()
-      smethods = c.functions()
-      inst_vars = c.instance_variables()
-      methods = c.methods()
+      class_vars = c.class_variables(show_inherited_members)
+      smethods = c.functions(show_inherited_members)
+      inst_vars = c.instance_variables(show_inherited_members)
+      methods = c.methods(show_inherited_members)
       mro = c.mro()
       %>
-      <div class="item">
-      <p id="${c.refname}" class="name">class ${ident(c.name)}</p>
-      ${show_desc(c)}
+      <dt id="${c.refname}"><code class="flex name class">
+          <span>class ${ident(c.name)}</span>
+          % if mro:
+              <span>(</span><span><small>ancestors:</small> ${', '.join(link(cls.refname) for cls in mro)})</span>
+          %endif
+      </code></dt>
 
-      <div class="class">
-        % if len(mro) > 0:
-          <h3>Ancestors (in MRO)</h3>
-          <ul class="class_list">
-          % for cls in mro:
-          <li>${link(cls.refname)}</li>
-          % endfor
-          </ul>
-        % endif
-        % if len(class_vars) > 0:
+      <dd>${show_desc(c)}
+
+      % if class_vars:
           <h3>Class variables</h3>
+          <dl>
           % for v in class_vars:
-            <div class="item">
-            <p id="${v.refname}" class="name">var ${ident(v.name)}</p>
-            ${show_inheritance(v)}
-            ${show_desc(v)}
-            </div>
+              <dt id="${v.refname}"><code class="name">var ${ident(v.name)}</code></dt>
+              <dd>${show_desc(v)}</dd>
           % endfor
-        % endif
-        % if len(smethods) > 0:
+          </dl>
+      % endif
+      % if smethods:
           <h3>Static methods</h3>
+          <dl>
           % for f in smethods:
-            ${show_func(f)}
+              ${show_func(f)}
           % endfor
-        % endif
-        % if len(inst_vars) > 0:
+          </dl>
+      % endif
+      % if inst_vars:
           <h3>Instance variables</h3>
+          <dl>
           % for v in inst_vars:
-            <div class="item">
-            <p id="${v.refname}" class="name">var ${ident(v.name)}</p>
-            ${show_inheritance(v)}
-            ${show_desc(v)}
-            </div>
+              <dt id="${v.refname}"><code class="name">var ${ident(v.name)}</code></dt>
+              <dd>${show_desc(v)}</dd>
           % endfor
-        % endif
-        % if len(methods) > 0:
+          </dl>
+      % endif
+      % if methods:
           <h3>Methods</h3>
+          <dl>
           % for f in methods:
-            ${show_func(f)}
+              ${show_func(f)}
           % endfor
-        % endif
-      </div>
-      </div>
+          </dl>
+      % endif
+      </dd>
     % endfor
-    % endif
-
-    % if len(submodules) > 0:
-    <h2 class="section-title" id="header-submodules">Sub-modules</h2>
-    % for m in submodules:
-      <div class="item">
-      <p class="name">${link(m.refname)}</p>
-      ${show_desc(m, limit=300)}
-      </div>
-    % endfor
+    </dl>
     % endif
   </section>
 </%def>
@@ -320,39 +322,50 @@
   submodules = module.submodules()
   supermodule = module.supermodule
   %>
-  <div id="sidebar">
+  <nav id="sidebar">
     <h1>Index</h1>
     <ul id="index">
     % if supermodule:
-    <li class="set"><h3>Super-module</h3>
+    <li><h3>Super-module</h3>
       <ul>
-        <li class="mono">${link(supermodule.refname)}</li>
+        <li><code>${link(supermodule.refname)}</code></li>
       </ul>
     </li>
     % endif
-    % if len(variables) > 0:
-    <li class="set"><h3><a href="#header-variables">Module variables</a></h3>
-      ${show_column_list(map(lambda v: link(v.refname), variables))}
+
+    % if submodules:
+    <li><h3><a href="#header-submodules">Sub-modules</a></h3>
+      <ul>
+      % for m in submodules:
+        <li><code>${link(m.refname)}</code></li>
+      % endfor
+      </ul>
     </li>
     % endif
 
-    % if len(functions) > 0:
-    <li class="set"><h3><a href="#header-functions">Functions</a></h3>
-      ${show_column_list(map(lambda f: link(f.refname), functions))}
+    % if variables:
+    <li><h3><a href="#header-variables">Global variables</a></h3>
+      ${show_column_list(variables)}
     </li>
     % endif
 
-    % if len(classes) > 0:
-    <li class="set"><h3><a href="#header-classes">Classes</a></h3>
+    % if functions:
+    <li><h3><a href="#header-functions">Functions</a></h3>
+      ${show_column_list(functions)}
+    </li>
+    % endif
+
+    % if classes:
+    <li><h3><a href="#header-classes">Classes</a></h3>
       <ul>
       % for c in classes:
-        <li class="mono">
-        <span class="class_name">${link(c.refname)}</span>
+        <li>
+        <h4><code>${link(c.refname)}</code></h4>
         <%
           methods = c.functions() + c.methods()
         %>
-        % if len(methods) > 0:
-          ${show_column_list(map(lambda f: link(f.refname), methods))}
+        % if methods:
+          ${show_column_list(methods)}
         % endif
         </li>
       % endfor
@@ -360,69 +373,55 @@
     </li>
     % endif
 
-    % if len(submodules) > 0:
-    <li class="set"><h3><a href="#header-submodules">Sub-modules</a></h3>
-      <ul>
-      % for m in submodules:
-        <li class="mono">${link(m.refname)}</li>
-      % endfor
-      </ul>
-    </li>
-    % endif
     </ul>
-  </div>
+  </nav>
 </%def>
 
 <!doctype html>
+<html lang="${html_lang}">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+  <meta name="generator" content="pdoc ${pdoc.__version__}" />
 
   % if module_list:
     <title>Python module list</title>
-    <meta name="description" content="A list of Python modules in sys.path" />
+    <meta name="description" content="A list of documented Python modules." />
   % else:
     <title>${module.name} API documentation</title>
-    <meta name="description" content="${module.docstring | glimpse, trim}" />
+    <meta name="description" content="${module.docstring | glimpse, trim, h}" />
   % endif
 
-  <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
   <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+  <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
   % if show_source_code:
     <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
   %endif
 
   <%namespace name="css" file="css.mako" />
-
-  <style type="text/css">
-  ${css.pdoc()}
-  </style>
-  <style type="text/css">
-  ${css.post()}
-  </style>
+  <style>${css.mobile()}</style>
+  <style media="screen and (min-width: 700px)">${css.desktop()}</style>
+  <style media="print">${css.print()}</style>
 
 </head>
 <body>
-<a href="#" id="top">Top</a>
-
-<div id="container">
+<main>
   % if module_list:
     <article id="content">
       ${show_module_list(modules)}
     </article>
   % else:
-    ${module_index(module)}
     <article id="content">
       ${show_module(module)}
     </article>
+    ${module_index(module)}
   % endif
-  <div class="clear"> </div>
-  <footer id="footer">
-    <p>
-      Generated by <a href="https://github.com/mitmproxy/pdoc">pdoc ${pdoc.__version__}</a>
-    </p>
-  </footer>
-</div>
+</main>
+
+<footer id="footer">
+    <p>Generated by <a href="https://github.com/mitmproxy/pdoc">pdoc ${pdoc.__version__}</a></p>
+</footer>
+
 % if show_source_code:
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad()</script>

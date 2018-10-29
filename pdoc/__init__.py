@@ -216,6 +216,7 @@ __pdoc__ = {}
 tpl_lookup = TemplateLookup(
     cache_args=dict(cached=True,
                     cache_type='memory'),
+    input_encoding='utf-8',
     directories=[path.join(path.dirname(__file__), "templates")],
 )
 """
@@ -898,20 +899,22 @@ class Class(Doc):
         return [self.module.find_class(c)
                 for c in self.obj.__subclasses__()]
 
-    def _filter_doc_objs(self, filter_func=lambda x: True):
+    def _filter_doc_objs(self, include_inherited=True, filter_func=lambda x: True):
         return sorted(obj for obj in self.doc.values()
-                      if filter_func(obj) and
-                         self.module._docfilter(obj))  # TODO check if this needed
+                      if ((include_inherited or not obj.inherits) and
+                          filter_func(obj) and
+                          self.module._docfilter(obj)))  # TODO check if this needed
 
-    def class_variables(self):
+    def class_variables(self, include_inherited=True):
         """
         Returns all documented class variables in the class, sorted
         alphabetically as a list of `pdoc.Variable`.
         """
         return self._filter_doc_objs(
+            include_inherited,
             lambda var: isinstance(var, Variable) and not var.instance_var)
 
-    def instance_variables(self):
+    def instance_variables(self, include_inherited=True):
         """
         Returns all instance variables in the class, sorted
         alphabetically as a list of `pdoc.Variable`. Instance variables
@@ -919,9 +922,10 @@ class Class(Doc):
         method.
         """
         return self._filter_doc_objs(
+            include_inherited,
             lambda var: isinstance(var, Variable) and var.instance_var)
 
-    def methods(self):
+    def methods(self, include_inherited=True):
         """
         Returns all documented methods as `pdoc.Function` objects in
         the class, sorted alphabetically with `__init__` always coming
@@ -930,14 +934,16 @@ class Class(Doc):
         Unfortunately, this also includes class methods.
         """
         return self._filter_doc_objs(
+            include_inherited,
             lambda f: isinstance(f, Function) and f.method)
 
-    def functions(self):
+    def functions(self, include_inherited=True):
         """
         Returns all documented static functions as `pdoc.Function`
         objects in the class, sorted alphabetically.
         """
         return self._filter_doc_objs(
+            include_inherited,
             lambda f: isinstance(f, Function) and not f.method)
 
     def _fill_inheritance(self):
