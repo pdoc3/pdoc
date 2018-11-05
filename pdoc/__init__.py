@@ -194,6 +194,7 @@ from warnings import warn
 from mako.lookup import TemplateLookup
 from mako.exceptions import TopLevelLookupException
 
+
 __version__ = "0.3.2"
 """
 The current version of pdoc. This value is read from `setup.py`.
@@ -685,7 +686,7 @@ class Module(Doc):
         txt = _render_template('/text.mako', module=self, **kwargs)
         return re.sub("\n\n\n+", "\n\n", txt)
 
-    def html(self, external_links=False, link_prefix="", source=True, **kwargs):
+    def html(self, external_links=False, link_prefix="", source=True, minify=True, **kwargs):
         """
         Returns the documentation for this module as
         self-contained HTML.
@@ -700,14 +701,20 @@ class Module(Doc):
         every Python object whenever possible. This can dramatically
         decrease performance when documenting large modules.
 
+        If `minify` is `True`, the resulting HTML is minified.
+
         `kwargs` is passed to the `mako` render function.
         """
-        return _render_template('/html.mako',
+        html = _render_template('/html.mako',
                                 module=self,
                                 external_links=external_links,
                                 link_prefix=link_prefix,
                                 show_source_code=source,
                                 **kwargs)
+        if minify:
+            from pdoc.html_helpers import minify_html
+            html = minify_html(html)
+        return html
 
     @property
     def is_package(self):

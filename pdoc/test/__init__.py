@@ -14,6 +14,8 @@ from urllib.request import urlopen
 
 import pdoc
 from pdoc.cli import main, parser
+from pdoc.html_helpers import minify_css, minify_html
+
 
 TESTS_BASEDIR = os.path.abspath(os.path.dirname(__file__) or '.')
 EXAMPLE_MODULE = 'example_pkg'
@@ -384,6 +386,21 @@ class ApiTest(unittest.TestCase):
                          a.doc['overridden_same_docstring'])
         self.assertEqual(b.doc['overridden'].inherits,
                          None)
+
+
+class HtmlHelpersTest(unittest.TestCase):
+    def test_minify_css(self):
+        css = 'a { color: white; } /*comment*/ b {;}'
+        minified = minify_css(css)
+        self.assertNotIn(' ', minified)
+        self.assertNotIn(';}', minified)
+        self.assertNotIn('*', minified)
+
+    def test_minify_html(self):
+        html = '  <p>   a   </p>    <pre>    a\n    b</pre>    c   \n    d   '
+        expected = '\n<p>\na\n</p>\n<pre>    a\n    b</pre>\nc\nd\n'
+        minified = minify_html(html)
+        self.assertEqual(minified, expected)
 
 
 class HttpTest(unittest.TestCase):

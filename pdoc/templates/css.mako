@@ -1,4 +1,8 @@
-<%def name="mobile()">
+<%!
+    from pdoc.html_helpers import minify_css
+%>
+
+<%def name="mobile()" filter="minify_css">
   .flex {
     display: flex !important;
   }
@@ -205,7 +209,7 @@
   }
 </%def>
 
-<%def name="desktop()">
+<%def name="desktop()" filter="minify_css">
   @media screen and (min-width: 700px) {
     #sidebar {
       width: 30%;
@@ -233,7 +237,7 @@
   }
 </%def>
 
-<%def name="print()">
+<%def name="print()" filter="minify_css">
 @media print {
   #sidebar h1 {
     page-break-before: always;
