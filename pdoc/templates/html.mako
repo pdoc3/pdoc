@@ -2,6 +2,7 @@
     # Template configuration
     html_lang = 'en'
     show_inherited_members = True
+    list_class_variables_in_index = False
 %>
 <%
   import os
@@ -371,10 +372,15 @@
         <li>
         <h4><code>${link(c.refname)}</code></h4>
         <%
-          methods = c.functions() + c.methods()
+            members = c.functions() + c.methods()
+            if list_class_variables_in_index:
+                members += c.instance_variables() + c.class_variables()
+            if not show_inherited_members:
+                members = [i for i in members if not i.inherits]
+            members = sorted(members)
         %>
-        % if methods:
-          ${show_column_list(methods)}
+        % if members:
+          ${show_column_list(members)}
         % endif
         </li>
       % endfor
