@@ -263,6 +263,7 @@
       inst_vars = c.instance_variables(show_inherited_members)
       methods = c.methods(show_inherited_members)
       mro = c.mro()
+      subclasses = c.subclasses()
       %>
       <dt id="${c.refname}"><code class="flex name class">
           <span>class ${ident(c.name)}</span>
@@ -273,6 +274,14 @@
 
       <dd>${show_desc(c)}
 
+      % if subclasses:
+          <h3>Subclasses</h3>
+          <ul class="hlist">
+          % for sub in subclasses:
+              <li>${link(sub.refname)}</li>
+          % endfor
+          </ul>
+      % endif
       % if class_vars:
           <h3>Class variables</h3>
           <dl>

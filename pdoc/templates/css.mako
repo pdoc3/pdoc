@@ -203,10 +203,18 @@
       overflow-y: scroll;
       margin-bottom: 15px;
     }
-
-  .desc h1, .desc h2, .desc h3 {
-    font-size: 100% !important;
+  .hlist {
+    list-syle: none;
   }
+    .hlist li {
+      display: inline;
+    }
+    .hlist li:after {
+      content: ',\2002';
+    }
+    .hlist li:last-child:after {
+      content: none;
+    }
 </%def>
 
 <%def name="desktop()" filter="minify_css">

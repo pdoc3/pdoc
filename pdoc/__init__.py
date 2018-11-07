@@ -650,11 +650,6 @@ class Module(Doc):
                 self.doc[root] = submodule
             self._submodules.sort()
 
-        # Now see if we can grab inheritance relationships between classes.
-        for docobj in self.doc.values():
-            if isinstance(docobj, Class):
-                docobj._fill_inheritance()
-
         # Build the reference name dictionary of the module
         for docobj in self.doc.values():
             self.refdoc[docobj.refname] = docobj
@@ -678,6 +673,12 @@ class Module(Doc):
                 continue
             assert isinstance(docstring, str), (type(docstring), docstring)
             dobj.docstring = inspect.cleandoc(docstring)
+
+        # Now that we have all refnames, link inheritance relationships
+        # between classes and their members
+        for docobj in self.doc.values():
+            if isinstance(docobj, Class):
+                docobj._fill_inheritance()
 
     def text(self, **kwargs):
         """
@@ -730,14 +731,10 @@ class Module(Doc):
         Given a Python `cls` object, try to find it in this module
         or in any of the exported identifiers of the submodules.
         """
-        for doc_cls in self.classes():
-            if cls is doc_cls.obj:
-                return doc_cls
-        for module in self.submodules():
-            doc_cls = module.find_class(cls)
-            if not isinstance(doc_cls, External):
-                return doc_cls
-        return External("%s.%s" % (cls.__module__, cls.__qualname__))
+        # XXX: Is this corrent? Does it always match
+        # `Class.module.name + Class.qualname`?.
+        # If not, see what was here before.
+        return self.find_ident(cls.__module__ + '.' + cls.__qualname__)
 
     def find_ident(self, name: str):
         """
