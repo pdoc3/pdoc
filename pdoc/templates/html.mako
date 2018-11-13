@@ -5,27 +5,22 @@
     list_class_variables_in_index = False
 %>
 <%
-  import os
   import re
-  import sys
 
   import markdown
 
   import pdoc
 
-  # From language reference, but adds '.' to allow fully qualified names.
-  pyident = re.compile('^[a-zA-Z_][a-zA-Z0-9_.]+$')
-
   # Whether we're showing the module list or a single module.
   module_list = 'modules' in context.keys()
 
-  def linkify(match):
+  def linkify(match, _is_pyident=re.compile(r'^[a-zA-Z_]\w*(\.\w+)+$').match):
     matched = match.group(0)
-    ident = matched[1:-1]
-    name, url = lookup(ident)
-    if name is None:
-      return matched
-    return '[`%s`](%s)' % (name, url)
+    refname = matched[1:-1]
+    if not _is_pyident(refname):
+        return matched
+    dobj = module.find_ident(refname)
+    return link(dobj, '<code>' + dobj.qualname + '</code>')
 
   def mark(s, linky=True):
     if linky:
@@ -42,87 +37,15 @@
       return s
     return s[0:length] + '...'
 
-  def module_url(m):
-    """
-    Returns a URL for `m`, which must be an instance of `Module`.
-    Also, `m` must be a submodule of the module being documented.
-
-    Namely, '.' import separators are replaced with '/' URL
-    separators. Also, packages are translated as directories
-    containing `index.html` corresponding to the `__init__` module,
-    while modules are translated as regular HTML files with an
-    `.m.html` suffix. (Given default values of
-    `pdoc.html_module_suffix` and `pdoc.html_package_name`.)
-    """
-    if module.name == m.name:
-      return ''
-
-    base = m.name.replace('.', '/')
-    if len(link_prefix) == 0:
-      base = os.path.relpath(base, module.name.replace('.', '/'))
-    url = (base[len('../'):] if base.startswith('../') else
-           '' if base == '..' else
-           base)
-    if m.is_package:
-      index = pdoc.html_package_name
-      url = url + '/' + index if url else index
-    else:
-      url += pdoc.html_module_suffix
-    return link_prefix + url
-
-  def external_url(refname):
-    """
-    Attempts to guess an absolute URL for the external identifier
-    given.
-
-    Note that this just returns the refname with an ".ext" suffix.
-    It will be up to whatever is interpreting the URLs to map it
-    to an appropriate documentation page.
-    """
-    return '/%s.ext' % refname
-
-  def is_external_linkable(name):
-    return external_links and pyident.match(name) and '.' in name
-
-  def lookup(refname):
-    """
-    Given a fully qualified identifier name, return its refname
-    with respect to the current module and a value for a `href`
-    attribute. If `refname` is not in the public interface of
-    this module or its submodules, then `None` is returned for
-    both return values. (Unless this module has enabled external
-    linking.)
-
-    In particular, this takes into account sub-modules and external
-    identifiers. If `refname` is in the public API of the current
-    module, then a local anchor link is given. If `refname` is in the
-    public API of a sub-module, then a link to a different page with
-    the appropriate anchor is given. Otherwise, `refname` is
-    considered external and no link is used.
-    """
-    d = module.find_ident(refname)
-    if isinstance(d, pdoc.External):
-      if is_external_linkable(refname):
-        return d.refname, external_url(d.refname)
-      else:
-        return None, None
-    if isinstance(d, pdoc.Module):
-      return d.refname, module_url(d)
-    if module.is_public(d.refname):
-      return d.name, '#%s' % d.refname
-    return d.refname, '%s#%s' % (module_url(d.module), d.refname)
-
-  def link(refname):
-    """
-    A convenience wrapper around `href` to produce the full
-    `a` tag if `refname` is found. Otherwise, plain text of
-    `refname` is returned.
-    """
-    name, url = lookup(refname)
-    if name is None:
-      return refname
-    return '<a href="%s">%s</a>' % (url, name)
+  def link(d, name=None, fmt='{}'):
+    name = fmt.format(name or d.qualname + ('()' if isinstance(d, pdoc.Function) else ''))
+    if not isinstance(d, pdoc.Doc) or isinstance(d, pdoc.External) and not external_links:
+        return name
+    if not show_inherited_members:
+      d = d.inherits_top()
+    return '<a href="{}">{}</a>'.format(d.url(relative_to=module, link_prefix=link_prefix), name)
 %>
+
 <%def name="ident(name)"><span class="ident">${name}</span></%def>
 
 <%def name="show_source(d)">
@@ -147,9 +70,9 @@
       <p class="inheritance">
           <em>Inherited from:</em>
           % if hasattr(d.inherits, 'cls'):
-              <code>${link(d.inherits.cls.refname)}</code>.<code>${link(d.inherits.refname)}</code>
+              <code>${link(d.inherits.cls)}</code>.<code>${link(d.inherits, d.name)}</code>
           % else:
-              <code>${link(d.inherits.refname)}</code>
+              <code>${link(d.inherits)}</code>
           % endif
       </p>
   % endif
@@ -179,7 +102,7 @@
 <%def name="show_column_list(items)">
   <ul class="${'two-column' if len(items) >= 6 else ''}">
   % for item in items:
-    <li><code>${link(item.refname)}</code></li>
+    <li><code>${link(item, item.name)}</code></li>
   % endfor
   </ul>
 </%def>
@@ -206,7 +129,7 @@
       <% parts = module.name.split('.')[:-1] %>
       % for i, m in enumerate(parts):
         <% parent = '.'.join(parts[:i+1]) %>
-        :: <a href="/${parent.replace('.', '/')}">${parent}</a>
+        :: <a href="/${parent.replace('.', '/')}/">${parent}</a>
       % endfor
     </nav>
   % endif
@@ -223,7 +146,7 @@
     <h2 class="section-title" id="header-submodules">Sub-modules</h2>
     <dl>
     % for m in submodules:
-      <dt><code class="name">${link(m.refname)}</code></dt>
+      <dt><code class="name">${link(m)}</code></dt>
       <dd>${show_desc(m, limit=300)}</dd>
     % endfor
     </dl>
@@ -269,7 +192,7 @@
       <dt id="${c.refname}"><code class="flex name class">
           <span>class ${ident(c.name)}</span>
           % if mro:
-              <span>(</span><span><small>ancestors:</small> ${', '.join(link(cls.refname) for cls in mro)})</span>
+              <span>(</span><span><small>ancestors:</small> ${', '.join(link(cls) for cls in mro)})</span>
           %endif
       </code></dt>
 
@@ -279,7 +202,7 @@
           <h3>Subclasses</h3>
           <ul class="hlist">
           % for sub in subclasses:
-              <li>${link(sub.refname)}</li>
+              <li>${link(sub)}</li>
           % endfor
           </ul>
       % endif
@@ -338,7 +261,7 @@
     % if supermodule:
     <li><h3>Super-module</h3>
       <ul>
-        <li><code>${link(supermodule.refname)}</code></li>
+        <li><code>${link(supermodule)}</code></li>
       </ul>
     </li>
     % endif
@@ -347,7 +270,7 @@
     <li><h3><a href="#header-submodules">Sub-modules</a></h3>
       <ul>
       % for m in submodules:
-        <li><code>${link(m.refname)}</code></li>
+        <li><code>${link(m)}</code></li>
       % endfor
       </ul>
     </li>
@@ -370,7 +293,7 @@
       <ul>
       % for c in classes:
         <li>
-        <h4><code>${link(c.refname)}</code></h4>
+        <h4><code>${link(c)}</code></h4>
         <%
             members = c.functions() + c.methods()
             if list_class_variables_in_index:

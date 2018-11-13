@@ -200,17 +200,9 @@ __version__ = "0.3.2"
 The current version of pdoc. This value is read from `setup.py`.
 """
 
-html_module_suffix = ".m.html"
-"""
-The suffix to use for module HTML files. By default, this is set to
-`.m.html`, where the extra `.m` is used to differentiate a package's
-`index.html` from a submodule called `index`.
-"""
-
-html_package_name = "index.html"
-"""
-The file name to use for a package's `__init__.py` module.
-"""
+_URL_MODULE_SUFFIX = '.html'
+_URL_INDEX_MODULE_SUFFIX = '.m.html'  # For modules named literal 'index'
+_URL_PACKAGE_SUFFIX = '/index.html'
 
 __pdoc__ = {}
 
@@ -561,6 +553,36 @@ class Doc:
         """
         return getattr(self.obj, '__qualname__', self.name)
 
+    def url(self, relative_to: 'Module' = None, *, link_prefix: str = ''):
+        """
+        Canonical relative URL (including page fragment) for this
+        documentation object.
+        """
+        if relative_to is None or link_prefix:
+            return link_prefix + self._url()
+
+        if self.module.name == relative_to.name:
+            return '#' + self.refname
+
+        # Otherwise, compute relative path from current module to link target
+        url = os.path.relpath(self._url(), relative_to.url())
+        # We have one set of '..' too many
+        if url.startswith('../'):
+            url = url[3:]
+        return url
+
+    def _url(self):
+        return self.module._url() + '#' + self.refname
+
+    def inherits_top(self):
+        """
+        Follow the `pdoc.Doc.inherits` chain and return the top object.
+        """
+        top = self
+        while top.inherits:
+            top = top.inherits
+        return top
+
     def __lt__(self, other):
         return self.name < other.name
 
@@ -805,6 +827,14 @@ class Module(Doc):
         alphabetically as a list of `pdoc.Module`.
         """
         return [m for m in self._submodules if self._docfilter(m)]
+
+    def _url(self):
+        url = self.module.name.replace('.', '/')
+        if self.is_package:
+            return url + _URL_PACKAGE_SUFFIX
+        elif url.endswith('/index'):
+            return url + _URL_INDEX_MODULE_SUFFIX
+        return url + _URL_MODULE_SUFFIX
 
 
 class Class(Doc):
@@ -1155,3 +1185,6 @@ class External(Doc):
         should be a fully qualified name.
         """
         super().__init__(name, None, None)
+
+    def url(self, *args, **kwargs):
+        return '/%s.ext' % self.name

@@ -190,8 +190,8 @@ class WebDoc(BaseHTTPRequestHandler):
     def resolve_ext(self, import_path):
         def exists(p):
             p = path.join(args.html_dir, p)
-            pkg = path.join(p, pdoc.html_package_name)
-            mod = p + pdoc.html_module_suffix
+            pkg = path.join(p, pdoc._URL_PACKAGE_SUFFIX.lstrip('/'))
+            mod = p + pdoc._URL_MODULE_SUFFIX
 
             if path.isfile(pkg):
                 return pkg[len(args.html_dir):]
@@ -209,20 +209,19 @@ class WebDoc(BaseHTTPRequestHandler):
 
     @property
     def import_path_from_req_url(self):
-        pieces = self.path.split('#')[0].strip('/').split('/')
-        if pieces[-1] == pdoc.html_package_name:
-            pieces = pieces[:-1]
-        if pieces[-1].endswith(pdoc.html_module_suffix):
-            pieces[-1] = pieces[-1][: -len(pdoc.html_module_suffix)]
-        return ".".join(pieces)
+        pth = self.path.split('#')[0].lstrip('/')
+        for suffix in ('/',
+                       pdoc._URL_PACKAGE_SUFFIX,
+                       pdoc._URL_INDEX_MODULE_SUFFIX,
+                       pdoc._URL_MODULE_SUFFIX):
+            if pth.endswith(suffix):
+                pth = pth[:-len(suffix)]
+                break
+        return pth.replace('/', '.')
 
 
 def module_html_path(m: pdoc.Module):
-    mbase = path.join(args.html_dir, *m.name.split("."))
-    if m.is_package:
-        return path.join(mbase, pdoc.html_package_name)
-    else:
-        return "%s%s" % (mbase, pdoc.html_module_suffix)
+    return path.join(args.html_dir, *m.url().split('/'))
 
 
 def _quit_if_exists(m: pdoc.Module):

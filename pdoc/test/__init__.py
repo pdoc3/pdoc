@@ -70,16 +70,17 @@ class CliTest(unittest.TestCase):
     ALL_FILES = [
         'example_pkg',
         'example_pkg/index.html',
-        'example_pkg/module.m.html',
+        'example_pkg/index.m.html',
+        'example_pkg/module.html',
         'example_pkg/_private',
         'example_pkg/_private/index.html',
-        'example_pkg/_private/module.m.html',
+        'example_pkg/_private/module.html',
         'example_pkg/subpkg',
-        'example_pkg/subpkg/_private.m.html',
+        'example_pkg/subpkg/_private.html',
         'example_pkg/subpkg/index.html',
         'example_pkg/subpkg2',
-        'example_pkg/subpkg2/_private.m.html',
-        'example_pkg/subpkg2/module.m.html',
+        'example_pkg/subpkg2/_private.html',
+        'example_pkg/subpkg2/module.html',
         'example_pkg/subpkg2/index.html',
     ]
     PUBLIC_FILES = [f for f in ALL_FILES if '/_' not in f]
@@ -150,7 +151,7 @@ class CliTest(unittest.TestCase):
                     self._check_files(include_patterns, exclude_patterns)
 
         filenames_files = {
-            ('module.py',): [EXAMPLE_MODULE, EXAMPLE_MODULE + '/module.m.html'],
+            ('module.py',): [EXAMPLE_MODULE, EXAMPLE_MODULE + '/module.html'],
             ('module.py', 'subpkg2'): [f for f in self.PUBLIC_FILES
                                        if 'module' in f or 'subpkg2' in f or f == EXAMPLE_MODULE],
         }
@@ -301,7 +302,7 @@ class CliTest(unittest.TestCase):
 class ApiTest(unittest.TestCase):
     def test_module(self):
         modules = {
-            EXAMPLE_MODULE: ('', ('module', 'subpkg', 'subpkg2')),
+            EXAMPLE_MODULE: ('', ('index', 'module', 'subpkg', 'subpkg2')),
             os.path.join(EXAMPLE_MODULE, 'subpkg2'): ('.subpkg2', ('subpkg2.module',)),
         }
         with chdir(TESTS_BASEDIR):
