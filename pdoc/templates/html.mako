@@ -5,33 +5,9 @@
     list_class_variables_in_index = False
 %>
 <%
-  import re
-
-  import markdown
-
   import pdoc
-  from pdoc.html_helpers import glimpse
+  from pdoc.html_helpers import glimpse, to_html as _to_html
 
-  # Whether we're showing the module list or a single module.
-  module_list = 'modules' in context.keys()
-
-  def linkify(match, _is_pyident=re.compile(r'^[a-zA-Z_]\w*(\.\w+)+$').match):
-    matched = match.group(0)
-    refname = matched[1:-1]
-    if not _is_pyident(refname):
-        return matched
-    dobj = module.find_ident(refname)
-    return link(dobj, '<code>' + dobj.qualname + '</code>')
-
-  def mark(s, linky=True):
-    if linky:
-      s, _ = re.subn('\b\n\b', ' ', s)
-    if not module_list:
-      s, _ = re.subn('`[^`]+`', linkify, s)
-
-    extensions = []
-    s = markdown.markdown(s.strip(), extensions=extensions)
-    return s
 
   def link(d, name=None, fmt='{}'):
     name = fmt.format(name or d.qualname + ('()' if isinstance(d, pdoc.Function) else ''))
@@ -40,6 +16,10 @@
     if not show_inherited_members:
       d = d.inherits_top()
     return '<a href="{}">{}</a>'.format(d.url(relative_to=module, link_prefix=link_prefix), name)
+
+
+  def to_html(text):
+    return _to_html(text, module=module, link=link)
 %>
 
 <%def name="ident(name)"><span class="ident">${name}</span></%def>
@@ -72,7 +52,7 @@
           % endif
       </p>
   % endif
-  <div${inherits}>${docstring | mark}</div>
+  <div${inherits}>${docstring | to_html}</div>
   % if not isinstance(d, pdoc.Module):
   ${show_source(d)}
   % endif
@@ -88,7 +68,7 @@
   % for name, desc in modules:
       <div class="flex">
       <dt><a href="${link_prefix}${name}">${name}</a></dt>
-      <dd>${desc | glimpse, mark}</dd>
+      <dd>${desc | glimpse, to_html}</dd>
       </div>
   % endfor
   </dl>
@@ -133,7 +113,7 @@
   </header>
 
   <section id="section-intro">
-  ${module.docstring | mark}
+  ${module.docstring | to_html}
   ${show_source(module)}
   </section>
 
@@ -317,6 +297,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
   <meta name="generator" content="pdoc ${pdoc.__version__}" />
+
+<%
+    module_list = 'modules' in context.keys()  # Whether we're showing module list in server mode
+%>
 
   % if module_list:
     <title>Python module list</title>

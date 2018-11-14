@@ -14,7 +14,10 @@ from urllib.request import urlopen
 
 import pdoc
 from pdoc.cli import main, parser
-from pdoc.html_helpers import minify_css, minify_html, glimpse
+from pdoc.html_helpers import (
+    minify_css, minify_html, glimpse, to_html,
+    ReferenceWarning,
+)
 
 TESTS_BASEDIR = os.path.abspath(os.path.dirname(__file__) or '.')
 EXAMPLE_MODULE = 'example_pkg'
@@ -407,6 +410,34 @@ class HtmlHelpersTest(unittest.TestCase):
         self.assertEqual(glimpse(text), 'foo bar …')
         self.assertEqual(glimpse(text, max_length=8, paragraph=False), 'foo …')
         self.assertEqual(glimpse('Foo bar\n-------'), 'Foo bar')
+
+    def test_to_html(self):
+        text = '# Title\n\n`pdoc.Module` is a `Doc`, not `dict`.'
+        expected = ('<h1 id="title">Title</h1>\n'
+                    '<p><a href="#pdoc.Module">Module</a> is a <a href="#pdoc.Doc">Doc</a>, '
+                    'not <code>dict</code>.</p>')
+
+        module = pdoc.Module(pdoc)
+
+        def link(dobj, *args, **kwargs):
+            return '<a href="{}">{}</a>'.format(dobj.url(relative_to=module), dobj.qualname)
+
+        html = to_html(text, module=module, link=link)
+        self.assertEqual(html, expected)
+
+        self.assertIn('<a href=', to_html('`pdoc.Doc.url()`', module=module, link=link))
+
+    def test_to_html_refname_warning(self):
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+
+        def f():
+            """Reference to some `example_pkg.nonexisting` object"""
+
+        mod.doc['__f'] = pdoc.Function('__f', mod, f)
+        with self.assertWarns(ReferenceWarning) as cm:
+            mod.html()
+        del mod.doc['__f']
+        self.assertIn('example_pkg.nonexisting', cm.warning.args[0])
 
 
 class HttpTest(unittest.TestCase):

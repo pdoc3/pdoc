@@ -3,6 +3,11 @@ Helper functions for HTML output.
 """
 import re
 from functools import partial
+from warnings import warn
+
+import markdown
+
+import pdoc
 
 
 def minify_css(css,
@@ -61,3 +66,74 @@ def glimpse(text, max_length=153, *, paragraph=True,
         if not text.endswith('.') or not paragraph:
             text = text.rstrip('. ') + ' …'
     return text
+
+
+_md = markdown.Markdown(
+    output_format='html5',
+    extensions=[
+        "markdown.extensions.abbr",
+        "markdown.extensions.attr_list",
+        "markdown.extensions.fenced_code",
+        "markdown.extensions.footnotes",
+        "markdown.extensions.tables",
+        "markdown.extensions.admonition",
+        "markdown.extensions.smarty",
+    ],
+    extension_configs={
+        "markdown.extensions.smarty": dict(
+            smart_dashes=True,
+            smart_ellipses=True,
+            smart_quotes=False,
+            smart_angled_quotes=False,
+        ),
+    },
+)
+
+
+class ReferenceWarning(UserWarning):
+    """
+    This warning is raised in `to_html` when a object reference in markdown
+    doesn't match any documented objects.
+
+    Look for this warning to catch typos / references to obsolete symbols.
+    """
+
+
+def to_html(text, docformat='markdown', *,
+            module: pdoc.Module = None, link=None,
+            # Matches markdown code spans not +directly+ within links.
+            # E.g. `code` and [foo is `bar`]() but not [`code`](...)
+            # Also skips \-escaped grave quotes.
+            _code_refs=re.compile(r'(?<![\[\\])`(?!\])([^`]|(?<=\\)`)+`').sub):
+    """
+    Returns HTML of `text` interpreted as `docformat`.
+
+    `module` should be the documented module (so the references can be
+    resolved) and `link` is the hyperlinking function like the one in the
+    example template.
+    """
+    assert docformat in ('markdown', 'md'), docformat  # TODO: Add support for NumpyDoc / Google
+
+    if module and link:
+
+        def linkify(match, _is_pyident=re.compile(r'^[a-zA-Z_]\w*(\.\w+)+$').match):
+            nonlocal link, module
+            matched = match.group(0)
+            refname = matched[1:-1]
+            refname = refname.rstrip('()')  # Function specified with parentheses
+            dobj = module.find_ident(refname)
+            if isinstance(dobj, pdoc.External):
+                if not _is_pyident(refname):
+                    return matched
+                # If refname in documentation has a typo or is obsolete, warn.
+                # XXX: Assume at least the first part of refname, i.e. the package, is correct.
+                module_part = module.find_ident(refname.split('.')[0])
+                if not isinstance(module_part, pdoc.External):
+                    warn('Code reference `{}` in module "{}" does not match any '
+                         'documented object.'.format(refname, module.refname),
+                         ReferenceWarning, stacklevel=3)
+            return link(dobj, fmt='`{}`')
+
+        text = _code_refs(linkify, text)
+
+    return _md.reset().convert(text)
