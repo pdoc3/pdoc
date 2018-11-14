@@ -10,6 +10,7 @@
   import markdown
 
   import pdoc
+  from pdoc.html_helpers import glimpse
 
   # Whether we're showing the module list or a single module.
   module_list = 'modules' in context.keys()
@@ -32,11 +33,6 @@
     s = markdown.markdown(s.strip(), extensions=extensions)
     return s
 
-  def glimpse(s, length=100):
-    if len(s) < length:
-      return s
-    return s[0:length] + '...'
-
   def link(d, name=None, fmt='{}'):
     name = fmt.format(name or d.qualname + ('()' if isinstance(d, pdoc.Function) else ''))
     if not isinstance(d, pdoc.Doc) or isinstance(d, pdoc.External) and not external_links:
@@ -57,14 +53,14 @@
     %endif
 </%def>
 
-<%def name="show_desc(d, limit=None)">
+<%def name="show_desc(d, short=False)">
   <%
   inherits = (' class="inherited"'
               if d.inherits and (not d.docstring or d.docstring == d.inherits.docstring) else
               '')
   docstring = d.inherits.docstring if inherits else d.docstring
-  if limit is not None:
-    docstring = glimpse(docstring, limit)
+  if short or inherits:
+    docstring = glimpse(docstring)
   %>
   % if d.inherits:
       <p class="inheritance">
@@ -147,7 +143,7 @@
     <dl>
     % for m in submodules:
       <dt><code class="name">${link(m)}</code></dt>
-      <dd>${show_desc(m, limit=300)}</dd>
+      <dd>${show_desc(m, short=True)}</dd>
     % endfor
     </dl>
     % endif

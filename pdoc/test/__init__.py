@@ -14,8 +14,7 @@ from urllib.request import urlopen
 
 import pdoc
 from pdoc.cli import main, parser
-from pdoc.html_helpers import minify_css, minify_html
-
+from pdoc.html_helpers import minify_css, minify_html, glimpse
 
 TESTS_BASEDIR = os.path.abspath(os.path.dirname(__file__) or '.')
 EXAMPLE_MODULE = 'example_pkg'
@@ -402,6 +401,12 @@ class HtmlHelpersTest(unittest.TestCase):
         expected = '\n<p>\na\n</p>\n<pre>    a\n    b</pre>\nc\nd\n'
         minified = minify_html(html)
         self.assertEqual(minified, expected)
+
+    def test_glimpse(self):
+        text = 'foo bar\n\nbaz'
+        self.assertEqual(glimpse(text), 'foo bar …')
+        self.assertEqual(glimpse(text, max_length=8, paragraph=False), 'foo …')
+        self.assertEqual(glimpse('Foo bar\n-------'), 'Foo bar')
 
 
 class HttpTest(unittest.TestCase):

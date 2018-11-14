@@ -37,3 +37,27 @@ def minify_html(html,
         if line:
             out.append(line)
     return '\n'.join(out)
+
+
+def glimpse(text, max_length=153, *, paragraph=True,
+            _split_paragraph=partial(re.compile(r'\s*\n\s*\n\s*').split, maxsplit=1),
+            _trim_last_word=partial(re.compile(r'\S+$').sub, ''),
+            _remove_titles=partial(re.compile(r'^(#+|-{4,}|={4,})', re.MULTILINE).sub, ' ')):
+    """
+    Returns a short excerpt (e.g. first paragraph) of text.
+    If `paragraph` is True, the first paragraph will be returned,
+    but never longer than `max_length` characters.
+    """
+    text = text.lstrip()
+    if paragraph:
+        text, *rest = _split_paragraph(text)
+        if rest:
+            text = text.rstrip('.')
+            text += ' …'
+        text = _remove_titles(text).strip()
+
+    if len(text) > max_length:
+        text = _trim_last_word(text[:max_length - 2])
+        if not text.endswith('.') or not paragraph:
+            text = text.rstrip('. ') + ' …'
+    return text
