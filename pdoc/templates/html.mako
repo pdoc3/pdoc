@@ -2,11 +2,12 @@
     # Template configuration
     html_lang = 'en'
     show_inherited_members = True
+    extract_module_toc_into_sidebar = True
     list_class_variables_in_index = False
 %>
 <%
   import pdoc
-  from pdoc.html_helpers import glimpse, to_html as _to_html
+  from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html
 
 
   def link(d, name=None, fmt='{}'):
@@ -233,6 +234,7 @@
   %>
   <nav id="sidebar">
     <h1>Index</h1>
+    ${extract_toc(module.docstring) if extract_module_toc_into_sidebar else ''}
     <ul id="index">
     % if supermodule:
     <li><h3>Super-module</h3>

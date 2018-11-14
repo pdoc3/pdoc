@@ -109,6 +109,7 @@
       margin-top: 0;
     }
 
+  .toc ul,
   #index {
     list-style-type: none;
     margin: 0;
@@ -239,8 +240,12 @@
       flex-direction: row-reverse;
       justify-content: flex-end;
     }
+    .toc ul ul,
     #index ul {
       padding-left: 1.5em;
+    }
+    .toc > ul > li {
+      margin-top: .5em;
     }
   }
 </%def>

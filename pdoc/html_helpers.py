@@ -78,6 +78,7 @@ _md = markdown.Markdown(
         "markdown.extensions.tables",
         "markdown.extensions.admonition",
         "markdown.extensions.smarty",
+        "markdown.extensions.toc",
     ],
     extension_configs={
         "markdown.extensions.smarty": dict(
@@ -137,3 +138,13 @@ def to_html(text, docformat='markdown', *,
         text = _code_refs(linkify, text)
 
     return _md.reset().convert(text)
+
+
+def extract_toc(text):
+    """
+    Returns HTML Table of Contents containing markdown titles in `text`.
+    """
+    toc, _ = _md.reset().convert('[TOC]\n\n@CUT@\n\n' + text).split('@CUT@', 1)
+    if toc.endswith('<p>'):  # CUT was put into its own paragraph
+        toc = toc[:-3].rstrip()
+    return toc

@@ -16,7 +16,7 @@ import pdoc
 from pdoc.cli import main, parser
 from pdoc.html_helpers import (
     minify_css, minify_html, glimpse, to_html,
-    ReferenceWarning,
+    ReferenceWarning, extract_toc,
 )
 
 TESTS_BASEDIR = os.path.abspath(os.path.dirname(__file__) or '.')
@@ -438,6 +438,19 @@ class HtmlHelpersTest(unittest.TestCase):
             mod.html()
         del mod.doc['__f']
         self.assertIn('example_pkg.nonexisting', cm.warning.args[0])
+
+    def test_extract_toc(self):
+        text = 'xxx\n\n# Title\n\nfoo\n\n## Subtitle\n\nbar'
+        expected = '''<div class="toc">
+<ul>
+<li><a href="#title">Title</a><ul>
+<li><a href="#subtitle">Subtitle</a></li>
+</ul>
+</li>
+</ul>
+</div>'''
+        toc = extract_toc(text)
+        self.assertEqual(toc, expected)
 
 
 class HttpTest(unittest.TestCase):
