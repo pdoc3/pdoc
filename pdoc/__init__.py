@@ -188,6 +188,7 @@ import pkgutil
 import re
 import sys
 from copy import copy
+from functools import lru_cache
 from itertools import chain, tee, groupby
 from warnings import warn
 
@@ -486,6 +487,7 @@ class Doc:
     also correspond to unexported members of the module, particularly in
     a class's ancestor list.)
     """
+    __slots__ = ('module', 'name', 'obj', 'docstring', 'inherits')
 
     def __init__(self, name, module, obj, docstring=None):
         """
@@ -523,6 +525,7 @@ class Doc:
         return '<{} {!r}>'.format(self.__class__.__name__, self.refname)
 
     @property
+    @lru_cache()
     def source(self):
         """
         Cleaned (dedented) source code of the Python object. If not
@@ -553,6 +556,7 @@ class Doc:
         """
         return getattr(self.obj, '__qualname__', self.name)
 
+    @lru_cache()
     def url(self, relative_to: 'Module' = None, *, link_prefix: str = ''):
         """
         Canonical relative URL (including page fragment) for this
@@ -599,6 +603,8 @@ class Module(Doc):
         The name of this module with respect to the context in which
         it was imported. It is always an absolute import path.
         """
+
+    __slots__ = ('_docfilter', 'supermodule', '_submodules', 'doc', 'refdoc')
 
     def __init__(self, module, docfilter=None, supermodule=None):
         """
@@ -841,6 +847,7 @@ class Class(Doc):
     """
     Representation of a class's documentation.
     """
+    __slots__ = ('doc',)
 
     def __init__(self, name, module, class_obj):
         """
@@ -1026,6 +1033,7 @@ class Function(Doc):
     """
     Representation of documentation for a Python function or method.
     """
+    __slots__ = ('cls', 'method')
 
     def __init__(self, name, module, func_obj, cls=None, method=False):
         """
@@ -1075,6 +1083,7 @@ class Function(Doc):
         except AttributeError:
             return False
 
+    @lru_cache()
     def params(self):
         """
         Returns a list where each element is a nicely formatted
@@ -1128,6 +1137,7 @@ class Variable(Doc):
     Representation of a variable's documentation. This includes
     module, class and instance variables.
     """
+    __slots__ = ('cls', 'instance_var')
 
     def __init__(self, name, module, docstring, *, obj=None, cls=None, instance_var=False):
         """

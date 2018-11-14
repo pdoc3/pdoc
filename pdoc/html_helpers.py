@@ -2,7 +2,7 @@
 Helper functions for HTML output.
 """
 import re
-from functools import partial
+from functools import partial, lru_cache
 from warnings import warn
 
 import markdown
@@ -10,6 +10,7 @@ import markdown
 import pdoc
 
 
+@lru_cache()
 def minify_css(css,
                _whitespace=partial(re.compile(r'\s*([,{:;}])\s*').sub, r'\1'),
                _comments=partial(re.compile(r'/\*.*?\*/', flags=re.DOTALL).sub, ''),
