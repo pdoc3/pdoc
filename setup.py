@@ -1,63 +1,57 @@
-import codecs
-from distutils.core import setup
-import os.path as path
+import os
+import sys
+from setuptools import setup, find_packages
 
-cwd = path.dirname(__file__)
-longdesc = codecs.open(path.join(cwd, "longdesc.rst"), "r", "utf-8").read()
-version = "0.0.0"
-with codecs.open(path.join(cwd, "pdoc", "__init__.py"), "r", "utf-8") as f:
-    for line in f:
-        if line.startswith("__version__"):
-            exec(line.strip())
-            version = __version__
-            break
+if sys.version_info < (3, 4):
+    sys.exit('ERROR: pdoc requires Python 3.4+')
 
-setup(
-    name="pdoc",
-    author="Andrew Gallant",
-    author_email="pdoc@burntsushi.net",
-    version=version,
-    license="AGPL-3.0",
-    description="A simple program and library to auto generate API "
-    "documentation for Python modules.",
-    long_description=longdesc,
-    url="https://github.com/BurntSushi/pdoc",
-    classifiers=[
-        "Topic :: Documentation",
-        "Topic :: Software Development :: Documentation",
-        "Topic :: Utilities",
-        "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
-        "Development Status :: 3 - Alpha",
-        "Environment :: Console",
-        "Intended Audience :: Developers",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3",
-    ],
-    platforms="ANY",
-    packages=["pdoc"],
-    package_data={"pdoc": ["templates/*"]},
-    data_files=[
-        (
-            "share/pdoc",
-            ["README.md", "longdesc.rst", "UNLICENSE", "INSTALL", "CHANGELOG"],
-        ),
-        ("share/doc/pdoc", ["doc/pdoc/index.html"]),
-    ],
-    entry_points={"console_scripts": ["pdoc = pdoc.cli:main"]},
-    provides=["pdoc"],
-    extras_require={
-        "dev": {
-            "black",
-            "flake8>=3.5, <3.6",
-            "pytest>=3.3,<4",
-            "pytest-cov>=2.5.1,<3",
-            "pytest-faulthandler>=1.3.1,<2",
-            "pytest-timeout>=1.2.1,<2",
-            "pytest-xdist>=1.22,<2",
-        }
-    },
-    install_requires=[
-        "mako",
-        "markdown",
-    ],
-)
+
+def _discover_tests():
+    import unittest
+    return unittest.defaultTestLoader.discover('pdoc.test')
+
+
+if __name__ == '__main__':
+    setup(
+        name="pdoc3",
+        author="Andrew Gallant",
+        license="AGPL-3.0",
+        description="Auto-generate API documentation for Python projects.",
+        long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
+        long_description_content_type='text/markdown',
+        url="https://github.com/mitmproxy/pdoc",
+        classifiers=[
+            "Topic :: Documentation",
+            "Topic :: Software Development :: Documentation",
+            "Topic :: Utilities",
+            "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+            "Development Status :: 5 - Production/Stable",
+            "Environment :: Console",
+            "Intended Audience :: Developers",
+            "Operating System :: OS Independent",
+            'Programming Language :: Python :: 3 :: Only',
+        ],
+        entry_points={
+            "console_scripts": [
+                "pdoc = pdoc.cli:main",
+                "pdoc3 = pdoc.cli:main",
+            ],
+        },
+        packages=find_packages(),
+        include_package_data=True,
+        provides=["pdoc"],
+        install_requires=[
+            "mako",
+            "markdown",
+            'typing ; python_version < "3.5"',
+        ],
+        setup_requires=[
+            'setuptools_git',
+            'setuptools_scm',
+        ],
+        use_scm_version={
+            'write_to': os.path.join('pdoc', '_version.py'),
+        },
+        test_suite="setup._discover_tests",
+        python_requires='>= 3.4',
+    )

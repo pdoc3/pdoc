@@ -1,12 +1,9 @@
-.*.swp
-tags
-build
-MANIFEST
 dist
 *.egg-info
-*.pyc
-*.pyo
+*.py[cod]
+
 venv
-.pytest_cache
 .coverage
-.tox
+.*_cache/*
+
+*.html

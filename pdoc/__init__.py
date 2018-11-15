@@ -194,11 +194,11 @@ from warnings import warn
 from mako.lookup import TemplateLookup
 from mako.exceptions import TopLevelLookupException
 
+try:
+    from pdoc._version import version as __version__  # noqa: F401
+except ImportError:
+    __version__ = '???'  # Package not installed
 
-__version__ = "0.3.2"
-"""
-The current version of pdoc. This value is read from `setup.py`.
-"""
 
 _URL_MODULE_SUFFIX = '.html'
 _URL_INDEX_MODULE_SUFFIX = '.m.html'  # For modules named literal 'index'
