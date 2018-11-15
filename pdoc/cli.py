@@ -155,10 +155,14 @@ class WebDoc(BaseHTTPRequestHandler):
                     code = 404
                     out = "External identifier <code>%s</code> not found." % import_path
             else:
-                self.send_response(302)
-                self.send_header("Location", resolved)
-                self.end_headers()
-                return
+                return self.redirect(resolved)
+        # Redirect '/pdoc' to '/pdoc/' so that relative links work
+        # (results in '/pdoc/cli.html' instead of 'cli.html')
+        elif not self.path.endswith(('/', '.html')):
+            return self.redirect(self.path + '/')
+        # Redirect '/pdoc/index.html' to '/pdoc/' so it's more pretty
+        elif self.path.endswith(pdoc._URL_PACKAGE_SUFFIX):
+            return self.redirect(self.path[:-len(pdoc._URL_PACKAGE_SUFFIX)] + '/')
         else:
             out = self.html()
             if out is None:
@@ -169,6 +173,11 @@ class WebDoc(BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/html; charset=utf-8")
         self.end_headers()
         self.echo(out)
+
+    def redirect(self, location):
+        self.send_response(302)
+        self.send_header("Location", location)
+        self.end_headers()
 
     def echo(self, s):
         self.wfile.write(s.encode("utf-8"))
