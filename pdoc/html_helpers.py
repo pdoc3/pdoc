@@ -21,27 +21,19 @@ def minify_css(css,
 
 
 def minify_html(html,
-                _contains_pre=re.compile(r'<pre\b', re.IGNORECASE).search,
-                _ends_pre=re.compile(r'</pre\b', re.IGNORECASE).search,
-                _norm_space=partial(re.compile(r'\s\s+').sub, ' ')):
+                _minify=partial(
+                    re.compile(r'(.*?)(<pre\b.*?</pre\b\s*>)|(.*)', re.IGNORECASE | re.DOTALL).sub,
+                    lambda m, _norm_space=partial(re.compile(r'\s\s+').sub, '\n'): (
+                        _norm_space(m.group(1) or '') +
+                        (m.group(2) or '') +
+                        _norm_space(m.group(3) or '')
+                    ))
+                ):
     """
     Minify HTML by replacing all consecutive whitespace with a single space
     (or newline) character, except inside `<pre>` tags.
     """
-    out = []
-    lines = iter(html.split('\n'))
-    for line in lines:
-        if _contains_pre(line):
-            out.append(line.lstrip())
-            while not _ends_pre(line) or _contains_pre(line):
-                line = next(lines)
-                out.append(line)
-            out[-1] = out[-1].rstrip()
-            continue
-        line = _norm_space(line.strip())
-        if line:
-            out.append(line)
-    return '\n'.join(out)
+    return _minify(html)
 
 
 def glimpse(text, max_length=153, *, paragraph=True,
