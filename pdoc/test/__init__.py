@@ -211,7 +211,7 @@ class CliTest(unittest.TestCase):
 
         with run_html(EXAMPLE_MODULE, external_links=None):
             self._basic_html_assertions()
-            self._check_files(['<a href="/sys.version.ext"'])
+            self._check_files(['<a title="sys.version" href="/sys.version.ext"'])
 
     def test_template_dir(self):
         old_tpl_dirs = pdoc.tpl_lookup.directories.copy()

@@ -16,7 +16,8 @@
         return name
     if not show_inherited_members:
       d = d.inherits_top()
-    return '<a href="{}">{}</a>'.format(d.url(relative_to=module, link_prefix=link_prefix), name)
+    url = d.url(relative_to=module, link_prefix=link_prefix)
+    return '<a title="{}" href="{}">{}</a>'.format(d.refname, url, name)
 
 
   def to_html(text):
