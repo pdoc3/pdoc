@@ -103,9 +103,7 @@ ${capture(function, m) | indent}
 
 Module ${module.name}
 -------${'-' * len(module.name)}
-% if not module._docfilter:
 ${module.docstring}
-% endif
 
 
 % if len(variables) > 0:

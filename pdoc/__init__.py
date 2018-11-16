@@ -604,9 +604,9 @@ class Module(Doc):
         it was imported. It is always an absolute import path.
         """
 
-    __slots__ = ('_docfilter', 'supermodule', '_submodules', 'doc', 'refdoc')
+    __slots__ = ('supermodule', '_submodules', 'doc', 'refdoc')
 
-    def __init__(self, module, docfilter=None, supermodule=None):
+    def __init__(self, module, *, docfilter=None, supermodule=None):
         """
         Creates a `Module` documentation object given the actual
         module Python object.
@@ -620,7 +620,6 @@ class Module(Doc):
         """
         super().__init__(module.__name__, self, module)
 
-        self._docfilter = docfilter or (lambda _: True)
         self.supermodule = supermodule
         self._submodules = []
 
@@ -673,10 +672,16 @@ class Module(Doc):
                 fullname = "%s.%s" % (self.name, root)
                 m = import_module(fullname)
 
-                submodule = Module(m, docfilter=self._docfilter, supermodule=self)
+                submodule = Module(m, docfilter=docfilter, supermodule=self)
                 self._submodules.append(submodule)
                 self.doc[root] = submodule
             self._submodules.sort()
+
+        # Apply docfilter
+        if docfilter:
+            for name, dobj in self.doc.copy().items():
+                if not docfilter(dobj):
+                    self.doc.pop(name)
 
         # Build the reference name dictionary of the module
         for docobj in self.doc.values():
@@ -804,7 +809,7 @@ class Module(Doc):
 
     def _filter_doc_objs(self, type: type = Doc):
         return sorted(obj for obj in self.doc.values()
-                      if isinstance(obj, type) and self._docfilter(obj))
+                      if isinstance(obj, type))
 
     def variables(self):
         """
@@ -832,7 +837,7 @@ class Module(Doc):
         Returns all documented sub-modules in the module sorted
         alphabetically as a list of `pdoc.Module`.
         """
-        return [m for m in self._submodules if self._docfilter(m)]
+        return self._submodules.copy()
 
     def _url(self):
         url = self.module.name.replace('.', '/')
@@ -942,9 +947,7 @@ class Class(Doc):
 
     def _filter_doc_objs(self, include_inherited=True, filter_func=lambda x: True):
         return sorted(obj for obj in self.doc.values()
-                      if ((include_inherited or not obj.inherits) and
-                          filter_func(obj) and
-                          self.module._docfilter(obj)))  # TODO check if this needed
+                      if (include_inherited or not obj.inherits) and filter_func(obj))
 
     def class_variables(self, include_inherited=True):
         """
