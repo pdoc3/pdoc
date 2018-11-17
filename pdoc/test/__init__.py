@@ -390,6 +390,14 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(b.doc['overridden'].inherits,
                          None)
 
+    def test_inherited_members(self):
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        a = mod.doc['A']
+        b = mod.doc['B']
+        self.assertEqual(b.inherited_members(), [(a, [a.doc['inherited'],
+                                                      a.doc['overridden_same_docstring']])])
+        self.assertEqual(a.inherited_members(), [])
+
 
 class HtmlHelpersTest(unittest.TestCase):
     def test_minify_css(self):

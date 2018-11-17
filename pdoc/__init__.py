@@ -188,7 +188,7 @@ import pkgutil
 import re
 import sys
 from copy import copy
-from itertools import chain, tee
+from itertools import chain, tee, groupby
 from warnings import warn
 
 from mako.lookup import TemplateLookup
@@ -979,6 +979,18 @@ class Class(Doc):
         return self._filter_doc_objs(
             include_inherited,
             lambda f: isinstance(f, Function) and not f.method)
+
+    def inherited_members(self):
+        """
+        Returns all inherited members as a list of tuples
+        (ancestor class, list of ancestor class' members sorted by name),
+        sorted by MRO.
+        """
+        return sorted(((k, sorted(g))
+                       for k, g in groupby((i.inherits
+                                            for i in self.doc.values() if i.inherits),
+                                           key=lambda i: i.cls)),
+                      key=lambda x, _mro_index=self.mro().index: _mro_index(x[0]))
 
     def _fill_inheritance(self):
         """

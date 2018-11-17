@@ -218,6 +218,28 @@
           % endfor
           </dl>
       % endif
+
+      % if not show_inherited_members:
+          <%
+              members = c.inherited_members()
+          %>
+          % if members:
+              <h3>Inherited members</h3>
+              <ul class="hlist">
+              % for cls, mems in members:
+                  <li><code><b>${link(cls)}</b></code>:
+                      <ul class="hlist">
+                          % for m in mems:
+                              <li><code>${link(m, name=m.name)}</code></li>
+                          % endfor
+                      </ul>
+
+                  </li>
+              % endfor
+              </ul>
+          % endif
+      % endif
+
       </dd>
     % endfor
     </dl>

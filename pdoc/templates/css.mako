@@ -216,6 +216,10 @@
     .hlist li:last-child:after {
       content: none;
     }
+    .hlist .hlist {
+      display: inline;
+      padding-left: 1em;
+    }
 </%def>
 
 <%def name="desktop()" filter="minify_css">
