@@ -222,6 +222,34 @@ if os.getenv("XDG_CONFIG_HOME"):
     tpl_lookup.directories.insert(0, path.join(os.getenv("XDG_CONFIG_HOME"), "pdoc"))
 
 
+class Context(dict):
+    """
+    The context object that maps all documented identifiers
+    (`pdoc.Doc.refname`) to their respective `pdoc.Doc` objects.
+
+    You can pass an instance of `pdoc.Context` to `pdoc.Module` constructor.
+    All `pdoc.Module` objects that share the same `pdoc.Context` will see
+    (and be able to link in HTML to) each other's identifiers.
+    """
+
+
+_global_context = Context()
+
+
+def reset():
+    """Resets the global `pdoc.Context` to the initial (empty) state."""
+    global _global_context
+    _global_context.clear()
+
+    # Clear LRU caches
+    for cls in (Doc, Module, Class, Function, Variable, External):
+        for _, method in inspect.getmembers(cls):
+            if isinstance(method, property):
+                method = method.fget
+            if hasattr(method, 'cache_clear'):
+                method.cache_clear()
+
+
 def _render_template(template_name, **kwargs):
     """
     Returns the Mako template with the given name.  If the template
@@ -604,9 +632,9 @@ class Module(Doc):
         it was imported. It is always an absolute import path.
         """
 
-    __slots__ = ('supermodule', '_submodules', 'doc', 'refdoc')
+    __slots__ = ('supermodule', 'doc', '_context')
 
-    def __init__(self, module, *, docfilter=None, supermodule=None):
+    def __init__(self, module, *, docfilter=None, supermodule=None, context=None):
         """
         Creates a `Module` documentation object given the actual
         module Python object.
@@ -620,17 +648,16 @@ class Module(Doc):
         """
         super().__init__(module.__name__, self, module)
 
+        self._context = _global_context if context is None else context
+        """
+        A lookup table for ALL doc objects of all modules that share this context,
+        mainly used in `Module.find_ident()`.
+        """
+
         self.supermodule = supermodule
-        self._submodules = []
 
         self.doc = {}
         """A mapping from identifier name to a documentation object."""
-
-        self.refdoc = {}
-        """
-        The same as `pdoc.Module.doc`, but maps fully qualified
-        identifier names to documentation objects.
-        """
 
         # Populate self.doc with this module's public members
         if hasattr(self.obj, '__all__'):
@@ -672,10 +699,8 @@ class Module(Doc):
                 fullname = "%s.%s" % (self.name, root)
                 m = import_module(fullname)
 
-                submodule = Module(m, docfilter=docfilter, supermodule=self)
-                self._submodules.append(submodule)
-                self.doc[root] = submodule
-            self._submodules.sort()
+                self.doc[root] = Module(
+                    m, docfilter=docfilter, supermodule=self, context=self._context)
 
         # Apply docfilter
         if docfilter:
@@ -684,21 +709,22 @@ class Module(Doc):
                     self.doc.pop(name)
 
         # Build the reference name dictionary of the module
+        self._context[self.refname] = self
         for docobj in self.doc.values():
-            self.refdoc[docobj.refname] = docobj
+            self._context[docobj.refname] = docobj
             if isinstance(docobj, Class):
-                self.refdoc.update((obj.refname, obj)
-                                   for obj in chain(docobj.class_variables(),
-                                                    docobj.instance_variables(),
-                                                    docobj.methods(),
-                                                    docobj.functions()))
+                self._context.update((obj.refname, obj)
+                                     for obj in chain(docobj.class_variables(),
+                                                      docobj.instance_variables(),
+                                                      docobj.methods(),
+                                                      docobj.functions()))
 
         # Finally look for more docstrings in the __pdoc__ override.
         for name, docstring in getattr(self.obj, "__pdoc__", {}).items():
             refname = "%s.%s" % (self.refname, name)
             if docstring is None:
                 self.doc.pop(name, None)
-                self.refdoc.pop(refname, None)
+                self._context.pop(refname, None)
                 continue
 
             dobj = self.find_ident(refname)
@@ -771,41 +797,15 @@ class Module(Doc):
 
     def find_ident(self, name: str):
         """
-        Searches this module and **all** of its public sub/super-modules
-        for an identifier with name `name` in its list of exported
-        identifiers according to `pdoc`.
-
-        A bare identifier (without `.` separators) will only be checked
-        for in this module.
+        Searches this module and **all** other public modules
+        for an identifier with name `name` in its list of
+        exported identifiers.
 
         The documentation object corresponding to the identifier is
         returned. If one cannot be found, then an instance of
         `External` is returned populated with the given identifier.
         """
-        # Without dot only look in the current module
-        if '.' not in name:
-            return self.doc.get(name) or External(name)
-
-        for module in chain((self,),
-                            self._submodules_recursive(),
-                            self._supermodules_recursive()):
-            if name == module.refname:
-                return module
-            if name in module.refdoc:
-                return module.refdoc[name]
-
-        return External(name)
-
-    def _submodules_recursive(self):
-        yield from self._submodules
-        for module in self._submodules:
-            yield from module._submodules_recursive()
-
-    def _supermodules_recursive(self):
-        module = self.supermodule
-        while module is not None:
-            yield module
-            module = module.supermodule
+        return self.doc.get(name) or self._context.get(name) or External(name)
 
     def _filter_doc_objs(self, type: type = Doc):
         return sorted(obj for obj in self.doc.values()
@@ -837,7 +837,7 @@ class Module(Doc):
         Returns all documented sub-modules in the module sorted
         alphabetically as a list of `pdoc.Module`.
         """
-        return self._submodules.copy()
+        return self._filter_doc_objs(Module)
 
     def _url(self):
         url = self.module.name.replace('.', '/')

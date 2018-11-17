@@ -379,6 +379,8 @@ class ApiTest(unittest.TestCase):
         mod = pdoc.Module(pdoc)
         self.assertIsInstance(mod.find_ident('subpkg'), pdoc.External)
 
+        self.assertIsInstance(mod.find_ident(EXAMPLE_MODULE + '.subpkg'), pdoc.Module)
+
     def test_inherits(self):
         module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
         a = module.doc['A']
@@ -397,6 +399,23 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(b.inherited_members(), [(a, [a.doc['inherited'],
                                                       a.doc['overridden_same_docstring']])])
         self.assertEqual(a.inherited_members(), [])
+
+    def test_context(self):
+        context = {}
+        pdoc.Module(pdoc, context=context)
+        self.assertIn('pdoc', context)
+        self.assertIn('pdoc.cli', context)
+        self.assertIn('pdoc.cli.main', context)
+        self.assertIn('pdoc.Module', context)
+        self.assertIsInstance(context['pdoc'], pdoc.Module)
+        self.assertIsInstance(context['pdoc.cli'], pdoc.Module)
+        self.assertIsInstance(context['pdoc.cli.main'], pdoc.Function)
+        self.assertIsInstance(context['pdoc.Module'], pdoc.Class)
+
+        module = pdoc.Module(pdoc)
+        self.assertIsInstance(module.find_ident('pdoc.Module'), pdoc.Class)
+        pdoc.reset()
+        self.assertIsInstance(module.find_ident('pdoc.Module'), pdoc.External)
 
 
 class HtmlHelpersTest(unittest.TestCase):
