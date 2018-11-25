@@ -175,8 +175,9 @@ public interface of the module.
 
 License
 -------
-`pdoc` is in the public domain via the
-[UNLICENSE](http://unlicense.org).
+`pdoc` is licensed under the terms of GNU [AGPL-3.0] or later.
+
+[AGPL-3.0]: https://www.gnu.org/licenses/agpl-3.0.html
 """
 from __future__ import absolute_import, division, print_function
 import ast

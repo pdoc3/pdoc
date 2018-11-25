@@ -182,5 +182,5 @@ public interface of the module.
 License
 -------
 
-``pdoc`` is in the public domain via the
-`UNLICENSE <http://unlicense.org>`__.
+``pdoc`` is licensed under the terms of
+`GNU AGPL-3.0 <https://www.gnu.org/licenses/agpl-3.0.html>`__ or later.

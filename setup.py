@@ -17,7 +17,7 @@ setup(
     author="Andrew Gallant",
     author_email="pdoc@burntsushi.net",
     version=version,
-    license="UNLICENSE",
+    license="AGPL-3.0",
     description="A simple program and library to auto generate API "
     "documentation for Python modules.",
     long_description=longdesc,
@@ -26,7 +26,7 @@ setup(
         "Topic :: Documentation",
         "Topic :: Software Development :: Documentation",
         "Topic :: Utilities",
-        "License :: Public Domain",
+        "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Developers",
