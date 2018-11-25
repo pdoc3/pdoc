@@ -38,7 +38,7 @@ Features
 
 The above features are explained in more detail in pdoc's documentation.
 
-`pdoc` is compatible with Python 3.6 and newer.
+`pdoc` is compatible with Python 3.4 or later.
 
 
 Example usage
@@ -50,7 +50,7 @@ For example, to view the documentation for the `csv` module in the console:
 
 Or, you could view it by pointing at the file directly:
 
-    pdoc /usr/lib/python2.7/csv.py
+    pdoc /usr/lib/python3/csv.py
 
 Submodules are fine too:
 
@@ -68,7 +68,7 @@ A file called `csv.m.html` will be written to the current directory.
 
 Or start an HTTP server that shows documentation for any installed module:
 
-    pdoc --http
+    pdoc --http :
 
 Then open your web browser to `http://localhost:8080`.
 

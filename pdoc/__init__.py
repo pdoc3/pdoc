@@ -30,8 +30,7 @@ included with this module.
 
 Compatibility
 -------------
-`pdoc` has been tested on Python 2.6, 2.7 and 3.3. It seems to work
-on all three.
+`pdoc` requires Python 3.4+.
 
 
 Contributing
