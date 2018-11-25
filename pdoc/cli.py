@@ -301,6 +301,11 @@ def main(_args=None):
         print('Starting pdoc server on {}:{}'.format(host, port), file=sys.stderr)
         httpd = HTTPServer((host, port), WebDoc)
         print("pdoc server ready at http://%s:%d" % (host, port), file=sys.stderr)
+
+        # Allow tests to perform `pdoc.cli._httpd.shutdown()`
+        global _httpd
+        _httpd = httpd
+
         try:
             httpd.serve_forever()
         finally:

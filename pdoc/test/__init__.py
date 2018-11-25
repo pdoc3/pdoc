@@ -1,7 +1,7 @@
 import os
 import signal
-import subprocess
 import sys
+import threading
 import unittest
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from glob import glob
@@ -506,15 +506,17 @@ class HttpTest(unittest.TestCase):
 
     def test_http(self):
         host, port = 'localhost', randint(9000, 12000)
-        cmd = 'pdoc --http :{} pdoc {}'.format(
+        args = '--http :{} pdoc {}'.format(
             port, os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)).split()
 
         with self._timeout(10):
-            with subprocess.Popen(cmd, stderr=subprocess.PIPE) as proc:
-                sleep(1)
+            with redirect_streams() as (stdout, stderr):
+                t = threading.Thread(target=main, args=(parser.parse_args(args),))
+                t.start()
+                sleep(.1)
 
-                if proc.poll() is not None:
-                    sys.stderr.write(proc.stderr.read().decode(sys.getdefaultencoding()))
+                if not t.is_alive():
+                    sys.stderr.write(stderr.getvalue())
                     raise AssertionError
 
                 try:
@@ -528,9 +530,13 @@ class HttpTest(unittest.TestCase):
                         with urlopen(url + 'pdoc', timeout=3) as resp:
                             html = resp.read()
                             self.assertIn(b'__pdoc__', html)
+                    with self.subTest(url='/csv.ext'):
+                        with urlopen(url + 'csv.ext', timeout=3) as resp:
+                            html = resp.read()
+                            self.assertIn(b'DictReader', html)
                 finally:
-                    proc.terminate()
-                    proc.kill()
+                    pdoc.cli._httpd.shutdown()
+                    t.join()
 
 
 if __name__ == '__main__':
