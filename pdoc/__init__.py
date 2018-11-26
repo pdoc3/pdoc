@@ -1099,7 +1099,6 @@ class Function(Doc):
             # I guess this is for C builtin functions?
             return ["..."]
 
-        # TODO: Optionally skip non-public "_params"
         params = []
         for i, param in enumerate(s.args):
             if s.defaults is not None and len(s.args) - i <= len(s.defaults):
@@ -1123,6 +1122,24 @@ class Function(Doc):
         keywords = getattr(s, "varkw", getattr(s, "keywords", None))
         if keywords is not None:
             params.append("**%s" % keywords)
+
+        # Remove "_private" params following catch-all *args and from the end
+        iter_params = iter(params)
+        params = []
+        for p in iter_params:
+            params.append(p)
+            if p.startswith('*'):
+                break
+        while len(params) > 1 and not _is_public(params[-2]) and '=' in params[-2]:
+            params.pop(-2)
+        for p in iter_params:
+            if _is_public(p.lstrip('*')):
+                params.append(p)
+        while params and not _is_public(params[-1]) and '=' in params[-1]:
+            params.pop(-1)
+        if params and params[-1] == '*':
+            params.pop(-1)
+
         # TODO: The only thing now missing for Python 3 are type annotations
         return params
 
