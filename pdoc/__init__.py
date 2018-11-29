@@ -1,159 +1,165 @@
 """
-Module pdoc provides types and functions for accessing the public
-documentation of a Python module. This includes modules (and
-sub-modules), functions, classes and module, class and instance
-variables.  Docstrings are taken from modules, functions and classes
-using the special `__doc__` attribute. Docstrings for variables are
-extracted by examining the module's abstract syntax tree.
+Python package `pdoc` provides types, functions, and a command-line
+interface for accessing public documentation of Python modules, and
+for presenting it in a user-friendly, industry-standard open format.
+It is best suited for small- to medium-sized projects with tidy,
+hierarchical APIs.
 
-The public interface of a module is determined through one of two
-ways. If `__all__` is defined in the module, then all identifiers in
-that list will be considered public. No other identifiers will be
-considered as public. Conversely, if `__all__` is not defined, then
-`pdoc` will heuristically determine the public interface. There are
-three rules that are applied to each identifier in the module:
+`pdoc` extracts documentation of:
 
-1. If the name starts with an underscore, it is **not** public.
+* modules (including submodules),
+* functions (including methods, properties, coroutines ...),
+* classes, and
+* variables (including globals, class variables, and instance variables).
 
-2. If the name is defined in a different module, it is **not** public.
+Documentation is extracted from live objects' [docstrings]
+using Python's `__doc__` attribute[^execution]. Documentation for
+variables is found by examining objects' abstract syntax trees.
 
-3. If the name refers to an immediate sub-module, then it is public.
+[docstrings]: https://docs.python.org/3/glossary.html#term-docstring
 
-Once documentation for a module is created with `pdoc.Module`, it
-can be output as either HTML or plain text using the covenience
-functions `pdoc.html` and `pdoc.text`, or the corresponding methods
-`pdoc.Module.html` and `pdoc.Module.text`.
-
-Alternatively, you may run an HTTP server with the `pdoc` script
-included with this module.
+[^execution]:
+    Documented modules are executed in order to provide `__doc__`
+    attributes. Any non-fenced global code in imported modules will
+    affect the current environment.
 
 
-Compatibility
--------------
-`pdoc` requires Python 3.4+.
-
-
-Contributing
-------------
-`pdoc` [is on GitHub](https://github.com/BurntSushi/pdoc). Pull
-requests and bug reports are welcome.
-
-
-Linking to other identifiers
+What objects are documented?
 ----------------------------
-In your documentation, you may link to other identifiers in
-your module or submodules. Linking is automatically done for
-you whenever you surround an identifier with a back quote
-(grave). The identifier name must be fully qualified. For
-example, <code>\`pdoc.Doc.docstring\`</code> is correct while
-<code>\`Doc.docstring\`</code> is incorrect.
+`pdoc` only extracts _public API_ documentation.[^public]
+All objects (modules, functions, classes, variables) are only
+considered public if their _identifiers don't begin with an
+underscore_ ( \_ ).[^private]
 
-If the `pdoc` script is used to run an HTTP server, then external
-linking to other packages installed is possible. No extra work is
-necessary; simply use the fully qualified path. For example,
-<code>\`nflvid.slice\`</code> will create a link to the `nflvid.slice`
-function, which is **not** a part of `pdoc` at all.
+[^public]:
+    Here, public API refers to the API that is made available
+    to your project end-users, not the public API e.g. of a
+    private class that can be reasonably extended elsewhere
+    by your project developers.
+
+[^private]:
+    Prefixing private, implementation-specific objects with
+    an underscore is [a common convention].
+
+[a common convention]: https://docs.python.org/3/tutorial/classes.html#private-variables
+
+In addition, if a module defines [`__all__`][__all__], then only
+the identifiers contained in this list will be considered public.
+Otherwise, a module's global identifiers are considered public
+only if they don't begin with an underscore and are defined
+in this exact module (i.e. not imported from somewhere else).
+
+[__all__]: https://docs.python.org/3/tutorial/modules.html#importing-from-a-package
+
+By transitivity, sub-objects of non-public objects
+(e.g. submodules of non-public modules, methods of non-public classes etc.)
+are not public and thus not documented.
 
 
-Where does pdoc get documentation from?
----------------------------------------
-Broadly speaking, `pdoc` gets everything you see from introspecting the
-module. This includes words describing a particular module, class,
-function or variable. While `pdoc` does some analysis on the source
-code of a module, importing the module itself is necessary to use
-Python's introspection features.
+Where does `pdoc` get documentation from?
+-----------------------------------------
+In Python, objects like modules, functions, classes, and methods
+have a special attribute `__doc__` which contains that object's
+documentation string ([docstring][docstrings]).
+For example, the following code defines a function with a docstring
+and shows how to access its contents:
 
-In Python, objects like modules, functions, classes and methods have
-a special attribute named `__doc__` which contains that object's
-*docstring*.  The docstring comes from a special placement of a string
-in your source code.  For example, the following code shows how to
-define a function with a docstring and access the contents of that
-docstring:
-
-    #!python
     >>> def test():
-    ...     '''This is a docstring.'''
+    ...     \"""This is a docstring.\"""
     ...     pass
     ...
     >>> test.__doc__
     'This is a docstring.'
 
-Something similar can be done for classes and modules too. For classes,
-the docstring should come on the line immediately following `class
-...`. For modules, the docstring should start on the first line of
-the file. These docstrings are what you see for each module, class,
-function and method listed in the documentation produced by `pdoc`.
+It's pretty much the same with classes and modules.
+See [PEP-257] for Python docstring conventions.
 
-The above just about covers *standard* uses of docstrings in Python.
-`pdoc` extends the above in a few important ways.
+[PEP-257]: https://www.python.org/dev/peps/pep-0257/
+
+These docstrings are set as descriptions for each module, class,
+function, and method listed in the documentation produced by `pdoc`.
+
+`pdoc` extends the standard use of docstrings in Python in two
+important ways: by allowing methods to inherit docstrings, and
+by introducing syntax for docstrings for variables.
 
 
-### Special docstring conventions used by `pdoc`
+### Docstrings inheritance
 
-**Firstly**, docstrings can be inherited. Consider the following code
-sample:
+`pdoc` considers methods' docstrings inherited from superclass methods',
+following the normal class inheritance patterns.
+Consider the following code example:
 
-    #!python
-    >>> class A (object):
-    ...     def test():
-    ...         '''Docstring for A.'''
-    ...
-    >>> class B (A):
-    ...     def test():
+    >>> class A:
+    ...     def test(self):
+    ...         \"""Docstring for A.\"""
     ...         pass
     ...
-    >>> print(A.test.__doc__)
-    Docstring for A.
-    >>> print(B.test.__doc__)
+    >>> class B(A):
+    ...     def test(self):
+    ...         pass
+    ...
+    >>> A.test.__doc__
+    'Docstring for A.'
+    >>> B.test.__doc__
     None
 
-In Python, the docstring for `B.test` is empty, even though one was
-defined in `A.test`. If `pdoc` generates documentation for the above
-code, then it will automatically attach the docstring for `A.test` to
-`B.test` only if `B.test` does not have a docstring. In the default
-HTML output, an inherited docstring is grey.
+In Python, the docstring for `B.test` doesn't exist, even though a
+docstring was defined for `A.test`.
+When `pdoc` generates documentation for the code such as above,
+it will automatically attach the docstring for `A.test` to
+`B.test` if `B.test` does not define its own docstring.
+In the default HTML template, such inherited docstrings are greyed out.
 
-**Secondly**, docstrings can be attached to variables, which includes
-module (or global) variables, class variables and instance variables.
-Python by itself [does not allow docstrings to be attached to
-variables](http://www.python.org/dev/peps/pep-0224). For example:
 
-    #!python
-    variable = "SomeValue"
-    '''Docstring for variable.'''
+### Docstrings for variables
 
-The resulting `variable` will have no `__doc__` attribute. To
-compensate, `pdoc` will read the source code when it's available to
-infer a connection between a variable and a docstring. The connection
-is only made when an assignment statement is followed by a docstring.
+Python by itself [doesn't allow docstrings attached to variables][PEP-224].
+However, `pdoc` supports docstrings attached to module (or global)
+variables, class variables, and object instance variables; all in
+the same way as proposed in [PEP-224], with a docstring following the
+variable assignment.
+For example:
 
-Something similar is done for instance variables as well. By
-convention, instance variables are initialized in a class's `__init__`
-method.  Therefore, `pdoc` adheres to that convention and looks for
-docstrings of variables like so:
+[PEP-224]: http://www.python.org/dev/peps/pep-0224
 
-    #!python
-    def __init__(self):
-        self.variable = "SomeValue"
-        '''Docstring for instance variable.'''
+    module_variable = 1
+    \"""Docstring for module_variable.\"""
 
-Note that `pdoc` only considers attributes defined on `self` as
+    class C:
+        class_variable = 2
+        \"""Docstring for class_variable.\"""
+
+        def __init__(self):
+            self.variable = 3
+            \"""Docstring for instance variable.\"""
+
+While the resulting variables have no `__doc__` attribute,
+`pdoc` compensates by reading the source code (when available)
+and parsing the syntax tree.
+
+By convention, variables defined in a class' `__init__` method
+and attached to `self` are considered and documented as
 instance variables.
 
-Class and instance variables can also have inherited docstrings.
+Class and instance variables can also [inherit docstrings].
 
-**Thirdly and finally**, docstrings can be overridden with a special
-`__pdoc__` dictionary that `pdoc` inspects if it exists. The keys of
-`__pdoc__` should be identifiers within the scope of the module. (In
-the case of an instance variable `self.variable` for class `A`, its
-module identifier would be `A.variable`.) The values of `__pdoc__`
-should be docstrings.
+[inherit docstrings]: #docstrings-inheritance
+
+
+Overriding docstrings with `__pdoc__`
+-------------------------------------
+Docstrings can be overridden with a special module-level
+`__pdoc__` dictionary that `pdoc` counsels when it exists. The keys
+of `__pdoc__` should be identifiers within the scope of the module or,
+alternatively, fully-qualified reference names. E.g. for instance
+variable `self.variable` for class `C`, its module identifier is
+`C.variable`. The values of `__pdoc__` dict should be docstrings.
 
 This particular feature is useful when there's no feasible way of
 attaching a docstring to something. A good example of this is a
-[namedtuple](http://goo.gl/akfXJ9):
+[namedtuple](https://docs.python.org/3/library/collections.html#collections.namedtuple):
 
-    #!python
     __pdoc__ = {}
 
     Table = namedtuple('Table', ['types', 'names', 'rows'])
@@ -164,17 +170,115 @@ attaching a docstring to something. A good example of this is a
 `pdoc` will then show `Table` as a class with documentation for the
 `types`, `names` and `rows` members.
 
-Note that assignments to `__pdoc__` need to placed where they'll be
+Additionally, if `__pdoc__[key] = None`, then `key` will be
+excluded from the public interface of the module.
+
+Note that assignments to `__pdoc__` need to be placed where they'll be
 executed when the module is imported. For example, at the top level
 of a module or in the definition of a class.
 
-If `__pdoc__[key] = None`, then `key` will not be included in the
-public interface of the module.
+
+Supported docstring formats
+---------------------------
+Currently, only docstrings formatted in pure Markdown
+(with [extensions]) are supported.
+[NumpyDoc] and [Google-style] docstring formats are on the roadmap,
+but need an avid implementor (patches welcome).
+
+[extensions]: https://python-markdown.github.io/extensions/#officially-supported-extensions
+[NumpyDoc]: https://numpydoc.readthedocs.io/
+[Google-style]: http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
+
+
+Linking to other identifiers
+----------------------------
+In your documentation, you may refer to other identifiers in
+your modules. When exporting to HTML, linking is automatically
+done whenever you surround an identifier with [backticks] ( \` ).
+The identifier name must be fully qualified, for example
+<code>\`pdoc.Doc.docstring\`</code> is correct (and will link to
+`pdoc.Doc.docstring`) while <code>\`Doc.docstring\`</code> is not.
+
+[backticks]: https://en.wikipedia.org/wiki/Grave_accent#Use_in_programming
+
+
+Command-line interface
+----------------------
+[cmd]: #command-line-interface
+`pdoc` includes a feature-rich "binary" program for producing
+HTML and plain text documentation of your modules.
+To produce HTML documentation of your whole package in subdirectory
+'build' of the current directory, using the default HTML template, run:
+
+    $ pdoc --html --html-dir build my_package
+
+To run a local HTTP server while developing your package or writing
+docstrings for it, run:
+
+    $ pdoc --http : my_package
+
+To re-build documentation as part of your continuous integration (CI)
+best practice, i.e. ensuring all reference links are correct and
+up-to-date, make warnings error loudly by settings the environment
+variable [`PYTHONWARNINGS`][PYTHONWARNINGS] before running pdoc:
+
+    $ export PYTHONWARNINGS='error::UserWarning'
+
+[PYTHONWARNINGS]: https://docs.python.org/3/using/cmdline.html#envvar-PYTHONWARNINGS
+
+For brief usage instructions, type:
+
+    $ pdoc --help
+
+
+Programmatic usage
+------------------
+The main entry point is `pdoc.Module` which wraps a module object
+and recursively imports and wraps any submodules and their members.
+After all related modules are wrapped (modules that share the
+same `pdoc.Context`, i.e., for cross-linking), you can use
+`pdoc.Module.html` and `pdoc.Module.text` methods to output
+documentation in the desired format.
+
+When documenting a single top-level module, you might find
+the functions `pdoc.html` and `pdoc.text` handy.
+For importing arbitrary modules/files, use `pdoc.import_module`.
+
+Alternatively, use the [runnable script][cmd] included with this package.
+
+
+Custom templates
+----------------
+To override the built-in HTML/CSS and plain text templates, copy
+the relevant templates from `pdoc/templates` directory into a directory
+of your choosing and edit them. When you run [pdoc command][cmd]
+afterwards, pass the directory path as a parameter to the
+`--template-dir` switch.
+
+If working with `pdoc` programmatically, _prepend_ the directory with
+modified templates into the `directories` list of the
+`pdoc.tpl_lookup` object.
+
+
+Compatibility
+-------------
+`pdoc` requires Python 3.4+.
+
+
+Contributing
+------------
+`pdoc` is [on GitHub]. Bug reports and pull requests are welcome.
+
+[on GitHub]: https://github.com/pdoc3/pdoc
 
 
 License
 -------
-`pdoc` is licensed under the terms of GNU [AGPL-3.0] or later.
+`pdoc` is licensed under the terms of GNU [AGPL-3.0]{: rel=license} or later,
+meaning you can use it for any reasonable purpose and remain in
+complete ownership of all the documentation you produce,
+but you are also encouraged to make sure any upgrades to `pdoc`
+itself find their way back to the community.
 
 [AGPL-3.0]: https://www.gnu.org/licenses/agpl-3.0.html
 """
@@ -280,23 +384,23 @@ def html(
 ) -> str:
     """
     Returns the documentation for the module `module_name` in HTML
-    format. The module must be importable.
+    format. The module must be a module or an importable string.
 
     `docfilter` is an optional predicate that controls which
-    documentation objects are shown in the output. It is a single
-    argument function that takes a documentation object and returns
-    `True` or `False`. If `False`, that object will not be included in
-    the output.
+    documentation objects are shown in the output. It is a function
+    that takes a single argument (a documentation object) and returns
+    `True` or `False`. If `False`, that object will not be documented.
 
     If `external_links` is `True`, then identifiers to external modules
     are always turned into links.
 
-    If `link_prefix` is `True`, then all links will have that prefix.
-    Otherwise, links are always relative.
+    If `link_prefix` is a non-empty string, all links will be relative
+    to the top module and will have that prefix.
+    Otherwise, all links will be relative.
 
-    If `source` is `True`, then source code will be retrieved for
-    every Python object whenever possible. This can dramatically
-    decrease performance when documenting large modules.
+    If `source` is `True`, then source code will be retrieved,
+    and outputted, for every Python object whenever possible. This can
+    dramatically decrease performance when documenting large modules.
     """
     mod = Module(import_module(module_name), docfilter=docfilter)
     return mod.html(external_links=external_links,
@@ -308,13 +412,13 @@ def html(
 def text(module_name, docfilter=None, **kwargs) -> str:
     """
     Returns the documentation for the module `module_name` in plain
-    text format. The module must be importable.
+    text format suitable for viewing on a terminal.
+    The module must be a module or an importable string.
 
     `docfilter` is an optional predicate that controls which
-    documentation objects are shown in the output. It is a single
-    argument function that takes a documentation object and returns
-    True of False. If False, that object will not be included in the
-    output.
+    documentation objects are shown in the output. It is a function
+    that takes a single argument (a documentation object) and returns
+    `True` or `False`. If `False`, that object will not be documented.
     """
     mod = Module(import_module(module_name), docfilter=docfilter)
     return mod.text(**kwargs)
@@ -491,9 +595,6 @@ def _is_public(ident_name):
     """
     Returns `True` if `ident_name` matches the export criteria for an
     identifier name.
-
-    This should not be used by clients. Instead, use
-    `pdoc.Module.is_public`.
     """
     return not ident_name.startswith("_")
 
@@ -503,10 +604,10 @@ class Doc:
     A base class for all documentation objects.
 
     A documentation object corresponds to *something* in a Python module
-    that has a docstring associated with it. Typically, this only includes
-    modules, classes, functions and methods. However, `pdoc` adds support
-    for extracting docstrings from the abstract syntax tree, which means
-    that variables (module, class or instance) are supported too.
+    that has a docstring associated with it. Typically, this includes
+    modules, classes, functions, and methods. However, `pdoc` adds support
+    for extracting some docstrings from abstract syntax trees, making
+    (module, class or instance) variables supported too.
 
     A special type of documentation object `pdoc.External` is used to
     represent identifiers that are not part of the public interface of
@@ -519,8 +620,10 @@ class Doc:
     def __init__(self, name, module, obj, docstring=None):
         """
         Initializes a documentation object, where `name` is the public
-        identifier name, `module` is a `pdoc.Module` object, and
-        `docstring` is a string containing the docstring for `name`.
+        identifier name, `module` is a `pdoc.Module` object where raw
+        Python object `obj` is defined, and `docstring` is its
+        documentation string. If `docstring` is left empty, it will be
+        read with `inspect.getdoc()`.
         """
         self.module = module
         """
@@ -588,6 +691,11 @@ class Doc:
         """
         Canonical relative URL (including page fragment) for this
         documentation object.
+
+        Specify `relative_to` (a `pdoc.Module` object) to obtain a
+        relative URL.
+
+        For usage of `link_prefix` see `pdoc.html()`.
         """
         if relative_to is None or link_prefix:
             return link_prefix + self._url()
@@ -622,13 +730,9 @@ class Module(Doc):
     """
     Representation of a module's documentation.
     """
-
-    __pdoc__["Module.module"] = "The Python module object."
-    __pdoc__[
-        "Module.name"
-    ] = """
-        The name of this module with respect to the context in which
-        it was imported. It is always an absolute import path.
+    __pdoc__["Module.name"] = """
+        The name of this module with respect to the context/path in which
+        it was imported from. It is always an absolute import path.
         """
 
     __slots__ = ('supermodule', 'doc', '_context')
@@ -639,11 +743,13 @@ class Module(Doc):
         module Python object.
 
         `docfilter` is an optional predicate that controls which
-        documentation objects are returned in the following
-        methods: `pdoc.Module.classes`, `pdoc.Module.functions`,
-        `pdoc.Module.variables` and `pdoc.Module.submodules`. The
-        filter is propagated to the analogous methods on a `pdoc.Class`
-        object.
+        sub-objects are documentated (see also: `pdoc.html()`).
+
+        `supermodule` is the parent `pdoc.Module` this module is
+        a submodule of.
+
+        `context` is an instance of `pdoc.Context`. If `None` a
+        global context object will be used.
         """
         super().__init__(module.__name__, self, module)
 
@@ -654,6 +760,9 @@ class Module(Doc):
         """
 
         self.supermodule = supermodule
+        """
+        The parent `pdoc.Module` this module is a submodule of, or `None`.
+        """
 
         self.doc = {}
         """A mapping from identifier name to a documentation object."""
@@ -757,17 +866,9 @@ class Module(Doc):
         Returns the documentation for this module as
         self-contained HTML.
 
-        If `external_links` is `True`, then identifiers to external
-        modules are always turned into links.
-
-        If `link_prefix` is `True`, then all links will have that
-        prefix. Otherwise, links are always relative.
-
-        If `source` is `True`, then source code will be retrieved for
-        every Python object whenever possible. This can dramatically
-        decrease performance when documenting large modules.
-
         If `minify` is `True`, the resulting HTML is minified.
+
+        For explanation of other arguments, see `pdoc.html()`.
 
         `kwargs` is passed to the `mako` render function.
         """
@@ -819,28 +920,28 @@ class Module(Doc):
 
     def variables(self):
         """
-        Returns all documented module level variables in the module
+        Returns all documented module-level variables in the module
         sorted alphabetically as a list of `pdoc.Variable`.
         """
         return self._filter_doc_objs(Variable)
 
     def classes(self):
         """
-        Returns all documented module level classes in the module
+        Returns all documented module-level classes in the module
         sorted alphabetically as a list of `pdoc.Class`.
         """
         return self._filter_doc_objs(Class)
 
     def functions(self):
         """
-        Returns all documented module level functions in the module
+        Returns all documented module-level functions in the module
         sorted alphabetically as a list of `pdoc.Function`.
         """
         return self._filter_doc_objs(Function)
 
     def submodules(self):
         """
-        Returns all documented sub-modules in the module sorted
+        Returns all documented sub-modules of the module sorted
         alphabetically as a list of `pdoc.Module`.
         """
         return self._filter_doc_objs(Module)
@@ -856,16 +957,13 @@ class Module(Doc):
 
 class Class(Doc):
     """
-    Representation of a class's documentation.
+    Representation of a class' documentation.
     """
     __slots__ = ('doc', '_super_members')
 
-    def __init__(self, name, module, class_obj):
-        """
-        Same as `pdoc.Doc.__init__`, except `class_obj` must be a
-        Python class object. The docstring is gathered automatically.
-        """
-        super().__init__(name, module, class_obj)
+    def __init__(self, name, module, obj, *, docstring=None):
+        assert isinstance(obj, type)
+        super().__init__(name, module, obj, docstring=docstring)
 
         self.doc = {}
         """A mapping from identifier name to a `pdoc.Doc` objects."""
@@ -968,8 +1066,7 @@ class Class(Doc):
         """
         Returns all instance variables in the class, sorted
         alphabetically as a list of `pdoc.Variable`. Instance variables
-        are attributes of `self` defined in a class's `__init__`
-        method.
+        are those defined in a class's `__init__` as `self.variable = ...`.
         """
         return self._filter_doc_objs(
             include_inherited,
@@ -977,11 +1074,9 @@ class Class(Doc):
 
     def methods(self, include_inherited=True):
         """
-        Returns all documented methods as `pdoc.Function` objects in
-        the class, sorted alphabetically with `__init__` always coming
-        first.
-
-        Unfortunately, this also includes class methods.
+        Returns all documented methods (including classmethods) as
+        `pdoc.Function` objects in the class, sorted alphabetically
+        with `__init__` always coming first.
         """
         return self._filter_doc_objs(
             include_inherited,
@@ -1051,13 +1146,13 @@ class Class(Doc):
 
 class Function(Doc):
     """
-    Representation of documentation for a Python function or method.
+    Representation of documentation for a function or method.
     """
     __slots__ = ('cls', 'method')
 
-    def __init__(self, name, module, func_obj, cls=None, method=False):
+    def __init__(self, name, module, obj, *, cls=None, method=False):
         """
-        Same as `pdoc.Doc.__init__`, except `func_obj` must be a
+        Same as `pdoc.Doc.__init__`, except `obj` must be a
         Python function object. The docstring is gathered automatically.
 
         `cls` should be set when this is a method or a static function
@@ -1066,7 +1161,8 @@ class Function(Doc):
         `method` should be `True` when the function is a method. In
         all other cases, it should be `False`.
         """
-        super().__init__(name, module, func_obj)
+        assert callable(obj)
+        super().__init__(name, module, obj)
 
         self.cls = cls
         """
@@ -1083,8 +1179,8 @@ class Function(Doc):
 
     def funcdef(self):
         """
-        Generates the string of keywords used to define the function, for example `def` or
-        `async def`.
+        Generates the string of keywords used to define the function,
+        for example `def` or `async def`.
         """
         return 'async def' if self._is_async else 'def'
 
@@ -1108,7 +1204,8 @@ class Function(Doc):
         """
         Returns a list where each element is a nicely formatted
         parameter of this function. This includes argument lists,
-        keyword arguments and default values.
+        keyword arguments and default values, and it doesn't include any
+        optional arguments whose names begin with an underscore.
         """
         try:
             s = inspect.getfullargspec(inspect.unwrap(self.obj))
@@ -1172,7 +1269,7 @@ class Function(Doc):
 class Variable(Doc):
     """
     Representation of a variable's documentation. This includes
-    module, class and instance variables.
+    module, class, and instance variables.
     """
     __slots__ = ('cls', 'instance_var')
 
@@ -1186,7 +1283,7 @@ class Variable(Doc):
 
         self.cls = cls
         """
-        The `podc.Class` object if this is a class or instance
+        The `pdoc.Class` object if this is a class or instance
         variable. If not, this is None.
         """
 
@@ -1210,29 +1307,22 @@ class Variable(Doc):
 class External(Doc):
     """
     A representation of an external identifier. The textual
-    representation is the same as an internal identifier, but without
-    any context. (Usually this makes linking more difficult.)
+    representation is the same as an internal identifier.
 
     External identifiers are also used to represent something that is
-    not exported but appears somewhere in the public interface (like
+    not documented but appears somewhere in the public interface (like
     the ancestor list of a class).
     """
 
-    __pdoc__[
-        "External.docstring"
-    ] = """
+    __pdoc__["External.docstring"] = """
         An empty string. External identifiers do not have
         docstrings.
         """
-    __pdoc__[
-        "External.module"
-    ] = """
+    __pdoc__["External.module"] = """
         Always `None`. External identifiers have no associated
         `pdoc.Module`.
         """
-    __pdoc__[
-        "External.name"
-    ] = """
+    __pdoc__["External.name"] = """
         Always equivalent to `pdoc.External.refname` since external
         identifiers are always expressed in their fully qualified
         form.
@@ -1246,4 +1336,7 @@ class External(Doc):
         super().__init__(name, None, None)
 
     def url(self, *args, **kwargs):
+        """
+        `External` objects return absolute urls matching `/{name}.ext`.
+        """
         return '/%s.ext' % self.name

@@ -1,3 +1,6 @@
+"""
+Unit tests for pdoc package.
+"""
 import os
 import signal
 import sys
@@ -69,6 +72,9 @@ def redirect_streams():
 
 
 class CliTest(unittest.TestCase):
+    """
+    Command-line interface unit tests.
+    """
     ALL_FILES = [
         'example_pkg',
         'example_pkg/index.html',
@@ -302,6 +308,9 @@ class CliTest(unittest.TestCase):
 
 
 class ApiTest(unittest.TestCase):
+    """
+    Programmatic/API unit tests.
+    """
     def test_module(self):
         modules = {
             EXAMPLE_MODULE: ('', ('index', 'module', 'subpkg', 'subpkg2')),
@@ -432,6 +441,9 @@ class ApiTest(unittest.TestCase):
 
 
 class HtmlHelpersTest(unittest.TestCase):
+    """
+    Unit tests for helper functions for producing HTML.
+    """
     def test_minify_css(self):
         css = 'a { color: white; } /*comment*/ b {;}'
         minified = minify_css(css)
@@ -494,6 +506,9 @@ class HtmlHelpersTest(unittest.TestCase):
 
 
 class HttpTest(unittest.TestCase):
+    """
+    Unit tests for the HTTP server functionality.
+    """
     @contextmanager
     def _timeout(self, secs):
         def _raise(*_):
@@ -524,7 +539,7 @@ class HttpTest(unittest.TestCase):
                     with self.subTest(url='/'):
                         with urlopen(url, timeout=3) as resp:
                             html = resp.read()
-                            self.assertIn(b'Module pdoc provides types and functions', html)
+                            self.assertIn(b'Python package <code>pdoc</code>', html)
                             self.assertNotIn(b'gzip', html)
                     with self.subTest(url='/' + EXAMPLE_MODULE):
                         with urlopen(url + 'pdoc', timeout=3) as resp:

@@ -19,7 +19,7 @@ if __name__ == '__main__':
         description="Auto-generate API documentation for Python projects.",
         long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
         long_description_content_type='text/markdown',
-        url="https://github.com/mitmproxy/pdoc",
+        url="https://pdoc3.github.io/pdoc/",
         classifiers=[
             "Topic :: Documentation",
             "Topic :: Software Development :: Documentation",
