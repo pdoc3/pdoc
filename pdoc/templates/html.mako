@@ -37,9 +37,7 @@
 
 <%def name="show_desc(d, short=False)">
   <%
-  inherits = (' class="inherited"'
-              if d.inherits and (not d.docstring or d.docstring == d.inherits.docstring) else
-              '')
+  inherits = ' class="inherited"' if d.inherits else ''
   docstring = d.inherits.docstring if inherits else d.docstring
   if short or inherits:
     docstring = glimpse(docstring)

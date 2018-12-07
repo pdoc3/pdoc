@@ -719,7 +719,15 @@ class Module(Doc):
                                                       docobj.methods(),
                                                       docobj.functions()))
 
-        # Finally look for more docstrings in the __pdoc__ override.
+        # Copy inherited ancestor members to subclasses
+        classes = [dobj
+                   for dobj in self.doc.values()
+                   if isinstance(dobj, Class)]
+        for c in classes:
+            c._fill_inheritance()
+
+        # Now that inherited members are in place,
+        # look for docstrings in the __pdoc__ override.
         for name, docstring in getattr(self.obj, "__pdoc__", {}).items():
             refname = "%s.%s" % (self.refname, name)
             if docstring is None:
@@ -733,11 +741,10 @@ class Module(Doc):
             assert isinstance(docstring, str), (type(docstring), docstring)
             dobj.docstring = inspect.cleandoc(docstring)
 
-        # Now that we have all refnames, link inheritance relationships
-        # between classes and their members
-        for docobj in self.doc.values():
-            if isinstance(docobj, Class):
-                docobj._fill_inheritance()
+        # Now after docstrings are set correctly, continue the
+        # inheritance routine, marking members inherited or not
+        for c in classes:
+            c._link_inheritance()
 
     def text(self, **kwargs):
         """
@@ -852,7 +859,7 @@ class Class(Doc):
     """
     Representation of a class's documentation.
     """
-    __slots__ = ('doc',)
+    __slots__ = ('doc', '_super_members')
 
     def __init__(self, name, module, class_obj):
         """
@@ -1005,31 +1012,42 @@ class Class(Doc):
     def _fill_inheritance(self):
         """
         Traverses this class's ancestor list and attempts to fill in
-        missing documentation from its ancestor's documentation.
+        missing documentation objects from its ancestors.
 
-        The first pass connects variables, methods and functions with
-        their inherited couterparts. (The templates will decide how to
-        display docstrings.) The second pass attempts to add instance
-        variables to this class that were only explicitly declared in
-        a parent class. This second pass is necessary since instance
-        variables are only discoverable by traversing the abstract
-        syntax tree.
+        Afterwards, call to `pdoc.Class._link_inheritance()` to also
+        set `pdoc.Doc.inherits` pointers.
         """
-        mro = [c for c in self.mro() if isinstance(c, Class)]
-
-        super_members = {}
-        for cls in mro:
+        super_members = self._super_members = {}
+        for cls in self.mro():
+            if not isinstance(cls, Class):
+                continue
             for name, dobj in cls.doc.items():
                 if name not in super_members and dobj.docstring:
                     super_members[name] = dobj
+
         for name, parent_dobj in super_members.items():
             if name not in self.doc:
-                self.doc[name] = copy(parent_dobj)
+                dobj = copy(parent_dobj)
+                dobj.cls = self
+
+                self.doc[name] = dobj
+                self.module._context[dobj.refname] = dobj
+
+    def _link_inheritance(self):
+        """
+        Set `pdoc.Doc.inherits` pointers to inherited ancestors' members,
+        as appropriate. This must be called after
+        `pdoc.Class._fill_inheritance()`.
+
+        The reason this is split in two parts is that in-between
+        the `__pdoc__` overrides are applied.
+        """
+        assert hasattr(self, '_super_members'), 'Call `Class._fill_inheritance()` first!'
+        for name, parent_dobj in self._super_members.items():
             dobj = self.doc[name]
-            if (dobj.obj is parent_dobj.obj or
-                    not dobj.docstring or
-                    dobj.docstring == parent_dobj.docstring):
+            if (dobj.docstring or parent_dobj.docstring) == parent_dobj.docstring:
                 dobj.inherits = parent_dobj
+        del self._super_members
 
 
 class Function(Doc):
