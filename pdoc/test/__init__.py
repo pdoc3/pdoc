@@ -13,6 +13,7 @@ from itertools import chain
 from random import randint
 from tempfile import TemporaryDirectory
 from time import sleep
+from unittest.mock import patch
 from urllib.request import urlopen
 
 import pdoc
@@ -179,9 +180,11 @@ class CliTest(unittest.TestCase):
 
     def test_html_identifier(self):
         for package in ('', '._private'):
-            with self.subTest(package=package):
+            with self.subTest(package=package), \
+                 self.assertWarns(UserWarning) as cm:
                 with run_html(EXAMPLE_MODULE + package, filter='A', html_no_source=None):
                     self._check_files(['A'], ['CONST', 'B docstring'])
+        self.assertIn('__pdoc__', cm.warning.args[0])
 
     def test_html_ref_links(self):
         with run_html(EXAMPLE_MODULE, html_no_source=None):
@@ -375,12 +378,22 @@ class ApiTest(unittest.TestCase):
 
     def test__pdoc__dict(self):
         module = pdoc.import_module(EXAMPLE_MODULE)
-        old__pdoc__ = module.__pdoc__
-        module.__pdoc__ = {'B': None}
-        mod = pdoc.Module(module)
-        self.assertIn('A', mod.doc)
-        self.assertNotIn('B', mod.doc)
-        module.__pdoc__ = old__pdoc__
+        with patch.object(module, '__pdoc__', {'B': False}):
+            mod = pdoc.Module(module)
+            self.assertIn('A', mod.doc)
+            self.assertNotIn('B', mod.doc)
+
+        with patch.object(module, '__pdoc__', {'B.__init__': False}):
+            mod = pdoc.Module(module)
+            self.assertIn('B', mod.doc)
+            self.assertNotIn('__init__', mod.doc['B'].doc)
+            self.assertIsInstance(mod.find_ident('B.__init__'), pdoc.External)
+
+    def test__pdoc__invalid_value(self):
+        module = pdoc.import_module(EXAMPLE_MODULE)
+        with patch.object(module, '__pdoc__', {'B': 1}), \
+                self.assertRaises(ValueError):
+            pdoc.Module(module)
 
     def test_find_ident(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))

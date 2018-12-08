@@ -92,4 +92,4 @@ class B(A, int):
 
 
 class Hidden:
-    __pdoc__['Hidden'] = None
+    __pdoc__['Hidden'] = False

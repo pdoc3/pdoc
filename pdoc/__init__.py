@@ -170,7 +170,7 @@ attaching a docstring to something. A good example of this is a
 `pdoc` will then show `Table` as a class with documentation for the
 `types`, `names` and `rows` members.
 
-Additionally, if `__pdoc__[key] = None`, then `key` will be
+Additionally, if `__pdoc__[key] = False`, then `key` will be
 excluded from the public interface of the module.
 
 Note that assignments to `__pdoc__` need to be placed where they'll be
@@ -838,15 +838,36 @@ class Module(Doc):
         # look for docstrings in the __pdoc__ override.
         for name, docstring in getattr(self.obj, "__pdoc__", {}).items():
             refname = "%s.%s" % (self.refname, name)
-            if docstring is None:
+            if docstring in (False, None):
+                if docstring is None:
+                    warn('Setting `__pdoc__[key] = None` is deprecated; '
+                         'use `__pdoc__[key] = False` '
+                         '(key: {!r}, module: {!r}).'.format(name, self.name))
+
+                if name not in self.doc and refname not in self._context:
+                    warn('__pdoc__-overriden key {!r} does not exist '
+                         'in module {!r}'.format(name, self.name))
+
+                obj = self.find_ident(name)
+                cls = getattr(obj, 'cls', None)
+                if cls:
+                    del cls.doc[obj.name]
                 self.doc.pop(name, None)
                 self._context.pop(refname, None)
+
+                # Pop also all that startwith refname
+                for key in list(self._context.keys()):
+                    if key.startswith(refname + '.'):
+                        del self._context[key]
+
                 continue
 
             dobj = self.find_ident(refname)
             if isinstance(dobj, External):
                 continue
-            assert isinstance(docstring, str), (type(docstring), docstring)
+            if not isinstance(docstring, str):
+                raise ValueError('__pdoc__ dict values must be strings;'
+                                 '__pdoc__[{!r}] is of type {}'.format(name, type(docstring)))
             dobj.docstring = inspect.cleandoc(docstring)
 
         # Now after docstrings are set correctly, continue the
@@ -970,16 +991,12 @@ class Class(Doc):
 
         self.doc.update(_var_docstrings(self))
 
-        def forced_out(name, _pdoc_overrides=getattr(self.module.obj, '__pdoc__', {}).get):
-            return _pdoc_overrides(self.name + '.' + name, False) is None
-
         public_objs = [(name, inspect.unwrap(obj))
                        for name, obj in inspect.getmembers(self.obj)
                        # Filter only *own* members. The rest are inherited
                        # in Class._fill_inheritance()
                        if (name in self.obj.__dict__ and
-                           (_is_public(name) or name == '__init__') and
-                           not forced_out(name))]
+                           (_is_public(name) or name == '__init__'))]
 
         # Convert the public Python objects to documentation objects.
         for name, obj in public_objs:
