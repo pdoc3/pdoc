@@ -292,7 +292,7 @@ import re
 import sys
 from copy import copy
 from functools import lru_cache
-from itertools import chain, tee, groupby
+from itertools import tee, groupby
 from warnings import warn
 
 from mako.lookup import TemplateLookup
@@ -822,10 +822,7 @@ class Module(Doc):
             self._context[docobj.refname] = docobj
             if isinstance(docobj, Class):
                 self._context.update((obj.refname, obj)
-                                     for obj in chain(docobj.class_variables(),
-                                                      docobj.instance_variables(),
-                                                      docobj.methods(),
-                                                      docobj.functions()))
+                                     for obj in docobj.doc.values())
 
         # Copy inherited ancestor members to subclasses
         classes = [dobj
@@ -933,7 +930,10 @@ class Module(Doc):
         returned. If one cannot be found, then an instance of
         `External` is returned populated with the given identifier.
         """
-        return self.doc.get(name) or self._context.get(name) or External(name)
+        return (self.doc.get(name) or
+                self._context.get(name) or
+                self._context.get(self.name + '.' + name) or
+                External(name))
 
     def _filter_doc_objs(self, type: type = Doc):
         return sorted(obj for obj in self.doc.values()
