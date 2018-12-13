@@ -37,7 +37,7 @@
 
 <%def name="show_desc(d, short=False)">
   <%
-  inherits = ' class="inherited"' if d.inherits else ''
+  inherits = ' inherited' if d.inherits else ''
   docstring = d.inherits.docstring if inherits else d.docstring
   if short or inherits:
     docstring = glimpse(docstring)
@@ -52,7 +52,7 @@
           % endif
       </p>
   % endif
-  <div${inherits}>${docstring | to_html}</div>
+  <section class="desc${inherits}">${docstring | to_html}</section>
   % if not isinstance(d, pdoc.Module):
   ${show_source(d)}
   % endif

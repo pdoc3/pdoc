@@ -173,20 +173,21 @@ attaching a docstring to something. A good example of this is a
 Additionally, if `__pdoc__[key] = False`, then `key` will be
 excluded from the public interface of the module.
 
-Note that assignments to `__pdoc__` need to be placed where they'll be
-executed when the module is imported. For example, at the top level
-of a module or in the definition of a class.
+.. note::
+    The assignments to `__pdoc__` need to be placed where they'll be
+    executed when the module is imported. For example, at the top level
+    of a module or in the definition of a class.
 
 
 Supported docstring formats
 ---------------------------
-Currently, only docstrings formatted in pure Markdown
-(with [extensions]) are supported.
-[NumpyDoc] and [Google-style] docstring formats are on the roadmap,
-but need an avid implementor (patches welcome).
+Currently, pure Markdown (with [extensions]), [numpydoc],
+and [Google-style] docstrings formats are supported.
+Basic reST directives (such as e.g. `.. deprecated::`) should also work.
 
+*[reST]: reStructuredText
 [extensions]: https://python-markdown.github.io/extensions/#officially-supported-extensions
-[NumpyDoc]: https://numpydoc.readthedocs.io/
+[numpydoc]: https://numpydoc.readthedocs.io/
 [Google-style]: http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
 
 

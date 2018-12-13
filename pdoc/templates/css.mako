@@ -51,6 +51,7 @@
     margin: 1em 0 .50em 0;
   }
   h3 {
+    font-size: 1.4em;
     margin: 25px 0 10px 0;
   }
   h4 {
@@ -182,6 +183,18 @@
       font-weight: bold;
     }
 
+    /* Docstrings titles, e.g. in numpydoc format */
+    .desc h2 {
+      font-weight: 400;
+      font-size: 1.25em;
+    }
+    .desc h3 {
+      font-size: 1em;
+    }
+    .desc dt code {
+      background: inherit;  /* Don't grey-back parameters */
+    }
+
     .source summary {
       background: #ffc;
       font-weight: 400;
@@ -220,6 +233,38 @@
       display: inline;
       padding-left: 1em;
     }
+
+  img {
+    max-width: 100%;
+  }
+
+  .admonition {
+    padding: .1em .5em;
+  }
+    .admonition-title {
+      font-weight: bold;
+    }
+    .admonition.note,
+    .admonition.info,
+    .admonition.important {
+      background: #aef;
+    }
+    .admonition.todo,
+    .admonition.versionadded,
+    .admonition.tip,
+    .admonition.hint {
+      background: #dfd;
+    }
+    .admonition.warning,
+    .admonition.versionchanged,
+    .admonition.deprecated {
+      background: #fd4;
+    }
+    .admonition.error,
+    .admonition.danger,
+    .admonition.caution {
+      background: lightpink;
+    ]
 </%def>
 
 <%def name="desktop()" filter="minify_css">

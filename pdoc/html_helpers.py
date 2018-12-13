@@ -1,6 +1,7 @@
 """
 Helper functions for HTML output.
 """
+import inspect
 import re
 from functools import partial, lru_cache
 from warnings import warn
@@ -27,9 +28,7 @@ def minify_html(html,
                     lambda m, _norm_space=partial(re.compile(r'\s\s+').sub, '\n'): (
                         _norm_space(m.group(1) or '') +
                         (m.group(2) or '') +
-                        _norm_space(m.group(3) or '')
-                    ))
-                ):
+                        _norm_space(m.group(3) or '')))):
     """
     Minify HTML by replacing all consecutive whitespace with a single space
     (or newline) character, except inside `<pre>` tags.
@@ -66,6 +65,7 @@ _md = markdown.Markdown(
     extensions=[
         "markdown.extensions.abbr",
         "markdown.extensions.attr_list",
+        "markdown.extensions.def_list",
         "markdown.extensions.fenced_code",
         "markdown.extensions.footnotes",
         "markdown.extensions.tables",
@@ -93,20 +93,187 @@ class ReferenceWarning(UserWarning):
     """
 
 
-def to_html(text, docformat='markdown', *,
+class _ToMarkdown:
+    """
+    This class serves as a namespace for methods converting common
+    documentation formats into markdown our Python-Markdown with
+    addons can ingest.
+
+    If debugging regexs (I can't imagine why that would be necessary
+    — they are all perfect!) an insta-preview tool such as RegEx101.com
+    will come in handy.
+    """
+    @staticmethod
+    def _deflist(name, type, desc,
+                 # Wraps any identifiers and string literals in parameter type spec
+                 # in backticks while skipping common "stopwords" such as 'or', 'of',
+                 # 'optional'. See §4 Parameters:
+                 # https://numpydoc.readthedocs.io/en/latest/format.html#sections
+                 _type_parts=partial(
+                     re.compile(r'(.*?)(, optional\.?|)$').sub,
+                     lambda m, _backtick_idents=partial(
+                             re.compile(r'[\w.\'"]+').sub,
+                             lambda m: ('{}' if m.group(0) in ('of', 'or') else
+                                        '`{}`').format(m.group(0))): (
+                         _backtick_idents(m.group(1)) + m.group(2)))):
+        """
+        Returns `name`, `type`, and `desc` formatted as a
+        Python-Markdown definition list entry. See also:
+        https://python-markdown.github.io/extensions/definition_lists/
+        """
+        type = _type_parts(type or '')
+        desc = desc or '&nbsp;'
+        if type:
+            return '**`{}`** :&ensp;{}\n:   {}\n\n'.format(name, type, desc)
+        return '**`{}`**\n:   {}\n\n'.format(name, desc)
+
+    @staticmethod
+    def _numpy_params(match,
+                      _name_parts=partial(re.compile(', ').sub, '`**, **`')):
+        """ Converts NumpyDoc parameter (etc.) sections into Markdown. """
+        name, type, desc = match.groups()
+        desc = desc.strip()
+        if name and (type or desc):
+            name = _name_parts(name)
+            return _ToMarkdown._deflist(name, type, desc)
+        return match.group(0)
+
+    @staticmethod
+    def _numpy_seealso(match):
+        """
+        Converts NumpyDoc "See Also" section either into referenced code,
+        optionally within a definition list.
+        """
+        title, spec_with_desc, simple_list = match.groups()
+        if spec_with_desc:
+            return title + '\n\n'.join('`{}`\n:   {}'.format(*map(str.strip, line.split(':', 1)))
+                                       for line in filter(None, spec_with_desc.split('\n')))
+        return title + ', '.join('`{}`'.format(i) for i in simple_list.split(', '))
+
+    @staticmethod
+    def numpy(text,
+              # All kinds of numpydoc Parameters (optionally with types; descriptions)
+              _params=partial(
+                  re.compile(r'^([\w*]+(?:, [\w*]+)*)(?: ?: ?(.*)(?<!\.)$)?'
+                             r'((?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
+                  _numpy_params.__func__),
+              _seealso=partial(
+                  re.compile(r'(See Also\n-{8}\n)(?:((?:\n?[\w.]* ?: .*)+)|(.*))').sub,
+                  _numpy_seealso.__func__)):
+        """
+        Convert `text` in numpydoc docstring format to Markdown
+        to be further converted later.
+        """
+        text = _seealso(text)
+        text = _params(text)
+        return text
+
+    @staticmethod
+    def google(text,
+               _googledoc_sections=partial(
+                   re.compile(r'(?<=\n\n)(\w+):$\n((?:\n?(?: {4}.*|$))+)', re.MULTILINE).sub,
+                   lambda m, _params=partial(
+                           re.compile(r'^([\w*]+)(?: \(([\w. ]+)\))?: '
+                                      r'((?:.*)(?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
+                           lambda m: _ToMarkdown._deflist(*m.groups())): (
+                       '\n{}\n-----\n{}'.format(
+                           m.group(1), _params(inspect.cleandoc(m.group(2))))))):
+        """
+        Convert `text` in Google-style docstring format to Markdown
+        to be further converted later.
+        """
+        return _googledoc_sections(text)
+
+    @staticmethod
+    def _admonition(match):
+        indent, type, value, text = match.groups()
+
+        if type in ('image', 'figure'):
+            return '{}![{}]({})\n'.format(
+                indent, text.translate(str.maketrans({'\n': ' ',
+                                                      '[': '\\[',
+                                                      ']': '\\]'})).strip(), value)
+        if type == 'versionchanged':
+            title = 'Changed in version:&ensp;' + value
+        elif type == 'versionadded':
+            title = 'Added in version:&ensp;' + value
+        elif type == 'deprecated' and value:
+            title = 'Deprecated since version:&ensp;' + value
+        elif type == 'admonition':
+            title = value
+        elif type.lower() == 'todo':
+            title = 'TODO'
+            text = value + ' ' + text
+        else:
+            title = type.capitalize()
+            if value:
+                title += ':&ensp;' + value
+
+        text = '\n'.join(indent + '    ' + line
+                         for line in inspect.cleandoc(text).split('\n'))
+        return '{}!!! {} "{}"\n{}\n'.format(indent, type, title, text)
+
+    @staticmethod
+    def admonitions(text,
+                    _admonitions=partial(
+                        re.compile(r'^(?P<indent> *)\.\. ?(\w+)::(?: *(.*))?'
+                                   r'((?:\n(?:(?P=indent) +.*| *$))*)', re.MULTILINE).sub,
+                        _admonition.__func__)):
+        """
+        Process reStructuredText's block directives such as
+        `.. warning::`, `.. deprecated::`, `.. versionadded::`, etc.
+        and turn them into Python-M>arkdown admonitions.
+
+        See: https://python-markdown.github.io/extensions/admonition/
+        """
+        # Apply twice for nested (e.g. image inside warning)
+        return _admonitions(_admonitions(text))
+
+    @staticmethod
+    def doctests(text,
+                 _indent_doctests=partial(
+                     re.compile(r'(?:^(?P<fence>```|~~~).*\n)?'
+                                r'(?:^>>>.*'
+                                r'(?:\n(?:(?:>>>|\.\.\.).*))*'
+                                r'(?:\n.*)?\n\n?)+'
+                                r'(?P=fence)?', re.MULTILINE).sub,
+                     lambda m: (m.group(0) if m.group('fence') else
+                                ('\n    ' + '\n    '.join(m.group(0).split('\n')) + '\n\n')))):
+        """
+        Indent non-fenced (`\`\`\``) top-level (0-indented)
+        doctest blocks so they render as code.
+        """
+        return _indent_doctests(text)
+
+
+def to_html(text, docformat: str = 'numpy,google', *,
             module: pdoc.Module = None, link=None,
             # Matches markdown code spans not +directly+ within links.
             # E.g. `code` and [foo is `bar`]() but not [`code`](...)
             # Also skips \-escaped grave quotes.
-            _code_refs=re.compile(r'(?<![\[\\])`(?!\])([^`]|(?<=\\)`)+`').sub):
+            _code_refs=re.compile(r'(?<![\[\\])`(?!])(?:[^`]|(?<=\\)`)+`').sub):
     """
     Returns HTML of `text` interpreted as `docformat`.
+    By default, Numpydoc and Google-style docstrings are assumed,
+    as well as pure Markdown.
 
     `module` should be the documented module (so the references can be
     resolved) and `link` is the hyperlinking function like the one in the
     example template.
     """
-    assert docformat in ('markdown', 'md'), docformat  # TODO: Add support for NumpyDoc / Google
+    assert all(i in (None, '', 'numpy', 'google') for i in docformat.split(',')), docformat
+
+    text = _ToMarkdown.admonitions(text)
+
+    if 'google' in docformat:
+        text = _ToMarkdown.google(text)
+
+    # If doing both, do numpy after google, otherwise google-style's
+    # headings are incorrectly interpreted as numpy params
+    if 'numpy' in docformat:
+        text = _ToMarkdown.numpy(text)
+
+    text = _ToMarkdown.doctests(text)
 
     if module and link:
 

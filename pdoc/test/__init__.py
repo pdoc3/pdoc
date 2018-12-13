@@ -1,6 +1,7 @@
 """
 Unit tests for pdoc package.
 """
+import inspect
 import os
 import signal
 import sys
@@ -123,7 +124,7 @@ class CliTest(unittest.TestCase):
             'B docstring',
             'B.overridden docstring',
             'builtins.int',
-            'External: ',
+            'External refs: ',
             '>sys.version<',
             'B.CONST docstring',
             'B.var docstring',
@@ -252,7 +253,7 @@ class CliTest(unittest.TestCase):
             'B docstring',
             'B.overridden docstring',
             'builtins.int',
-            'External: ',
+            'External refs: ',
             'sys.version',
             'B.CONST docstring',
             'B.var docstring',
@@ -516,6 +517,155 @@ class HtmlHelpersTest(unittest.TestCase):
 </div>'''
         toc = extract_toc(text)
         self.assertEqual(toc, expected)
+
+
+class Docformats(unittest.TestCase):
+    _module = pdoc.Module(pdoc)
+    _docmodule = pdoc.import_module(EXAMPLE_MODULE)
+
+    @staticmethod
+    def _link(dobj, *args, **kwargs):
+        return '<a>`{}`</a>'.format(dobj.refname)
+
+    def test_numpy(self):
+        expected = '''<p>Summary line.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x1</code></strong>, <strong><code>x2</code></strong> :&ensp;<code>array_like</code></dt>
+<dd>
+<p>Input arrays,
+description of <code>x1</code>, <code>x2</code>.</p>
+<div class="admonition versionadded">
+<p class="admonition-title">Added in version:&ensp;1.5.0</p>
+</div>
+</dd>
+<dt><strong><code>x</code></strong> :&ensp;{ <code>NoneType</code>, <code>'B'</code>, <code>'C'</code> }, optional</dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>n</code></strong> :&ensp;<code>int</code> or <code>list</code> of <code>int</code></dt>
+<dd>Description of num</dd>
+<dt><strong><code>*args</code></strong>, <strong><code>**kwargs</code></strong></dt>
+<dd>Passed on.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>output</code></strong> :&ensp;<a><code>pdoc.Doc</code></a></dt>
+<dd>The output array</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><strong><code>TypeError</code></strong></dt>
+<dd>When something.</dd>
+</dl>
+<h2 id="see-also">See Also</h2>
+<p><code>fromstring</code>, <code>loadtxt</code></p>
+<h2 id="see-also_1">See Also</h2>
+<dl>
+<dt><a><code>pdoc.text</code></a></dt>
+<dd>Function a with its description.</dd>
+<dt><a><code>scipy.random.norm</code></a></dt>
+<dd>Random variates, PDFs, etc.</dd>
+</dl>
+<h2 id="notes">Notes</h2>
+<p>Foo bar.</p>
+<h3 id="h3-title">H3 Title</h3>
+<p>Foo bar.</p>'''  # noqa: E501
+        text = inspect.getdoc(self._docmodule.numpy)
+        html = to_html(text, module=self._module, link=self._link)
+        self.assertEqual(html, expected)
+
+    def test_google(self):
+        expected = '''<p>Summary line.
+Nomatch:</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>arg1</code></strong> :&ensp;<code>int</code></dt>
+<dd>Description of arg1</dd>
+<dt><strong><code>arg2</code></strong> :&ensp;<code>str</code> or <code>int</code></dt>
+<dd>Description of arg2</dd>
+<dt><strong><code>*args</code></strong></dt>
+<dd>passed around</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>bool</code></strong></dt>
+<dd>Description of return value</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><strong><code>AttributeError</code></strong></dt>
+<dd>
+<p>The <code>Raises</code> section is a list of all exceptions
+that are relevant to the interface.</p>
+<p>and a third line.</p>
+</dd>
+<dt><strong><code>ValueError</code></strong></dt>
+<dd>If <code>arg2</code> is equal to <code>arg1</code>.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<p>Examples in doctest format.</p>
+<pre><code>&gt;&gt;&gt; a = [1,2,3]
+</code></pre>
+<h2 id="todos">Todos</h2>
+<ul>
+<li>For module TODOs</li>
+</ul>'''
+        text = inspect.getdoc(self._docmodule.google)
+        html = to_html(text, module=self._module, link=self._link)
+        self.assertEqual(html, expected)
+
+    def test_doctests(self):
+        expected = '''<p>Need an intro paragrapgh.</p>
+<pre><code>&gt;&gt;&gt; Then code is indented one level
+</code></pre>
+<p>Alternatively</p>
+<pre><code>fenced code works
+</code></pre>'''
+        text = inspect.getdoc(self._docmodule.doctests)
+        html = to_html(text, module=self._module, link=self._link)
+        self.assertEqual(html, expected)
+
+    def test_reST_directives(self):
+        expected = '''<div class="admonition todo">
+<p class="admonition-title">TODO</p>
+<p>Create something.</p>
+</div>
+<div class="admonition admonition">
+<p class="admonition-title">Example</p>
+<p>Image shows something.</p>
+<p><img alt="" src="/logo.png"></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Can only nest admonitions two levels.</p>
+</div>
+</div>
+<p><img alt="" src="https://www.debian.org/logos/openlogo-nd-100.png"></p>
+<p>Now you know.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Some warning
+lines.</p>
+</div>
+<ul>
+<li>
+<p>Describe some func in a list
+  across multiple lines:</p>
+<div class="admonition deprecated">
+<p class="admonition-title">Deprecated since version:&ensp;3.1</p>
+<p>Use <code>spam</code> instead.</p>
+</div>
+<div class="admonition versionadded">
+<p class="admonition-title">Added in version:&ensp;2.5</p>
+<p>The <em>spam</em> parameter.</p>
+</div>
+</li>
+</ul>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>Don't touch this!</p>
+</div>'''
+        text = inspect.getdoc(self._docmodule.reST_directives)
+        html = to_html(text, module=self._module, link=self._link)
+        self.assertEqual(html, expected)
 
 
 class HttpTest(unittest.TestCase):
