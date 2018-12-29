@@ -1,3 +1,32 @@
+0.5.0
+=====
+  - Relicensed as AGPL-3.0.
+  - Major refactoring, Python 3 compatibility.
+  - Support Numpydoc, Google-style docstrings, and some reST directives.
+  - CLI changes:
+    - Specifying modules/packages to document if mandatory.
+    - Identifier filtering can be turned on with an optional `--filter`
+      argument.
+    - Argument `--all-submodules` is removed.
+    - To avoid polluting the python package with scattered *.html files,
+      the default `--html-dir` now points to `./html`.
+    - Arguments `--http-host` and `--http-port` are removed in favor
+      of passing a parameter to argument `--http`.
+    - Program errors if specified template directory is invalid.
+  - All document objects have a `.obj` property, pointing to the raw
+    Python object.
+  - Major template updates:
+    - Template exceptions are propagated to stderr.
+    - Major refactoring (modern HTML5) of the HTML template.
+    - HTML template loads Normalize.css and Highlight.js from CDN.
+    - HTML template output is minified.
+    - HTML template includes sub-templates (config.mako, head.mako, logo.mako,
+      credits.mako) to more easily adapt it.
+    - In HTML template, module headings are extracted into sidebar TOC.
+  - `Function.params()` returns only public parameters.
+  - To disable documenting an identifier with `__pdoc__`, prefer `False`
+    to `None` (deprecated).
+
 0.3.1
 =====
   - Source code is extracted from __wrapped__ if it exists, and then
