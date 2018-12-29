@@ -256,6 +256,18 @@ of your choosing and edit them. When you run [pdoc command][cmd]
 afterwards, pass the directory path as a parameter to the
 `--template-dir` switch.
 
+.. tip::
+    If you find you only need to apply minor alterations to the HTML template,
+    see if you can do so by overriding just some of the following, placeholder
+    sub-templates:
+
+    + _config.mako_: Basic template configuration, affects the way templates are rendered.
+    * _head.mako_: Included just before `</head>`. Best for adding resources and styles.
+    * _logo.mako_: Included at the very top of the navigation sidebar. Empty by default.
+    * _credits.mako_: Included in the footer, right before pdoc version string.
+
+    See default template files for reference.
+
 If working with `pdoc` programmatically, _prepend_ the directory with
 modified templates into the `directories` list of the
 `pdoc.tpl_lookup` object.
