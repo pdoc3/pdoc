@@ -44,7 +44,7 @@ class B(A, int):
         self.instance_var = None
         """instance var docstring"""
 
-    def f(self, a: int, b: int = 1, *args, c: str='c', **kwargs):
+    def f(self, a: int, b: int = 1, *args, c: str = 'c', **kwargs):
         """B.f docstring"""
 
     @staticmethod

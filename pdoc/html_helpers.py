@@ -240,7 +240,7 @@ class _ToMarkdown:
                      lambda m: (m.group(0) if m.group('fence') else
                                 ('\n    ' + '\n    '.join(m.group(0).split('\n')) + '\n\n')))):
         """
-        Indent non-fenced (`\`\`\``) top-level (0-indented)
+        Indent non-fenced (`~~~`) top-level (0-indented)
         doctest blocks so they render as code.
         """
         return _indent_doctests(text)

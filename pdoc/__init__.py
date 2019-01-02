@@ -29,7 +29,7 @@ What objects are documented?
 `pdoc` only extracts _public API_ documentation.[^public]
 All objects (modules, functions, classes, variables) are only
 considered public if their _identifiers don't begin with an
-underscore_ ( \_ ).[^private]
+underscore_ ( \\_ ).[^private]
 
 [^public]:
     Here, public API refers to the API that is made available
@@ -195,10 +195,10 @@ Linking to other identifiers
 ----------------------------
 In your documentation, you may refer to other identifiers in
 your modules. When exporting to HTML, linking is automatically
-done whenever you surround an identifier with [backticks] ( \` ).
+done whenever you surround an identifier with [backticks] ( \\` ).
 The identifier name must be fully qualified, for example
-<code>\`pdoc.Doc.docstring\`</code> is correct (and will link to
-`pdoc.Doc.docstring`) while <code>\`Doc.docstring\`</code> is not.
+<code>\\`pdoc.Doc.docstring\\`</code> is correct (and will link to
+`pdoc.Doc.docstring`) while <code>\\`Doc.docstring\\`</code> is _not_.
 
 [backticks]: https://en.wikipedia.org/wiki/Grave_accent#Use_in_programming
 
@@ -275,7 +275,7 @@ modified templates into the `directories` list of the
 
 Compatibility
 -------------
-`pdoc` requires Python 3.4+.
+`pdoc` requires Python 3.5+.
 
 
 Contributing
