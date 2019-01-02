@@ -283,6 +283,10 @@ def main(_args=None):
     sys.stdin.close()
 
     if args.template_dir is not None:
+        if not path.isdir(args.template_dir):
+            print('Error: Template dir {!r} is not a directory'.format(args.template_dir),
+                  file=sys.stderr)
+            sys.exit(1)
         pdoc.tpl_lookup.directories.insert(0, args.template_dir)
 
     if args.http:
