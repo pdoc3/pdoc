@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script>window.dataLayer=[['js',new Date()],['config','UA-43663477-5']]</script>
+    <script async src='https://www.googletagmanager.com/gtag/js?id=UA-43663477-5'></script>
+
+    <meta name="description" content="Auto-generate API documentation for Python projects from docstrings in numpydoc, Google, or plain Markdown format.">
+    <meta name="keywords" content="python, documentation, generator, api, docstrings, numpydoc, markdown">
+    <title>pdoc – Auto-generate API documentation for Python projects</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
+
+    <style>
+        blockquote.card p:first-child:before { content: '“' }
+        blockquote.card p:first-child:after  { content: '”' }
+        blockquote.card p:last-child:before  { content: '— ' }
+        blockquote.card p:first-child {font-style: italic}
+    </style>
+    <style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <link rel="icon" type="image/png" href="logo.png" sizes="512x512">
+    <link rel="canonical home" href="https://pdoc3.github.io/pdoc/">
+</head>
+<body>
+
+<section class="section">
+    <div class="container">
+        <div class="level">
+            <div class="level-left">
+                <div class="image is-128x128" style="margin-right:3em"><img alt="" src="logo.png"></div>
+                <div>
+                    <h1 class="title is-1">
+                        pdoc
+                    </h1>
+                    <h2 class="subtitle is-4">
+                        Auto-generate API documentation for Python projects
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <p>
+                Ever finished a neat Python script only to see it later lay unused by anyone else
+                because the only documenting effort you gave it was the petty README.md?
+
+                Ever found Sphinx too cumbersome to use for the small project on your hands or
+                have repeatedly found <abbr title="reStructuredText">reST</abbr> syntax for links
+                too volatile to touch-type, whereas you had always loved and adored markdown?
+
+                Many have.
+
+                Documentation is a <abbr title="pain in the ass">PITA</abbr> to maintain.
+                Real programmers don't document their programs —
+                documentation is for simpletons who can't read object code from memory dumps.
+                Right?
+            </p>
+
+            <div class="columns container is-centered" style="margin-top:2em; margin-bottom:2em;">
+                <blockquote class="media is-half-desktop is-two-thirds-tablet 1is-one-third-widescreen">
+                    <div class="media-left"><span class="icon is-medium"><i class="fa fa-2x fa-quote-left"></i></span></div>
+                    <div class="media-content">
+                        <p>
+                            Documentation is like sex: when it is good, it is very, very good;
+                            <br>and when it is bad, it is better than nothing.
+                        </p>
+                        <i class="is-pulled-right">— Dick B.</i>
+                    </div>
+                </blockquote>
+            </div>
+
+            <p>
+                Enter <b>pdoc</b>, the perfect documentation generator for small-to-medium-sized, tidy Python projects.
+                It generates <b>documentation simply from your project's already-existing public modules' and objects' docstrings</b>,
+                like <cite>sphinx-apidoc</cite> or <cite>sphinx.ext.autodoc</cite>,
+                but without the hassle of these tools.
+                Minimal and lightweight.
+                Guaranteed 99% correct magic out of the box!
+            </p>
+        </div>
+
+        <div class="columns" style="margin-top:3em">
+            <ul class="column">
+                <li class="media">
+                    <div class="media-left"><span class="icon is-medium"><i class="fab fa-2x fa-python"></i></span></div>
+                    <div class="media-content">
+                        <p><b>Compatible with Python 3+</b></p>
+                        <p>Python 3.5 and up. Best choice for new or forward-looking projects.</p>
+                    </div>
+                </li>
+                <li class="media">
+                   <div class="media-left"><span class="icon is-medium"><i class="fa fa-2x fa-scroll"></i></span></div>
+                   <div class="media-content">
+                       <p><b>Common docstring formats</b></p>
+                       <p>Out-of-the-box support for markdown, numpydoc, Google-style docstrings, Napoleon, and some common reST directives.</p>
+                   </div>
+                </li>
+                <li class="media">
+                   <div class="media-left"><span class="icon is-medium"><i class="fa fa-2x fa-magic "></i></span></div>
+                   <div class="media-content">
+                       <p><b>Zero configuration</b></p>
+                       <p>Pdoc works automatically, following common Python programming conventions. Simply run the command line script, ecstatically nodding in agreement.</p>
+                   </div>
+                </li>
+            </ul>
+
+            <ul class="column">
+                <li class="media">
+                    <div class="media-left"><span class="icon is-medium"><i class="fa fa-2x fa-sitemap"></i></span></div>
+                    <div class="media-content">
+                        <p><b>Docs hieararchy follows module hierarchy</b></p>
+                        <p>Use modules docstrings to introduce topics. Literate programming exactly as Guido intended it.</p>
+                    </div>
+                </li>
+                <li class="media">
+                    <div class="media-left"><span class="icon is-medium"><i class="fa fa-2x fa-cogs"></i></span></div>
+                    <div class="media-content">
+                        <p><b>Customizable templates</b></p>
+                        <p>Pdoc uses fast mako templating engine. The default templates should suit most cases, but they can easily be extended or overridden.</p>
+                    </div>
+                </li>
+                <li class="media">
+                    <div class="media-left"><span class="icon is-medium"><i class="fa fa-2x fa-link"></i></span></div>
+                    <div class="media-content">
+                        <p><b>Easy cross-linking of identifiers</b></p>
+                        <p>Simply wrap object references in backticks and let the technology do all the rest.</p>
+                    </div>
+                </li>
+            </ul>
+            <ul class="column">
+                <li class="media">
+                    <div class="media-left"><span class="icon is-medium"><i class="fa fa-2x fa-laptop-code"></i></span></div>
+                    <div class="media-content">
+                        <p><b>Integrated dev web server</b></p>
+                        <p>Instant feedback on your doc writing skills — see it as you write it.</p>
+                    </div>
+                </li>
+                <li class="media">
+                    <div class="media-left"><span class="icon is-medium"><i class="fa fa-2x fa-check-square"></i></span></div>
+                    <div class="media-content">
+                        <p><b>Dependable</b></p>
+                        <p>Unmatched identifiers and source errors raise loud warnings. Reliably build documentation in your <abbr title="continuous integration">CI</abbr> pipeline.</p>
+                    </div>
+                </li>
+                <li class="media">
+                    <div class="media-left"><span class="icon is-medium"><i class="fa fa-2x fa-eye"></i></span></div>
+                    <div class="media-content">
+                        <p><b>Plain text, HTML, or PDF output</b></p>
+                        <p>Functionally laid out for every kind of eye.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h3 class="title is-narrow has-text-centered">
+            Download
+        </h3>
+
+        <div class="columns is-centered">
+            <div class="column is-narrow">
+                <div class="control has-icons-left has-icons-right">
+                    <input class="input is-large is-dark" readonly value="pip3 install pdoc3"
+                           style="background:#ffd; cursor:pointer; caret-color:transparent; font-family:monospace;"
+                           onclick="getSelection().removeAllRanges(); this.select();">
+                    <span class="icon is-left has-text-grey" ><i class="fa fa-dollar-sign"></i></span>
+                    <span class="icon is-right has-text-grey"><i class="fa fa-download"></i></span>
+                </div>
+            </div>
+
+            <div class="column is-narrow has-text-centered buttons">
+                <a class="button is-success is-large" title="pdoc on PyPI" href="https://pypi.org/project/pdoc3/" style="margin-right:.8em;">
+                    <span class="icon"><i class="fa fa-download"></i></span>
+                    <span>PyPI</span>
+                </a>
+                <a class="button is-large has-background-white-ter" title="pdoc on GitHub" href="https://github.com/pdoc3/pdoc">
+                    <span class="icon"><i class="fab fa-github"></i></span>
+                    <span>GitHub</span>
+                </a>
+            </div>
+        </div>
+
+        <p class="has-text-centered">
+            <span class="is-size-5">*</span>
+            PyPI package <b><a href="https://pypi.org/project/pdoc3/">pdoc3</a></b>.
+            Not to be confused with an older package
+            <a href="https://pypi.org/project/pdoc/" rel="nofollow">pdoc</a>
+            this package is a fork of. <span class="icon" ><i class="fa fa-code-branch"></i></span>
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h3 class="title is-narrow has-text-centered">
+            Usage
+        </h3>
+
+        <div class="content columns is-centered">
+            <div class="column is-narrow has-text-centered">
+                <div class="control has-icons-left">
+                    <input class="input is-large is-dark" readonly disabled value="pdoc --html pdoc"
+                           style="cursor:default; caret-color:transparent; font-family:monospace; pointer-events:none; user-select:none;"
+                           tabindex="-1">
+                    <span class="icon is-left has-text-grey" ><i class="fa fa-dollar-sign"></i></span>
+                </div>
+            </div>
+            <div class="column is-narrow has-text-centered is-size-3 has-text-centered">produces</div>
+            <div class="column is-narrow has-text-centered">
+                <a class="button is-large is-link" title="pdoc documentation" href="doc/pdoc/">
+                    <span class="icon"><i class="fa fa-file-alt"></i></span>
+                    <span>Documentation</span>
+                </a>
+            </div>
+        </div>
+
+        <p class="has-text-centered">
+            <span class="is-size-5">*</span>
+            Replace second <code>pdoc</code> with your package&nbsp;/&nbsp;directory&nbsp;/&nbsp;file&nbsp;name to view the
+            documentation of <em>your</em> project.
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h3 class="title is-narrow has-text-centered">
+            What Users are Saying
+        </h3>
+
+        <div class="columns is-multiline">
+            <div class="column is-3 is-offset-1">
+                <blockquote class="card">
+                    <div class="card-content content">
+                        <p class="is-size-5">The proof of [this] program's value is its existence.</p>
+                        <p class="is-size-6 has-text-right">Alan Perlis</p>
+                    </div>
+                </blockquote>
+            </div>
+            <div class="column is-4">
+                <blockquote class="card">
+                    <div class="card-content content">
+                        <p class="is-size-5">All this technology is completely unnecessary to a happy life.</p>
+                        <p class="is-size-6 has-text-right">Tom Hodgkinson</p>
+                    </div>
+                </blockquote>
+            </div>
+            <div class="column is-3">
+                <blockquote class="card">
+                    <div class="card-content content">
+                        <p class="is-size-5">[...] When all else fails, read the instructions.</p>
+                        <p class="is-size-6 has-text-right">Cahn</p>
+                    </div>
+                </blockquote>
+            </div>
+            <div class="column is-6 is-offset-3">
+                <blockquote class="card">
+                    <div class="card-content content">
+                        <p class="is-size-5">
+                            I believe that the time is ripe for significantly better
+                            documentation of programs, and that we can best achieve this by
+                            considering programs to be works of literature.
+                        </p>
+                        <p class="is-size-6 has-text-right">Donald Knuth</p>
+                    </div>
+                </blockquote>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="footer" style="margin-top:8em;">
+    <div class="container is-fluid has-text-grey-lighter">
+        <span class="is-pulled-left">卐</span>
+        <span class="is-pulled-right">卍</span>
+    </div>
+    <div class="container">
+        <blockquote class="content is-clearfix has-text-centered has-text-grey">
+            <p>There is nothing in the programming field more despicable than an undocumented program.&ensp;<i>—&nbsp;Ed Young</i></p>
+        </blockquote>
+    </div>
+</footer>
+
+<a href="https://github.com/kernc/xsuspender" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/typogr/0.6.8/typogr.min.js"></script>
+<script>document.body.innerHTML = typogr.widont(document.body.innerHTML);</script>
+</body>
+</html>

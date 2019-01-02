@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.5.0.dev1" />
+<title>pdoc.html_helpers API documentation</title>
+<meta name="description" content="Helper functions for HTML output." />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id=^header-]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:1px solid #ddd;margin:1em 0 1em 4ch}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}#index .two-column{column-count:2}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.name small{font-weight:normal}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{background:#ffc;font-weight:400;font-size:.8em;width:11em;text-transform:uppercase;padding:0px 8px;border:1px solid #fd6;border-radius:5px;cursor:pointer}.source summary:hover{background:#fe9 !important}.source[open] summary{background:#fda}.source pre{max-height:500px;overflow-y:scroll;margin-bottom:15px}.hlist{list-syle:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink;]</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a,a:visited{text-decoration:underline}a[href]:after{content:" (" attr(href) ")"}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title"><code>pdoc.html_helpers</code> module</h1>
+</header>
+<section id="section-intro">
+<p>Helper functions for HTML output.</p>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Helper functions for HTML output.
+&#34;&#34;&#34;
+import inspect
+import re
+from functools import partial, lru_cache
+from warnings import warn
+
+import markdown
+
+import pdoc
+
+
+@lru_cache()
+def minify_css(css,
+               _whitespace=partial(re.compile(r&#39;\s*([,{:;}])\s*&#39;).sub, r&#39;\1&#39;),
+               _comments=partial(re.compile(r&#39;/\*.*?\*/&#39;, flags=re.DOTALL).sub, &#39;&#39;),
+               _trailing_semicolon=partial(re.compile(r&#39;;\s*}&#39;).sub, &#39;}&#39;)):
+    &#34;&#34;&#34;
+    Minify CSS by removing extraneous whitespace, comments, and trailing semicolons.
+    &#34;&#34;&#34;
+    return _trailing_semicolon(_whitespace(_comments(css))).strip()
+
+
+def minify_html(html,
+                _minify=partial(
+                    re.compile(r&#39;(.*?)(&lt;pre\b.*?&lt;/pre\b\s*&gt;)|(.*)&#39;, re.IGNORECASE | re.DOTALL).sub,
+                    lambda m, _norm_space=partial(re.compile(r&#39;\s\s+&#39;).sub, &#39;\n&#39;): (
+                        _norm_space(m.group(1) or &#39;&#39;) +
+                        (m.group(2) or &#39;&#39;) +
+                        _norm_space(m.group(3) or &#39;&#39;)))):
+    &#34;&#34;&#34;
+    Minify HTML by replacing all consecutive whitespace with a single space
+    (or newline) character, except inside `&lt;pre&gt;` tags.
+    &#34;&#34;&#34;
+    return _minify(html)
+
+
+def glimpse(text, max_length=153, *, paragraph=True,
+            _split_paragraph=partial(re.compile(r&#39;\s*\n\s*\n\s*&#39;).split, maxsplit=1),
+            _trim_last_word=partial(re.compile(r&#39;\S+$&#39;).sub, &#39;&#39;),
+            _remove_titles=partial(re.compile(r&#39;^(#+|-{4,}|={4,})&#39;, re.MULTILINE).sub, &#39; &#39;)):
+    &#34;&#34;&#34;
+    Returns a short excerpt (e.g. first paragraph) of text.
+    If `paragraph` is True, the first paragraph will be returned,
+    but never longer than `max_length` characters.
+    &#34;&#34;&#34;
+    text = text.lstrip()
+    if paragraph:
+        text, *rest = _split_paragraph(text)
+        if rest:
+            text = text.rstrip(&#39;.&#39;)
+            text += &#39; …&#39;
+        text = _remove_titles(text).strip()
+
+    if len(text) &gt; max_length:
+        text = _trim_last_word(text[:max_length - 2])
+        if not text.endswith(&#39;.&#39;) or not paragraph:
+            text = text.rstrip(&#39;. &#39;) + &#39; …&#39;
+    return text
+
+
+_md = markdown.Markdown(
+    output_format=&#39;html5&#39;,
+    extensions=[
+        &#34;markdown.extensions.abbr&#34;,
+        &#34;markdown.extensions.attr_list&#34;,
+        &#34;markdown.extensions.def_list&#34;,
+        &#34;markdown.extensions.fenced_code&#34;,
+        &#34;markdown.extensions.footnotes&#34;,
+        &#34;markdown.extensions.tables&#34;,
+        &#34;markdown.extensions.admonition&#34;,
+        &#34;markdown.extensions.smarty&#34;,
+        &#34;markdown.extensions.toc&#34;,
+    ],
+    extension_configs={
+        &#34;markdown.extensions.smarty&#34;: dict(
+            smart_dashes=True,
+            smart_ellipses=True,
+            smart_quotes=False,
+            smart_angled_quotes=False,
+        ),
+    },
+)
+
+
+class ReferenceWarning(UserWarning):
+    &#34;&#34;&#34;
+    This warning is raised in `to_html` when a object reference in markdown
+    doesn&#39;t match any documented objects.
+
+    Look for this warning to catch typos / references to obsolete symbols.
+    &#34;&#34;&#34;
+
+
+class _ToMarkdown:
+    &#34;&#34;&#34;
+    This class serves as a namespace for methods converting common
+    documentation formats into markdown our Python-Markdown with
+    addons can ingest.
+
+    If debugging regexs (I can&#39;t imagine why that would be necessary
+    — they are all perfect!) an insta-preview tool such as RegEx101.com
+    will come in handy.
+    &#34;&#34;&#34;
+    @staticmethod
+    def _deflist(name, type, desc,
+                 # Wraps any identifiers and string literals in parameter type spec
+                 # in backticks while skipping common &#34;stopwords&#34; such as &#39;or&#39;, &#39;of&#39;,
+                 # &#39;optional&#39;. See §4 Parameters:
+                 # https://numpydoc.readthedocs.io/en/latest/format.html#sections
+                 _type_parts=partial(
+                     re.compile(r&#39;(.*?)(, optional\.?|)$&#39;).sub,
+                     lambda m, _backtick_idents=partial(
+                             re.compile(r&#39;[\w.\&#39;&#34;]+&#39;).sub,
+                             lambda m: (&#39;{}&#39; if m.group(0) in (&#39;of&#39;, &#39;or&#39;) else
+                                        &#39;`{}`&#39;).format(m.group(0))): (
+                         _backtick_idents(m.group(1)) + m.group(2)))):
+        &#34;&#34;&#34;
+        Returns `name`, `type`, and `desc` formatted as a
+        Python-Markdown definition list entry. See also:
+        https://python-markdown.github.io/extensions/definition_lists/
+        &#34;&#34;&#34;
+        type = _type_parts(type or &#39;&#39;)
+        desc = desc or &#39;&amp;nbsp;&#39;
+        if type:
+            return &#39;**`{}`** :&amp;ensp;{}\n:   {}\n\n&#39;.format(name, type, desc)
+        return &#39;**`{}`**\n:   {}\n\n&#39;.format(name, desc)
+
+    @staticmethod
+    def _numpy_params(match,
+                      _name_parts=partial(re.compile(&#39;, &#39;).sub, &#39;`**, **`&#39;)):
+        &#34;&#34;&#34; Converts NumpyDoc parameter (etc.) sections into Markdown. &#34;&#34;&#34;
+        name, type, desc = match.groups()
+        desc = desc.strip()
+        if name and (type or desc):
+            name = _name_parts(name)
+            return _ToMarkdown._deflist(name, type, desc)
+        return match.group(0)
+
+    @staticmethod
+    def _numpy_seealso(match):
+        &#34;&#34;&#34;
+        Converts NumpyDoc &#34;See Also&#34; section either into referenced code,
+        optionally within a definition list.
+        &#34;&#34;&#34;
+        title, spec_with_desc, simple_list = match.groups()
+        if spec_with_desc:
+            return title + &#39;\n\n&#39;.join(&#39;`{}`\n:   {}&#39;.format(*map(str.strip, line.split(&#39;:&#39;, 1)))
+                                       for line in filter(None, spec_with_desc.split(&#39;\n&#39;)))
+        return title + &#39;, &#39;.join(&#39;`{}`&#39;.format(i) for i in simple_list.split(&#39;, &#39;))
+
+    @staticmethod
+    def numpy(text,
+              # All kinds of numpydoc Parameters (optionally with types; descriptions)
+              _params=partial(
+                  re.compile(r&#39;^([\w*]+(?:, [\w*]+)*)(?: ?: ?(.*)(?&lt;!\.)$)?&#39;
+                             r&#39;((?:\n(?: {4}.*|$))*)&#39;, re.MULTILINE).sub,
+                  _numpy_params.__func__),
+              _seealso=partial(
+                  re.compile(r&#39;(See Also\n-{8}\n)(?:((?:\n?[\w.]* ?: .*)+)|(.*))&#39;).sub,
+                  _numpy_seealso.__func__)):
+        &#34;&#34;&#34;
+        Convert `text` in numpydoc docstring format to Markdown
+        to be further converted later.
+        &#34;&#34;&#34;
+        text = _seealso(text)
+        text = _params(text)
+        return text
+
+    @staticmethod
+    def google(text,
+               _googledoc_sections=partial(
+                   re.compile(r&#39;(?&lt;=\n\n)(\w+):$\n((?:\n?(?: {4}.*|$))+)&#39;, re.MULTILINE).sub,
+                   lambda m, _params=partial(
+                           re.compile(r&#39;^([\w*]+)(?: \(([\w. ]+)\))?: &#39;
+                                      r&#39;((?:.*)(?:\n(?: {4}.*|$))*)&#39;, re.MULTILINE).sub,
+                           lambda m: _ToMarkdown._deflist(*m.groups())): (
+                       &#39;\n{}\n-----\n{}&#39;.format(
+                           m.group(1), _params(inspect.cleandoc(m.group(2))))))):
+        &#34;&#34;&#34;
+        Convert `text` in Google-style docstring format to Markdown
+        to be further converted later.
+        &#34;&#34;&#34;
+        return _googledoc_sections(text)
+
+    @staticmethod
+    def _admonition(match):
+        indent, type, value, text = match.groups()
+
+        if type in (&#39;image&#39;, &#39;figure&#39;):
+            return &#39;{}![{}]({})\n&#39;.format(
+                indent, text.translate(str.maketrans({&#39;\n&#39;: &#39; &#39;,
+                                                      &#39;[&#39;: &#39;\\[&#39;,
+                                                      &#39;]&#39;: &#39;\\]&#39;})).strip(), value)
+        if type == &#39;versionchanged&#39;:
+            title = &#39;Changed in version:&amp;ensp;&#39; + value
+        elif type == &#39;versionadded&#39;:
+            title = &#39;Added in version:&amp;ensp;&#39; + value
+        elif type == &#39;deprecated&#39; and value:
+            title = &#39;Deprecated since version:&amp;ensp;&#39; + value
+        elif type == &#39;admonition&#39;:
+            title = value
+        elif type.lower() == &#39;todo&#39;:
+            title = &#39;TODO&#39;
+            text = value + &#39; &#39; + text
+        else:
+            title = type.capitalize()
+            if value:
+                title += &#39;:&amp;ensp;&#39; + value
+
+        text = &#39;\n&#39;.join(indent + &#39;    &#39; + line
+                         for line in inspect.cleandoc(text).split(&#39;\n&#39;))
+        return &#39;{}!!! {} &#34;{}&#34;\n{}\n&#39;.format(indent, type, title, text)
+
+    @staticmethod
+    def admonitions(text,
+                    _admonitions=partial(
+                        re.compile(r&#39;^(?P&lt;indent&gt; *)\.\. ?(\w+)::(?: *(.*))?&#39;
+                                   r&#39;((?:\n(?:(?P=indent) +.*| *$))*)&#39;, re.MULTILINE).sub,
+                        _admonition.__func__)):
+        &#34;&#34;&#34;
+        Process reStructuredText&#39;s block directives such as
+        `.. warning::`, `.. deprecated::`, `.. versionadded::`, etc.
+        and turn them into Python-M&gt;arkdown admonitions.
+
+        See: https://python-markdown.github.io/extensions/admonition/
+        &#34;&#34;&#34;
+        # Apply twice for nested (e.g. image inside warning)
+        return _admonitions(_admonitions(text))
+
+    @staticmethod
+    def doctests(text,
+                 _indent_doctests=partial(
+                     re.compile(r&#39;(?:^(?P&lt;fence&gt;```|~~~).*\n)?&#39;
+                                r&#39;(?:^&gt;&gt;&gt;.*&#39;
+                                r&#39;(?:\n(?:(?:&gt;&gt;&gt;|\.\.\.).*))*&#39;
+                                r&#39;(?:\n.*)?\n\n?)+&#39;
+                                r&#39;(?P=fence)?&#39;, re.MULTILINE).sub,
+                     lambda m: (m.group(0) if m.group(&#39;fence&#39;) else
+                                (&#39;\n    &#39; + &#39;\n    &#39;.join(m.group(0).split(&#39;\n&#39;)) + &#39;\n\n&#39;)))):
+        &#34;&#34;&#34;
+        Indent non-fenced (`\`\`\``) top-level (0-indented)
+        doctest blocks so they render as code.
+        &#34;&#34;&#34;
+        return _indent_doctests(text)
+
+
+def to_html(text, docformat: str = &#39;numpy,google&#39;, *,
+            module: pdoc.Module = None, link=None,
+            # Matches markdown code spans not +directly+ within links.
+            # E.g. `code` and [foo is `bar`]() but not [`code`](...)
+            # Also skips \-escaped grave quotes.
+            _code_refs=re.compile(r&#39;(?&lt;![\[\\])`(?!])(?:[^`]|(?&lt;=\\)`)+`&#39;).sub):
+    &#34;&#34;&#34;
+    Returns HTML of `text` interpreted as `docformat`.
+    By default, Numpydoc and Google-style docstrings are assumed,
+    as well as pure Markdown.
+
+    `module` should be the documented module (so the references can be
+    resolved) and `link` is the hyperlinking function like the one in the
+    example template.
+    &#34;&#34;&#34;
+    assert all(i in (None, &#39;&#39;, &#39;numpy&#39;, &#39;google&#39;) for i in docformat.split(&#39;,&#39;)), docformat
+
+    text = _ToMarkdown.admonitions(text)
+
+    if &#39;google&#39; in docformat:
+        text = _ToMarkdown.google(text)
+
+    # If doing both, do numpy after google, otherwise google-style&#39;s
+    # headings are incorrectly interpreted as numpy params
+    if &#39;numpy&#39; in docformat:
+        text = _ToMarkdown.numpy(text)
+
+    text = _ToMarkdown.doctests(text)
+
+    if module and link:
+
+        def linkify(match, _is_pyident=re.compile(r&#39;^[a-zA-Z_]\w*(\.\w+)+$&#39;).match):
+            nonlocal link, module
+            matched = match.group(0)
+            refname = matched[1:-1]
+            refname = refname.rstrip(&#39;()&#39;)  # Function specified with parentheses
+            dobj = module.find_ident(refname)
+            if isinstance(dobj, pdoc.External):
+                if not _is_pyident(refname):
+                    return matched
+                # If refname in documentation has a typo or is obsolete, warn.
+                # XXX: Assume at least the first part of refname, i.e. the package, is correct.
+                module_part = module.find_ident(refname.split(&#39;.&#39;)[0])
+                if not isinstance(module_part, pdoc.External):
+                    warn(&#39;Code reference `{}` in module &#34;{}&#34; does not match any &#39;
+                         &#39;documented object.&#39;.format(refname, module.refname),
+                         ReferenceWarning, stacklevel=3)
+            return link(dobj, fmt=&#39;`{}`&#39;)
+
+        text = _code_refs(linkify, text)
+
+    return _md.reset().convert(text)
+
+
+def extract_toc(text):
+    &#34;&#34;&#34;
+    Returns HTML Table of Contents containing markdown titles in `text`.
+    &#34;&#34;&#34;
+    toc, _ = _md.reset().convert(&#39;[TOC]\n\n@CUT@\n\n&#39; + text).split(&#39;@CUT@&#39;, 1)
+    if toc.endswith(&#39;&lt;p&gt;&#39;):  # CUT was put into its own paragraph
+        toc = toc[:-3].rstrip()
+    return toc}</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="pdoc.html_helpers.extract_toc"><code class="name flex">
+<span>def <span class="ident">extract_toc</span></span>(<span>text)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Returns HTML Table of Contents containing markdown titles in <code>text</code>.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def extract_toc(text):
+    &#34;&#34;&#34;
+    Returns HTML Table of Contents containing markdown titles in `text`.
+    &#34;&#34;&#34;
+    toc, _ = _md.reset().convert(&#39;[TOC]\n\n@CUT@\n\n&#39; + text).split(&#39;@CUT@&#39;, 1)
+    if toc.endswith(&#39;&lt;p&gt;&#39;):  # CUT was put into its own paragraph
+        toc = toc[:-3].rstrip()
+    return toc}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.html_helpers.glimpse"><code class="name flex">
+<span>def <span class="ident">glimpse</span></span>(<span>text, max_length=153, *, paragraph=True)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Returns a short excerpt (e.g. first paragraph) of text.
+If <code>paragraph</code> is True, the first paragraph will be returned,
+but never longer than <code>max_length</code> characters.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def glimpse(text, max_length=153, *, paragraph=True,
+            _split_paragraph=partial(re.compile(r&#39;\s*\n\s*\n\s*&#39;).split, maxsplit=1),
+            _trim_last_word=partial(re.compile(r&#39;\S+$&#39;).sub, &#39;&#39;),
+            _remove_titles=partial(re.compile(r&#39;^(#+|-{4,}|={4,})&#39;, re.MULTILINE).sub, &#39; &#39;)):
+    &#34;&#34;&#34;
+    Returns a short excerpt (e.g. first paragraph) of text.
+    If `paragraph` is True, the first paragraph will be returned,
+    but never longer than `max_length` characters.
+    &#34;&#34;&#34;
+    text = text.lstrip()
+    if paragraph:
+        text, *rest = _split_paragraph(text)
+        if rest:
+            text = text.rstrip(&#39;.&#39;)
+            text += &#39; …&#39;
+        text = _remove_titles(text).strip()
+
+    if len(text) &gt; max_length:
+        text = _trim_last_word(text[:max_length - 2])
+        if not text.endswith(&#39;.&#39;) or not paragraph:
+            text = text.rstrip(&#39;. &#39;) + &#39; …&#39;
+    return text}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.html_helpers.minify_css"><code class="name flex">
+<span>def <span class="ident">minify_css</span></span>(<span>css)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Minify CSS by removing extraneous whitespace, comments, and trailing semicolons.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">@lru_cache()
+def minify_css(css,
+               _whitespace=partial(re.compile(r&#39;\s*([,{:;}])\s*&#39;).sub, r&#39;\1&#39;),
+               _comments=partial(re.compile(r&#39;/\*.*?\*/&#39;, flags=re.DOTALL).sub, &#39;&#39;),
+               _trailing_semicolon=partial(re.compile(r&#39;;\s*}&#39;).sub, &#39;}&#39;)):
+    &#34;&#34;&#34;
+    Minify CSS by removing extraneous whitespace, comments, and trailing semicolons.
+    &#34;&#34;&#34;
+    return _trailing_semicolon(_whitespace(_comments(css))).strip()}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.html_helpers.minify_html"><code class="name flex">
+<span>def <span class="ident">minify_html</span></span>(<span>html)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Minify HTML by replacing all consecutive whitespace with a single space
+(or newline) character, except inside <code>&lt;pre&gt;</code> tags.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def minify_html(html,
+                _minify=partial(
+                    re.compile(r&#39;(.*?)(&lt;pre\b.*?&lt;/pre\b\s*&gt;)|(.*)&#39;, re.IGNORECASE | re.DOTALL).sub,
+                    lambda m, _norm_space=partial(re.compile(r&#39;\s\s+&#39;).sub, &#39;\n&#39;): (
+                        _norm_space(m.group(1) or &#39;&#39;) +
+                        (m.group(2) or &#39;&#39;) +
+                        _norm_space(m.group(3) or &#39;&#39;)))):
+    &#34;&#34;&#34;
+    Minify HTML by replacing all consecutive whitespace with a single space
+    (or newline) character, except inside `&lt;pre&gt;` tags.
+    &#34;&#34;&#34;
+    return _minify(html)}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.html_helpers.to_html"><code class="name flex">
+<span>def <span class="ident">to_html</span></span>(<span>text, docformat=&#39;numpy,google&#39;, *, module=None, link=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Returns HTML of <code>text</code> interpreted as <code>docformat</code>.
+By default, Numpydoc and Google-style docstrings are assumed,
+as well as pure Markdown.</p>
+<p><code>module</code> should be the documented module (so the references can be
+resolved) and <code>link</code> is the hyperlinking function like the one in the
+example template.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def to_html(text, docformat: str = &#39;numpy,google&#39;, *,
+            module: pdoc.Module = None, link=None,
+            # Matches markdown code spans not +directly+ within links.
+            # E.g. `code` and [foo is `bar`]() but not [`code`](...)
+            # Also skips \-escaped grave quotes.
+            _code_refs=re.compile(r&#39;(?&lt;![\[\\])`(?!])(?:[^`]|(?&lt;=\\)`)+`&#39;).sub):
+    &#34;&#34;&#34;
+    Returns HTML of `text` interpreted as `docformat`.
+    By default, Numpydoc and Google-style docstrings are assumed,
+    as well as pure Markdown.
+
+    `module` should be the documented module (so the references can be
+    resolved) and `link` is the hyperlinking function like the one in the
+    example template.
+    &#34;&#34;&#34;
+    assert all(i in (None, &#39;&#39;, &#39;numpy&#39;, &#39;google&#39;) for i in docformat.split(&#39;,&#39;)), docformat
+
+    text = _ToMarkdown.admonitions(text)
+
+    if &#39;google&#39; in docformat:
+        text = _ToMarkdown.google(text)
+
+    # If doing both, do numpy after google, otherwise google-style&#39;s
+    # headings are incorrectly interpreted as numpy params
+    if &#39;numpy&#39; in docformat:
+        text = _ToMarkdown.numpy(text)
+
+    text = _ToMarkdown.doctests(text)
+
+    if module and link:
+
+        def linkify(match, _is_pyident=re.compile(r&#39;^[a-zA-Z_]\w*(\.\w+)+$&#39;).match):
+            nonlocal link, module
+            matched = match.group(0)
+            refname = matched[1:-1]
+            refname = refname.rstrip(&#39;()&#39;)  # Function specified with parentheses
+            dobj = module.find_ident(refname)
+            if isinstance(dobj, pdoc.External):
+                if not _is_pyident(refname):
+                    return matched
+                # If refname in documentation has a typo or is obsolete, warn.
+                # XXX: Assume at least the first part of refname, i.e. the package, is correct.
+                module_part = module.find_ident(refname.split(&#39;.&#39;)[0])
+                if not isinstance(module_part, pdoc.External):
+                    warn(&#39;Code reference `{}` in module &#34;{}&#34; does not match any &#39;
+                         &#39;documented object.&#39;.format(refname, module.refname),
+                         ReferenceWarning, stacklevel=3)
+            return link(dobj, fmt=&#39;`{}`&#39;)
+
+        text = _code_refs(linkify, text)
+
+    return _md.reset().convert(text)}</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="pdoc.html_helpers.ReferenceWarning"><code class="flex name class">
+<span>class <span class="ident">ReferenceWarning</span></span>
+<span>(</span><span><small>ancestors:</small> builtins.UserWarning, builtins.Warning, builtins.Exception, builtins.BaseException)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>This warning is raised in <a title="pdoc.html_helpers.to_html" href="#pdoc.html_helpers.to_html"><code>to_html()</code></a> when a object reference in markdown
+doesn't match any documented objects.</p>
+<p>Look for this warning to catch typos / references to obsolete symbols.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">class ReferenceWarning(UserWarning):
+    &#34;&#34;&#34;
+    This warning is raised in `to_html` when a object reference in markdown
+    doesn&#39;t match any documented objects.
+
+    Look for this warning to catch typos / references to obsolete symbols.
+    &#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="pdoc" href="index.html">pdoc</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="pdoc.html_helpers.extract_toc" href="#pdoc.html_helpers.extract_toc">extract_toc</a></code></li>
+<li><code><a title="pdoc.html_helpers.glimpse" href="#pdoc.html_helpers.glimpse">glimpse</a></code></li>
+<li><code><a title="pdoc.html_helpers.minify_css" href="#pdoc.html_helpers.minify_css">minify_css</a></code></li>
+<li><code><a title="pdoc.html_helpers.minify_html" href="#pdoc.html_helpers.minify_html">minify_html</a></code></li>
+<li><code><a title="pdoc.html_helpers.to_html" href="#pdoc.html_helpers.to_html">to_html</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="pdoc.html_helpers.ReferenceWarning" href="#pdoc.html_helpers.ReferenceWarning">ReferenceWarning</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.com/pdoc"><cite>pdoc</cite> 0.5.0.dev1</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

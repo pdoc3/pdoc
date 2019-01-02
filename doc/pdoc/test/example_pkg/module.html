@@ -1,0 +1,1291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.5.0.dev1" />
+<title>pdoc.test.example_pkg.module API documentation</title>
+<meta name="description" content="Module docstring" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id=^header-]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:1px solid #ddd;margin:1em 0 1em 4ch}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}#index .two-column{column-count:2}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.name small{font-weight:normal}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{background:#ffc;font-weight:400;font-size:.8em;width:11em;text-transform:uppercase;padding:0px 8px;border:1px solid #fd6;border-radius:5px;cursor:pointer}.source summary:hover{background:#fe9 !important}.source[open] summary{background:#fda}.source pre{max-height:500px;overflow-y:scroll;margin-bottom:15px}.hlist{list-syle:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink;]</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a,a:visited{text-decoration:underline}a[href]:after{content:" (" attr(href) ")"}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title"><code>pdoc.test.example_pkg.module</code> module</h1>
+</header>
+<section id="section-intro">
+<p>Module docstring</p>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">&#34;&#34;&#34;Module docstring&#34;&#34;&#34;
+import subprocess
+
+CONST = &#39;const&#39;
+&#34;&#34;&#34;CONST docstring&#34;&#34;&#34;
+
+var = 2
+&#34;&#34;&#34;var docstring&#34;&#34;&#34;
+
+# https://github.com/mitmproxy/pdoc/pull/44
+foreign_var = subprocess.CalledProcessError(0, &#39;&#39;)
+&#34;&#34;&#34;foreign var docstring&#34;&#34;&#34;
+
+__pdoc__ = {}
+
+
+class A:
+    &#34;&#34;&#34;`A` is base class for `example_pkg.B`.&#34;&#34;&#34;  # Test refname link
+    def overridden(self):
+        &#34;&#34;&#34;A.overridden docstring&#34;&#34;&#34;
+
+    def overridden_same_docstring(self):
+        &#34;&#34;&#34;A.overridden_same_docstring docstring&#34;&#34;&#34;
+
+    def inherited(self):  # Inherited in B
+        &#34;&#34;&#34;A.inherited docstring&#34;&#34;&#34;
+
+
+class B(A, int):
+    &#34;&#34;&#34;
+    B docstring
+
+    External refs: `sys.version`, `sys`
+    &#34;&#34;&#34;
+
+    CONST = 2
+    &#34;&#34;&#34;B.CONST docstring&#34;&#34;&#34;
+
+    var = 3
+    &#34;&#34;&#34;B.var docstring&#34;&#34;&#34;
+
+    def __init__(self):
+        &#34;&#34;&#34;__init__ docstring&#34;&#34;&#34;
+        self.instance_var = None
+        &#34;&#34;&#34;instance var docstring&#34;&#34;&#34;
+
+    def f(self, a: int, b: int = 1, *args, c: str=&#39;c&#39;, **kwargs):
+        &#34;&#34;&#34;B.f docstring&#34;&#34;&#34;
+
+    @staticmethod
+    def static(x):
+        &#34;&#34;&#34;B.static docstring&#34;&#34;&#34;
+
+    @classmethod
+    def cls(cls):
+        &#34;&#34;&#34;B.cls docstring&#34;&#34;&#34;
+
+    def _private(self):
+        &#34;&#34;&#34;B._private docstring&#34;&#34;&#34;
+
+    @staticmethod
+    def _private_static():
+        &#34;&#34;&#34;B._private_static docstring&#34;&#34;&#34;
+
+    @classmethod
+    def _private_cls(cls):
+        &#34;&#34;&#34;B._private_cls docstring&#34;&#34;&#34;
+
+    @property
+    def p(self):
+        &#34;&#34;&#34;B.p docstring&#34;&#34;&#34;
+        return 1
+
+    class C:
+        &#34;&#34;&#34;B.C docstring&#34;&#34;&#34;
+        def f(self):
+            &#34;&#34;&#34;B.C.f docstring&#34;&#34;&#34;
+
+    class _Private:
+        &#34;&#34;&#34;B._Private docstring&#34;&#34;&#34;
+        def f(self):
+            &#34;&#34;&#34;B._Private.f docstring&#34;&#34;&#34;
+
+    def overridden(self):
+        pass
+
+    assert overridden.__doc__ is None
+    __pdoc__[&#39;B.overridden&#39;] = &#39;B.overridden docstring&#39;
+
+    def overridden_same_docstring(self):
+        pass
+
+
+class Hidden:
+    __pdoc__[&#39;Hidden&#39;] = False
+
+
+class Docformats:
+    def numpy(self):
+        &#34;&#34;&#34;
+        Summary line.
+
+        Parameters
+        ----------
+        x1, x2 : array_like
+            Input arrays,
+            description of `x1`, `x2`.
+
+            .. versionadded:: 1.5.0
+        x : { NoneType, &#39;B&#39;, &#39;C&#39; }, optional
+        n : int or list of int
+            Description of num
+        *args, **kwargs
+            Passed on.
+
+        Returns
+        -------
+        output : pdoc.Doc
+            The output array
+
+        Raises
+        ------
+        TypeError
+            When something.
+
+        See Also
+        --------
+        fromstring, loadtxt
+
+        See Also
+        --------
+        pdoc.text : Function a with its description.
+        scipy.random.norm : Random variates, PDFs, etc.
+
+        Notes
+        -----
+        Foo bar.
+
+        ### H3 Title
+
+        Foo bar.
+        &#34;&#34;&#34;
+
+    def google(self):
+        &#34;&#34;&#34;
+        Summary line.
+        Nomatch:
+
+        Args:
+            arg1 (int): Description of arg1
+            arg2 (str or int): Description of arg2
+            *args: passed around
+
+        Returns:
+            bool: Description of return value
+
+        Raises:
+            AttributeError: The ``Raises`` section is a list of all exceptions
+                that are relevant to the interface.
+
+                and a third line.
+            ValueError: If `arg2` is equal to `arg1`.
+
+        Examples:
+            Examples in doctest format.
+
+            &gt;&gt;&gt; a = [1,2,3]
+
+        Todos:
+            * For module TODOs
+        &#34;&#34;&#34;
+
+    def doctests(self):
+        &#34;&#34;&#34;
+        Need an intro paragrapgh.
+
+            &gt;&gt;&gt; Then code is indented one level
+
+        Alternatively
+        ```
+        fenced code works
+        ```
+        &#34;&#34;&#34;
+
+    def reST_directives(self):
+        &#34;&#34;&#34;
+        .. todo::
+
+           Create something.
+
+        .. admonition:: Example
+
+           Image shows something.
+
+           .. image:: /logo.png
+
+           .. note::
+              Can only nest admonitions two levels.
+
+        .. image:: https://www.debian.org/logos/openlogo-nd-100.png
+
+        Now you know.
+
+        .. warning::
+
+            Some warning
+            lines.
+
+        * Describe some func in a list
+          across multiple lines:
+
+            .. deprecated:: 3.1
+              Use `spam` instead.
+
+            .. versionadded:: 2.5
+             The *spam* parameter.
+
+        .. caution::
+            Don&#39;t touch this!
+        &#34;&#34;&#34;
+
+
+numpy = Docformats.numpy
+
+
+google = Docformats.google
+
+
+doctests = Docformats.doctests
+
+
+reST_directives = Docformats.reST_directives}</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="pdoc.test.example_pkg.module.CONST"><code class="name">var <span class="ident">CONST</span></code></dt>
+<dd>
+<section class="desc"><p>CONST docstring</p></section>
+</dd>
+<dt id="pdoc.test.example_pkg.module.foreign_var"><code class="name">var <span class="ident">foreign_var</span></code></dt>
+<dd>
+<section class="desc"><p>foreign var docstring</p></section>
+</dd>
+<dt id="pdoc.test.example_pkg.module.var"><code class="name">var <span class="ident">var</span></code></dt>
+<dd>
+<section class="desc"><p>var docstring</p></section>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="pdoc.test.example_pkg.module.doctests"><code class="name flex">
+<span>def <span class="ident">doctests</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Need an intro paragrapgh.</p>
+<pre><code>&gt;&gt;&gt; Then code is indented one level
+</code></pre>
+<p>Alternatively</p>
+<pre><code>fenced code works
+</code></pre></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def doctests(self):
+    &#34;&#34;&#34;
+    Need an intro paragrapgh.
+
+        &gt;&gt;&gt; Then code is indented one level
+
+    Alternatively
+    ```
+    fenced code works
+    ```
+    &#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.example_pkg.module.google"><code class="name flex">
+<span>def <span class="ident">google</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Summary line.
+Nomatch:</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>arg1</code></strong> :&ensp;<code>int</code></dt>
+<dd>Description of arg1</dd>
+<dt><strong><code>arg2</code></strong> :&ensp;<code>str</code> or <code>int</code></dt>
+<dd>Description of arg2</dd>
+<dt><strong><code>*args</code></strong></dt>
+<dd>passed around</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>bool</code></strong></dt>
+<dd>Description of return value</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><strong><code>AttributeError</code></strong></dt>
+<dd>
+<p>The <code>Raises</code> section is a list of all exceptions
+that are relevant to the interface.</p>
+<p>and a third line.</p>
+</dd>
+<dt><strong><code>ValueError</code></strong></dt>
+<dd>If <code>arg2</code> is equal to <code>arg1</code>.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<p>Examples in doctest format.</p>
+<pre><code>&gt;&gt;&gt; a = [1,2,3]
+</code></pre>
+<h2 id="todos">Todos</h2>
+<ul>
+<li>For module TODOs</li>
+</ul></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def google(self):
+    &#34;&#34;&#34;
+    Summary line.
+    Nomatch:
+
+    Args:
+        arg1 (int): Description of arg1
+        arg2 (str or int): Description of arg2
+        *args: passed around
+
+    Returns:
+        bool: Description of return value
+
+    Raises:
+        AttributeError: The ``Raises`` section is a list of all exceptions
+            that are relevant to the interface.
+
+            and a third line.
+        ValueError: If `arg2` is equal to `arg1`.
+
+    Examples:
+        Examples in doctest format.
+
+        &gt;&gt;&gt; a = [1,2,3]
+
+    Todos:
+        * For module TODOs
+    &#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.example_pkg.module.numpy"><code class="name flex">
+<span>def <span class="ident">numpy</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Summary line.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x1</code></strong>, <strong><code>x2</code></strong> :&ensp;<code>array_like</code></dt>
+<dd>
+<p>Input arrays,
+description of <code>x1</code>, <code>x2</code>.</p>
+<div class="admonition versionadded">
+<p class="admonition-title">Added in version:&ensp;1.5.0</p>
+</div>
+</dd>
+<dt><strong><code>x</code></strong> :&ensp;{ <code>NoneType</code>, <code>'B'</code>, <code>'C'</code> }, optional</dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>n</code></strong> :&ensp;<code>int</code> or <code>list</code> of <code>int</code></dt>
+<dd>Description of num</dd>
+<dt><strong><code>*args</code></strong>, <strong><code>**kwargs</code></strong></dt>
+<dd>Passed on.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>output</code></strong> :&ensp;<a title="pdoc.Doc" href="../../index.html#pdoc.Doc"><code>Doc</code></a></dt>
+<dd>The output array</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><strong><code>TypeError</code></strong></dt>
+<dd>When something.</dd>
+</dl>
+<h2 id="see-also">See Also</h2>
+<p><code>fromstring</code>, <code>loadtxt</code></p>
+<h2 id="see-also_1">See Also</h2>
+<dl>
+<dt><a title="pdoc.text" href="../../index.html#pdoc.text"><code>text()</code></a></dt>
+<dd>Function a with its description.</dd>
+<dt><code>scipy.random.norm</code></dt>
+<dd>Random variates, PDFs, etc.</dd>
+</dl>
+<h2 id="notes">Notes</h2>
+<p>Foo bar.</p>
+<h3 id="h3-title">H3 Title</h3>
+<p>Foo bar.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def numpy(self):
+    &#34;&#34;&#34;
+    Summary line.
+
+    Parameters
+    ----------
+    x1, x2 : array_like
+        Input arrays,
+        description of `x1`, `x2`.
+
+        .. versionadded:: 1.5.0
+    x : { NoneType, &#39;B&#39;, &#39;C&#39; }, optional
+    n : int or list of int
+        Description of num
+    *args, **kwargs
+        Passed on.
+
+    Returns
+    -------
+    output : pdoc.Doc
+        The output array
+
+    Raises
+    ------
+    TypeError
+        When something.
+
+    See Also
+    --------
+    fromstring, loadtxt
+
+    See Also
+    --------
+    pdoc.text : Function a with its description.
+    scipy.random.norm : Random variates, PDFs, etc.
+
+    Notes
+    -----
+    Foo bar.
+
+    ### H3 Title
+
+    Foo bar.
+    &#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.example_pkg.module.reST_directives"><code class="name flex">
+<span>def <span class="ident">reST_directives</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><div class="admonition todo">
+<p class="admonition-title">TODO</p>
+<p>Create something.</p>
+</div>
+<div class="admonition admonition">
+<p class="admonition-title">Example</p>
+<p>Image shows something.</p>
+<p><img alt="" src="/logo.png"></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Can only nest admonitions two levels.</p>
+</div>
+</div>
+<p><img alt="" src="https://www.debian.org/logos/openlogo-nd-100.png"></p>
+<p>Now you know.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Some warning
+lines.</p>
+</div>
+<ul>
+<li>
+<p>Describe some func in a list
+across multiple lines:</p>
+<div class="admonition deprecated">
+<p class="admonition-title">Deprecated since version:&ensp;3.1</p>
+<p>Use <code>spam</code> instead.</p>
+</div>
+<div class="admonition versionadded">
+<p class="admonition-title">Added in version:&ensp;2.5</p>
+<p>The <em>spam</em> parameter.</p>
+</div>
+</li>
+</ul>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>Don't touch this!</p>
+</div></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def reST_directives(self):
+    &#34;&#34;&#34;
+    .. todo::
+
+       Create something.
+
+    .. admonition:: Example
+
+       Image shows something.
+
+       .. image:: /logo.png
+
+       .. note::
+          Can only nest admonitions two levels.
+
+    .. image:: https://www.debian.org/logos/openlogo-nd-100.png
+
+    Now you know.
+
+    .. warning::
+
+        Some warning
+        lines.
+
+    * Describe some func in a list
+      across multiple lines:
+
+        .. deprecated:: 3.1
+          Use `spam` instead.
+
+        .. versionadded:: 2.5
+         The *spam* parameter.
+
+    .. caution::
+        Don&#39;t touch this!
+    &#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="pdoc.test.example_pkg.module.A"><code class="flex name class">
+<span>class <span class="ident">A</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p><a title="pdoc.test.example_pkg.module.A" href="#pdoc.test.example_pkg.module.A"><code>A</code></a> is base class for <code>example_pkg.B</code>.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">class A:
+    &#34;&#34;&#34;`A` is base class for `example_pkg.B`.&#34;&#34;&#34;  # Test refname link
+    def overridden(self):
+        &#34;&#34;&#34;A.overridden docstring&#34;&#34;&#34;
+
+    def overridden_same_docstring(self):
+        &#34;&#34;&#34;A.overridden_same_docstring docstring&#34;&#34;&#34;
+
+    def inherited(self):  # Inherited in B
+        &#34;&#34;&#34;A.inherited docstring&#34;&#34;&#34;}</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="pdoc.test.example_pkg.module.B" href="#pdoc.test.example_pkg.module.B">B</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="pdoc.test.example_pkg.module.A.inherited"><code class="name flex">
+<span>def <span class="ident">inherited</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A.inherited docstring</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def inherited(self):  # Inherited in B
+    &#34;&#34;&#34;A.inherited docstring&#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.example_pkg.module.A.overridden"><code class="name flex">
+<span>def <span class="ident">overridden</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A.overridden docstring</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def overridden(self):
+    &#34;&#34;&#34;A.overridden docstring&#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.example_pkg.module.A.overridden_same_docstring"><code class="name flex">
+<span>def <span class="ident">overridden_same_docstring</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A.overridden_same_docstring docstring</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def overridden_same_docstring(self):
+    &#34;&#34;&#34;A.overridden_same_docstring docstring&#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pdoc.test.example_pkg.module.B"><code class="flex name class">
+<span>class <span class="ident">B</span></span>
+<span>(</span><span><small>ancestors:</small> <a title="pdoc.test.example_pkg.module.A" href="#pdoc.test.example_pkg.module.A">A</a>, builtins.int)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>B docstring</p>
+<p>External refs: <code>sys.version</code>, <code>sys</code></p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">class B(A, int):
+    &#34;&#34;&#34;
+    B docstring
+
+    External refs: `sys.version`, `sys`
+    &#34;&#34;&#34;
+
+    CONST = 2
+    &#34;&#34;&#34;B.CONST docstring&#34;&#34;&#34;
+
+    var = 3
+    &#34;&#34;&#34;B.var docstring&#34;&#34;&#34;
+
+    def __init__(self):
+        &#34;&#34;&#34;__init__ docstring&#34;&#34;&#34;
+        self.instance_var = None
+        &#34;&#34;&#34;instance var docstring&#34;&#34;&#34;
+
+    def f(self, a: int, b: int = 1, *args, c: str=&#39;c&#39;, **kwargs):
+        &#34;&#34;&#34;B.f docstring&#34;&#34;&#34;
+
+    @staticmethod
+    def static(x):
+        &#34;&#34;&#34;B.static docstring&#34;&#34;&#34;
+
+    @classmethod
+    def cls(cls):
+        &#34;&#34;&#34;B.cls docstring&#34;&#34;&#34;
+
+    def _private(self):
+        &#34;&#34;&#34;B._private docstring&#34;&#34;&#34;
+
+    @staticmethod
+    def _private_static():
+        &#34;&#34;&#34;B._private_static docstring&#34;&#34;&#34;
+
+    @classmethod
+    def _private_cls(cls):
+        &#34;&#34;&#34;B._private_cls docstring&#34;&#34;&#34;
+
+    @property
+    def p(self):
+        &#34;&#34;&#34;B.p docstring&#34;&#34;&#34;
+        return 1
+
+    class C:
+        &#34;&#34;&#34;B.C docstring&#34;&#34;&#34;
+        def f(self):
+            &#34;&#34;&#34;B.C.f docstring&#34;&#34;&#34;
+
+    class _Private:
+        &#34;&#34;&#34;B._Private docstring&#34;&#34;&#34;
+        def f(self):
+            &#34;&#34;&#34;B._Private.f docstring&#34;&#34;&#34;
+
+    def overridden(self):
+        pass
+
+    assert overridden.__doc__ is None
+    __pdoc__[&#39;B.overridden&#39;] = &#39;B.overridden docstring&#39;
+
+    def overridden_same_docstring(self):
+        pass}</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="pdoc.test.example_pkg.module.B.C"><code class="name">var <span class="ident">C</span></code></dt>
+<dd>
+<section class="desc"><p>B.C docstring</p></section>
+</dd>
+<dt id="pdoc.test.example_pkg.module.B.CONST"><code class="name">var <span class="ident">CONST</span></code></dt>
+<dd>
+<section class="desc"><p>B.CONST docstring</p></section>
+</dd>
+<dt id="pdoc.test.example_pkg.module.B.var"><code class="name">var <span class="ident">var</span></code></dt>
+<dd>
+<section class="desc"><p>B.var docstring</p></section>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="pdoc.test.example_pkg.module.B.cls"><code class="name flex">
+<span>def <span class="ident">cls</span></span>(<span>cls)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>B.cls docstring</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">@classmethod
+def cls(cls):
+    &#34;&#34;&#34;B.cls docstring&#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.example_pkg.module.B.static"><code class="name flex">
+<span>def <span class="ident">static</span></span>(<span>x)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>B.static docstring</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">@staticmethod
+def static(x):
+    &#34;&#34;&#34;B.static docstring&#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="pdoc.test.example_pkg.module.B.instance_var"><code class="name">var <span class="ident">instance_var</span></code></dt>
+<dd>
+<section class="desc"><p>instance var docstring</p></section>
+</dd>
+<dt id="pdoc.test.example_pkg.module.B.p"><code class="name">var <span class="ident">p</span></code></dt>
+<dd>
+<section class="desc"><p>B.p docstring</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">@property
+def p(self):
+    &#34;&#34;&#34;B.p docstring&#34;&#34;&#34;
+    return 1}</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pdoc.test.example_pkg.module.B.__init__"><code class="name flex">
+<span>def <span class="ident">__init__</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p><strong>init</strong> docstring</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def __init__(self):
+    &#34;&#34;&#34;__init__ docstring&#34;&#34;&#34;
+    self.instance_var = None
+    &#34;&#34;&#34;instance var docstring&#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.example_pkg.module.B.f"><code class="name flex">
+<span>def <span class="ident">f</span></span>(<span>self, a, b=1, *args, c=&#39;c&#39;, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>B.f docstring</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def f(self, a: int, b: int = 1, *args, c: str=&#39;c&#39;, **kwargs):
+    &#34;&#34;&#34;B.f docstring&#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.example_pkg.module.B.inherited"><code class="name flex">
+<span>def <span class="ident">inherited</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<p class="inheritance">
+<em>Inherited from:</em>
+<code><a title="pdoc.test.example_pkg.module.A" href="#pdoc.test.example_pkg.module.A">A</a></code>.<code><a title="pdoc.test.example_pkg.module.A.inherited" href="#pdoc.test.example_pkg.module.A.inherited">inherited</a></code>
+</p>
+<section class="desc inherited"><p>A.inherited docstring</p></section>
+</dd>
+<dt id="pdoc.test.example_pkg.module.B.overridden"><code class="name flex">
+<span>def <span class="ident">overridden</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>B.overridden docstring</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def overridden(self):
+    pass}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.example_pkg.module.B.overridden_same_docstring"><code class="name flex">
+<span>def <span class="ident">overridden_same_docstring</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<p class="inheritance">
+<em>Inherited from:</em>
+<code><a title="pdoc.test.example_pkg.module.A" href="#pdoc.test.example_pkg.module.A">A</a></code>.<code><a title="pdoc.test.example_pkg.module.A.overridden_same_docstring" href="#pdoc.test.example_pkg.module.A.overridden_same_docstring">overridden_same_docstring</a></code>
+</p>
+<section class="desc inherited"><p>A.overridden_same_docstring docstring</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def overridden_same_docstring(self):
+    pass}</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pdoc.test.example_pkg.module.Docformats"><code class="flex name class">
+<span>class <span class="ident">Docformats</span></span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">class Docformats:
+    def numpy(self):
+        &#34;&#34;&#34;
+        Summary line.
+
+        Parameters
+        ----------
+        x1, x2 : array_like
+            Input arrays,
+            description of `x1`, `x2`.
+
+            .. versionadded:: 1.5.0
+        x : { NoneType, &#39;B&#39;, &#39;C&#39; }, optional
+        n : int or list of int
+            Description of num
+        *args, **kwargs
+            Passed on.
+
+        Returns
+        -------
+        output : pdoc.Doc
+            The output array
+
+        Raises
+        ------
+        TypeError
+            When something.
+
+        See Also
+        --------
+        fromstring, loadtxt
+
+        See Also
+        --------
+        pdoc.text : Function a with its description.
+        scipy.random.norm : Random variates, PDFs, etc.
+
+        Notes
+        -----
+        Foo bar.
+
+        ### H3 Title
+
+        Foo bar.
+        &#34;&#34;&#34;
+
+    def google(self):
+        &#34;&#34;&#34;
+        Summary line.
+        Nomatch:
+
+        Args:
+            arg1 (int): Description of arg1
+            arg2 (str or int): Description of arg2
+            *args: passed around
+
+        Returns:
+            bool: Description of return value
+
+        Raises:
+            AttributeError: The ``Raises`` section is a list of all exceptions
+                that are relevant to the interface.
+
+                and a third line.
+            ValueError: If `arg2` is equal to `arg1`.
+
+        Examples:
+            Examples in doctest format.
+
+            &gt;&gt;&gt; a = [1,2,3]
+
+        Todos:
+            * For module TODOs
+        &#34;&#34;&#34;
+
+    def doctests(self):
+        &#34;&#34;&#34;
+        Need an intro paragrapgh.
+
+            &gt;&gt;&gt; Then code is indented one level
+
+        Alternatively
+        ```
+        fenced code works
+        ```
+        &#34;&#34;&#34;
+
+    def reST_directives(self):
+        &#34;&#34;&#34;
+        .. todo::
+
+           Create something.
+
+        .. admonition:: Example
+
+           Image shows something.
+
+           .. image:: /logo.png
+
+           .. note::
+              Can only nest admonitions two levels.
+
+        .. image:: https://www.debian.org/logos/openlogo-nd-100.png
+
+        Now you know.
+
+        .. warning::
+
+            Some warning
+            lines.
+
+        * Describe some func in a list
+          across multiple lines:
+
+            .. deprecated:: 3.1
+              Use `spam` instead.
+
+            .. versionadded:: 2.5
+             The *spam* parameter.
+
+        .. caution::
+            Don&#39;t touch this!
+        &#34;&#34;&#34;}</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="pdoc.test.example_pkg.module.Docformats.doctests"><code class="name flex">
+<span>def <span class="ident">doctests</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Need an intro paragrapgh.</p>
+<pre><code>&gt;&gt;&gt; Then code is indented one level
+</code></pre>
+<p>Alternatively</p>
+<pre><code>fenced code works
+</code></pre></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def doctests(self):
+    &#34;&#34;&#34;
+    Need an intro paragrapgh.
+
+        &gt;&gt;&gt; Then code is indented one level
+
+    Alternatively
+    ```
+    fenced code works
+    ```
+    &#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.example_pkg.module.Docformats.google"><code class="name flex">
+<span>def <span class="ident">google</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Summary line.
+Nomatch:</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>arg1</code></strong> :&ensp;<code>int</code></dt>
+<dd>Description of arg1</dd>
+<dt><strong><code>arg2</code></strong> :&ensp;<code>str</code> or <code>int</code></dt>
+<dd>Description of arg2</dd>
+<dt><strong><code>*args</code></strong></dt>
+<dd>passed around</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>bool</code></strong></dt>
+<dd>Description of return value</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><strong><code>AttributeError</code></strong></dt>
+<dd>
+<p>The <code>Raises</code> section is a list of all exceptions
+that are relevant to the interface.</p>
+<p>and a third line.</p>
+</dd>
+<dt><strong><code>ValueError</code></strong></dt>
+<dd>If <code>arg2</code> is equal to <code>arg1</code>.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<p>Examples in doctest format.</p>
+<pre><code>&gt;&gt;&gt; a = [1,2,3]
+</code></pre>
+<h2 id="todos">Todos</h2>
+<ul>
+<li>For module TODOs</li>
+</ul></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def google(self):
+    &#34;&#34;&#34;
+    Summary line.
+    Nomatch:
+
+    Args:
+        arg1 (int): Description of arg1
+        arg2 (str or int): Description of arg2
+        *args: passed around
+
+    Returns:
+        bool: Description of return value
+
+    Raises:
+        AttributeError: The ``Raises`` section is a list of all exceptions
+            that are relevant to the interface.
+
+            and a third line.
+        ValueError: If `arg2` is equal to `arg1`.
+
+    Examples:
+        Examples in doctest format.
+
+        &gt;&gt;&gt; a = [1,2,3]
+
+    Todos:
+        * For module TODOs
+    &#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.example_pkg.module.Docformats.numpy"><code class="name flex">
+<span>def <span class="ident">numpy</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Summary line.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x1</code></strong>, <strong><code>x2</code></strong> :&ensp;<code>array_like</code></dt>
+<dd>
+<p>Input arrays,
+description of <code>x1</code>, <code>x2</code>.</p>
+<div class="admonition versionadded">
+<p class="admonition-title">Added in version:&ensp;1.5.0</p>
+</div>
+</dd>
+<dt><strong><code>x</code></strong> :&ensp;{ <code>NoneType</code>, <code>'B'</code>, <code>'C'</code> }, optional</dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>n</code></strong> :&ensp;<code>int</code> or <code>list</code> of <code>int</code></dt>
+<dd>Description of num</dd>
+<dt><strong><code>*args</code></strong>, <strong><code>**kwargs</code></strong></dt>
+<dd>Passed on.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>output</code></strong> :&ensp;<a title="pdoc.Doc" href="../../index.html#pdoc.Doc"><code>Doc</code></a></dt>
+<dd>The output array</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><strong><code>TypeError</code></strong></dt>
+<dd>When something.</dd>
+</dl>
+<h2 id="see-also">See Also</h2>
+<p><code>fromstring</code>, <code>loadtxt</code></p>
+<h2 id="see-also_1">See Also</h2>
+<dl>
+<dt><a title="pdoc.text" href="../../index.html#pdoc.text"><code>text()</code></a></dt>
+<dd>Function a with its description.</dd>
+<dt><code>scipy.random.norm</code></dt>
+<dd>Random variates, PDFs, etc.</dd>
+</dl>
+<h2 id="notes">Notes</h2>
+<p>Foo bar.</p>
+<h3 id="h3-title">H3 Title</h3>
+<p>Foo bar.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def numpy(self):
+    &#34;&#34;&#34;
+    Summary line.
+
+    Parameters
+    ----------
+    x1, x2 : array_like
+        Input arrays,
+        description of `x1`, `x2`.
+
+        .. versionadded:: 1.5.0
+    x : { NoneType, &#39;B&#39;, &#39;C&#39; }, optional
+    n : int or list of int
+        Description of num
+    *args, **kwargs
+        Passed on.
+
+    Returns
+    -------
+    output : pdoc.Doc
+        The output array
+
+    Raises
+    ------
+    TypeError
+        When something.
+
+    See Also
+    --------
+    fromstring, loadtxt
+
+    See Also
+    --------
+    pdoc.text : Function a with its description.
+    scipy.random.norm : Random variates, PDFs, etc.
+
+    Notes
+    -----
+    Foo bar.
+
+    ### H3 Title
+
+    Foo bar.
+    &#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.example_pkg.module.Docformats.reST_directives"><code class="name flex">
+<span>def <span class="ident">reST_directives</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><div class="admonition todo">
+<p class="admonition-title">TODO</p>
+<p>Create something.</p>
+</div>
+<div class="admonition admonition">
+<p class="admonition-title">Example</p>
+<p>Image shows something.</p>
+<p><img alt="" src="/logo.png"></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Can only nest admonitions two levels.</p>
+</div>
+</div>
+<p><img alt="" src="https://www.debian.org/logos/openlogo-nd-100.png"></p>
+<p>Now you know.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Some warning
+lines.</p>
+</div>
+<ul>
+<li>
+<p>Describe some func in a list
+across multiple lines:</p>
+<div class="admonition deprecated">
+<p class="admonition-title">Deprecated since version:&ensp;3.1</p>
+<p>Use <code>spam</code> instead.</p>
+</div>
+<div class="admonition versionadded">
+<p class="admonition-title">Added in version:&ensp;2.5</p>
+<p>The <em>spam</em> parameter.</p>
+</div>
+</li>
+</ul>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>Don't touch this!</p>
+</div></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def reST_directives(self):
+    &#34;&#34;&#34;
+    .. todo::
+
+       Create something.
+
+    .. admonition:: Example
+
+       Image shows something.
+
+       .. image:: /logo.png
+
+       .. note::
+          Can only nest admonitions two levels.
+
+    .. image:: https://www.debian.org/logos/openlogo-nd-100.png
+
+    Now you know.
+
+    .. warning::
+
+        Some warning
+        lines.
+
+    * Describe some func in a list
+      across multiple lines:
+
+        .. deprecated:: 3.1
+          Use `spam` instead.
+
+        .. versionadded:: 2.5
+         The *spam* parameter.
+
+    .. caution::
+        Don&#39;t touch this!
+    &#34;&#34;&#34;}</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="pdoc.test.example_pkg" href="index.html">pdoc.test.example_pkg</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="pdoc.test.example_pkg.module.CONST" href="#pdoc.test.example_pkg.module.CONST">CONST</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.foreign_var" href="#pdoc.test.example_pkg.module.foreign_var">foreign_var</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.var" href="#pdoc.test.example_pkg.module.var">var</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="pdoc.test.example_pkg.module.doctests" href="#pdoc.test.example_pkg.module.doctests">doctests</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.google" href="#pdoc.test.example_pkg.module.google">google</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.numpy" href="#pdoc.test.example_pkg.module.numpy">numpy</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.reST_directives" href="#pdoc.test.example_pkg.module.reST_directives">reST_directives</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="pdoc.test.example_pkg.module.A" href="#pdoc.test.example_pkg.module.A">A</a></code></h4>
+<ul class="">
+<li><code><a title="pdoc.test.example_pkg.module.A.inherited" href="#pdoc.test.example_pkg.module.A.inherited">inherited</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.A.overridden" href="#pdoc.test.example_pkg.module.A.overridden">overridden</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.A.overridden_same_docstring" href="#pdoc.test.example_pkg.module.A.overridden_same_docstring">overridden_same_docstring</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pdoc.test.example_pkg.module.B" href="#pdoc.test.example_pkg.module.B">B</a></code></h4>
+<ul class="two-column">
+<li><code><a title="pdoc.test.example_pkg.module.B.__init__" href="#pdoc.test.example_pkg.module.B.__init__">__init__</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.cls" href="#pdoc.test.example_pkg.module.B.cls">cls</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.f" href="#pdoc.test.example_pkg.module.B.f">f</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.inherited" href="#pdoc.test.example_pkg.module.B.inherited">inherited</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.overridden" href="#pdoc.test.example_pkg.module.B.overridden">overridden</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.overridden_same_docstring" href="#pdoc.test.example_pkg.module.B.overridden_same_docstring">overridden_same_docstring</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.static" href="#pdoc.test.example_pkg.module.B.static">static</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pdoc.test.example_pkg.module.Docformats" href="#pdoc.test.example_pkg.module.Docformats">Docformats</a></code></h4>
+<ul class="">
+<li><code><a title="pdoc.test.example_pkg.module.Docformats.doctests" href="#pdoc.test.example_pkg.module.Docformats.doctests">doctests</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.Docformats.google" href="#pdoc.test.example_pkg.module.Docformats.google">google</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.Docformats.numpy" href="#pdoc.test.example_pkg.module.Docformats.numpy">numpy</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.Docformats.reST_directives" href="#pdoc.test.example_pkg.module.Docformats.reST_directives">reST_directives</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.com/pdoc"><cite>pdoc</cite> 0.5.0.dev1</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>
