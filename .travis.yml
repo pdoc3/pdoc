@@ -1,5 +1,5 @@
 language: python
-dist: trusty
+dist: xenial
 sudo: false
 cache:
   pip: true
@@ -11,8 +11,6 @@ matrix:
     - python: '3.5'
     - python: '3.6'
     - python: '3.7'
-
-    - python: '3.6'
       name: 'Lint, Coverage'
       before_script:
         - pip install flake8 coverage
@@ -23,7 +21,7 @@ matrix:
         - bash <(curl -s https://codecov.io/bash)
 
 before_install:
-  - set -eu
+  - set -e
 
 install:
   - pip install .
