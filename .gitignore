@@ -2,6 +2,8 @@ dist
 *.egg-info
 *.py[cod]
 
+pdoc/_version.py
+
 venv
 .coverage
 .*_cache/*
