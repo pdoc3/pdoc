@@ -4,9 +4,9 @@ pdoc
 ====
 Auto-generate API documentation for Python projects.
 
-[![Build Status](https://travis-ci.org/pdoc3/pdoc.svg?branch=master)](https://travis-ci.org/pdoc3/pdoc)
-[![Code Coverage](https://codecov.io/gh/pdoc3/pdoc/branch/master/graph/badge.svg)](https://codecov.io/gh/pdoc3/pdoc)
-[![Backtesting on PyPI](https://img.shields.io/pypi/pyversions/pdoc3.svg)](https://pypi.org/project/pdoc3/)
+[![Build Status](https://img.shields.io/travis/pdoc3/pdoc.svg?style=for-the-badge)](https://travis-ci.org/pdoc3/pdoc)
+[![Code Coverage](https://img.shields.io/codecov/c/gh/pdoc3/pdoc.svg?style=for-the-badge)](https://codecov.io/gh/pdoc3/pdoc)
+[![pdoc3 on PyPI](https://img.shields.io/pypi/v/pdoc3.svg?style=for-the-badge)](https://pypi.org/project/pdoc3)
 
 [**Project website**](https://pdoc3.github.io/pdoc/)
 
