@@ -10,12 +10,4 @@ Auto-generate API documentation for Python projects.
 
 [**Project website**](https://pdoc3.github.io/pdoc/)
 
-[Documentation](https://pdoc3.github.io/pdoc/docs/pdoc/)
-
-Development
------------
-Fork the project. Then:
-
-    git clone git@github.com:YOUR_USERNAME/pdoc
-    cd pdoc
-    pip3 install -e .
+[Documentation](https://pdoc3.github.io/pdoc/doc/pdoc/)
