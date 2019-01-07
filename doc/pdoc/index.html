@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.5.0.dev1" />
+<meta name="generator" content="pdoc 0.5.0rc4" />
 <title>pdoc API documentation</title>
 <meta name="description" content="Python package `pdoc` provides types, functions, and a command-line
 interface for accessing public documentation of Python modules, and
@@ -14,6 +14,9 @@ for presenting …" />
 <style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id=^header-]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:1px solid #ddd;margin:1em 0 1em 4ch}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}#index .two-column{column-count:2}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.name small{font-weight:normal}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{background:#ffc;font-weight:400;font-size:.8em;width:11em;text-transform:uppercase;padding:0px 8px;border:1px solid #fd6;border-radius:5px;cursor:pointer}.source summary:hover{background:#fe9 !important}.source[open] summary{background:#fda}.source pre{max-height:500px;overflow-y:scroll;margin-bottom:15px}.hlist{list-syle:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink;]</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a,a:visited{text-decoration:underline}a[href]:after{content:" (" attr(href) ")"}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em}</style>
+<link rel="canonical" href="https://pdoc3.github.io/pdoc/doc/pdoc/">
+<link rel="icon" href="https://pdoc.github.io/pdoc/logo.png">
 </head>
 <body>
 <main>
@@ -156,7 +159,7 @@ your modules. When exporting to HTML, linking is automatically
 done whenever you surround an identifier with <a href="https://en.wikipedia.org/wiki/Grave_accent#Use_in_programming">backticks</a> ( ` ).
 The identifier name must be fully qualified, for example
 <code>`pdoc.Doc.docstring`</code> is correct (and will link to
-<a title="pdoc.Doc.docstring" href="#pdoc.Doc.docstring"><code>Doc.docstring</code></a>) while <code>`Doc.docstring`</code> is not.</p>
+<a title="pdoc.Doc.docstring" href="#pdoc.Doc.docstring"><code>Doc.docstring</code></a>) while <code>`Doc.docstring`</code> is <em>not</em>.</p>
 <h2 id="command-line-interface">Command-line interface</h2>
 <p><a title="pdoc" href="#pdoc"><code>pdoc</code></a> includes a feature-rich "binary" program for producing
 HTML and plain text documentation of your modules.
@@ -211,9 +214,9 @@ sub-templates:</p>
 modified templates into the <code>directories</code> list of the
 <a title="pdoc.tpl_lookup" href="#pdoc.tpl_lookup"><code>tpl_lookup</code></a> object.</p>
 <h2 id="compatibility">Compatibility</h2>
-<p><a title="pdoc" href="#pdoc"><code>pdoc</code></a> requires Python 3.4+.</p>
+<p><a title="pdoc" href="#pdoc"><code>pdoc</code></a> requires Python 3.5+.</p>
 <h2 id="contributing">Contributing</h2>
-<p><a title="pdoc" href="#pdoc"><code>pdoc</code></a> is <a href="https://github.com/kernc/pdoc">on GitHub</a>. Bug reports and pull requests are welcome.</p>
+<p><a title="pdoc" href="#pdoc"><code>pdoc</code></a> is <a href="https://github.com/pdoc3/pdoc">on GitHub</a>. Bug reports and pull requests are welcome.</p>
 <h2 id="license">License</h2>
 <p><a title="pdoc" href="#pdoc"><code>pdoc</code></a> is licensed under the terms of GNU <a href="https://www.gnu.org/licenses/agpl-3.0.html" rel="license">AGPL-3.0</a> or later,
 meaning you can use it for any reasonable purpose and remain in
@@ -273,7 +276,7 @@ What objects are documented?
 `pdoc` only extracts _public API_ documentation.[^public]
 All objects (modules, functions, classes, variables) are only
 considered public if their _identifiers don&#39;t begin with an
-underscore_ ( \_ ).[^private]
+underscore_ ( \\_ ).[^private]
 
 [^public]:
     Here, public API refers to the API that is made available
@@ -439,10 +442,10 @@ Linking to other identifiers
 ----------------------------
 In your documentation, you may refer to other identifiers in
 your modules. When exporting to HTML, linking is automatically
-done whenever you surround an identifier with [backticks] ( \` ).
+done whenever you surround an identifier with [backticks] ( \\` ).
 The identifier name must be fully qualified, for example
-&lt;code&gt;\`pdoc.Doc.docstring\`&lt;/code&gt; is correct (and will link to
-`pdoc.Doc.docstring`) while &lt;code&gt;\`Doc.docstring\`&lt;/code&gt; is not.
+&lt;code&gt;\\`pdoc.Doc.docstring\\`&lt;/code&gt; is correct (and will link to
+`pdoc.Doc.docstring`) while &lt;code&gt;\\`Doc.docstring\\`&lt;/code&gt; is _not_.
 
 [backticks]: https://en.wikipedia.org/wiki/Grave_accent#Use_in_programming
 
@@ -519,14 +522,14 @@ modified templates into the `directories` list of the
 
 Compatibility
 -------------
-`pdoc` requires Python 3.4+.
+`pdoc` requires Python 3.5+.
 
 
 Contributing
 ------------
 `pdoc` is [on GitHub]. Bug reports and pull requests are welcome.
 
-[on GitHub]: https://github.com/kernc/pdoc
+[on GitHub]: https://github.com/pdoc3/pdoc
 
 
 License
@@ -1102,6 +1105,10 @@ class Module(Doc):
                     warn(&#39;__pdoc__-overriden key {!r} does not exist &#39;
                          &#39;in module {!r}&#39;.format(name, self.name))
 
+                obj = self.find_ident(name)
+                cls = getattr(obj, &#39;cls&#39;, None)
+                if cls:
+                    del cls.doc[obj.name]
                 self.doc.pop(name, None)
                 self._context.pop(refname, None)
 
@@ -2490,9 +2497,9 @@ a class's ancestor list.)</p></section>
 <ul class="hlist">
 <li><a title="pdoc.Module" href="#pdoc.Module">Module</a></li>
 <li><a title="pdoc.Class" href="#pdoc.Class">Class</a></li>
+<li><a title="pdoc.Function" href="#pdoc.Function">Function</a></li>
 <li><a title="pdoc.Variable" href="#pdoc.Variable">Variable</a></li>
 <li><a title="pdoc.External" href="#pdoc.External">External</a></li>
-<li><a title="pdoc.Function" href="#pdoc.Function">Function</a></li>
 </ul>
 <h3>Instance variables</h3>
 <dl>
@@ -3329,6 +3336,10 @@ documentation object …</p></section>
                     warn(&#39;__pdoc__-overriden key {!r} does not exist &#39;
                          &#39;in module {!r}&#39;.format(name, self.name))
 
+                obj = self.find_ident(name)
+                cls = getattr(obj, &#39;cls&#39;, None)
+                if cls:
+                    del cls.doc[obj.name]
                 self.doc.pop(name, None)
                 self._context.pop(refname, None)
 
@@ -3673,6 +3684,10 @@ global context object will be used.</p></section>
                 warn(&#39;__pdoc__-overriden key {!r} does not exist &#39;
                      &#39;in module {!r}&#39;.format(name, self.name))
 
+            obj = self.find_ident(name)
+            cls = getattr(obj, &#39;cls&#39;, None)
+            if cls:
+                del cls.doc[obj.name]
             self.doc.pop(name, None)
             self._context.pop(refname, None)
 
@@ -4082,6 +4097,11 @@ documentation object …</p></section>
 </section>
 </article>
 <nav id="sidebar">
+<header>
+<a class="homelink" rel="home" title="pdoc Home" href="https://pdoc3.github.io/pdoc/">
+<img src="https://pdoc3.github.io/pdoc/logo.png" alt=""> pdoc
+</a>
+</header>
 <h1>Index</h1>
 <div class="toc">
 <ul>
@@ -4199,9 +4219,10 @@ documentation object …</p></section>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.com/pdoc"><cite>pdoc</cite> 0.5.0.dev1</a>.</p>
+<p><span style="color:#ddd">&#21328;</span></p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.0rc4</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
-</body>
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-43663477-5','auto');ga('require','cleanUrlTracker',{indexFilename:'index.html',trailingSlash:'add'});ga('require','outboundLinkTracker',{events:['click','auxclick','contextmenu']});ga('require','maxScrollTracker');ga('require','pageVisibilityTracker');ga('send','pageview');setTimeout(function(){ga('send','event','pageview','view')},15000);</script><script async src='https://www.google-analytics.com/analytics.js'></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js'></script></body>
 </html>
