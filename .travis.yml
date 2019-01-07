@@ -19,6 +19,14 @@ matrix:
       after_success:
         - bash <(curl -s https://codecov.io/bash)
 
+    - python: '3.6'
+      name: 'Docs'
+      stage: deploy
+      script:
+        - doc/build.sh
+      after_success:
+        - if [ "$TRAVIS_BRANCH" = "$TRAVIS_TAG" ]; then bash .github/deploy-gh-pages.sh; fi
+
 before_install:
   - set -e
 
