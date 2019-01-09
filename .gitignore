@@ -1,10 +1,12 @@
 dist
+build
 *.egg-info
 *.py[cod]
 
 pdoc/_version.py
 
 venv
+htmlcov
 .coverage
 .*_cache/*
 
