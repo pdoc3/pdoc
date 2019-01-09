@@ -20,6 +20,11 @@ if __name__ == '__main__':
         long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
         long_description_content_type='text/markdown',
         url="https://pdoc3.github.io/pdoc/",
+        project_urls={
+            'Documentation': 'https://pdoc3.github.io/pdoc/doc/pdoc/',
+            'Source': 'https://github.com/pdoc3/pdoc/',
+            'Tracker': 'https://github.com/pdoc3/pdoc/issues',
+        },
         classifiers=[
             "Topic :: Documentation",
             "Topic :: Software Development :: Documentation",
