@@ -1047,9 +1047,10 @@ class Module(Doc):
         returned. If one cannot be found, then an instance of
         `External` is returned populated with the given identifier.
         """
-        return (self.doc.get(name) or
-                self._context.get(name) or
-                self._context.get(self.name + '.' + name) or
+        _name = name.rstrip('()')  # Function specified with parentheses
+        return (self.doc.get(_name) or
+                self._context.get(_name) or
+                self._context.get(self.name + '.' + _name) or
                 External(name))
 
     def _filter_doc_objs(self, type: Type[T]) -> List[T]:

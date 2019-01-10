@@ -282,7 +282,6 @@ def to_html(text: str, docformat: str = 'numpy,google', *,
             nonlocal link, module
             matched = match.group(0)
             refname = matched[1:-1]
-            refname = refname.rstrip('()')  # Function specified with parentheses
             dobj = module.find_ident(refname)
             if isinstance(dobj, pdoc.External):
                 if not _is_pyident(refname):

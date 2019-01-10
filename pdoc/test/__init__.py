@@ -429,6 +429,11 @@ class ApiTest(unittest.TestCase):
 
         self.assertIsInstance(mod.find_ident(EXAMPLE_MODULE + '.subpkg'), pdoc.Module)
 
+        nonexistent = 'foo()'
+        result = mod.find_ident(nonexistent)
+        self.assertIsInstance(result, pdoc.External)
+        self.assertEqual(result.name, nonexistent)
+
     def test_inherits(self):
         module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
         pdoc.link_inheritance()
@@ -563,6 +568,8 @@ class HtmlHelpersTest(unittest.TestCase):
         self.assertEqual(html, expected)
 
         self.assertIn('<a href=', to_html('`pdoc.Doc.url()`', module=module, link=link))
+
+        self.assertIn('<code>foo.f()</code>', to_html('`foo.f()`', module=module, link=link))
 
     def test_to_html_refname_warning(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
