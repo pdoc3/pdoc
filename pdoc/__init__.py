@@ -1178,7 +1178,7 @@ class Class(Doc):
     def subclasses(self) -> List['Class']:
         """
         Returns a list of subclasses of this class that are visible to the
-        Python interpreter (obtained from type.__subclasses__()).
+        Python interpreter (obtained from `type.__subclasses__()`).
 
         The objects in the list are of type `pdoc.Class` if available,
         and `pdoc.External` otherwise.
@@ -1193,16 +1193,16 @@ class Class(Doc):
 
     def class_variables(self, include_inherited=True):
         """
-        Returns all documented class variables in the class, sorted
-        alphabetically as a list of `pdoc.Variable`.
+        Returns a sorted list of `pdoc.Variable` objects that
+        represent this class' class variables.
         """
         return self._filter_doc_objs(
             Variable, include_inherited, lambda dobj: not dobj.instance_var)
 
     def instance_variables(self, include_inherited=True):
         """
-        Returns all instance variables in the class, sorted
-        alphabetically as a list of `pdoc.Variable`. Instance variables
+        Returns a sorted list of `pdoc.Variable` objects that
+        represent this class' instance variables. Instance variables
         are those defined in a class's `__init__` as `self.variable = ...`.
         """
         return self._filter_doc_objs(
@@ -1210,17 +1210,16 @@ class Class(Doc):
 
     def methods(self, include_inherited=True):
         """
-        Returns all documented methods (including classmethods) as
-        `pdoc.Function` objects in the class, sorted alphabetically
-        with `__init__` always coming first.
+        Returns a sorted list of `pdoc.Function` objects that
+        represent this class' methods.
         """
         return self._filter_doc_objs(
             Function, include_inherited, lambda dobj: dobj.method)
 
     def functions(self, include_inherited=True) -> List['Function']:
         """
-        Returns all documented static functions as `pdoc.Function`
-        objects in the class, sorted alphabetically.
+        Returns a sorted list of `pdoc.Function` objects that
+        represent this class' static functions.
         """
         return self._filter_doc_objs(
             Function, include_inherited, lambda dobj: not dobj.method)
