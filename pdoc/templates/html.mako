@@ -7,9 +7,8 @@
     name = fmt.format(name or d.qualname + ('()' if isinstance(d, pdoc.Function) else ''))
     if not isinstance(d, pdoc.Doc) or isinstance(d, pdoc.External) and not external_links:
         return name
-    if not show_inherited_members:
-      d = d.inherits_top()
-    url = d.url(relative_to=module, link_prefix=link_prefix)
+    url = d.url(relative_to=module, link_prefix=link_prefix,
+                top_ancestor=not show_inherited_members)
     return '<a title="{}" href="{}">{}</a>'.format(d.refname, url, name)
 
 

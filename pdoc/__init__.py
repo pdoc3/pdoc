@@ -785,7 +785,8 @@ class Doc:
         return getattr(self.obj, '__qualname__', self.name)
 
     @lru_cache()
-    def url(self, relative_to: 'Module' = None, *, link_prefix: str = ''):
+    def url(self, relative_to: 'Module' = None, *, link_prefix: str = '',
+            top_ancestor: bool = False):
         """
         Canonical relative URL (including page fragment) for this
         documentation object.
@@ -794,7 +795,13 @@ class Doc:
         relative URL.
 
         For usage of `link_prefix` see `pdoc.html()`.
+
+        If `top_ancestor` is `True`, the returned URL instead points to
+        the top ancestor in the object's `pdoc.Doc.inherits` chain.
         """
+        if top_ancestor:
+            self = self._inherits_top()
+
         if relative_to is None or link_prefix:
             return link_prefix + self._url()
 
@@ -811,7 +818,7 @@ class Doc:
     def _url(self):
         return self.module._url() + '#' + self.refname
 
-    def inherits_top(self):
+    def _inherits_top(self):
         """
         Follow the `pdoc.Doc.inherits` chain and return the top object.
         """

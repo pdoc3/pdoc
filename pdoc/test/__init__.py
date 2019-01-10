@@ -500,6 +500,22 @@ class ApiTest(unittest.TestCase):
                              lambda a, b, *, _c=1: None)
         self.assertEqual(func.params(), ['a', 'b'])
 
+    def test_url(self):
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        pdoc.link_inheritance()
+
+        c = mod.doc['D']
+        self.assertEqual(c.url(), 'example_pkg/index.html#example_pkg.D')
+        self.assertEqual(c.url(link_prefix='/'), '/example_pkg/index.html#example_pkg.D')
+        self.assertEqual(c.url(relative_to=c.module), '#example_pkg.D')
+        self.assertEqual(c.url(top_ancestor=True), 'example_pkg/index.html#example_pkg.B')
+
+        f = c.doc['overridden']
+        self.assertEqual(f.url(), 'example_pkg/index.html#example_pkg.D.overridden')
+        self.assertEqual(f.url(link_prefix='/'), '/example_pkg/index.html#example_pkg.D.overridden')
+        self.assertEqual(f.url(relative_to=c.module), '#example_pkg.D.overridden')
+        self.assertEqual(f.url(top_ancestor=1), 'example_pkg/index.html#example_pkg.B.overridden')
+
 
 class HtmlHelpersTest(unittest.TestCase):
     """
