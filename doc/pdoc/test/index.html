@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.5.0rc4" />
+<meta name="generator" content="pdoc 0.5.0" />
 <title>pdoc.test API documentation</title>
 <meta name="description" content="Unit tests for pdoc package." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -35,6 +35,7 @@ import signal
 import sys
 import threading
 import unittest
+import warnings
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from glob import glob
 from io import StringIO
@@ -77,8 +78,8 @@ def chdir(path):
 def run(*args, _check=True, **kwargs) -&gt; int:
     params = ((&#39;--&#39; + key.replace(&#39;_&#39;, &#39;-&#39;), value)
               for key, value in kwargs.items())
-    params = list(filter(None, chain.from_iterable(params)))
-    _args = parser.parse_args([*params, *args])
+    params = list(filter(None, chain.from_iterable(params)))  # type: ignore
+    _args = parser.parse_args([*params, *args])               # type: ignore
     try:
         returncode = main(_args)
         return returncode or 0
@@ -122,6 +123,9 @@ class CliTest(unittest.TestCase):
         &#39;example_pkg/subpkg2/index.html&#39;,
     ]
     PUBLIC_FILES = [f for f in ALL_FILES if &#39;/_&#39; not in f]
+
+    def setUp(self):
+        pdoc.reset()
 
     def _basic_html_assertions(self, expected_files=PUBLIC_FILES):
         # Output directory tree layout is as expected
@@ -310,7 +314,7 @@ class CliTest(unittest.TestCase):
                 run(EXAMPLE_MODULE)
                 out = stdout.getvalue()
 
-            header = &#39;Module {}\n{:-&lt;{}}&#39;.format(EXAMPLE_MODULE, &#39;&#39;,
+            header = &#39;Module {}\n{:=&lt;{}}&#39;.format(EXAMPLE_MODULE, &#39;&#39;,
                                                  len(&#39;Module &#39;) + len(EXAMPLE_MODULE))
             self.assertIn(header, out)
             for pattern in include_patterns:
@@ -334,7 +338,7 @@ class CliTest(unittest.TestCase):
             run(EXAMPLE_MODULE, filter=&#39;A&#39;)
             out = stdout.getvalue()
         self.assertIn(&#39;A&#39;, out)
-        self.assertIn(&#39;Descendents\n    -----------\n    example_pkg.B&#39;, out)
+        self.assertIn(&#39;### Descendants\n\n    * example_pkg.B&#39;, out)
         self.assertNotIn(&#39;CONST&#39;, out)
         self.assertNotIn(&#39;B docstring&#39;, out)
 
@@ -343,6 +347,9 @@ class ApiTest(unittest.TestCase):
     &#34;&#34;&#34;
     Programmatic/API unit tests.
     &#34;&#34;&#34;
+    def setUp(self):
+        pdoc.reset()
+
     def test_module(self):
         modules = {
             EXAMPLE_MODULE: (&#39;&#39;, (&#39;index&#39;, &#39;module&#39;, &#39;subpkg&#39;, &#39;subpkg2&#39;)),
@@ -369,6 +376,12 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(sorted(m.name for m in m.submodules()),
                          [EXAMPLE_MODULE + &#39;._private.module&#39;])
 
+    def test_instance_var(self):
+        pdoc.reset()
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        var = mod.doc[&#39;B&#39;].doc[&#39;instance_var&#39;]
+        self.assertTrue(var.instance_var)
+
     def test_refname(self):
         mod = EXAMPLE_MODULE + &#39;.&#39; + &#39;subpkg&#39;
         module = pdoc.Module(pdoc.import_module(mod))
@@ -387,6 +400,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(method.refname, mod + &#39;.B.f&#39;)
 
         # Inherited method&#39;s refname points to class&#39; implicit copy
+        pdoc.link_inheritance()
         self.assertEqual(cls.doc[&#39;inherited&#39;].refname, mod + &#39;.B.inherited&#39;)
 
     def test_qualname(self):
@@ -409,11 +423,13 @@ class ApiTest(unittest.TestCase):
         module = pdoc.import_module(EXAMPLE_MODULE)
         with patch.object(module, &#39;__pdoc__&#39;, {&#39;B&#39;: False}):
             mod = pdoc.Module(module)
+            pdoc.link_inheritance()
             self.assertIn(&#39;A&#39;, mod.doc)
             self.assertNotIn(&#39;B&#39;, mod.doc)
 
         with patch.object(module, &#39;__pdoc__&#39;, {&#39;B.__init__&#39;: False}):
             mod = pdoc.Module(module)
+            pdoc.link_inheritance()
             self.assertIn(&#39;B&#39;, mod.doc)
             self.assertNotIn(&#39;__init__&#39;, mod.doc[&#39;B&#39;].doc)
             self.assertIsInstance(mod.find_ident(&#39;B.__init__&#39;), pdoc.External)
@@ -423,6 +439,15 @@ class ApiTest(unittest.TestCase):
         with patch.object(module, &#39;__pdoc__&#39;, {&#39;B&#39;: 1}), \
                 self.assertRaises(ValueError):
             pdoc.Module(module)
+            pdoc.link_inheritance()
+
+    def test__all__(self):
+        module = pdoc.import_module(EXAMPLE_MODULE + &#39;.index&#39;)
+        with patch.object(module, &#39;__all__&#39;, [&#39;B&#39;], create=True):
+            mod = pdoc.Module(module)
+            with self.assertWarns(UserWarning):  # Only B is used but __pdoc__ contains others
+                pdoc.link_inheritance()
+            self.assertEqual(list(mod.doc.keys()), [&#39;B&#39;])
 
     def test_find_ident(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
@@ -432,8 +457,15 @@ class ApiTest(unittest.TestCase):
 
         self.assertIsInstance(mod.find_ident(EXAMPLE_MODULE + &#39;.subpkg&#39;), pdoc.Module)
 
+        nonexistent = &#39;foo()&#39;
+        result = mod.find_ident(nonexistent)
+        self.assertIsInstance(result, pdoc.External)
+        self.assertEqual(result.name, nonexistent)
+
     def test_inherits(self):
         module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        pdoc.link_inheritance()
+
         a = module.doc[&#39;A&#39;]
         b = module.doc[&#39;B&#39;]
         self.assertEqual(b.doc[&#39;inherited&#39;].inherits,
@@ -443,13 +475,41 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(b.doc[&#39;overridden&#39;].inherits,
                          None)
 
+        c = module.doc[&#39;C&#39;]
+        d = module.doc[&#39;D&#39;]
+        self.assertEqual(d.doc[&#39;overridden&#39;].inherits, c.doc[&#39;overridden&#39;])
+        self.assertEqual(c.doc[&#39;overridden&#39;].inherits, b.doc[&#39;overridden&#39;])
+
     def test_inherited_members(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        pdoc.link_inheritance()
         a = mod.doc[&#39;A&#39;]
         b = mod.doc[&#39;B&#39;]
         self.assertEqual(b.inherited_members(), [(a, [a.doc[&#39;inherited&#39;],
                                                       a.doc[&#39;overridden_same_docstring&#39;]])])
         self.assertEqual(a.inherited_members(), [])
+
+    def test_link_inheritance(self):
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        with warnings.catch_warnings(record=True) as w:
+            pdoc.link_inheritance()
+            pdoc.link_inheritance()
+        self.assertFalse(w)
+
+        mod._is_inheritance_linked = False
+        with self.assertWarns(UserWarning):
+            pdoc.link_inheritance()
+
+        # Test inheritance across modules
+        pdoc.reset()
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + &#39;._test_linking&#39;))
+        pdoc.link_inheritance()
+        a = mod.doc[&#39;a&#39;].doc[&#39;A&#39;]
+        b = mod.doc[&#39;b&#39;].doc[&#39;B&#39;]
+        c = mod.doc[&#39;b&#39;].doc[&#39;c&#39;].doc[&#39;C&#39;]
+        self.assertEqual(b.inherits, a)
+        self.assertEqual(b.doc[&#39;a&#39;].inherits, a.doc[&#39;a&#39;])
+        self.assertEqual(b.doc[&#39;c&#39;].inherits, c.doc[&#39;c&#39;])
 
     def test_context(self):
         context = {}
@@ -480,6 +540,22 @@ class ApiTest(unittest.TestCase):
         func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc),
                              lambda a, b, *, _c=1: None)
         self.assertEqual(func.params(), [&#39;a&#39;, &#39;b&#39;])
+
+    def test_url(self):
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        pdoc.link_inheritance()
+
+        c = mod.doc[&#39;D&#39;]
+        self.assertEqual(c.url(), &#39;example_pkg/index.html#example_pkg.D&#39;)
+        self.assertEqual(c.url(link_prefix=&#39;/&#39;), &#39;/example_pkg/index.html#example_pkg.D&#39;)
+        self.assertEqual(c.url(relative_to=c.module), &#39;#example_pkg.D&#39;)
+        self.assertEqual(c.url(top_ancestor=True), &#39;example_pkg/index.html#example_pkg.B&#39;)
+
+        f = c.doc[&#39;overridden&#39;]
+        self.assertEqual(f.url(), &#39;example_pkg/index.html#example_pkg.D.overridden&#39;)
+        self.assertEqual(f.url(link_prefix=&#39;/&#39;), &#39;/example_pkg/index.html#example_pkg.D.overridden&#39;)
+        self.assertEqual(f.url(relative_to=c.module), &#39;#example_pkg.D.overridden&#39;)
+        self.assertEqual(f.url(top_ancestor=1), &#39;example_pkg/index.html#example_pkg.B.overridden&#39;)
 
 
 class HtmlHelpersTest(unittest.TestCase):
@@ -520,6 +596,8 @@ class HtmlHelpersTest(unittest.TestCase):
         self.assertEqual(html, expected)
 
         self.assertIn(&#39;&lt;a href=&#39;, to_html(&#39;`pdoc.Doc.url()`&#39;, module=module, link=link))
+
+        self.assertIn(&#39;&lt;code&gt;foo.f()&lt;/code&gt;&#39;, to_html(&#39;`foo.f()`&#39;, module=module, link=link))
 
     def test_to_html_refname_warning(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
@@ -804,8 +882,8 @@ def redirect_streams():
 <pre><code class="python">def run(*args, _check=True, **kwargs) -&gt; int:
     params = ((&#39;--&#39; + key.replace(&#39;_&#39;, &#39;-&#39;), value)
               for key, value in kwargs.items())
-    params = list(filter(None, chain.from_iterable(params)))
-    _args = parser.parse_args([*params, *args])
+    params = list(filter(None, chain.from_iterable(params)))  # type: ignore
+    _args = parser.parse_args([*params, *args])               # type: ignore
     try:
         returncode = main(_args)
         return returncode or 0
@@ -858,6 +936,9 @@ def temp_dir():
     &#34;&#34;&#34;
     Programmatic/API unit tests.
     &#34;&#34;&#34;
+    def setUp(self):
+        pdoc.reset()
+
     def test_module(self):
         modules = {
             EXAMPLE_MODULE: (&#39;&#39;, (&#39;index&#39;, &#39;module&#39;, &#39;subpkg&#39;, &#39;subpkg2&#39;)),
@@ -884,6 +965,12 @@ def temp_dir():
         self.assertEqual(sorted(m.name for m in m.submodules()),
                          [EXAMPLE_MODULE + &#39;._private.module&#39;])
 
+    def test_instance_var(self):
+        pdoc.reset()
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        var = mod.doc[&#39;B&#39;].doc[&#39;instance_var&#39;]
+        self.assertTrue(var.instance_var)
+
     def test_refname(self):
         mod = EXAMPLE_MODULE + &#39;.&#39; + &#39;subpkg&#39;
         module = pdoc.Module(pdoc.import_module(mod))
@@ -902,6 +989,7 @@ def temp_dir():
         self.assertEqual(method.refname, mod + &#39;.B.f&#39;)
 
         # Inherited method&#39;s refname points to class&#39; implicit copy
+        pdoc.link_inheritance()
         self.assertEqual(cls.doc[&#39;inherited&#39;].refname, mod + &#39;.B.inherited&#39;)
 
     def test_qualname(self):
@@ -924,11 +1012,13 @@ def temp_dir():
         module = pdoc.import_module(EXAMPLE_MODULE)
         with patch.object(module, &#39;__pdoc__&#39;, {&#39;B&#39;: False}):
             mod = pdoc.Module(module)
+            pdoc.link_inheritance()
             self.assertIn(&#39;A&#39;, mod.doc)
             self.assertNotIn(&#39;B&#39;, mod.doc)
 
         with patch.object(module, &#39;__pdoc__&#39;, {&#39;B.__init__&#39;: False}):
             mod = pdoc.Module(module)
+            pdoc.link_inheritance()
             self.assertIn(&#39;B&#39;, mod.doc)
             self.assertNotIn(&#39;__init__&#39;, mod.doc[&#39;B&#39;].doc)
             self.assertIsInstance(mod.find_ident(&#39;B.__init__&#39;), pdoc.External)
@@ -938,6 +1028,15 @@ def temp_dir():
         with patch.object(module, &#39;__pdoc__&#39;, {&#39;B&#39;: 1}), \
                 self.assertRaises(ValueError):
             pdoc.Module(module)
+            pdoc.link_inheritance()
+
+    def test__all__(self):
+        module = pdoc.import_module(EXAMPLE_MODULE + &#39;.index&#39;)
+        with patch.object(module, &#39;__all__&#39;, [&#39;B&#39;], create=True):
+            mod = pdoc.Module(module)
+            with self.assertWarns(UserWarning):  # Only B is used but __pdoc__ contains others
+                pdoc.link_inheritance()
+            self.assertEqual(list(mod.doc.keys()), [&#39;B&#39;])
 
     def test_find_ident(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
@@ -947,8 +1046,15 @@ def temp_dir():
 
         self.assertIsInstance(mod.find_ident(EXAMPLE_MODULE + &#39;.subpkg&#39;), pdoc.Module)
 
+        nonexistent = &#39;foo()&#39;
+        result = mod.find_ident(nonexistent)
+        self.assertIsInstance(result, pdoc.External)
+        self.assertEqual(result.name, nonexistent)
+
     def test_inherits(self):
         module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        pdoc.link_inheritance()
+
         a = module.doc[&#39;A&#39;]
         b = module.doc[&#39;B&#39;]
         self.assertEqual(b.doc[&#39;inherited&#39;].inherits,
@@ -958,13 +1064,41 @@ def temp_dir():
         self.assertEqual(b.doc[&#39;overridden&#39;].inherits,
                          None)
 
+        c = module.doc[&#39;C&#39;]
+        d = module.doc[&#39;D&#39;]
+        self.assertEqual(d.doc[&#39;overridden&#39;].inherits, c.doc[&#39;overridden&#39;])
+        self.assertEqual(c.doc[&#39;overridden&#39;].inherits, b.doc[&#39;overridden&#39;])
+
     def test_inherited_members(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        pdoc.link_inheritance()
         a = mod.doc[&#39;A&#39;]
         b = mod.doc[&#39;B&#39;]
         self.assertEqual(b.inherited_members(), [(a, [a.doc[&#39;inherited&#39;],
                                                       a.doc[&#39;overridden_same_docstring&#39;]])])
         self.assertEqual(a.inherited_members(), [])
+
+    def test_link_inheritance(self):
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        with warnings.catch_warnings(record=True) as w:
+            pdoc.link_inheritance()
+            pdoc.link_inheritance()
+        self.assertFalse(w)
+
+        mod._is_inheritance_linked = False
+        with self.assertWarns(UserWarning):
+            pdoc.link_inheritance()
+
+        # Test inheritance across modules
+        pdoc.reset()
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + &#39;._test_linking&#39;))
+        pdoc.link_inheritance()
+        a = mod.doc[&#39;a&#39;].doc[&#39;A&#39;]
+        b = mod.doc[&#39;b&#39;].doc[&#39;B&#39;]
+        c = mod.doc[&#39;b&#39;].doc[&#39;c&#39;].doc[&#39;C&#39;]
+        self.assertEqual(b.inherits, a)
+        self.assertEqual(b.doc[&#39;a&#39;].inherits, a.doc[&#39;a&#39;])
+        self.assertEqual(b.doc[&#39;c&#39;].inherits, c.doc[&#39;c&#39;])
 
     def test_context(self):
         context = {}
@@ -994,10 +1128,37 @@ def temp_dir():
 
         func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc),
                              lambda a, b, *, _c=1: None)
-        self.assertEqual(func.params(), [&#39;a&#39;, &#39;b&#39;])}</code></pre>
+        self.assertEqual(func.params(), [&#39;a&#39;, &#39;b&#39;])
+
+    def test_url(self):
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        pdoc.link_inheritance()
+
+        c = mod.doc[&#39;D&#39;]
+        self.assertEqual(c.url(), &#39;example_pkg/index.html#example_pkg.D&#39;)
+        self.assertEqual(c.url(link_prefix=&#39;/&#39;), &#39;/example_pkg/index.html#example_pkg.D&#39;)
+        self.assertEqual(c.url(relative_to=c.module), &#39;#example_pkg.D&#39;)
+        self.assertEqual(c.url(top_ancestor=True), &#39;example_pkg/index.html#example_pkg.B&#39;)
+
+        f = c.doc[&#39;overridden&#39;]
+        self.assertEqual(f.url(), &#39;example_pkg/index.html#example_pkg.D.overridden&#39;)
+        self.assertEqual(f.url(link_prefix=&#39;/&#39;), &#39;/example_pkg/index.html#example_pkg.D.overridden&#39;)
+        self.assertEqual(f.url(relative_to=c.module), &#39;#example_pkg.D.overridden&#39;)
+        self.assertEqual(f.url(top_ancestor=1), &#39;example_pkg/index.html#example_pkg.B.overridden&#39;)}</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
+<dt id="pdoc.test.ApiTest.setUp"><code class="name flex">
+<span>def <span class="ident">setUp</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Hook method for setting up the test fixture before exercising it.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def setUp(self):
+    pdoc.reset()}</code></pre>
+</details>
+</dd>
 <dt id="pdoc.test.ApiTest.test_Function_private_params"><code class="name flex">
 <span>def <span class="ident">test_Function_private_params</span></span>(<span>self)</span>
 </code></dt>
@@ -1019,6 +1180,22 @@ def temp_dir():
     self.assertEqual(func.params(), [&#39;a&#39;, &#39;b&#39;])}</code></pre>
 </details>
 </dd>
+<dt id="pdoc.test.ApiTest.test__all__"><code class="name flex">
+<span>def <span class="ident">test__all__</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def test__all__(self):
+    module = pdoc.import_module(EXAMPLE_MODULE + &#39;.index&#39;)
+    with patch.object(module, &#39;__all__&#39;, [&#39;B&#39;], create=True):
+        mod = pdoc.Module(module)
+        with self.assertWarns(UserWarning):  # Only B is used but __pdoc__ contains others
+            pdoc.link_inheritance()
+        self.assertEqual(list(mod.doc.keys()), [&#39;B&#39;])}</code></pre>
+</details>
+</dd>
 <dt id="pdoc.test.ApiTest.test__pdoc__dict"><code class="name flex">
 <span>def <span class="ident">test__pdoc__dict</span></span>(<span>self)</span>
 </code></dt>
@@ -1030,11 +1207,13 @@ def temp_dir():
     module = pdoc.import_module(EXAMPLE_MODULE)
     with patch.object(module, &#39;__pdoc__&#39;, {&#39;B&#39;: False}):
         mod = pdoc.Module(module)
+        pdoc.link_inheritance()
         self.assertIn(&#39;A&#39;, mod.doc)
         self.assertNotIn(&#39;B&#39;, mod.doc)
 
     with patch.object(module, &#39;__pdoc__&#39;, {&#39;B.__init__&#39;: False}):
         mod = pdoc.Module(module)
+        pdoc.link_inheritance()
         self.assertIn(&#39;B&#39;, mod.doc)
         self.assertNotIn(&#39;__init__&#39;, mod.doc[&#39;B&#39;].doc)
         self.assertIsInstance(mod.find_ident(&#39;B.__init__&#39;), pdoc.External)}</code></pre>
@@ -1051,7 +1230,8 @@ def temp_dir():
     module = pdoc.import_module(EXAMPLE_MODULE)
     with patch.object(module, &#39;__pdoc__&#39;, {&#39;B&#39;: 1}), \
             self.assertRaises(ValueError):
-        pdoc.Module(module)}</code></pre>
+        pdoc.Module(module)
+        pdoc.link_inheritance()}</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_context"><code class="name flex">
@@ -1092,7 +1272,12 @@ def temp_dir():
     mod = pdoc.Module(pdoc)
     self.assertIsInstance(mod.find_ident(&#39;subpkg&#39;), pdoc.External)
 
-    self.assertIsInstance(mod.find_ident(EXAMPLE_MODULE + &#39;.subpkg&#39;), pdoc.Module)}</code></pre>
+    self.assertIsInstance(mod.find_ident(EXAMPLE_MODULE + &#39;.subpkg&#39;), pdoc.Module)
+
+    nonexistent = &#39;foo()&#39;
+    result = mod.find_ident(nonexistent)
+    self.assertIsInstance(result, pdoc.External)
+    self.assertEqual(result.name, nonexistent)}</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_import_filename"><code class="name flex">
@@ -1119,6 +1304,7 @@ def temp_dir():
 <summary>Source code</summary>
 <pre><code class="python">def test_inherited_members(self):
     mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+    pdoc.link_inheritance()
     a = mod.doc[&#39;A&#39;]
     b = mod.doc[&#39;B&#39;]
     self.assertEqual(b.inherited_members(), [(a, [a.doc[&#39;inherited&#39;],
@@ -1135,6 +1321,8 @@ def temp_dir():
 <summary>Source code</summary>
 <pre><code class="python">def test_inherits(self):
     module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+    pdoc.link_inheritance()
+
     a = module.doc[&#39;A&#39;]
     b = module.doc[&#39;B&#39;]
     self.assertEqual(b.doc[&#39;inherited&#39;].inherits,
@@ -1142,7 +1330,56 @@ def temp_dir():
     self.assertEqual(b.doc[&#39;overridden_same_docstring&#39;].inherits,
                      a.doc[&#39;overridden_same_docstring&#39;])
     self.assertEqual(b.doc[&#39;overridden&#39;].inherits,
-                     None)}</code></pre>
+                     None)
+
+    c = module.doc[&#39;C&#39;]
+    d = module.doc[&#39;D&#39;]
+    self.assertEqual(d.doc[&#39;overridden&#39;].inherits, c.doc[&#39;overridden&#39;])
+    self.assertEqual(c.doc[&#39;overridden&#39;].inherits, b.doc[&#39;overridden&#39;])}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.ApiTest.test_instance_var"><code class="name flex">
+<span>def <span class="ident">test_instance_var</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def test_instance_var(self):
+    pdoc.reset()
+    mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+    var = mod.doc[&#39;B&#39;].doc[&#39;instance_var&#39;]
+    self.assertTrue(var.instance_var)}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.ApiTest.test_link_inheritance"><code class="name flex">
+<span>def <span class="ident">test_link_inheritance</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def test_link_inheritance(self):
+    mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+    with warnings.catch_warnings(record=True) as w:
+        pdoc.link_inheritance()
+        pdoc.link_inheritance()
+    self.assertFalse(w)
+
+    mod._is_inheritance_linked = False
+    with self.assertWarns(UserWarning):
+        pdoc.link_inheritance()
+
+    # Test inheritance across modules
+    pdoc.reset()
+    mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + &#39;._test_linking&#39;))
+    pdoc.link_inheritance()
+    a = mod.doc[&#39;a&#39;].doc[&#39;A&#39;]
+    b = mod.doc[&#39;b&#39;].doc[&#39;B&#39;]
+    c = mod.doc[&#39;b&#39;].doc[&#39;c&#39;].doc[&#39;C&#39;]
+    self.assertEqual(b.inherits, a)
+    self.assertEqual(b.doc[&#39;a&#39;].inherits, a.doc[&#39;a&#39;])
+    self.assertEqual(b.doc[&#39;c&#39;].inherits, c.doc[&#39;c&#39;])}</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_module"><code class="name flex">
@@ -1229,7 +1466,32 @@ def temp_dir():
     self.assertEqual(method.refname, mod + &#39;.B.f&#39;)
 
     # Inherited method&#39;s refname points to class&#39; implicit copy
+    pdoc.link_inheritance()
     self.assertEqual(cls.doc[&#39;inherited&#39;].refname, mod + &#39;.B.inherited&#39;)}</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.ApiTest.test_url"><code class="name flex">
+<span>def <span class="ident">test_url</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def test_url(self):
+    mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+    pdoc.link_inheritance()
+
+    c = mod.doc[&#39;D&#39;]
+    self.assertEqual(c.url(), &#39;example_pkg/index.html#example_pkg.D&#39;)
+    self.assertEqual(c.url(link_prefix=&#39;/&#39;), &#39;/example_pkg/index.html#example_pkg.D&#39;)
+    self.assertEqual(c.url(relative_to=c.module), &#39;#example_pkg.D&#39;)
+    self.assertEqual(c.url(top_ancestor=True), &#39;example_pkg/index.html#example_pkg.B&#39;)
+
+    f = c.doc[&#39;overridden&#39;]
+    self.assertEqual(f.url(), &#39;example_pkg/index.html#example_pkg.D.overridden&#39;)
+    self.assertEqual(f.url(link_prefix=&#39;/&#39;), &#39;/example_pkg/index.html#example_pkg.D.overridden&#39;)
+    self.assertEqual(f.url(relative_to=c.module), &#39;#example_pkg.D.overridden&#39;)
+    self.assertEqual(f.url(top_ancestor=1), &#39;example_pkg/index.html#example_pkg.B.overridden&#39;)}</code></pre>
 </details>
 </dd>
 </dl>
@@ -1263,6 +1525,9 @@ def temp_dir():
         &#39;example_pkg/subpkg2/index.html&#39;,
     ]
     PUBLIC_FILES = [f for f in ALL_FILES if &#39;/_&#39; not in f]
+
+    def setUp(self):
+        pdoc.reset()
 
     def _basic_html_assertions(self, expected_files=PUBLIC_FILES):
         # Output directory tree layout is as expected
@@ -1451,7 +1716,7 @@ def temp_dir():
                 run(EXAMPLE_MODULE)
                 out = stdout.getvalue()
 
-            header = &#39;Module {}\n{:-&lt;{}}&#39;.format(EXAMPLE_MODULE, &#39;&#39;,
+            header = &#39;Module {}\n{:=&lt;{}}&#39;.format(EXAMPLE_MODULE, &#39;&#39;,
                                                  len(&#39;Module &#39;) + len(EXAMPLE_MODULE))
             self.assertIn(header, out)
             for pattern in include_patterns:
@@ -1475,7 +1740,7 @@ def temp_dir():
             run(EXAMPLE_MODULE, filter=&#39;A&#39;)
             out = stdout.getvalue()
         self.assertIn(&#39;A&#39;, out)
-        self.assertIn(&#39;Descendents\n    -----------\n    example_pkg.B&#39;, out)
+        self.assertIn(&#39;### Descendants\n\n    * example_pkg.B&#39;, out)
         self.assertNotIn(&#39;CONST&#39;, out)
         self.assertNotIn(&#39;B docstring&#39;, out)}</code></pre>
 </details>
@@ -1492,6 +1757,17 @@ def temp_dir():
 </dl>
 <h3>Methods</h3>
 <dl>
+<dt id="pdoc.test.CliTest.setUp"><code class="name flex">
+<span>def <span class="ident">setUp</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Hook method for setting up the test fixture before exercising it.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def setUp(self):
+    pdoc.reset()}</code></pre>
+</details>
+</dd>
 <dt id="pdoc.test.CliTest.test_external_links"><code class="name flex">
 <span>def <span class="ident">test_external_links</span></span>(<span>self)</span>
 </code></dt>
@@ -1742,7 +2018,7 @@ def temp_dir():
             run(EXAMPLE_MODULE)
             out = stdout.getvalue()
 
-        header = &#39;Module {}\n{:-&lt;{}}&#39;.format(EXAMPLE_MODULE, &#39;&#39;,
+        header = &#39;Module {}\n{:=&lt;{}}&#39;.format(EXAMPLE_MODULE, &#39;&#39;,
                                              len(&#39;Module &#39;) + len(EXAMPLE_MODULE))
         self.assertIn(header, out)
         for pattern in include_patterns:
@@ -1774,7 +2050,7 @@ def temp_dir():
         run(EXAMPLE_MODULE, filter=&#39;A&#39;)
         out = stdout.getvalue()
     self.assertIn(&#39;A&#39;, out)
-    self.assertIn(&#39;Descendents\n    -----------\n    example_pkg.B&#39;, out)
+    self.assertIn(&#39;### Descendants\n\n    * example_pkg.B&#39;, out)
     self.assertNotIn(&#39;CONST&#39;, out)
     self.assertNotIn(&#39;B docstring&#39;, out)}</code></pre>
 </details>
@@ -2184,6 +2460,8 @@ lines.&lt;/p&gt;
 
         self.assertIn(&#39;&lt;a href=&#39;, to_html(&#39;`pdoc.Doc.url()`&#39;, module=module, link=link))
 
+        self.assertIn(&#39;&lt;code&gt;foo.f()&lt;/code&gt;&#39;, to_html(&#39;`foo.f()`&#39;, module=module, link=link))
+
     def test_to_html_refname_warning(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
 
@@ -2296,7 +2574,9 @@ lines.&lt;/p&gt;
     html = to_html(text, module=module, link=link)
     self.assertEqual(html, expected)
 
-    self.assertIn(&#39;&lt;a href=&#39;, to_html(&#39;`pdoc.Doc.url()`&#39;, module=module, link=link))}</code></pre>
+    self.assertIn(&#39;&lt;a href=&#39;, to_html(&#39;`pdoc.Doc.url()`&#39;, module=module, link=link))
+
+    self.assertIn(&#39;&lt;code&gt;foo.f()&lt;/code&gt;&#39;, to_html(&#39;`foo.f()`&#39;, module=module, link=link))}</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.HtmlHelpersTest.test_to_html_refname_warning"><code class="name flex">
@@ -2461,7 +2741,9 @@ lines.&lt;/p&gt;
 <li>
 <h4><code><a title="pdoc.test.ApiTest" href="#pdoc.test.ApiTest">ApiTest</a></code></h4>
 <ul class="two-column">
+<li><code><a title="pdoc.test.ApiTest.setUp" href="#pdoc.test.ApiTest.setUp">setUp</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_Function_private_params" href="#pdoc.test.ApiTest.test_Function_private_params">test_Function_private_params</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test__all__" href="#pdoc.test.ApiTest.test__all__">test__all__</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test__pdoc__dict" href="#pdoc.test.ApiTest.test__pdoc__dict">test__pdoc__dict</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test__pdoc__invalid_value" href="#pdoc.test.ApiTest.test__pdoc__invalid_value">test__pdoc__invalid_value</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_context" href="#pdoc.test.ApiTest.test_context">test_context</a></code></li>
@@ -2469,15 +2751,21 @@ lines.&lt;/p&gt;
 <li><code><a title="pdoc.test.ApiTest.test_import_filename" href="#pdoc.test.ApiTest.test_import_filename">test_import_filename</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_inherited_members" href="#pdoc.test.ApiTest.test_inherited_members">test_inherited_members</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_inherits" href="#pdoc.test.ApiTest.test_inherits">test_inherits</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_instance_var" href="#pdoc.test.ApiTest.test_instance_var">test_instance_var</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_link_inheritance" href="#pdoc.test.ApiTest.test_link_inheritance">test_link_inheritance</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_module" href="#pdoc.test.ApiTest.test_module">test_module</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_module_allsubmodules" href="#pdoc.test.ApiTest.test_module_allsubmodules">test_module_allsubmodules</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_qualname" href="#pdoc.test.ApiTest.test_qualname">test_qualname</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_refname" href="#pdoc.test.ApiTest.test_refname">test_refname</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_url" href="#pdoc.test.ApiTest.test_url">test_url</a></code></li>
 </ul>
 </li>
 <li>
 <h4><code><a title="pdoc.test.CliTest" href="#pdoc.test.CliTest">CliTest</a></code></h4>
 <ul class="two-column">
+<li><code><a title="pdoc.test.CliTest.ALL_FILES" href="#pdoc.test.CliTest.ALL_FILES">ALL_FILES</a></code></li>
+<li><code><a title="pdoc.test.CliTest.PUBLIC_FILES" href="#pdoc.test.CliTest.PUBLIC_FILES">PUBLIC_FILES</a></code></li>
+<li><code><a title="pdoc.test.CliTest.setUp" href="#pdoc.test.CliTest.setUp">setUp</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_external_links" href="#pdoc.test.CliTest.test_external_links">test_external_links</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html" href="#pdoc.test.CliTest.test_html">test_html</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html_identifier" href="#pdoc.test.CliTest.test_html_identifier">test_html_identifier</a></code></li>
@@ -2524,7 +2812,7 @@ lines.&lt;/p&gt;
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.0rc4</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.0</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

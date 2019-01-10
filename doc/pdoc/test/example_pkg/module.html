@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.5.0rc4" />
+<meta name="generator" content="pdoc 0.5.0" />
 <title>pdoc.test.example_pkg.module API documentation</title>
 <meta name="description" content="Module docstring" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -117,6 +117,10 @@ class B(A, int):
 
     def overridden_same_docstring(self):
         pass
+
+
+class C(B): pass  # noqa: E701, E302
+class D(C): pass  # noqa: E701, E302
 
 
 class Hidden:
@@ -690,6 +694,10 @@ across multiple lines:</p>
     def overridden_same_docstring(self):
         pass}</code></pre>
 </details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="pdoc.test.example_pkg.module.C" href="#pdoc.test.example_pkg.module.B">C</a></li>
+</ul>
 <h3>Class variables</h3>
 <dl>
 <dt id="pdoc.test.example_pkg.module.B.C"><code class="name">var <span class="ident">C</span></code></dt>
@@ -776,16 +784,6 @@ def p(self):
     &#34;&#34;&#34;B.f docstring&#34;&#34;&#34;}</code></pre>
 </details>
 </dd>
-<dt id="pdoc.test.example_pkg.module.B.inherited"><code class="name flex">
-<span>def <span class="ident">inherited</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<p class="inheritance">
-<em>Inherited from:</em>
-<code><a title="pdoc.test.example_pkg.module.A" href="#pdoc.test.example_pkg.module.A">A</a></code>.<code><a title="pdoc.test.example_pkg.module.A.inherited" href="#pdoc.test.example_pkg.module.A.inherited">inherited</a></code>
-</p>
-<section class="desc inherited"><p>A.inherited docstring</p></section>
-</dd>
 <dt id="pdoc.test.example_pkg.module.B.overridden"><code class="name flex">
 <span>def <span class="ident">overridden</span></span>(<span>self)</span>
 </code></dt>
@@ -797,22 +795,88 @@ def p(self):
     pass}</code></pre>
 </details>
 </dd>
-<dt id="pdoc.test.example_pkg.module.B.overridden_same_docstring"><code class="name flex">
-<span>def <span class="ident">overridden_same_docstring</span></span>(<span>self)</span>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="pdoc.test.example_pkg.module.A" href="#pdoc.test.example_pkg.module.A">A</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pdoc.test.example_pkg.module.A.inherited" href="#pdoc.test.example_pkg.module.A.inherited">inherited</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.A.overridden_same_docstring" href="#pdoc.test.example_pkg.module.A.overridden_same_docstring">overridden_same_docstring</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="pdoc.test.example_pkg.module.C"><code class="flex name class">
+<span>class <span class="ident">C</span></span>
+<span>(</span><span><small>ancestors:</small> <a title="pdoc.test.example_pkg.module.B" href="#pdoc.test.example_pkg.module.B">B</a>, <a title="pdoc.test.example_pkg.module.A" href="#pdoc.test.example_pkg.module.A">A</a>, builtins.int)</span>
 </code></dt>
 <dd>
 <p class="inheritance">
 <em>Inherited from:</em>
-<code><a title="pdoc.test.example_pkg.module.A" href="#pdoc.test.example_pkg.module.A">A</a></code>.<code><a title="pdoc.test.example_pkg.module.A.overridden_same_docstring" href="#pdoc.test.example_pkg.module.A.overridden_same_docstring">overridden_same_docstring</a></code>
+<code><a title="pdoc.test.example_pkg.module.B" href="#pdoc.test.example_pkg.module.B">B</a></code>
 </p>
-<section class="desc inherited"><p>A.overridden_same_docstring docstring</p></section>
+<section class="desc inherited"><p>B docstring …</p></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def overridden_same_docstring(self):
-    pass}</code></pre>
+<pre><code class="python">class C(B): pass  # noqa: E701, E302}</code></pre>
 </details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="pdoc.test.example_pkg.module.D" href="#pdoc.test.example_pkg.module.B">D</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="pdoc.test.example_pkg.module.B" href="#pdoc.test.example_pkg.module.B">B</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pdoc.test.example_pkg.module.B.__init__" href="#pdoc.test.example_pkg.module.B.__init__">__init__</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.C" href="#pdoc.test.example_pkg.module.B.C">C</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.CONST" href="#pdoc.test.example_pkg.module.B.CONST">CONST</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.cls" href="#pdoc.test.example_pkg.module.B.cls">cls</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.f" href="#pdoc.test.example_pkg.module.B.f">f</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.inherited" href="#pdoc.test.example_pkg.module.A.inherited">inherited</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.instance_var" href="#pdoc.test.example_pkg.module.B.instance_var">instance_var</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.overridden" href="#pdoc.test.example_pkg.module.B.overridden">overridden</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.overridden_same_docstring" href="#pdoc.test.example_pkg.module.A.overridden_same_docstring">overridden_same_docstring</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.p" href="#pdoc.test.example_pkg.module.B.p">p</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.static" href="#pdoc.test.example_pkg.module.B.static">static</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.var" href="#pdoc.test.example_pkg.module.B.var">var</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
-</dl>
+<dt id="pdoc.test.example_pkg.module.D"><code class="flex name class">
+<span>class <span class="ident">D</span></span>
+<span>(</span><span><small>ancestors:</small> <a title="pdoc.test.example_pkg.module.C" href="#pdoc.test.example_pkg.module.B">C</a>, <a title="pdoc.test.example_pkg.module.B" href="#pdoc.test.example_pkg.module.B">B</a>, <a title="pdoc.test.example_pkg.module.A" href="#pdoc.test.example_pkg.module.A">A</a>, builtins.int)</span>
+</code></dt>
+<dd>
+<p class="inheritance">
+<em>Inherited from:</em>
+<code><a title="pdoc.test.example_pkg.module.C" href="#pdoc.test.example_pkg.module.B">C</a></code>
+</p>
+<section class="desc inherited"><p>B docstring …</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">class D(C): pass  # noqa: E701, E302}</code></pre>
+</details>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="pdoc.test.example_pkg.module.C" href="#pdoc.test.example_pkg.module.B">C</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pdoc.test.example_pkg.module.C.__init__" href="#pdoc.test.example_pkg.module.B.__init__">__init__</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.C.C" href="#pdoc.test.example_pkg.module.B.C">C</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.C.CONST" href="#pdoc.test.example_pkg.module.B.CONST">CONST</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.C.cls" href="#pdoc.test.example_pkg.module.B.cls">cls</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.C.f" href="#pdoc.test.example_pkg.module.B.f">f</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.C.inherited" href="#pdoc.test.example_pkg.module.A.inherited">inherited</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.C.instance_var" href="#pdoc.test.example_pkg.module.B.instance_var">instance_var</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.C.overridden" href="#pdoc.test.example_pkg.module.B.overridden">overridden</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.C.overridden_same_docstring" href="#pdoc.test.example_pkg.module.A.overridden_same_docstring">overridden_same_docstring</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.C.p" href="#pdoc.test.example_pkg.module.B.p">p</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.C.static" href="#pdoc.test.example_pkg.module.B.static">static</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.C.var" href="#pdoc.test.example_pkg.module.B.var">var</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="pdoc.test.example_pkg.module.Docformats"><code class="flex name class">
 <span>class <span class="ident">Docformats</span></span>
@@ -1267,14 +1331,23 @@ across multiple lines:</p>
 <li>
 <h4><code><a title="pdoc.test.example_pkg.module.B" href="#pdoc.test.example_pkg.module.B">B</a></code></h4>
 <ul class="two-column">
+<li><code><a title="pdoc.test.example_pkg.module.B.C" href="#pdoc.test.example_pkg.module.B.C">C</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.CONST" href="#pdoc.test.example_pkg.module.B.CONST">CONST</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.module.B.__init__" href="#pdoc.test.example_pkg.module.B.__init__">__init__</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.module.B.cls" href="#pdoc.test.example_pkg.module.B.cls">cls</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.module.B.f" href="#pdoc.test.example_pkg.module.B.f">f</a></code></li>
-<li><code><a title="pdoc.test.example_pkg.module.B.inherited" href="#pdoc.test.example_pkg.module.B.inherited">inherited</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.instance_var" href="#pdoc.test.example_pkg.module.B.instance_var">instance_var</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.module.B.overridden" href="#pdoc.test.example_pkg.module.B.overridden">overridden</a></code></li>
-<li><code><a title="pdoc.test.example_pkg.module.B.overridden_same_docstring" href="#pdoc.test.example_pkg.module.B.overridden_same_docstring">overridden_same_docstring</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.p" href="#pdoc.test.example_pkg.module.B.p">p</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.module.B.static" href="#pdoc.test.example_pkg.module.B.static">static</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.module.B.var" href="#pdoc.test.example_pkg.module.B.var">var</a></code></li>
 </ul>
+</li>
+<li>
+<h4><code><a title="pdoc.test.example_pkg.module.C" href="#pdoc.test.example_pkg.module.B">C</a></code></h4>
+</li>
+<li>
+<h4><code><a title="pdoc.test.example_pkg.module.D" href="#pdoc.test.example_pkg.module.B">D</a></code></h4>
 </li>
 <li>
 <h4><code><a title="pdoc.test.example_pkg.module.Docformats" href="#pdoc.test.example_pkg.module.Docformats">Docformats</a></code></h4>
@@ -1292,7 +1365,7 @@ across multiple lines:</p>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.0rc4</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.0</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

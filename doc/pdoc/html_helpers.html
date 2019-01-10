@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.5.0rc4" />
+<meta name="generator" content="pdoc 0.5.0" />
 <title>pdoc.html_helpers API documentation</title>
 <meta name="description" content="Helper functions for HTML output." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -32,6 +32,7 @@ Helper functions for HTML output.
 import inspect
 import re
 from functools import partial, lru_cache
+from typing import Callable
 from warnings import warn
 
 import markdown
@@ -40,7 +41,7 @@ import pdoc
 
 
 @lru_cache()
-def minify_css(css,
+def minify_css(css: str,
                _whitespace=partial(re.compile(r&#39;\s*([,{:;}])\s*&#39;).sub, r&#39;\1&#39;),
                _comments=partial(re.compile(r&#39;/\*.*?\*/&#39;, flags=re.DOTALL).sub, &#39;&#39;),
                _trailing_semicolon=partial(re.compile(r&#39;;\s*}&#39;).sub, &#39;}&#39;)):
@@ -50,7 +51,7 @@ def minify_css(css,
     return _trailing_semicolon(_whitespace(_comments(css))).strip()
 
 
-def minify_html(html,
+def minify_html(html: str,
                 _minify=partial(
                     re.compile(r&#39;(.*?)(&lt;pre\b.*?&lt;/pre\b\s*&gt;)|(.*)&#39;, re.IGNORECASE | re.DOTALL).sub,
                     lambda m, _norm_space=partial(re.compile(r&#39;\s\s+&#39;).sub, &#39;\n&#39;): (
@@ -64,7 +65,7 @@ def minify_html(html,
     return _minify(html)
 
 
-def glimpse(text, max_length=153, *, paragraph=True,
+def glimpse(text: str, max_length=153, *, paragraph=True,
             _split_paragraph=partial(re.compile(r&#39;\s*\n\s*\n\s*&#39;).split, maxsplit=1),
             _trim_last_word=partial(re.compile(r&#39;\S+$&#39;).sub, &#39;&#39;),
             _remove_titles=partial(re.compile(r&#39;^(#+|-{4,}|={4,})&#39;, re.MULTILINE).sub, &#39; &#39;)):
@@ -274,8 +275,8 @@ class _ToMarkdown:
         return _indent_doctests(text)
 
 
-def to_html(text, docformat: str = &#39;numpy,google&#39;, *,
-            module: pdoc.Module = None, link=None,
+def to_html(text: str, docformat: str = &#39;numpy,google&#39;, *,
+            module: pdoc.Module = None, link: Callable[..., str] = None,
             # Matches markdown code spans not +directly+ within links.
             # E.g. `code` and [foo is `bar`]() but not [`code`](...)
             # Also skips \-escaped grave quotes.
@@ -309,7 +310,6 @@ def to_html(text, docformat: str = &#39;numpy,google&#39;, *,
             nonlocal link, module
             matched = match.group(0)
             refname = matched[1:-1]
-            refname = refname.rstrip(&#39;()&#39;)  # Function specified with parentheses
             dobj = module.find_ident(refname)
             if isinstance(dobj, pdoc.External):
                 if not _is_pyident(refname):
@@ -328,7 +328,7 @@ def to_html(text, docformat: str = &#39;numpy,google&#39;, *,
     return _md.reset().convert(text)
 
 
-def extract_toc(text):
+def extract_toc(text: str):
     &#34;&#34;&#34;
     Returns HTML Table of Contents containing markdown titles in `text`.
     &#34;&#34;&#34;
@@ -352,7 +352,7 @@ def extract_toc(text):
 <section class="desc"><p>Returns HTML Table of Contents containing markdown titles in <code>text</code>.</p></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def extract_toc(text):
+<pre><code class="python">def extract_toc(text: str):
     &#34;&#34;&#34;
     Returns HTML Table of Contents containing markdown titles in `text`.
     &#34;&#34;&#34;
@@ -371,7 +371,7 @@ If <code>paragraph</code> is True, the first paragraph will be returned,
 but never longer than <code>max_length</code> characters.</p></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def glimpse(text, max_length=153, *, paragraph=True,
+<pre><code class="python">def glimpse(text: str, max_length=153, *, paragraph=True,
             _split_paragraph=partial(re.compile(r&#39;\s*\n\s*\n\s*&#39;).split, maxsplit=1),
             _trim_last_word=partial(re.compile(r&#39;\S+$&#39;).sub, &#39;&#39;),
             _remove_titles=partial(re.compile(r&#39;^(#+|-{4,}|={4,})&#39;, re.MULTILINE).sub, &#39; &#39;)):
@@ -403,7 +403,7 @@ but never longer than <code>max_length</code> characters.</p></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">@lru_cache()
-def minify_css(css,
+def minify_css(css: str,
                _whitespace=partial(re.compile(r&#39;\s*([,{:;}])\s*&#39;).sub, r&#39;\1&#39;),
                _comments=partial(re.compile(r&#39;/\*.*?\*/&#39;, flags=re.DOTALL).sub, &#39;&#39;),
                _trailing_semicolon=partial(re.compile(r&#39;;\s*}&#39;).sub, &#39;}&#39;)):
@@ -421,7 +421,7 @@ def minify_css(css,
 (or newline) character, except inside <code>&lt;pre&gt;</code> tags.</p></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def minify_html(html,
+<pre><code class="python">def minify_html(html: str,
                 _minify=partial(
                     re.compile(r&#39;(.*?)(&lt;pre\b.*?&lt;/pre\b\s*&gt;)|(.*)&#39;, re.IGNORECASE | re.DOTALL).sub,
                     lambda m, _norm_space=partial(re.compile(r&#39;\s\s+&#39;).sub, &#39;\n&#39;): (
@@ -447,8 +447,8 @@ resolved) and <code>link</code> is the hyperlinking function like the one in the
 example template.</p></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def to_html(text, docformat: str = &#39;numpy,google&#39;, *,
-            module: pdoc.Module = None, link=None,
+<pre><code class="python">def to_html(text: str, docformat: str = &#39;numpy,google&#39;, *,
+            module: pdoc.Module = None, link: Callable[..., str] = None,
             # Matches markdown code spans not +directly+ within links.
             # E.g. `code` and [foo is `bar`]() but not [`code`](...)
             # Also skips \-escaped grave quotes.
@@ -482,7 +482,6 @@ example template.</p></section>
             nonlocal link, module
             matched = match.group(0)
             refname = matched[1:-1]
-            refname = refname.rstrip(&#39;()&#39;)  # Function specified with parentheses
             dobj = module.find_ident(refname)
             if isinstance(dobj, pdoc.External):
                 if not _is_pyident(refname):
@@ -565,7 +564,7 @@ doesn't match any documented objects.</p>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.0rc4</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.0</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
