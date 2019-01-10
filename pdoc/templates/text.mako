@@ -1,33 +1,29 @@
 ## Define mini-templates for each portion of the doco.
 
 <%!
-  import re
-
   def indent(s, spaces=4):
-      """
-      Inserts `spaces` after each string of new lines in `s`
-      and before the start of the string.
-      """
-      new = re.sub('(\n+)', '\\1%s' % (' ' * spaces), s)
-      return (' ' * spaces) + new.strip()
+      new = s.replace('\n', '\n' + ' ' * spaces)
+      return ' ' * spaces + new.strip()
 %>
 
-<%def name="function(func)" filter="trim">
-${func.name}(${", ".join(func.params())})
-${func.docstring | indent}
+<%def name="deflist(s)">:${indent(s)[1:]}</%def>
+
+<%def name="h3(s)">### ${s}
 </%def>
 
-<%def name="variable(var)" filter="trim">
-${var.name}
-${var.docstring | indent}
+<%def name="function(func)" buffered="True">
+`${func.name}(${", ".join(func.params())})`
+${func.docstring | deflist}
 </%def>
 
-<%def name="class_(cls)" filter="trim">
-${cls.name} \
-% if len(cls.docstring) > 0:
+<%def name="variable(var)" buffered="True">
+`${var.name}`
+${var.docstring | deflist}
+</%def>
 
-${cls.docstring | indent}
-% endif
+<%def name="class_(cls)" buffered="True">
+`${cls.name}`
+${cls.docstring | deflist}
 <%
   class_vars = cls.class_variables()
   static_methods = cls.functions()
@@ -36,51 +32,45 @@ ${cls.docstring | indent}
   mro = cls.mro()
   subclasses = cls.subclasses()
 %>
-% if len(mro) > 0:
-    Ancestors (in MRO)
-    ------------------
+% if mro:
+    ${h3('Ancestors (in MRO)')}
     % for c in mro:
-    ${c.refname}
+    * ${c.refname}
     % endfor
 
 % endif
-% if len(subclasses) > 0:
-    Descendents
-    -----------
+% if subclasses:
+    ${h3('Descendants')}
     % for c in subclasses:
-    ${c.refname}
+    * ${c.refname}
     % endfor
 
 % endif
-% if len(class_vars) > 0:
-    Class variables
-    ---------------
+% if class_vars:
+    ${h3('Class variables')}
     % for v in class_vars:
-${capture(variable, v) | indent}
+${variable(v) | indent}
 
     % endfor
 % endif
-% if len(static_methods) > 0:
-    Static methods
-    --------------
+% if static_methods:
+    ${h3('Static methods')}
     % for f in static_methods:
-${capture(function, f) | indent}
+${function(f) | indent}
 
     % endfor
 % endif
-% if len(inst_vars) > 0:
-    Instance variables
-    ------------------
+% if inst_vars:
+    ${h3('Instance variables')}
     % for v in inst_vars:
-${capture(variable, v) | indent}
+${variable(v) | indent}
 
     % endfor
 % endif
-% if len(methods) > 0:
-    Methods
-    -------
+% if methods:
+    ${h3('Methods')}
     % for m in methods:
-${capture(function, m) | indent}
+${function(m) | indent}
 
     % endfor
 % endif
@@ -96,11 +86,19 @@ ${capture(function, m) | indent}
 %>
 
 Module ${module.name}
--------${'-' * len(module.name)}
+=======${'=' * len(module.name)}
 ${module.docstring}
 
 
-% if len(variables) > 0:
+% if submodules:
+Sub-modules
+-----------
+    % for m in submodules:
+* ${m.name}
+    % endfor
+% endif
+
+% if variables:
 Variables
 ---------
     % for v in variables:
@@ -109,8 +107,7 @@ ${variable(v)}
     % endfor
 % endif
 
-
-% if len(functions) > 0:
+% if functions:
 Functions
 ---------
     % for f in functions:
@@ -119,21 +116,11 @@ ${function(f)}
     % endfor
 % endif
 
-
-% if len(classes) > 0:
+% if classes:
 Classes
 -------
     % for c in classes:
 ${class_(c)}
 
-    % endfor
-% endif
-
-
-% if len(submodules) > 0:
-Sub-modules
------------
-    % for m in submodules:
-    ${m.name}
     % endfor
 % endif

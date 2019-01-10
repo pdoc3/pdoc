@@ -286,7 +286,7 @@ class CliTest(unittest.TestCase):
                 run(EXAMPLE_MODULE)
                 out = stdout.getvalue()
 
-            header = 'Module {}\n{:-<{}}'.format(EXAMPLE_MODULE, '',
+            header = 'Module {}\n{:=<{}}'.format(EXAMPLE_MODULE, '',
                                                  len('Module ') + len(EXAMPLE_MODULE))
             self.assertIn(header, out)
             for pattern in include_patterns:
@@ -310,7 +310,7 @@ class CliTest(unittest.TestCase):
             run(EXAMPLE_MODULE, filter='A')
             out = stdout.getvalue()
         self.assertIn('A', out)
-        self.assertIn('Descendents\n    -----------\n    example_pkg.B', out)
+        self.assertIn('### Descendants\n\n    * example_pkg.B', out)
         self.assertNotIn('CONST', out)
         self.assertNotIn('B docstring', out)
 
