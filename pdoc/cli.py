@@ -102,6 +102,8 @@ aa(
          "and port ({}:{}), set the parameter to :.".format(DEFAULT_HOST, DEFAULT_PORT),
 )
 
+args = argparse.Namespace()
+
 
 class WebDoc(BaseHTTPRequestHandler):
     args = None  # Set before server instantiated

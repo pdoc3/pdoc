@@ -50,8 +50,8 @@ def chdir(path):
 def run(*args, _check=True, **kwargs) -> int:
     params = (('--' + key.replace('_', '-'), value)
               for key, value in kwargs.items())
-    params = list(filter(None, chain.from_iterable(params)))
-    _args = parser.parse_args([*params, *args])
+    params = list(filter(None, chain.from_iterable(params)))  # type: ignore
+    _args = parser.parse_args([*params, *args])               # type: ignore
     try:
         returncode = main(_args)
         return returncode or 0
@@ -347,6 +347,12 @@ class ApiTest(unittest.TestCase):
         m = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + '._private'))
         self.assertEqual(sorted(m.name for m in m.submodules()),
                          [EXAMPLE_MODULE + '._private.module'])
+
+    def test_instance_var(self):
+        pdoc.reset()
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        var = mod.doc['B'].doc['instance_var']
+        self.assertTrue(var.instance_var)
 
     def test_refname(self):
         mod = EXAMPLE_MODULE + '.' + 'subpkg'

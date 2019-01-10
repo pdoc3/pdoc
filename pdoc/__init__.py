@@ -329,7 +329,8 @@ import sys
 from copy import copy
 from functools import lru_cache, reduce
 from itertools import tee, groupby
-from typing import Dict, Iterable, List, Set, Type, TypeVar, Union
+from types import ModuleType
+from typing import Dict, Iterable, List, Set, Type, TypeVar, Union, Tuple, Generator, Callable
 from warnings import warn
 
 from mako.lookup import TemplateLookup
@@ -345,7 +346,7 @@ _URL_MODULE_SUFFIX = '.html'
 _URL_INDEX_MODULE_SUFFIX = '.m.html'  # For modules named literal 'index'
 _URL_PACKAGE_SUFFIX = '/index.html'
 
-T = TypeVar('T')
+T = TypeVar('T', bound='Doc')
 
 __pdoc__ = {}  # type: Dict[str, Union[bool, str]]
 
@@ -361,7 +362,7 @@ from the file system. You may add additional paths by modifying the
 object's `directories` attribute.
 """
 if os.getenv("XDG_CONFIG_HOME"):
-    tpl_lookup.directories.insert(0, path.join(os.getenv("XDG_CONFIG_HOME"), "pdoc"))
+    tpl_lookup.directories.insert(0, path.join(os.getenv("XDG_CONFIG_HOME", ''), "pdoc"))
 
 
 class Context(dict):
@@ -468,7 +469,7 @@ def text(module_name, docfilter=None, **kwargs) -> str:
     return mod.text(**kwargs)
 
 
-def import_module(module: str):
+def import_module(module) -> ModuleType:
     """
     Return module object matching `module` specification (either a python
     module path or a filesystem path to file/directory).
@@ -540,7 +541,8 @@ def _pairwise(iterable):
     return zip(a, b)
 
 
-def _var_docstrings(doc_obj: 'Doc', *, _init_tree: ast.AST = None) -> dict:
+def _var_docstrings(doc_obj: Union['Module', 'Class'], *,
+                    _init_tree: ast.FunctionDef = None) -> Dict[str, 'Variable']:
     """
     Extracts docstrings for variables of `doc_obj`
     (either a `pdoc.Module` or `pdoc.Class`).
@@ -551,10 +553,8 @@ def _var_docstrings(doc_obj: 'Doc', *, _init_tree: ast.AST = None) -> dict:
     variables (defined as `self.something` in class' `__init__`),
     recognized by `Variable.instance_var == True`.
     """
-    assert isinstance(doc_obj, (Module, Class))
-
     if _init_tree:
-        tree = _init_tree
+        tree = _init_tree  # type: Union[ast.Module, ast.FunctionDef]
     else:
         try:
             tree = ast.parse(inspect.getsource(doc_obj.obj))
@@ -562,9 +562,9 @@ def _var_docstrings(doc_obj: 'Doc', *, _init_tree: ast.AST = None) -> dict:
             warn("Couldn't get/parse source of '{!r}'".format(doc_obj))
             return {}
         if isinstance(doc_obj, Class):
-            tree = tree.body[0]  # ast.parse creates a dummy ast.Module wrapper we don't need
+            tree = tree.body[0]  # type: ignore  # ast.parse creates a dummy ast.Module wrapper
 
-    vs = {}
+    vs = {}  # type: Dict[str, Variable]
 
     cls = None
     module = doc_obj
@@ -591,9 +591,10 @@ def _var_docstrings(doc_obj: 'Doc', *, _init_tree: ast.AST = None) -> dict:
         module_all = set(module_all)
 
     try:
-        ast_AnnAssign = ast.AnnAssign
+        ast_AnnAssign = ast.AnnAssign   # type: Type
     except AttributeError:  # Python < 3.6
         ast_AnnAssign = type(None)
+
     ast_Assignments = (ast.Assign, ast_AnnAssign)
 
     for assign_node, str_node in _pairwise(ast.iter_child_nodes(tree)):
@@ -653,12 +654,12 @@ def _filter_type(type: Type[T],
     return [i for i in values if isinstance(i, type)]
 
 
-def _toposort(graph: Dict[T, Set[T]]) -> List[T]:
+def _toposort(graph: Dict[T, Set[T]]) -> Generator[T, None, None]:
     """
     Return items of `graph` sorted in topological order.
     Source: https://rosettacode.org/wiki/Topological_sort#Python
     """
-    items_without_deps = reduce(set.union, graph.values(), set()) - set(graph.keys())
+    items_without_deps = reduce(set.union, graph.values(), set()) - set(graph.keys())  # type: ignore  # noqa: E501
     yield from items_without_deps
     ordered = items_without_deps
     while True:
@@ -751,9 +752,9 @@ class Doc:
     def __repr__(self):
         return '<{} {!r}>'.format(self.__class__.__name__, self.refname)
 
-    @property
+    @property  # type: ignore
     @lru_cache()
-    def source(self):
+    def source(self) -> str:
         """
         Cleaned (dedented) source code of the Python object. If not
         available, an empty string.
@@ -834,7 +835,8 @@ class Module(Doc):
 
     __slots__ = ('supermodule', 'doc', '_context', '_is_inheritance_linked')
 
-    def __init__(self, module, *, docfilter=None, supermodule=None, context=None):
+    def __init__(self, module: ModuleType, *, docfilter: Callable[[Doc], bool] = None,
+                 supermodule: 'Module' = None, context: Context = None):
         """
         Creates a `Module` documentation object given the actual
         module Python object.
@@ -861,7 +863,7 @@ class Module(Doc):
         The parent `pdoc.Module` this module is a submodule of, or `None`.
         """
 
-        self.doc = {}
+        self.doc = {}  # type: Dict[str, Doc]
         """A mapping from identifier name to a documentation object."""
 
         self._is_inheritance_linked = False
@@ -977,14 +979,14 @@ class Module(Doc):
 
         self._is_inheritance_linked = True
 
-    def text(self, **kwargs):
+    def text(self, **kwargs) -> str:
         """
         Returns the documentation for this module as plain text.
         """
         txt = _render_template('/text.mako', module=self, **kwargs)
         return re.sub("\n\n\n+", "\n\n", txt)
 
-    def html(self, external_links=False, link_prefix="", source=True, minify=True, **kwargs):
+    def html(self, external_links=False, link_prefix="", source=True, minify=True, **kwargs) -> str:
         """
         Returns the documentation for this module as
         self-contained HTML.
@@ -1025,7 +1027,7 @@ class Module(Doc):
         # If not, see what was here before.
         return self.find_ident(cls.__module__ + '.' + cls.__qualname__)
 
-    def find_ident(self, name: str):
+    def find_ident(self, name: str) -> Doc:
         """
         Searches this module and **all** other public modules
         for an identifier with name `name` in its list of
@@ -1040,7 +1042,7 @@ class Module(Doc):
                 self._context.get(self.name + '.' + name) or
                 External(name))
 
-    def _filter_doc_objs(self, type: type = Doc):
+    def _filter_doc_objs(self, type: Type[T]) -> List[T]:
         return sorted(_filter_type(type, self.doc))
 
     def variables(self):
@@ -1162,7 +1164,7 @@ class Class(Doc):
             classes = _filter_type(Class, classes)
         return classes
 
-    def subclasses(self):
+    def subclasses(self) -> List['Class']:
         """
         Returns a list of subclasses of this class that are visible to the
         Python interpreter (obtained from type.__subclasses__()).
@@ -1173,8 +1175,9 @@ class Class(Doc):
         return [self.module.find_class(c)
                 for c in self.obj.__subclasses__()]
 
-    def _filter_doc_objs(self, include_inherited=True, filter_func=lambda x: True):
-        return sorted(obj for obj in self.doc.values()
+    def _filter_doc_objs(self, type: Type[T], include_inherited=True,
+                         filter_func: Callable[[T], bool] = lambda x: True) -> List[T]:
+        return sorted(obj for obj in _filter_type(type, self.doc)
                       if (include_inherited or not obj.inherits) and filter_func(obj))
 
     def class_variables(self, include_inherited=True):
@@ -1183,8 +1186,7 @@ class Class(Doc):
         alphabetically as a list of `pdoc.Variable`.
         """
         return self._filter_doc_objs(
-            include_inherited,
-            lambda var: isinstance(var, Variable) and not var.instance_var)
+            Variable, include_inherited, lambda dobj: not dobj.instance_var)
 
     def instance_variables(self, include_inherited=True):
         """
@@ -1193,8 +1195,7 @@ class Class(Doc):
         are those defined in a class's `__init__` as `self.variable = ...`.
         """
         return self._filter_doc_objs(
-            include_inherited,
-            lambda var: isinstance(var, Variable) and var.instance_var)
+            Variable, include_inherited, lambda dobj: dobj.instance_var)
 
     def methods(self, include_inherited=True):
         """
@@ -1203,19 +1204,17 @@ class Class(Doc):
         with `__init__` always coming first.
         """
         return self._filter_doc_objs(
-            include_inherited,
-            lambda f: isinstance(f, Function) and f.method)
+            Function, include_inherited, lambda dobj: dobj.method)
 
-    def functions(self, include_inherited=True):
+    def functions(self, include_inherited=True) -> List['Function']:
         """
         Returns all documented static functions as `pdoc.Function`
         objects in the class, sorted alphabetically.
         """
         return self._filter_doc_objs(
-            include_inherited,
-            lambda f: isinstance(f, Function) and not f.method)
+            Function, include_inherited, lambda dobj: not dobj.method)
 
-    def inherited_members(self):
+    def inherited_members(self) -> List[Tuple['Class', List[Doc]]]:
         """
         Returns all inherited members as a list of tuples
         (ancestor class, list of ancestor class' members sorted by name),
@@ -1225,7 +1224,7 @@ class Class(Doc):
                        for k, g in groupby((i.inherits
                                             for i in self.doc.values() if i.inherits),
                                            key=lambda i: i.cls)),
-                      key=lambda x, _mro_index=self.mro().index: _mro_index(x[0]))
+                      key=lambda x, _mro_index=self.mro().index: _mro_index(x[0]))  # type: ignore
 
     def _fill_inheritance(self):
         """
@@ -1278,7 +1277,7 @@ class Function(Doc):
     """
     __slots__ = ('cls', 'method')
 
-    def __init__(self, name, module, obj, *, cls=None, method=False):
+    def __init__(self, name, module, obj, *, cls: Class = None, method=False):
         """
         Same as `pdoc.Doc.__init__`, except `obj` must be a
         Python function object. The docstring is gathered automatically.
@@ -1328,7 +1327,7 @@ class Function(Doc):
             return False
 
     @lru_cache()
-    def params(self):
+    def params(self) -> List[str]:
         """
         Returns a list where each element is a nicely formatted
         parameter of this function. This includes argument lists,
@@ -1401,7 +1400,8 @@ class Variable(Doc):
     """
     __slots__ = ('cls', 'instance_var')
 
-    def __init__(self, name, module, docstring, *, obj=None, cls=None, instance_var=False):
+    def __init__(self, name, module, docstring, *,
+                 obj=None, cls: Class = None, instance_var=False):
         """
         Same as `pdoc.Doc.__init__`, except `cls` should be provided
         as a `pdoc.Class` object when this is a class or instance

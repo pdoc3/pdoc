@@ -17,9 +17,10 @@ matrix:
     - python: '3.7'
       name: 'Lint, Coverage'
       before_script:
-        - pip install flake8 coverage
+        - pip install flake8 coverage mypy
       script:
-        - flake8 --max-line-length=100 .
+        - flake8
+        - mypy pdoc
         - time catchsegv coverage run setup.py test
       after_success:
         - bash <(curl -s https://codecov.io/bash)

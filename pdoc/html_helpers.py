@@ -4,6 +4,7 @@ Helper functions for HTML output.
 import inspect
 import re
 from functools import partial, lru_cache
+from typing import Callable
 from warnings import warn
 
 import markdown
@@ -12,7 +13,7 @@ import pdoc
 
 
 @lru_cache()
-def minify_css(css,
+def minify_css(css: str,
                _whitespace=partial(re.compile(r'\s*([,{:;}])\s*').sub, r'\1'),
                _comments=partial(re.compile(r'/\*.*?\*/', flags=re.DOTALL).sub, ''),
                _trailing_semicolon=partial(re.compile(r';\s*}').sub, '}')):
@@ -22,7 +23,7 @@ def minify_css(css,
     return _trailing_semicolon(_whitespace(_comments(css))).strip()
 
 
-def minify_html(html,
+def minify_html(html: str,
                 _minify=partial(
                     re.compile(r'(.*?)(<pre\b.*?</pre\b\s*>)|(.*)', re.IGNORECASE | re.DOTALL).sub,
                     lambda m, _norm_space=partial(re.compile(r'\s\s+').sub, '\n'): (
@@ -36,7 +37,7 @@ def minify_html(html,
     return _minify(html)
 
 
-def glimpse(text, max_length=153, *, paragraph=True,
+def glimpse(text: str, max_length=153, *, paragraph=True,
             _split_paragraph=partial(re.compile(r'\s*\n\s*\n\s*').split, maxsplit=1),
             _trim_last_word=partial(re.compile(r'\S+$').sub, ''),
             _remove_titles=partial(re.compile(r'^(#+|-{4,}|={4,})', re.MULTILINE).sub, ' ')):
@@ -246,8 +247,8 @@ class _ToMarkdown:
         return _indent_doctests(text)
 
 
-def to_html(text, docformat: str = 'numpy,google', *,
-            module: pdoc.Module = None, link=None,
+def to_html(text: str, docformat: str = 'numpy,google', *,
+            module: pdoc.Module = None, link: Callable[..., str] = None,
             # Matches markdown code spans not +directly+ within links.
             # E.g. `code` and [foo is `bar`]() but not [`code`](...)
             # Also skips \-escaped grave quotes.
@@ -300,7 +301,7 @@ def to_html(text, docformat: str = 'numpy,google', *,
     return _md.reset().convert(text)
 
 
-def extract_toc(text):
+def extract_toc(text: str):
     """
     Returns HTML Table of Contents containing markdown titles in `text`.
     """
