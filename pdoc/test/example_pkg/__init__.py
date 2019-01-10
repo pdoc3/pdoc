@@ -91,6 +91,10 @@ class B(A, int):
         pass
 
 
+class C(B): pass  # noqa: E701, E302
+class D(C): pass  # noqa: E701, E302
+
+
 class Hidden:
     __pdoc__['Hidden'] = False
 

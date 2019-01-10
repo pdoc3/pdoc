@@ -7,6 +7,7 @@ import signal
 import sys
 import threading
 import unittest
+import warnings
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from glob import glob
 from io import StringIO
@@ -94,6 +95,9 @@ class CliTest(unittest.TestCase):
         'example_pkg/subpkg2/index.html',
     ]
     PUBLIC_FILES = [f for f in ALL_FILES if '/_' not in f]
+
+    def setUp(self):
+        pdoc.reset()
 
     def _basic_html_assertions(self, expected_files=PUBLIC_FILES):
         # Output directory tree layout is as expected
@@ -315,6 +319,9 @@ class ApiTest(unittest.TestCase):
     """
     Programmatic/API unit tests.
     """
+    def setUp(self):
+        pdoc.reset()
+
     def test_module(self):
         modules = {
             EXAMPLE_MODULE: ('', ('index', 'module', 'subpkg', 'subpkg2')),
@@ -359,6 +366,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(method.refname, mod + '.B.f')
 
         # Inherited method's refname points to class' implicit copy
+        pdoc.link_inheritance()
         self.assertEqual(cls.doc['inherited'].refname, mod + '.B.inherited')
 
     def test_qualname(self):
@@ -381,11 +389,13 @@ class ApiTest(unittest.TestCase):
         module = pdoc.import_module(EXAMPLE_MODULE)
         with patch.object(module, '__pdoc__', {'B': False}):
             mod = pdoc.Module(module)
+            pdoc.link_inheritance()
             self.assertIn('A', mod.doc)
             self.assertNotIn('B', mod.doc)
 
         with patch.object(module, '__pdoc__', {'B.__init__': False}):
             mod = pdoc.Module(module)
+            pdoc.link_inheritance()
             self.assertIn('B', mod.doc)
             self.assertNotIn('__init__', mod.doc['B'].doc)
             self.assertIsInstance(mod.find_ident('B.__init__'), pdoc.External)
@@ -395,6 +405,7 @@ class ApiTest(unittest.TestCase):
         with patch.object(module, '__pdoc__', {'B': 1}), \
                 self.assertRaises(ValueError):
             pdoc.Module(module)
+            pdoc.link_inheritance()
 
     def test_find_ident(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
@@ -406,6 +417,8 @@ class ApiTest(unittest.TestCase):
 
     def test_inherits(self):
         module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        pdoc.link_inheritance()
+
         a = module.doc['A']
         b = module.doc['B']
         self.assertEqual(b.doc['inherited'].inherits,
@@ -415,13 +428,41 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(b.doc['overridden'].inherits,
                          None)
 
+        c = module.doc['C']
+        d = module.doc['D']
+        self.assertEqual(d.doc['overridden'].inherits, c.doc['overridden'])
+        self.assertEqual(c.doc['overridden'].inherits, b.doc['overridden'])
+
     def test_inherited_members(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        pdoc.link_inheritance()
         a = mod.doc['A']
         b = mod.doc['B']
         self.assertEqual(b.inherited_members(), [(a, [a.doc['inherited'],
                                                       a.doc['overridden_same_docstring']])])
         self.assertEqual(a.inherited_members(), [])
+
+    def test_link_inheritance(self):
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        with warnings.catch_warnings(record=True) as w:
+            pdoc.link_inheritance()
+            pdoc.link_inheritance()
+        self.assertFalse(w)
+
+        mod._is_inheritance_linked = False
+        with self.assertWarns(UserWarning):
+            pdoc.link_inheritance()
+
+        # Test inheritance across modules
+        pdoc.reset()
+        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + '._test_linking'))
+        pdoc.link_inheritance()
+        a = mod.doc['a'].doc['A']
+        b = mod.doc['b'].doc['B']
+        c = mod.doc['b'].doc['c'].doc['C']
+        self.assertEqual(b.inherits, a)
+        self.assertEqual(b.doc['a'].inherits, a.doc['a'])
+        self.assertEqual(b.doc['c'].inherits, c.doc['c'])
 
     def test_context(self):
         context = {}

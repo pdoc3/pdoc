@@ -236,13 +236,36 @@ Programmatic usage
 ------------------
 The main entry point is `pdoc.Module` which wraps a module object
 and recursively imports and wraps any submodules and their members.
-After all related modules are wrapped (modules that share the
-same `pdoc.Context`, i.e., for cross-linking), you can use
-`pdoc.Module.html` and `pdoc.Module.text` methods to output
-documentation in the desired format.
 
-When documenting a single top-level module, you might find
-the functions `pdoc.html` and `pdoc.text` handy.
+After all related modules are wrapped (related modules are those that
+share the same `pdoc.Context`), you need to call
+`pdoc.link_inheritance` with the used `Context` instance to
+establish class inheritance links.
+
+Afterwards, you can use `pdoc.Module.html` and `pdoc.Module.text`
+methods to output documentation in the desired format.
+For example:
+
+    import pdoc
+
+    modules = ['a', 'b']  # Public submodules are auto-imported
+    context = pdoc.Context()
+
+    modules = [pdoc.Module(mod, context=context)
+               for mod in modules]
+    pdoc.link_inheritance(context)
+
+    def recursive_htmls(mod):
+        yield mod.name, mod.html()
+        for submod in mod.submodules():
+            yield from recursive_htmls(submod)
+
+    for mod in modules:
+        for module_name, html in recursive_htmls(mod):
+            ...  # Process
+
+When documenting a single module, you might find
+functions `pdoc.html` and `pdoc.text` handy.
 For importing arbitrary modules/files, use `pdoc.import_module`.
 
 Alternatively, use the [runnable script][cmd] included with this package.
@@ -304,8 +327,9 @@ import pkgutil
 import re
 import sys
 from copy import copy
-from functools import lru_cache
+from functools import lru_cache, reduce
 from itertools import tee, groupby
+from typing import Dict, Iterable, List, Set, Type, TypeVar, Union
 from warnings import warn
 
 from mako.lookup import TemplateLookup
@@ -321,7 +345,9 @@ _URL_MODULE_SUFFIX = '.html'
 _URL_INDEX_MODULE_SUFFIX = '.m.html'  # For modules named literal 'index'
 _URL_PACKAGE_SUFFIX = '/index.html'
 
-__pdoc__ = {}
+T = TypeVar('T')
+
+__pdoc__ = {}  # type: Dict[str, Union[bool, str]]
 
 tpl_lookup = TemplateLookup(
     cache_args=dict(cached=True,
@@ -346,6 +372,9 @@ class Context(dict):
     You can pass an instance of `pdoc.Context` to `pdoc.Module` constructor.
     All `pdoc.Module` objects that share the same `pdoc.Context` will see
     (and be able to link in HTML to) each other's identifiers.
+
+    If you don't pass your own `Context` instance to `Module` constructor,
+    a global context object will be used.
     """
 
 
@@ -416,6 +445,7 @@ def html(
     dramatically decrease performance when documenting large modules.
     """
     mod = Module(import_module(module_name), docfilter=docfilter)
+    link_inheritance()
     return mod.html(external_links=external_links,
                     link_prefix=link_prefix,
                     source=source,
@@ -434,6 +464,7 @@ def text(module_name, docfilter=None, **kwargs) -> str:
     `True` or `False`. If `False`, that object will not be documented.
     """
     mod = Module(import_module(module_name), docfilter=docfilter)
+    link_inheritance()
     return mod.text(**kwargs)
 
 
@@ -612,6 +643,59 @@ def _is_public(ident_name):
     return not ident_name.startswith("_")
 
 
+def _filter_type(type: Type[T],
+                 values: Union[Iterable['Doc'], Dict[str, 'Doc']]) -> List[T]:
+    """
+    Return a list of values from `values` of type `type`.
+    """
+    if isinstance(values, dict):
+        values = values.values()
+    return [i for i in values if isinstance(i, type)]
+
+
+def _toposort(graph: Dict[T, Set[T]]) -> List[T]:
+    """
+    Return items of `graph` sorted in topological order.
+    Source: https://rosettacode.org/wiki/Topological_sort#Python
+    """
+    items_without_deps = reduce(set.union, graph.values(), set()) - set(graph.keys())
+    yield from items_without_deps
+    ordered = items_without_deps
+    while True:
+        graph = {item: (deps - ordered)
+                 for item, deps in graph.items()
+                 if item not in ordered}
+        ordered = {item
+                   for item, deps in graph.items()
+                   if not deps}
+        yield from ordered
+        if not ordered:
+            break
+    assert not graph, "A cyclic dependency exists amongst %r" % graph
+
+
+def link_inheritance(context: Context = None):
+    """
+    Link inheritance relationsships between `pdoc.Class` objects
+    (and between their members) of all `pdoc.Module` objects that
+    share the provided `context` (`pdoc.Context`).
+
+    You need to call this if you expect `pdoc.Doc.inherits` and
+    inherited `pdoc.Doc.docstring` to be set correctly.
+    """
+    if context is None:
+        context = _global_context
+
+    graph = {cls: set(cls.mro(only_documented=True))
+             for cls in _filter_type(Class, context)}
+
+    for cls in _toposort(graph):
+        cls._fill_inheritance()
+
+    for module in _filter_type(Module, context):
+        module._link_inheritance()
+
+
 class Doc:
     """
     A base class for all documentation objects.
@@ -748,7 +832,7 @@ class Module(Doc):
         it was imported from. It is always an absolute import path.
         """
 
-    __slots__ = ('supermodule', 'doc', '_context')
+    __slots__ = ('supermodule', 'doc', '_context', '_is_inheritance_linked')
 
     def __init__(self, module, *, docfilter=None, supermodule=None, context=None):
         """
@@ -779,6 +863,9 @@ class Module(Doc):
 
         self.doc = {}
         """A mapping from identifier name to a documentation object."""
+
+        self._is_inheritance_linked = False
+        """Re-entry guard for `pdoc.Module._link_inheritance()`."""
 
         # Populate self.doc with this module's public members
         if hasattr(self.obj, '__all__'):
@@ -837,15 +924,18 @@ class Module(Doc):
                 self._context.update((obj.refname, obj)
                                      for obj in docobj.doc.values())
 
-        # Copy inherited ancestor members to subclasses
-        classes = [dobj
-                   for dobj in self.doc.values()
-                   if isinstance(dobj, Class)]
-        for c in classes:
-            c._fill_inheritance()
+    def _link_inheritance(self):
+        # Inherited members are already in place since
+        # `Class._fill_inheritance()` has been called from
+        # `pdoc.fill_inheritance()`.
+        # Now look for docstrings in the module's __pdoc__ override.
 
-        # Now that inherited members are in place,
-        # look for docstrings in the __pdoc__ override.
+        if self._is_inheritance_linked:
+            # Prevent re-linking inheritance for modules which have already
+            # had done so. Otherwise, this would raise "does not exist"
+            # errors if `pdoc.link_inheritance()` is called multiple times.
+            return
+
         for name, docstring in getattr(self.obj, "__pdoc__", {}).items():
             refname = "%s.%s" % (self.refname, name)
             if docstring in (False, None):
@@ -882,8 +972,10 @@ class Module(Doc):
 
         # Now after docstrings are set correctly, continue the
         # inheritance routine, marking members inherited or not
-        for c in classes:
+        for c in _filter_type(Class, self.doc):
             c._link_inheritance()
+
+        self._is_inheritance_linked = True
 
     def text(self, **kwargs):
         """
@@ -949,8 +1041,7 @@ class Module(Doc):
                 External(name))
 
     def _filter_doc_objs(self, type: type = Doc):
-        return sorted(obj for obj in self.doc.values()
-                      if isinstance(obj, type))
+        return sorted(_filter_type(type, self.doc))
 
     def variables(self):
         """
@@ -1056,7 +1147,7 @@ class Class(Doc):
     def refname(self):
         return self.module.name + '.' + self.qualname
 
-    def mro(self):
+    def mro(self, only_documented=False) -> List['Class']:
         """
         Returns a list of ancestor (superclass) documentation objects
         in method resolution order.
@@ -1064,9 +1155,12 @@ class Class(Doc):
         The list will contain objects of type `pdoc.Class`
         if the types are documented, and `pdoc.External` otherwise.
         """
-        return [self.module.find_class(c)
-                for c in inspect.getmro(self.obj)
-                if c not in (self.obj, object)]
+        classes = [self.module.find_class(c)
+                   for c in inspect.getmro(self.obj)
+                   if c not in (self.obj, object)]
+        if only_documented:
+            classes = _filter_type(Class, classes)
+        return classes
 
     def subclasses(self):
         """
@@ -1142,20 +1236,16 @@ class Class(Doc):
         set `pdoc.Doc.inherits` pointers.
         """
         super_members = self._super_members = {}
-        for cls in self.mro():
-            if not isinstance(cls, Class):
-                continue
+        for cls in self.mro(only_documented=True):
             for name, dobj in cls.doc.items():
                 if name not in super_members and dobj.docstring:
                     super_members[name] = dobj
+                    if name not in self.doc:
+                        dobj = copy(dobj)
+                        dobj.cls = self
 
-        for name, parent_dobj in super_members.items():
-            if name not in self.doc:
-                dobj = copy(parent_dobj)
-                dobj.cls = self
-
-                self.doc[name] = dobj
-                self.module._context[dobj.refname] = dobj
+                        self.doc[name] = dobj
+                        self.module._context[dobj.refname] = dobj
 
     def _link_inheritance(self):
         """
@@ -1166,10 +1256,18 @@ class Class(Doc):
         The reason this is split in two parts is that in-between
         the `__pdoc__` overrides are applied.
         """
-        assert hasattr(self, '_super_members'), 'Call `Class._fill_inheritance()` first!'
+        if not hasattr(self, '_super_members'):
+            return
+
+        # Set inheritence for the Class itself
+        parent_cls = next(iter(self.mro(only_documented=True)), None)
+        if parent_cls and self.docstring == parent_cls.docstring:
+            self.inherits = parent_cls
+
         for name, parent_dobj in self._super_members.items():
             dobj = self.doc[name]
-            if (dobj.docstring or parent_dobj.docstring) == parent_dobj.docstring:
+            if (dobj.obj is parent_dobj.obj or
+                    (dobj.docstring or parent_dobj.docstring) == parent_dobj.docstring):
                 dobj.inherits = parent_dobj
         del self._super_members
 

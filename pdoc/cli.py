@@ -329,6 +329,7 @@ def main(_args=None):
     modules = [pdoc.Module(pdoc.import_module(module),
                            docfilter=docfilter)
                for module in args.modules]
+    pdoc.link_inheritance()
 
     for module in modules:
         if args.html:
