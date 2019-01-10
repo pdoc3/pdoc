@@ -1278,6 +1278,7 @@ class Class(Doc):
             if (dobj.obj is parent_dobj.obj or
                     (dobj.docstring or parent_dobj.docstring) == parent_dobj.docstring):
                 dobj.inherits = parent_dobj
+                dobj.docstring = parent_dobj.docstring
         del self._super_members
 
 

@@ -10,22 +10,16 @@
       """
       new = re.sub('(\n+)', '\\1%s' % (' ' * spaces), s)
       return (' ' * spaces) + new.strip()
-
-  def docstring(d):
-      if not d.docstring and d.inherits:
-          return d.inherits.docstring
-      else:
-          return d.docstring
 %>
 
 <%def name="function(func)" filter="trim">
 ${func.name}(${", ".join(func.params())})
-${docstring(func) | indent}
+${func.docstring | indent}
 </%def>
 
 <%def name="variable(var)" filter="trim">
 ${var.name}
-${docstring(var) | indent}
+${var.docstring | indent}
 </%def>
 
 <%def name="class_(cls)" filter="trim">
