@@ -878,14 +878,17 @@ class Module(Doc):
 
         # Populate self.doc with this module's public members
         if hasattr(self.obj, '__all__'):
-            module_all = set(self.obj.__all__)
-            public_objs = [(name, inspect.unwrap(obj))
-                           for name, obj in inspect.getmembers(self.obj)
-                           if name in module_all]
+            public_objs = []
+            for name in self.obj.__all__:
+                try:
+                    public_objs.append((name, getattr(self.obj, name)))
+                except AttributeError:
+                    warn("Module {!r} doesn't contain identifier `{}` "
+                         "exported in `__all__`".format(self.module, name))
         else:
             def is_from_this_module(obj):
                 mod = inspect.getmodule(obj)
-                return mod is None or mod.__name__ in self.obj.__name__
+                return mod is None or mod.__name__ == self.name
 
             public_objs = [(name, inspect.unwrap(obj))
                            for name, obj in inspect.getmembers(self.obj)

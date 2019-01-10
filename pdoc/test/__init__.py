@@ -413,6 +413,14 @@ class ApiTest(unittest.TestCase):
             pdoc.Module(module)
             pdoc.link_inheritance()
 
+    def test__all__(self):
+        module = pdoc.import_module(EXAMPLE_MODULE + '.index')
+        with patch.object(module, '__all__', ['B'], create=True):
+            mod = pdoc.Module(module)
+            with self.assertWarns(UserWarning):  # Only B is used but __pdoc__ contains others
+                pdoc.link_inheritance()
+            self.assertEqual(list(mod.doc.keys()), ['B'])
+
     def test_find_ident(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
         self.assertIsInstance(mod.find_ident('subpkg'), pdoc.Module)
