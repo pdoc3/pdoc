@@ -4,9 +4,9 @@ IS_RELEASE=${TRAVIS_TAG+1}
 
 die () { echo "ERROR: $*" >&2; exit 2; }
 
-for cmd in pdoc; do
+for cmd in pdoc3; do
     command -v "$cmd" >/dev/null ||
-        die "Missing $cmd; \`pip install pdoc\`"
+        die "Missing $cmd; \`pip install $cmd\`"
 done
 
 DOCROOT="$(dirname "$(readlink -f "$0")")"
@@ -19,7 +19,7 @@ echo
 mkdir -p "$BUILDROOT"
 rm -r "$BUILDROOT" 2>/dev/null || true
 pushd "$DOCROOT/.." >/dev/null
-pdoc --html \
+pdoc3 --html \
      ${IS_RELEASE+--template-dir "$DOCROOT/pdoc_template"} \
      --html-dir "$BUILDROOT" \
      pdoc
