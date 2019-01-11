@@ -1,0 +1,7 @@
+https://pdoc3.github.io/pdoc/
+https://pdoc3.github.io/pdoc/doc/
+https://pdoc3.github.io/pdoc/doc/pdoc/
+https://pdoc3.github.io/pdoc/doc/pdoc/cli.html
+https://pdoc3.github.io/pdoc/doc/pdoc/html_helpers.html
+https://pdoc3.github.io/pdoc/doc/pdoc/test/
+https://pdoc3.github.io/pdoc/doc/pdoc/test/example_pkg/
