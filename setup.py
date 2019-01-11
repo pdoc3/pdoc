@@ -48,7 +48,7 @@ if __name__ == '__main__':
         obsoletes=["pdoc"],
         install_requires=[
             "mako",
-            "markdown",
+            "markdown >= 3.0",
         ],
         setup_requires=[
             'setuptools_git',
