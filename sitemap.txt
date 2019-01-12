@@ -5,3 +5,8 @@ https://pdoc3.github.io/pdoc/doc/pdoc/cli.html
 https://pdoc3.github.io/pdoc/doc/pdoc/html_helpers.html
 https://pdoc3.github.io/pdoc/doc/pdoc/test/
 https://pdoc3.github.io/pdoc/doc/pdoc/test/example_pkg/
+https://pdoc3.github.io/pdoc/doc/pdoc/test/example_pkg/index.m.html
+https://pdoc3.github.io/pdoc/doc/pdoc/test/example_pkg/module.html
+https://pdoc3.github.io/pdoc/doc/pdoc/test/example_pkg/subpkg/
+https://pdoc3.github.io/pdoc/doc/pdoc/test/example_pkg/subpkg2/
+https://pdoc3.github.io/pdoc/doc/pdoc/test/example_pkg/subpkg2/module.html
