@@ -71,7 +71,7 @@
   .title code {
     font-weight: bold;
   }
-  h2[id=^header-] {
+  h2[id^="header-"] {
     margin-top: 2em;
   }
   .ident {
@@ -218,7 +218,7 @@
       margin-bottom: 15px;
     }
   .hlist {
-    list-syle: none;
+    list-style: none;
   }
     .hlist li {
       display: inline;
@@ -264,7 +264,7 @@
     .admonition.danger,
     .admonition.caution {
       background: lightpink;
-    ]
+    }
 </%def>
 
 <%def name="desktop()" filter="minify_css">
