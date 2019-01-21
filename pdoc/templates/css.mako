@@ -313,13 +313,14 @@
         text-shadow: none !important;
     }
 
-    a,
-    a:visited {
-        text-decoration: underline;
-    }
-
     a[href]:after {
         content: " (" attr(href) ")";
+        font-size: 90%;
+    }
+    /* Internal, documentation links, recognized by having a title,
+       don't need the URL explicity stated. */
+    a[href][title]:after {
+        content: none;
     }
 
     abbr[title]:after {
