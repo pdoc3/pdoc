@@ -660,6 +660,14 @@ Nomatch:</p>
 <dd>Description of arg1</dd>
 <dt><strong><code>arg2</code></strong> :&ensp;<code>str</code> or <code>int</code></dt>
 <dd>Description of arg2</dd>
+<dt><strong><code>arg3</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Description of arg3</dd>
+<dt><strong><code>arg4</code></strong> :&ensp;<code>str</code>, <code>optional</code>, <code>default</code>=<code>10</code></dt>
+<dd>Description of arg4</dd>
+<dt><strong><code>arg5</code></strong> :&ensp;<code>str</code>,<code>optional</code>,<code>default</code>=<code>10</code></dt>
+<dd>Description of arg5</dd>
+<dt><strong><code>arg6</code></strong> :&ensp;<code>str</code> or <code>int</code>,<code>optional</code>,<code>default</code> = <code>10</code></dt>
+<dd>Description of arg6</dd>
 <dt><strong><code>*args</code></strong></dt>
 <dd>passed around</dd>
 </dl>

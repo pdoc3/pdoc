@@ -153,6 +153,10 @@ class Docformats:
         Args:
             arg1 (int): Description of arg1
             arg2 (str or int): Description of arg2
+            arg3 (str, optional): Description of arg3
+            arg4 (str, optional, default=10): Description of arg4
+            arg5 (str,optional,default=10): Description of arg5
+            arg6 (str or int,optional,default = 10): Description of arg6
             *args: passed around
 
         Returns:

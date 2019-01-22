@@ -174,7 +174,7 @@ class _ToMarkdown:
                _googledoc_sections=partial(
                    re.compile(r'(?<=\n\n)(\w+):$\n((?:\n?(?: {4}.*|$))+)', re.MULTILINE).sub,
                    lambda m, _params=partial(
-                           re.compile(r'^([\w*]+)(?: \(([\w. ]+)\))?: '
+                           re.compile(r'^([\w*]+)(?: \(([\w.,= ]+)\))?: '
                                       r'((?:.*)(?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
                            lambda m: _ToMarkdown._deflist(*m.groups())): (
                        '\n{}\n-----\n{}'.format(
