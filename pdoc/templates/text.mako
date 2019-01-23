@@ -12,7 +12,7 @@
 </%def>
 
 <%def name="function(func)" buffered="True">
-`${func.name}(${", ".join(func.params())})`
+`${func.name}(${", ".join(map(str, func.params()))})`
 ${func.docstring | deflist}
 </%def>
 

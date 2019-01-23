@@ -98,7 +98,7 @@
 
   <%def name="show_func(f)">
     <dt id="${f.refname}"><code class="name flex">
-        <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${', '.join(f.params()) | h})</span>
+        <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${', '.join(map(str, f.params())) | h})</span>
     </code></dt>
     <dd>${show_desc(f)}</dd>
   </%def>

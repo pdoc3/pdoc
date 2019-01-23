@@ -330,7 +330,9 @@ from copy import copy
 from functools import lru_cache, reduce
 from itertools import tee, groupby
 from types import ModuleType
-from typing import Dict, Iterable, List, Set, Type, TypeVar, Union, Tuple, Generator, Callable
+from typing import Dict, List, Set, Tuple
+from typing import NamedTuple, Optional, Union, Type, TypeVar
+from typing import Callable, Iterable, Generator
 from warnings import warn
 
 from mako.lookup import TemplateLookup
@@ -636,11 +638,16 @@ def _var_docstrings(doc_obj: Union['Module', 'Class'], *,
     return vs
 
 
-def _is_public(ident_name):
+def _is_public(ident):
     """
     Returns `True` if `ident_name` matches the export criteria for an
     identifier name.
     """
+    if isinstance(ident, Parameter):
+        ident_name = ident.name.lstrip('*')
+    else:
+        ident_name = ident
+
     return not ident_name.startswith("_")
 
 
@@ -1282,6 +1289,19 @@ class Class(Doc):
         del self._super_members
 
 
+class Parameter(NamedTuple('Parameter',
+                           [('name', str), ('default', Optional[str])])):
+    """Representation of a function parameter, incl. default value."""
+
+    def __str__(self) -> str:
+        r = self.name
+
+        if self.default is not None:
+            r += ' = ' + self.default
+
+        return r
+
+
 class Function(Doc):
     """
     Representation of documentation for a function or method.
@@ -1338,58 +1358,63 @@ class Function(Doc):
             return False
 
     @lru_cache()
-    def params(self) -> List[str]:
+    def params(self) -> List[Parameter]:
         """
-        Returns a list where each element is a nicely formatted
-        parameter of this function. This includes argument lists,
-        keyword arguments and default values, and it doesn't include any
+        Returns a list representing each parameter of this function, with a
+        nicely-formatted string conversion. This includes argument lists,
+        keyword arguments, and default values, and it doesn't include any
         optional arguments whose names begin with an underscore.
         """
         try:
             s = inspect.getfullargspec(inspect.unwrap(self.obj))
         except TypeError:
             # I guess this is for C builtin functions?
-            return ["..."]
+            return [Parameter('...', None)]
 
         params = []
+
         for i, param in enumerate(s.args):
+            default = None
             if s.defaults is not None and len(s.args) - i <= len(s.defaults):
                 defind = len(s.defaults) - (len(s.args) - i)
-                params.append("%s = %s" % (param, repr(s.defaults[defind])))
-            else:
-                params.append(param)
-        if s.varargs is not None:
-            params.append("*%s" % s.varargs)
+                default = repr(s.defaults[defind])
+
+            params.append(Parameter(name=param,
+                                    default=default))
 
         kwonlyargs = getattr(s, "kwonlyargs", None)
+        if kwonlyargs or s.varargs is not None:
+            params.append(Parameter(name='*' + s.varargs if s.varargs else '*',
+                                    default=None))
+
         if kwonlyargs:
-            if s.varargs is None:
-                params.append("*")
             for param in kwonlyargs:
-                try:
-                    params.append("%s = %s" % (param, repr(s.kwonlydefaults[param])))
-                except KeyError:
-                    params.append(param)
+                if param in s.kwonlydefaults:
+                    default = repr(s.kwonlydefaults[param])
+                else:
+                    default = None
+
+                params.append(Parameter(name=param, default=default))
 
         keywords = getattr(s, "varkw", getattr(s, "keywords", None))
         if keywords is not None:
-            params.append("**%s" % keywords)
+            params.append(Parameter(name='**' + keywords, default=None))
 
         # Remove "_private" params following catch-all *args and from the end
         iter_params = iter(params)
         params = []
         for p in iter_params:
             params.append(p)
-            if p.startswith('*'):
+            if p.name.startswith('*'):
                 break
-        while len(params) > 1 and not _is_public(params[-2]) and '=' in params[-2]:
+        while len(params) > 1 and not _is_public(params[-2]) and params[-2].default is not None:
             params.pop(-2)
         for p in iter_params:
-            if _is_public(p.lstrip('*')):
+            if _is_public(p.name):
                 params.append(p)
-        while params and not _is_public(params[-1]) and '=' in params[-1]:
+        while params and not _is_public(params[-1]) and params[-1].default is not None:
             params.pop(-1)
-        if params and params[-1] == '*':
+        if params and params[-1].name == "*":
             params.pop(-1)
 
         # TODO: The only thing now missing for Python 3 are type annotations

@@ -503,15 +503,15 @@ class ApiTest(unittest.TestCase):
     def test_Function_private_params(self):
         func = pdoc.Function('f', pdoc.Module(pdoc),
                              lambda a, _a, _b=None: None)
-        self.assertEqual(func.params(), ['a', '_a'])
+        self.assertEqual([str(p) for p in func.params()], ['a', '_a'])
 
         func = pdoc.Function('f', pdoc.Module(pdoc),
                              lambda _ok, a, _a, *args, _b=None, c=None, _d=None: None)
-        self.assertEqual(func.params(), ['_ok', 'a', '_a', '*args', 'c = None'])
+        self.assertEqual([str(p) for p in func.params()], ['_ok', 'a', '_a', '*args', 'c = None'])
 
         func = pdoc.Function('f', pdoc.Module(pdoc),
                              lambda a, b, *, _c=1: None)
-        self.assertEqual(func.params(), ['a', 'b'])
+        self.assertEqual([str(p) for p in func.params()], ['a', 'b'])
 
     def test_url(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
