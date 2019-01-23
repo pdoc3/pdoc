@@ -1290,11 +1290,16 @@ class Class(Doc):
 
 
 class Parameter(NamedTuple('Parameter',
-                           [('name', str), ('default', Optional[str])])):
-    """Representation of a function parameter, incl. default value."""
+                           [('name', str),
+                            ('hint', Optional[str]),
+                            ('default', Optional[str])])):
+    """Representation of a function parameter, incl. type hint & default value."""
 
     def __str__(self) -> str:
         r = self.name
+
+        if self.hint is not None:
+            r += ': ' + self.hint
 
         if self.default is not None:
             r += ' = ' + self.default
@@ -1369,7 +1374,7 @@ class Function(Doc):
             s = inspect.getfullargspec(inspect.unwrap(self.obj))
         except TypeError:
             # I guess this is for C builtin functions?
-            return [Parameter('...', None)]
+            return [Parameter('...', None, None)]
 
         params = []
 
@@ -1380,11 +1385,13 @@ class Function(Doc):
                 default = repr(s.defaults[defind])
 
             params.append(Parameter(name=param,
+                                    hint=None,  # XXXTODO
                                     default=default))
 
         kwonlyargs = getattr(s, "kwonlyargs", None)
         if kwonlyargs or s.varargs is not None:
             params.append(Parameter(name='*' + s.varargs if s.varargs else '*',
+                                    hint=None,
                                     default=None))
 
         if kwonlyargs:
@@ -1394,11 +1401,12 @@ class Function(Doc):
                 else:
                     default = None
 
-                params.append(Parameter(name=param, default=default))
+                params.append(Parameter(name=param, default=default,
+                                        hint=None))  # XXXTODO
 
         keywords = getattr(s, "varkw", getattr(s, "keywords", None))
         if keywords is not None:
-            params.append(Parameter(name='**' + keywords, default=None))
+            params.append(Parameter(name='**' + keywords, hint=None, default=None))
 
         # Remove "_private" params following catch-all *args and from the end
         iter_params = iter(params)
