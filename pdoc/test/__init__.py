@@ -132,7 +132,7 @@ class CliTest(unittest.TestCase):
             '>sys.version<',
             'B.CONST docstring',
             'B.var docstring',
-            'b=1',
+            'b = 1',
             '*args',
             '**kwargs',
             '__init__ docstring',
@@ -264,7 +264,7 @@ class CliTest(unittest.TestCase):
             '__init__ docstring',
             'instance_var',
             'instance var docstring',
-            'b=1',
+            'b = 1',
             '*args',
             '**kwargs',
             'B.f docstring',
@@ -507,7 +507,7 @@ class ApiTest(unittest.TestCase):
 
         func = pdoc.Function('f', pdoc.Module(pdoc),
                              lambda _ok, a, _a, *args, _b=None, c=None, _d=None: None)
-        self.assertEqual(func.params(), ['_ok', 'a', '_a', '*args', 'c=None'])
+        self.assertEqual(func.params(), ['_ok', 'a', '_a', '*args', 'c = None'])
 
         func = pdoc.Function('f', pdoc.Module(pdoc),
                              lambda a, b, *, _c=1: None)

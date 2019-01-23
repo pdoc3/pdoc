@@ -1355,7 +1355,7 @@ class Function(Doc):
         for i, param in enumerate(s.args):
             if s.defaults is not None and len(s.args) - i <= len(s.defaults):
                 defind = len(s.defaults) - (len(s.args) - i)
-                params.append("%s=%s" % (param, repr(s.defaults[defind])))
+                params.append("%s = %s" % (param, repr(s.defaults[defind])))
             else:
                 params.append(param)
         if s.varargs is not None:
@@ -1367,7 +1367,7 @@ class Function(Doc):
                 params.append("*")
             for param in kwonlyargs:
                 try:
-                    params.append("%s=%s" % (param, repr(s.kwonlydefaults[param])))
+                    params.append("%s = %s" % (param, repr(s.kwonlydefaults[param])))
                 except KeyError:
                     params.append(param)
 
