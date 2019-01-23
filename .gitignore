@@ -2,6 +2,7 @@ dist
 build
 *.egg-info
 *.py[cod]
+/.eggs/
 
 pdoc/_version.py
 
