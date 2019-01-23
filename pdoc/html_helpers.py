@@ -172,10 +172,10 @@ class _ToMarkdown:
     @staticmethod
     def google(text,
                _googledoc_sections=partial(
-                   re.compile(r'(?<=\n\n)(\w+):$\n((?:\n?(?: {4}.*|$))+)', re.MULTILINE).sub,
+                   re.compile(r'(?<=\n\n)(\w+):$\n((?:\n?(?: {2,}.*|$))+)', re.MULTILINE).sub,
                    lambda m, _params=partial(
                            re.compile(r'^([\w*]+)(?: \(([\w. ]+)\))?: '
-                                      r'((?:.*)(?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
+                                      r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub,
                            lambda m: _ToMarkdown._deflist(*m.groups())): (
                        '\n{}\n-----\n{}'.format(
                            m.group(1), _params(inspect.cleandoc(m.group(2))))))):

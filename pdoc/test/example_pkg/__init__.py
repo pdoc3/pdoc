@@ -166,9 +166,9 @@ class Docformats:
             ValueError: If `arg2` is equal to `arg1`.
 
         Examples:
-            Examples in doctest format.
+          Examples in doctest format.
 
-            >>> a = [1,2,3]
+          >>> a = [1,2,3]
 
         Todos:
             * For module TODOs
