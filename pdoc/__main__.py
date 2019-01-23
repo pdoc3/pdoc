@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from pdoc import cli
+from pdoc.cli import main
 
 if __name__ == "__main__":
-    cli.main(cli.parser.parse_args())
+    main()
