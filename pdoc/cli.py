@@ -49,7 +49,6 @@ aa(
     "will be shown in the output. Search is case sensitive. "
     "Has no effect when --http is set.",
 )
-aa("--version", action="store_true", help="Print the version of pdoc and exit.")
 aa("--html", action="store_true", help="When set, the output will be HTML formatted.")
 aa(
     "--html-dir",

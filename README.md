@@ -1,5 +1,5 @@
 
-[![Build Status](https://travis-ci.org/mitmproxy/pdoc.svg?branch=master)](https://travis-ci.org/mitmproxy/pdoc)
+[![Build Status](https://travis-ci.org/pdoc3/pdoc.svg?branch=master)](https://travis-ci.org/pdoc3/pdoc)
 
 
 `pdoc` is a library and a command line program to discover the public
