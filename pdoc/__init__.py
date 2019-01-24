@@ -183,7 +183,9 @@ Supported docstring formats
 ---------------------------
 Currently, pure Markdown (with [extensions]), [numpydoc],
 and [Google-style] docstrings formats are supported.
-Basic reST directives (such as e.g. `.. deprecated::`) should also work.
+Basic reST directives (such as e.g.
+`.. versionadded::`, `.. deprecated::`, `.. note::`, `.. image::`, ...)
+should also work.
 
 *[reST]: reStructuredText
 [extensions]: https://python-markdown.github.io/extensions/#officially-supported-extensions
