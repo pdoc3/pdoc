@@ -4,7 +4,7 @@ import os.path as path
 
 cwd = path.dirname(__file__)
 longdesc = codecs.open(path.join(cwd, "longdesc.rst"), "r", "utf-8").read()
-version = "0.0.0"
+version = "0.3.9"
 with codecs.open(path.join(cwd, "pdoc", "__init__.py"), "r", "utf-8") as f:
     for line in f:
         if line.startswith("__version__"):
@@ -13,7 +13,7 @@ with codecs.open(path.join(cwd, "pdoc", "__init__.py"), "r", "utf-8") as f:
             break
 
 setup(
-    name="pdoc",
+    name="pdoc3",
     author="Andrew Gallant",
     author_email="pdoc@burntsushi.net",
     version=version,
@@ -21,7 +21,7 @@ setup(
     description="A simple program and library to auto generate API "
     "documentation for Python modules.",
     long_description=longdesc,
-    url="https://github.com/BurntSushi/pdoc",
+    url="https://pdoc3.github.io/pdoc",
     classifiers=[
         "Topic :: Documentation",
         "Topic :: Software Development :: Documentation",

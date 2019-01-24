@@ -36,7 +36,7 @@ on all three.
 
 Contributing
 ------------
-`pdoc` [is on GitHub](https://github.com/BurntSushi/pdoc). Pull
+`pdoc` [is on GitHub](https://github.com/pdoc3/pdoc). Pull
 requests and bug reports are welcome.
 
 
@@ -191,7 +191,7 @@ import sys
 from mako.lookup import TemplateLookup
 from mako.exceptions import TopLevelLookupException
 
-__version__ = "0.3.2"
+__version__ = "0.3.9"
 """
 The current version of pdoc. This value is read from `setup.py`.
 """
