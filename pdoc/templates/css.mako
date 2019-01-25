@@ -196,26 +196,20 @@
     }
 
     .source summary {
-      background: #ffc;
+      color: #666;
+      text-align: right;
       font-weight: 400;
       font-size: .8em;
-      width: 11em;
       text-transform: uppercase;
-      padding: 0px 8px;
-      border: 1px solid #fd6;
-      border-radius: 5px;
       cursor: pointer;
     }
-      .source summary:hover {
-        background: #fe9 !important;
-      }
-      .source[open] summary {
-        background: #fda;
-      }
     .source pre {
       max-height: 500px;
       overflow-y: scroll;
-      margin-bottom: 15px;
+      border: 0;
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      margin: 0;
     }
   .hlist {
     list-style: none;
