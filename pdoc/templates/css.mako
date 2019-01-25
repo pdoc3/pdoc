@@ -92,8 +92,11 @@
 
   pre {
     background: #f8f8f8;
-    border: 1px solid #ddd;
-    margin: 1em 0 1em 4ch;
+    border: 0;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 1ex;
   }
 
   #http-server-module-list {
@@ -206,9 +209,6 @@
     .source pre {
       max-height: 500px;
       overflow-y: scroll;
-      border: 0;
-      border-top: 1px solid #ddd;
-      border-bottom: 1px solid #ddd;
       margin: 0;
     }
   .hlist {
