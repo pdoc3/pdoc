@@ -37,7 +37,7 @@
     % if show_source_code and d.source and d.obj is not getattr(d.inherits, 'obj', None):
         <details class="source">
             <summary>Source code</summary>
-            <pre><code class="python">${d.source | h}}</code></pre>
+            <pre><code class="python">${d.source | h}</code></pre>
         </details>
     %endif
 </%def>

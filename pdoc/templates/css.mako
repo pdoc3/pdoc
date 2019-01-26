@@ -92,8 +92,11 @@
 
   pre {
     background: #f8f8f8;
-    border: 1px solid #ddd;
-    margin: 1em 0 1em 4ch;
+    border: 0;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 1ex;
   }
 
   #http-server-module-list {
@@ -196,26 +199,20 @@
     }
 
     .source summary {
-      background: #ffc;
+      color: #666;
+      text-align: right;
       font-weight: 400;
       font-size: .8em;
-      width: 11em;
       text-transform: uppercase;
-      padding: 0px 8px;
-      border: 1px solid #fd6;
-      border-radius: 5px;
       cursor: pointer;
     }
-      .source summary:hover {
-        background: #fe9 !important;
-      }
-      .source[open] summary {
-        background: #fda;
-      }
     .source pre {
       max-height: 500px;
-      overflow-y: scroll;
-      margin-bottom: 15px;
+      overflow: auto;
+      margin: 0;
+    }
+    .source pre code {
+      overflow: visible;
     }
   .hlist {
     list-style: none;
