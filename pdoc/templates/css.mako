@@ -208,8 +208,11 @@
     }
     .source pre {
       max-height: 500px;
-      overflow-y: scroll;
+      overflow: auto;
       margin: 0;
+    }
+    .source pre code {
+      overflow: visible;
     }
   .hlist {
     list-style: none;
