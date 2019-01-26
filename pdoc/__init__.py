@@ -149,13 +149,17 @@ Class and instance variables can also [inherit docstrings].
 
 Overriding docstrings with `__pdoc__`
 -------------------------------------
-Docstrings can be overridden with a special module-level
-`__pdoc__` dictionary that `pdoc` counsels when it exists. The keys
-of `__pdoc__` should be identifiers within the scope of the module or,
+Docstrings for objects can be disabled or overridden with a special
+module-level dictionary `__pdoc__`. The _keys_
+should be string identifiers within the scope of the module or,
 alternatively, fully-qualified reference names. E.g. for instance
-variable `self.variable` for class `C`, its module identifier is
-`C.variable`. The values of `__pdoc__` dict should be docstrings.
+variable `self.variable` of class `C`, its module-level identifier is
+`'C.variable'`.
 
+If `__pdoc__[key] = False`, then `key` (and its members) will be
+**excluded from the documentation** of the module.
+
+Alternatively, the _values_ of `__pdoc__` should be the overriding docstrings.
 This particular feature is useful when there's no feasible way of
 attaching a docstring to something. A good example of this is a
 [namedtuple](https://docs.python.org/3/library/collections.html#collections.namedtuple):
@@ -169,9 +173,6 @@ attaching a docstring to something. A good example of this is a
 
 `pdoc` will then show `Table` as a class with documentation for the
 `types`, `names` and `rows` members.
-
-Additionally, if `__pdoc__[key] = False`, then `key` will be
-excluded from the public interface of the module.
 
 .. note::
     The assignments to `__pdoc__` need to be placed where they'll be
