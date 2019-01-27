@@ -190,7 +190,7 @@ class _ToMarkdown:
                                       r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub,
                            lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups()))): (
                        '\n{}\n-----\n{}'.format(
-                           m.group(1), _params(inspect.cleandoc(m.group(2))))))):
+                           m.group(1), _params(inspect.cleandoc('\n' + m.group(2))))))):
         """
         Convert `text` in Google-style docstring format to Markdown
         to be further converted later.

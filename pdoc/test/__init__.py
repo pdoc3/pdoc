@@ -674,6 +674,13 @@ code
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
+<dt><strong><code>issue_10</code></strong></dt>
+<dd>description didn't work across multiple lines
+if only a single item was listed. <code>inspect.cleandoc()</code>
+somehow stripped the required extra indentation.</dd>
+</dl>
+<h2 id="returns_1">Returns</h2>
+<dl>
 <dt><strong><code>bool</code></strong></dt>
 <dd>Description of return value</dd>
 </dl>

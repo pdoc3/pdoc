@@ -163,6 +163,11 @@ class Docformats:
           *args: passed around
 
         Returns:
+            issue_10: description didn't work across multiple lines
+                if only a single item was listed. `inspect.cleandoc()`
+                somehow stripped the required extra indentation.
+
+        Returns:
             bool: Description of return value
 
         Raises:
