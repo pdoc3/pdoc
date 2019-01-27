@@ -81,7 +81,10 @@
 </%def>
 
 <%def name="show_column_list(items)">
-  <ul class="${'two-column' if len(items) >= 6 else ''}">
+  <%
+      two_column = len(items) >= 6 and all(len(i.name) < 20 for i in items)
+  %>
+  <ul class="${'two-column' if two_column else ''}">
   % for item in items:
     <li><code>${link(item, item.name)}</code></li>
   % endfor
