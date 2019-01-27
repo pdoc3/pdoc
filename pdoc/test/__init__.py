@@ -660,6 +660,15 @@ Nomatch:</p>
 <dd>Description of arg1</dd>
 <dt><strong><code>arg2</code></strong> :&ensp;<code>str</code> or <code>int</code></dt>
 <dd>Description of arg2</dd>
+<dt><strong><code>test_sequence</code></strong></dt>
+<dd>
+<p>2-dim numpy array of real numbers, size: N * D
+- the test observation sequence.</p>
+<pre><code>test_sequence =
+code
+</code></pre>
+<p>Continue.</p>
+</dd>
 <dt><strong><code>*args</code></strong></dt>
 <dd>passed around</dd>
 </dl>

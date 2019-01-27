@@ -124,6 +124,7 @@ class _ToMarkdown:
         """
         type = _type_parts(type or '')
         desc = desc or '&nbsp;'
+        assert _ToMarkdown._is_indented_4_spaces(desc)
         if type:
             return '**`{}`** :&ensp;{}\n:   {}\n\n'.format(name, type, desc)
         return '**`{}`**\n:   {}\n\n'.format(name, desc)
@@ -170,13 +171,24 @@ class _ToMarkdown:
         return text
 
     @staticmethod
+    def _is_indented_4_spaces(txt, _3_spaces_or_less=re.compile(r'\n\s{0,3}\S').search):
+        return '\n' not in txt or not _3_spaces_or_less(txt)
+
+    @staticmethod
+    def _fix_indent(name, type, desc):
+        """Mazbe fix indent from 2 to 4 spaces."""
+        if not _ToMarkdown._is_indented_4_spaces(desc):
+            desc = desc.replace('\n', '\n  ')
+        return name, type, desc
+
+    @staticmethod
     def google(text,
                _googledoc_sections=partial(
                    re.compile(r'(?<=\n\n)(\w+):$\n((?:\n?(?: {2,}.*|$))+)', re.MULTILINE).sub,
                    lambda m, _params=partial(
                            re.compile(r'^([\w*]+)(?: \(([\w. ]+)\))?: '
                                       r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub,
-                           lambda m: _ToMarkdown._deflist(*m.groups())): (
+                           lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups()))): (
                        '\n{}\n-----\n{}'.format(
                            m.group(1), _params(inspect.cleandoc(m.group(2))))))):
         """
