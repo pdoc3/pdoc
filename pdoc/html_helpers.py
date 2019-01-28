@@ -184,12 +184,12 @@ class _ToMarkdown:
     @staticmethod
     def google(text,
                _googledoc_sections=partial(
-                   re.compile(r'(?<=\n\n)(\w+):$\n((?:\n?(?: {2,}.*|$))+)', re.MULTILINE).sub,
+                   re.compile(r'^([A-Z]\w+):$\n((?:\n?(?: {2,}.*|$))+)', re.MULTILINE).sub,
                    lambda m, _params=partial(
                            re.compile(r'^([\w*]+)(?: \(([\w. ]+)\))?: '
                                       r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub,
                            lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups()))): (
-                       '\n{}\n-----\n{}'.format(
+                       m.group() if not m.group(2) else '\n{}\n-----\n{}'.format(
                            m.group(1), _params(inspect.cleandoc('\n' + m.group(2))))))):
         """
         Convert `text` in Google-style docstring format to Markdown

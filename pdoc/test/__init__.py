@@ -695,6 +695,12 @@ that are relevant to the interface.</p>
 <dt><strong><code>ValueError</code></strong></dt>
 <dd>If <code>arg2</code> is equal to <code>arg1</code>.</dd>
 </dl>
+<p>Test a title without a blank line before it.</p>
+<h2 id="args_1">Args</h2>
+<dl>
+<dt><strong><code>A</code></strong></dt>
+<dd>a</dd>
+</dl>
 <h2 id="examples">Examples</h2>
 <p>Examples in doctest format.</p>
 <pre><code>&gt;&gt;&gt; a = [1,2,3]

@@ -177,6 +177,10 @@ class Docformats:
                 and a third line.
             ValueError: If `arg2` is equal to `arg1`.
 
+        Test a title without a blank line before it.
+        Args:
+            A: a
+
         Examples:
           Examples in doctest format.
 
