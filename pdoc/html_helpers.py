@@ -112,7 +112,6 @@ class _ToMarkdown:
                  # https://numpydoc.readthedocs.io/en/latest/format.html#sections
                  _type_parts=partial(
                      re.compile(r'(.*?)(,optional|,default\s*=\s*|)$').sub,
-
                      lambda m, _backtick_idents=partial(
                              re.compile(r'(default\s*=\s*[\d\'"]|[\w.\'"])+').sub,
                              lambda m: ('{}' if m.group(0) in ('of', 'or') else
