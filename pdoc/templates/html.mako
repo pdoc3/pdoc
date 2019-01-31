@@ -37,7 +37,7 @@
     % if show_source_code and d.source and d.obj is not getattr(d.inherits, 'obj', None):
         <details class="source">
             <summary>Source code</summary>
-            <pre><code class="python">${d.source | h}}</code></pre>
+            <pre><code class="python">${d.source | h}</code></pre>
         </details>
     %endif
 </%def>
@@ -81,7 +81,10 @@
 </%def>
 
 <%def name="show_column_list(items)">
-  <ul class="${'two-column' if len(items) >= 6 else ''}">
+  <%
+      two_column = len(items) >= 6 and all(len(i.name) < 20 for i in items)
+  %>
+  <ul class="${'two-column' if two_column else ''}">
   % for item in items:
     <li><code>${link(item, item.name)}</code></li>
   % endfor

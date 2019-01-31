@@ -157,10 +157,19 @@ class Docformats:
             arg4 (str, optional, default=10): Description of arg4
             arg5 (str,optional,default=10): Description of arg5
             arg6 (str or int,optional,default = 10): Description of arg6
+            test_sequence: 2-dim numpy array of real numbers, size: N * D
+              - the test observation sequence.
+
+                  test_sequence =
+                  code
+
+              Continue.
             *args: passed around
 
         Returns:
-            bool: Description of return value
+            issue_10: description didn't work across multiple lines
+                if only a single item was listed. `inspect.cleandoc()`
+                somehow stripped the required extra indentation.
 
         Raises:
             AttributeError: The ``Raises`` section is a list of all exceptions
@@ -169,10 +178,14 @@ class Docformats:
                 and a third line.
             ValueError: If `arg2` is equal to `arg1`.
 
-        Examples:
-            Examples in doctest format.
+        Test a title without a blank line before it.
+        Args:
+            A: a
 
-            >>> a = [1,2,3]
+        Examples:
+          Examples in doctest format.
+
+          >>> a = [1,2,3]
 
         Todos:
             * For module TODOs

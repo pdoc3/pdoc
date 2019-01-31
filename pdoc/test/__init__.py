@@ -668,13 +668,24 @@ Nomatch:</p>
 <dd>Description of arg5</dd>
 <dt><strong><code>arg6</code></strong> :&ensp;<code>str</code> or <code>int</code>,<code>optional</code>,<code>default</code> = <code>10</code></dt>
 <dd>Description of arg6</dd>
+<dt><strong><code>test_sequence</code></strong></dt>
+<dd>
+<p>2-dim numpy array of real numbers, size: N * D
+- the test observation sequence.</p>
+<pre><code>test_sequence =
+code
+</code></pre>
+<p>Continue.</p>
+</dd>
 <dt><strong><code>*args</code></strong></dt>
 <dd>passed around</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>bool</code></strong></dt>
-<dd>Description of return value</dd>
+<dt><strong><code>issue_10</code></strong></dt>
+<dd>description didn't work across multiple lines
+if only a single item was listed. <code>inspect.cleandoc()</code>
+somehow stripped the required extra indentation.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
@@ -686,6 +697,12 @@ that are relevant to the interface.</p>
 </dd>
 <dt><strong><code>ValueError</code></strong></dt>
 <dd>If <code>arg2</code> is equal to <code>arg1</code>.</dd>
+</dl>
+<p>Test a title without a blank line before it.</p>
+<h2 id="args_1">Args</h2>
+<dl>
+<dt><strong><code>A</code></strong></dt>
+<dd>a</dd>
 </dl>
 <h2 id="examples">Examples</h2>
 <p>Examples in doctest format.</p>
