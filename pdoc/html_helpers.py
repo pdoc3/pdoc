@@ -2,9 +2,9 @@
 Helper functions for HTML output.
 """
 import inspect
+import os.path
 import re
 from functools import partial, lru_cache
-from pathlib import Path
 from typing import Callable
 from warnings import warn
 
@@ -203,9 +203,7 @@ class _ToMarkdown:
         indent, type, value, text = match.groups()
 
         if type == 'include' and module:
-            options = dict(re.findall(r'\n *:([^:]+): *([^\n]+)', text, re.MULTILINE))
-            path = Path(module.module.name.replace('.', '/')) / value
-            return _ToMarkdown.include(path, indent, options)
+            return _ToMarkdown.include(value, text, indent, module)
         elif type in ('image', 'figure'):
             return '{}![{}]({})\n'.format(
                 indent, text.translate(str.maketrans({'\n': ' ',
@@ -247,19 +245,45 @@ class _ToMarkdown:
         return substitute(substitute(text))
 
     @staticmethod
-    def include(path: Path, indent: str, options: dict) -> str:
-        if not path.exists():
-            raise RuntimeError('include %s: file does not exist' % (path,))
+    def include(value: str, text: str, indent: str, module: pdoc.Module) -> str:
+        path = os.path.join(os.path.dirname(module.obj.__file__), value)
 
-        if path.suffix not in ('.md', '.markdown'):
-            raise RuntimeError('include %s: only markdown sources allowed '
-                               'for now' % (path,))
+        try:
+            with open(path, 'rt', encoding='utf-8') as f:
+                lines = [indent + line for line in f]
+        except Exception as e:
+            raise RuntimeError('`.. include:: {}` error in module {!r}: {}'
+                               .format(value, module, e))
 
-        selection = slice(int(options.get('start-line', 0)),
-                          int(options.get('end-line', 0)) or None)
+        options = _ToMarkdown._parse_directive_options(text)
 
-        return '\n'.join(indent + line for line in
-                         path.read_text('utf-8').split('\n')[selection])
+        start = int(options.get('start-line', 0))
+        try:
+            end = int(options['end-line'])
+        except KeyError:
+            end = len(lines) - 1
+
+        start_after = options.get('start-after')
+        if start_after:
+            for start in range(start, end):
+                j = lines[start].find(start_after)
+                if j >= 0:
+                    lines[start] = lines[start][j + len(start_after):]
+                    break
+
+        end_before = options.get('end-before')
+        if end_before:
+            for end in range(end, start - 1, -1):
+                j = lines[end].find(end_before)
+                if j >= 0:
+                    lines[end] = lines[end][:j]
+                    break
+
+        return ''.join(lines[start:end + 1])
+
+    @staticmethod
+    def _parse_directive_options(text: str):
+        return dict(re.findall(r'\n *:([^:]+): *([^\n]+)', text, re.MULTILINE))
 
     @staticmethod
     def doctests(text,
