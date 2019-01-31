@@ -202,11 +202,10 @@ class _ToMarkdown:
     def _admonition(module, match):
         indent, type, value, text = match.groups()
 
-        if type == 'include':
-            path = Path(value)
-            if module:
-                path = Path(module.module.name.replace('.', '/')) / path
-            return _ToMarkdown.include(path, indent)
+        if type == 'include' and module:
+            options = dict(re.findall(r'\n *:([^:]+): *([^\n]+)', text, re.MULTILINE))
+            path = Path(module.module.name.replace('.', '/')) / value
+            return _ToMarkdown.include(path, indent, options)
         elif type in ('image', 'figure'):
             return '{}![{}]({})\n'.format(
                 indent, text.translate(str.maketrans({'\n': ' ',
@@ -248,7 +247,7 @@ class _ToMarkdown:
         return substitute(substitute(text))
 
     @staticmethod
-    def include(path: Path, indent: str) -> str:
+    def include(path: Path, indent: str, options: dict) -> str:
         if not path.exists():
             raise RuntimeError('include %s: file does not exist' % (path,))
 
@@ -256,8 +255,11 @@ class _ToMarkdown:
             raise RuntimeError('include %s: only markdown sources allowed '
                                'for now' % (path,))
 
-        return '\n'.join(indent + line
-                         for line in path.read_text().split('\n'))
+        selection = slice(int(options.get('start-line', 0)),
+                          int(options.get('end-line', 0)) or None)
+
+        return '\n'.join(indent + line for line in
+                         path.read_text('utf-8').split('\n')[selection])
 
     @staticmethod
     def doctests(text,

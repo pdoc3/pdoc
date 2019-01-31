@@ -185,8 +185,9 @@ Supported docstring formats
 Currently, pure Markdown (with [extensions]), [numpydoc],
 and [Google-style] docstrings formats are supported.
 Basic reST directives (such as e.g.
-`.. versionadded::`, `.. deprecated::`, `.. note::`, `.. image::`,
-`.. include::`, ...) should also work.
+`.. versionadded::`, `.. deprecated::`, `.. note::`, `.. image::`, ...) should
+also work, in addition to `.. include::` with its `:start-line:` and
+`:end-line:` options.
 
 *[reST]: reStructuredText
 [extensions]: https://python-markdown.github.io/extensions/#officially-supported-extensions
