@@ -617,7 +617,7 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <p class="admonition-title">Added in version:&ensp;1.5.0</p>
 </div>
 </dd>
-<dt><strong><code>x</code></strong> :&ensp;{ <code>NoneType</code>, <code>'B'</code>, <code>'C'</code> }, optional</dt>
+<dt><strong><code>x</code></strong> :&ensp;{ <code>NoneType</code>, <code>'B'</code>, <code>'C'</code> }, <code>optional</code></dt>
 <dd>&nbsp;</dd>
 <dt><strong><code>n</code></strong> :&ensp;<code>int</code> or <code>list</code> of <code>int</code></dt>
 <dd>Description of num</dd>
@@ -660,23 +660,23 @@ Nomatch:</p>
 <dd>Description of arg1</dd>
 <dt><strong><code>arg2</code></strong> :&ensp;<code>str</code> or <code>int</code></dt>
 <dd>Description of arg2</dd>
-<dt><strong><code>arg3</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dt><strong><code>arg3</code></strong> :&ensp;<code>str</code>, <code>optional</code></dt>
 <dd>Description of arg3</dd>
-<dt><strong><code>arg4</code></strong> :&ensp;<code>str</code>, <code>optional</code>, <code>default</code>=<code>10</code></dt>
+<dt><strong><code>arg4</code></strong> :&ensp;<code>str</code>, <code>optional</code>, <code>default=10</code></dt>
 <dd>Description of arg4</dd>
-<dt><strong><code>arg5</code></strong> :&ensp;<code>str</code>,<code>optional</code>,<code>default</code>=<code>10</code></dt>
+<dt><strong><code>arg5</code></strong> :&ensp;<code>str</code>,<code>optional</code>,<code>default=10</code></dt>
 <dd>Description of arg5</dd>
-<dt><strong><code>arg6</code></strong> :&ensp;<code>str</code> or <code>int</code>,<code>optional</code>,<code>default</code> = <code>10</code></dt>
+<dt><strong><code>arg6</code></strong> :&ensp;<code>str</code> or <code>int</code>,<code>optional</code>,<code>default = 10</code></dt>
 <dd>Description of arg6</dd>
-<dt><strong><code>test_sequence</code></strong></dt>
-<dd>
-<p>2-dim numpy array of real numbers, size: N * D
-- the test observation sequence.</p>
-<pre><code>test_sequence =
-code
+</dl>
+<h2 id="args_1">Args</h2>
+<p>test_sequence: 2-dim numpy array of real numbers, size: N * D
+    - the test observation sequence.</p>
+<pre><code>    test_sequence =
+    code
 </code></pre>
-<p>Continue.</p>
-</dd>
+<dl>
+<dt>Continue.</dt>
 <dt><strong><code>*args</code></strong></dt>
 <dd>passed around</dd>
 </dl>
@@ -699,7 +699,7 @@ that are relevant to the interface.</p>
 <dd>If <code>arg2</code> is equal to <code>arg1</code>.</dd>
 </dl>
 <p>Test a title without a blank line before it.</p>
-<h2 id="args_1">Args</h2>
+<h2 id="args_2">Args</h2>
 <dl>
 <dt><strong><code>A</code></strong></dt>
 <dd>a</dd>
@@ -711,7 +711,7 @@ that are relevant to the interface.</p>
 <h2 id="todos">Todos</h2>
 <ul>
 <li>For module TODOs</li>
-</ul>'''
+</ul>'''  # noqa: E501
         text = inspect.getdoc(self._docmodule.google)
         html = to_html(text, module=self._module, link=self._link)
         self.assertEqual(html, expected)

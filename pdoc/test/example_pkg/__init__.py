@@ -157,14 +157,16 @@ class Docformats:
             arg4 (str, optional, default=10): Description of arg4
             arg5 (str,optional,default=10): Description of arg5
             arg6 (str or int,optional,default = 10): Description of arg6
+
+        Args:
             test_sequence: 2-dim numpy array of real numbers, size: N * D
               - the test observation sequence.
 
                   test_sequence =
                   code
 
-              Continue.
-            *args: passed around
+            Continue.
+          *args: passed around
 
         Returns:
             issue_10: description didn't work across multiple lines

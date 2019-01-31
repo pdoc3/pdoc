@@ -111,9 +111,10 @@ class _ToMarkdown:
                  # 'optional'. See §4 Parameters:
                  # https://numpydoc.readthedocs.io/en/latest/format.html#sections
                  _type_parts=partial(
-                     re.compile(r'(.*?)(, optional\.?|)$').sub,
+                     re.compile(r'(.*?)(,optional|,default\s*=\s*|)$').sub,
+
                      lambda m, _backtick_idents=partial(
-                             re.compile(r'[\w.\'"]+').sub,
+                             re.compile(r'(default\s*=\s*[\d\'"]|[\w.\'"])+').sub,
                              lambda m: ('{}' if m.group(0) in ('of', 'or') else
                                         '`{}`').format(m.group(0))): (
                          _backtick_idents(m.group(1)) + m.group(2)))):
@@ -126,6 +127,7 @@ class _ToMarkdown:
         desc = desc or '&nbsp;'
         assert _ToMarkdown._is_indented_4_spaces(desc)
         if type:
+            print('**`{}`** :&ensp;{}\n:   {}\n\n'.format(name, type, desc))
             return '**`{}`** :&ensp;{}\n:   {}\n\n'.format(name, type, desc)
         return '**`{}`**\n:   {}\n\n'.format(name, desc)
 
