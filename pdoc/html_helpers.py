@@ -4,6 +4,7 @@ Helper functions for HTML output.
 import inspect
 import re
 from functools import partial, lru_cache
+from pathlib import Path
 from typing import Callable
 from warnings import warn
 
@@ -198,10 +199,15 @@ class _ToMarkdown:
         return _googledoc_sections(text)
 
     @staticmethod
-    def _admonition(match):
+    def _admonition(module, match):
         indent, type, value, text = match.groups()
 
-        if type in ('image', 'figure'):
+        if type == 'include':
+            path = Path(value)
+            if module:
+                path = Path(module.module.name.replace('.', '/')) / path
+            return _ToMarkdown.include(path, indent)
+        elif type in ('image', 'figure'):
             return '{}![{}]({})\n'.format(
                 indent, text.translate(str.maketrans({'\n': ' ',
                                                       '[': '\\[',
@@ -227,11 +233,7 @@ class _ToMarkdown:
         return '{}!!! {} "{}"\n{}\n'.format(indent, type, title, text)
 
     @staticmethod
-    def admonitions(text,
-                    _admonitions=partial(
-                        re.compile(r'^(?P<indent> *)\.\. ?(\w+)::(?: *(.*))?'
-                                   r'((?:\n(?:(?P=indent) +.*| *$))*)', re.MULTILINE).sub,
-                        _admonition.__func__)):
+    def admonitions(text, module):
         """
         Process reStructuredText's block directives such as
         `.. warning::`, `.. deprecated::`, `.. versionadded::`, etc.
@@ -239,8 +241,23 @@ class _ToMarkdown:
 
         See: https://python-markdown.github.io/extensions/admonition/
         """
+        substitute = partial(re.compile(r'^(?P<indent> *)\.\. ?(\w+)::(?: *(.*))?'
+                                        r'((?:\n(?:(?P=indent) +.*| *$))*)', re.MULTILINE).sub,
+                             partial(_ToMarkdown._admonition, module))
         # Apply twice for nested (e.g. image inside warning)
-        return _admonitions(_admonitions(text))
+        return substitute(substitute(text))
+
+    @staticmethod
+    def include(path: Path, indent: str) -> str:
+        if not path.exists():
+            raise RuntimeError('include %s: file does not exist' % (path,))
+
+        if path.suffix not in ('.md', '.markdown'):
+            raise RuntimeError('include %s: only markdown sources allowed '
+                               'for now' % (path,))
+
+        return '\n'.join(indent + line
+                         for line in path.read_text().split('\n'))
 
     @staticmethod
     def doctests(text,
@@ -276,7 +293,7 @@ def to_html(text: str, docformat: str = 'numpy,google', *,
     """
     assert all(i in (None, '', 'numpy', 'google') for i in docformat.split(',')), docformat
 
-    text = _ToMarkdown.admonitions(text)
+    text = _ToMarkdown.admonitions(text, module)
 
     if 'google' in docformat:
         text = _ToMarkdown.google(text)
