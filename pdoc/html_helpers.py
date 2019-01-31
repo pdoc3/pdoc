@@ -126,7 +126,6 @@ class _ToMarkdown:
         desc = desc or '&nbsp;'
         assert _ToMarkdown._is_indented_4_spaces(desc)
         if type:
-            print('**`{}`** :&ensp;{}\n:   {}\n\n'.format(name, type, desc))
             return '**`{}`** :&ensp;{}\n:   {}\n\n'.format(name, type, desc)
         return '**`{}`**\n:   {}\n\n'.format(name, desc)
 
