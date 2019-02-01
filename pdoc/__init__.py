@@ -1274,11 +1274,6 @@ class Class(Doc):
         if not hasattr(self, '_super_members'):
             return
 
-        # Set inheritence for the Class itself
-        parent_cls = next(iter(self.mro(only_documented=True)), None)
-        if parent_cls and self.docstring == parent_cls.docstring:
-            self.inherits = parent_cls
-
         for name, parent_dobj in self._super_members.items():
             dobj = self.doc[name]
             if (dobj.obj is parent_dobj.obj or
