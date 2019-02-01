@@ -239,10 +239,14 @@ class Docformats:
             Don't touch this!
 
         ```python
-        .. include:: subpkg/include_me.py
+        .. include:: subpkg/_include_me.py
             :start-line: 1
             :end-line: 2
         ```
+
+        .. include:: subpkg/_include_me.py
+            :start-after: =
+            :end-before: 4
         """
 
 
