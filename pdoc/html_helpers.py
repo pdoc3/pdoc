@@ -250,7 +250,7 @@ class _ToMarkdown:
 
         try:
             with open(path, 'rt', encoding='utf-8') as f:
-                lines = [indent + line for line in f]
+                lines = list(f)
         except Exception as e:
             raise RuntimeError('`.. include:: {}` error in module {!r}: {}'
                                .format(value, module, e))
@@ -258,10 +258,7 @@ class _ToMarkdown:
         options = _ToMarkdown._parse_directive_options(text)
 
         start = int(options.get('start-line', 0))
-        try:
-            end = int(options['end-line'])
-        except KeyError:
-            end = len(lines) - 1
+        end = int(options.get('end-line', len(lines)))
 
         start_after = options.get('start-after')
         if start_after:
@@ -279,7 +276,7 @@ class _ToMarkdown:
                     lines[end] = lines[end][:j]
                     break
 
-        return ''.join(lines[start:end + 1])
+        return ''.join(indent + l for l in lines[start:end + 1])
 
     @staticmethod
     def _parse_directive_options(text: str):
