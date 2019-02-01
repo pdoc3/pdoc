@@ -237,6 +237,12 @@ class Docformats:
 
         .. caution::
             Don't touch this!
+
+        ```python
+        .. include:: subpkg/include_me.py
+            :start-line: 1
+            :end-line: 2
+        ```
         """
 
 
