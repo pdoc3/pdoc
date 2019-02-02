@@ -354,6 +354,12 @@ class ApiTest(unittest.TestCase):
         var = mod.doc['B'].doc['instance_var']
         self.assertTrue(var.instance_var)
 
+    def test_builtin_methoddescriptors(self):
+        import parser
+        with self.assertWarns(UserWarning):
+            c = pdoc.Class('STType', pdoc.Module(parser), parser.STType)
+        self.assertIsInstance(c.doc['compile'], pdoc.Function)
+
     def test_refname(self):
         mod = EXAMPLE_MODULE + '.' + 'subpkg'
         module = pdoc.Module(pdoc.import_module(mod))
