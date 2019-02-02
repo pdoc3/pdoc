@@ -1125,7 +1125,7 @@ class Class(Doc):
         for name, obj in public_objs:
             if name in self.doc and self.doc[name].docstring:
                 continue
-            if inspect.ismethod(obj) or inspect.isfunction(obj):
+            if inspect.isroutine(obj):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self,
                     method=not self._method_type(self.obj, name))
@@ -1136,7 +1136,7 @@ class Class(Doc):
                     name, self.module, inspect.getdoc(obj),
                     obj=getattr(obj, 'fget', obj),
                     cls=self, instance_var=True)
-            elif not inspect.isroutine(obj):
+            else:
                 self.doc[name] = Variable(
                     name, self.module,
                     docstring=isinstance(obj, type) and inspect.getdoc(obj) or "",
