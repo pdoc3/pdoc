@@ -8,6 +8,7 @@ import os
 import os.path as path
 import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from typing import Sequence
 
 import pdoc
 
@@ -55,6 +56,11 @@ aa(
     action="store_true",
     help="Overwrites any existing HTML files instead of producing an error.",
 )
+aa("--pdf",
+   action="store_true",
+   help="When set, the specified modules will be printed to standard output, "
+        "formatted in Markdown-Extra, compatible with most "
+        "Markdown-(to-HTML-)to-PDF converters.")
 aa(
     "--external-links",
     action="store_true",
@@ -281,6 +287,18 @@ def write_html_files(m: pdoc.Module):
         write_html_files(submodule)
 
 
+def _flatten_submodules(modules: Sequence[pdoc.Module]):
+    for module in modules:
+        yield module
+        for submodule in module.submodules():
+            yield from _flatten_submodules((submodule,))
+
+
+def print_pdf(modules, **kwargs):
+    modules = list(_flatten_submodules(modules))
+    print(pdoc._render_template('/pdf.mako', modules=modules, **kwargs))
+
+
 def main(_args=None):
     """ Command-line entry point """
     global args
@@ -337,6 +355,40 @@ def main(_args=None):
                            docfilter=docfilter)
                for module in args.modules]
     pdoc.link_inheritance()
+
+    if args.pdf:
+        print_pdf(modules)
+        print("""
+PDF-ready markdown written to standard output.
+                              ^^^^^^^^^^^^^^^
+Convert this file to PDF using e.g. Pandoc:
+
+    pandoc --metadata=title:"MyProject Documentation"             \\
+           --toc --toc-depth=4 --from=markdown+abbreviations      \\
+           --pdf-engine=xelatex --variable=mainfont:"DejaVu Sans" \\
+           --output=pdf.pdf pdf.md
+
+or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
+
+    markdown_py --extension=meta         \\
+                --extension=abbr         \\
+                --extension=attr_list    \\
+                --extension=def_list     \\
+                --extension=fenced_code  \\
+                --extension=footnotes    \\
+                --extension=tables       \\
+                --extension=admonition   \\
+                --extension=smarty       \\
+                --extension=toc          \\
+                pdf.md > pdf.html
+
+    chromium --headless --disable-gpu --print-to-pdf=pdf.pdf pdf.html
+
+    wkhtmltopdf -s A4 --print-media-type pdf.html pdf.pdf
+
+or similar, at your own discretion.""",
+              file=sys.stderr)
+        sys.exit(0)
 
     for module in modules:
         if args.html:

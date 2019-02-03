@@ -292,15 +292,28 @@ class _ToMarkdown:
 
 
 def to_html(text: str, docformat: str = 'numpy,google', *,
-            module: pdoc.Module = None, link: Callable[..., str] = None,
-            # Matches markdown code spans not +directly+ within links.
-            # E.g. `code` and [foo is `bar`]() but not [`code`](...)
-            # Also skips \-escaped grave quotes.
-            _code_refs=re.compile(r'(?<![\[\\])`(?!])(?:[^`]|(?<=\\)`)+`').sub):
+            module: pdoc.Module = None, link: Callable[..., str] = None):
     """
     Returns HTML of `text` interpreted as `docformat`.
     By default, Numpydoc and Google-style docstrings are assumed,
     as well as pure Markdown.
+
+    `module` should be the documented module (so the references can be
+    resolved) and `link` is the hyperlinking function like the one in the
+    example template.
+    """
+    md = to_markdown(text, docformat=docformat, module=module, link=link)
+    return _md.reset().convert(md)
+
+
+def to_markdown(text: str, docformat: str = 'numpy,google', *,
+                module: pdoc.Module = None, link: Callable[..., str] = None,
+                # Matches markdown code spans not +directly+ within links.
+                # E.g. `code` and [foo is `bar`]() but not [`code`](...)
+                # Also skips \-escaped grave quotes.
+                _code_refs=re.compile(r'(?<![\[\\])`(?!])(?:[^`]|(?<=\\)`)+`').sub):
+    """
+    Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
 
     `module` should be the documented module (so the references can be
     resolved) and `link` is the hyperlinking function like the one in the
@@ -342,7 +355,7 @@ def to_html(text: str, docformat: str = 'numpy,google', *,
 
         text = _code_refs(linkify, text)
 
-    return _md.reset().convert(text)
+    return text
 
 
 def extract_toc(text: str):

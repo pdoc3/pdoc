@@ -326,6 +326,17 @@ class CliTest(unittest.TestCase):
         self.assertNotIn('CONST', out)
         self.assertNotIn('B docstring', out)
 
+    def test_pdf(self):
+        with redirect_streams() as (stdout, stderr):
+            run('pdoc', pdf=None)
+            out = stdout.getvalue()
+            err = stderr.getvalue()
+        self.assertIn('pdoc3.github.io', out)
+        self.assertIn('pandoc', err)
+
+        self.assertIn(str(inspect.signature(pdoc.Doc.__init__)).replace('self, ', ''),
+                      out)
+
 
 class ApiTest(unittest.TestCase):
     """
@@ -865,7 +876,7 @@ that are relevant to the interface.</p>
 <div class="admonition admonition">
 <p class="admonition-title">Example</p>
 <p>Image shows something.</p>
-<p><img alt="" src="/logo.png"></p>
+<p><img alt="" src="https://www.debian.org/logos/openlogo-nd-100.png"></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Can only nest admonitions two levels.</p>
