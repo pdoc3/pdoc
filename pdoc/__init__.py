@@ -287,7 +287,7 @@ afterwards, pass the directory path as a parameter to the
     see if you can do so by overriding just some of the following, placeholder
     sub-templates:
 
-    + _config.mako_: Basic template configuration, affects the way templates are rendered.
+    * _config.mako_: Basic template configuration, affects the way templates are rendered.
     * _head.mako_: Included just before `</head>`. Best for adding resources and styles.
     * _logo.mako_: Included at the very top of the navigation sidebar. Empty by default.
     * _credits.mako_: Included in the footer, right before pdoc version string.
