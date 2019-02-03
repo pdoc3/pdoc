@@ -219,7 +219,7 @@ class Docformats:
 
            Image shows something.
 
-           .. image:: /logo.png
+           .. image:: https://www.debian.org/logos/openlogo-nd-100.png
 
            .. note::
               Can only nest admonitions two levels.
