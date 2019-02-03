@@ -883,6 +883,8 @@ class Module(Doc):
         global context object will be used.
         """
         super().__init__(module.__name__, self, module)
+        if self.name.endswith('.__init__') and not self.is_package:
+            self.name = self.name[:-len('.__init__')]
 
         self._context = _global_context if context is None else context
         """
@@ -913,7 +915,7 @@ class Module(Doc):
         else:
             def is_from_this_module(obj):
                 mod = inspect.getmodule(obj)
-                return mod is None or mod.__name__ == self.name
+                return mod is None or mod.__name__ == self.obj.__name__
 
             public_objs = [(name, inspect.unwrap(obj))
                            for name, obj in inspect.getmembers(self.obj)
@@ -1060,7 +1062,7 @@ class Module(Doc):
         or in any of the exported identifiers of the submodules.
         """
         # XXX: Is this corrent? Does it always match
-        # `Class.module.name + Class.qualname`?.
+        # `Class.module.name + Class.qualname`?. Especially now?
         # If not, see what was here before.
         return self.find_ident(cls.__module__ + '.' + cls.__qualname__)
 
