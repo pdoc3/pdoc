@@ -670,6 +670,11 @@ class ApiTest(unittest.TestCase):
         self.assertNotEqual(sorted_methods, unsorted_methods)
         self.assertEqual(sorted_methods, sorted(unsorted_methods))
 
+    def test_module_init(self):
+        mod = pdoc.Module(pdoc.import_module('pdoc.__init__'))
+        self.assertEqual(mod.name, 'pdoc')
+        self.assertIn('Module', mod.doc)
+
 
 class HtmlHelpersTest(unittest.TestCase):
     """
