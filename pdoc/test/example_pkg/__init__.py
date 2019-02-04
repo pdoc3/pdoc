@@ -151,6 +151,10 @@ class Docformats:
         Nomatch:
 
         Args:
+            arg1 (str, optional): Text1
+            arg2 (List[str], optional, default=10): Text2
+
+        Args:
           arg1 (int): Description of arg1
           arg2 (str or int): Description of arg2
           test_sequence: 2-dim numpy array of real numbers, size: N * D
@@ -166,9 +170,6 @@ class Docformats:
             issue_10: description didn't work across multiple lines
                 if only a single item was listed. `inspect.cleandoc()`
                 somehow stripped the required extra indentation.
-
-        Returns:
-            bool: Description of return value
 
         Raises:
             AttributeError: The ``Raises`` section is a list of all exceptions

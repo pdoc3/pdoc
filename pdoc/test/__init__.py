@@ -662,6 +662,14 @@ description of <code>x1</code>, <code>x2</code>.</p>
 Nomatch:</p>
 <h2 id="args">Args</h2>
 <dl>
+<dt><strong><code>arg1</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Text1</dd>
+<dt><strong><code>arg2</code></strong> :&ensp;<code>List</code>[<code>str</code>], optional,\
+ default=<code>10</code></dt>
+<dd>Text2</dd>
+</dl>
+<h2 id="args_1">Args</h2>
+<dl>
 <dt><strong><code>arg1</code></strong> :&ensp;<code>int</code></dt>
 <dd>Description of arg1</dd>
 <dt><strong><code>arg2</code></strong> :&ensp;<code>str</code> or <code>int</code></dt>
@@ -685,11 +693,6 @@ code
 if only a single item was listed. <code>inspect.cleandoc()</code>
 somehow stripped the required extra indentation.</dd>
 </dl>
-<h2 id="returns_1">Returns</h2>
-<dl>
-<dt><strong><code>bool</code></strong></dt>
-<dd>Description of return value</dd>
-</dl>
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><strong><code>AttributeError</code></strong></dt>
@@ -702,7 +705,7 @@ that are relevant to the interface.</p>
 <dd>If <code>arg2</code> is equal to <code>arg1</code>.</dd>
 </dl>
 <p>Test a title without a blank line before it.</p>
-<h2 id="args_1">Args</h2>
+<h2 id="args_2">Args</h2>
 <dl>
 <dt><strong><code>A</code></strong></dt>
 <dd>a</dd>
