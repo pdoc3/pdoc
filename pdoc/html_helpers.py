@@ -203,8 +203,12 @@ class _ToMarkdown:
         indent, type, value, text = match.groups()
 
         if type == 'include' and module:
-            return _ToMarkdown._include_file(indent, value,
-                                             _ToMarkdown._directive_options(text), module)
+            try:
+                return _ToMarkdown._include_file(indent, value,
+                                                 _ToMarkdown._directive_opts(text), module)
+            except Exception as e:
+                raise RuntimeError('`.. include:: {}` error in module {!r}: {}'
+                                   .format(value, module.name, e))
         if type in ('image', 'figure'):
             return '{}![{}]({})\n'.format(
                 indent, text.translate(str.maketrans({'\n': ' ',
@@ -252,13 +256,9 @@ class _ToMarkdown:
         start_after = options.get('start-after')
         end_before = options.get('end-before')
 
-        try:
-            with open(os.path.join(os.path.dirname(module.obj.__file__), path),
-                      encoding='utf-8') as f:
-                text = ''.join(list(f)[start_line:end_line])
-        except Exception as e:
-            raise RuntimeError('`.. include:: {}` error in module {!r}: {}'
-                               .format(path, module.name, e))
+        with open(os.path.join(os.path.dirname(module.obj.__file__), path),
+                  encoding='utf-8') as f:
+            text = ''.join(list(f)[start_line:end_line])
 
         if start_after:
             text = text[text.index(start_after) + len(start_after):]
@@ -269,7 +269,7 @@ class _ToMarkdown:
         return text
 
     @staticmethod
-    def _directive_options(text: str) -> dict:
+    def _directive_opts(text: str) -> dict:
         return dict(re.findall(r'^ *:([^:]+): *(.*)', text, re.MULTILINE))
 
     @staticmethod
