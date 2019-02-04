@@ -186,7 +186,7 @@ class _ToMarkdown:
                _googledoc_sections=partial(
                    re.compile(r'^([A-Z]\w+):$\n((?:\n?(?: {2,}.*|$))+)', re.MULTILINE).sub,
                    lambda m, _params=partial(
-                           re.compile(r'^([\w*]+)(?: \(([\w.,= ]+)\))?: '
+                           re.compile(r'^([\w*]+)(?: \(([\w.,=\[\] ]+)\))?: '
                                       r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub,
                            lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups()))): (
                        m.group() if not m.group(2) else '\n{}\n-----\n{}'.format(
