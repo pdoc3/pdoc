@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.5.1" />
+<meta name="generator" content="pdoc 0.5.2" />
 <title>pdoc.test API documentation</title>
 <meta name="description" content="Unit tests for pdoc package." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id=^header-]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:1px solid #ddd;margin:1em 0 1em 4ch}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}#index .two-column{column-count:2}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.name small{font-weight:normal}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{background:#ffc;font-weight:400;font-size:.8em;width:11em;text-transform:uppercase;padding:0px 8px;border:1px solid #fd6;border-radius:5px;cursor:pointer}.source summary:hover{background:#fe9 !important}.source[open] summary{background:#fda}.source pre{max-height:500px;overflow-y:scroll;margin-bottom:15px}.hlist{list-syle:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink;]</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}#index .two-column{column-count:2}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.name small{font-weight:normal}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
-<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a,a:visited{text-decoration:underline}a[href]:after{content:" (" attr(href) ")"}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 <style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em}</style>
 <link rel="canonical" href="https://pdoc3.github.io/pdoc/doc/pdoc/test/">
 <link rel="icon" href="https://pdoc.github.io/pdoc/logo.png">
@@ -382,6 +382,12 @@ class ApiTest(unittest.TestCase):
         var = mod.doc[&#39;B&#39;].doc[&#39;instance_var&#39;]
         self.assertTrue(var.instance_var)
 
+    def test_builtin_methoddescriptors(self):
+        import parser
+        with self.assertWarns(UserWarning):
+            c = pdoc.Class(&#39;STType&#39;, pdoc.Module(parser), parser.STType)
+        self.assertIsInstance(c.doc[&#39;compile&#39;], pdoc.Function)
+
     def test_refname(self):
         mod = EXAMPLE_MODULE + &#39;.&#39; + &#39;subpkg&#39;
         module = pdoc.Module(pdoc.import_module(mod))
@@ -507,9 +513,11 @@ class ApiTest(unittest.TestCase):
         a = mod.doc[&#39;a&#39;].doc[&#39;A&#39;]
         b = mod.doc[&#39;b&#39;].doc[&#39;B&#39;]
         c = mod.doc[&#39;b&#39;].doc[&#39;c&#39;].doc[&#39;C&#39;]
-        self.assertEqual(b.inherits, a)
         self.assertEqual(b.doc[&#39;a&#39;].inherits, a.doc[&#39;a&#39;])
         self.assertEqual(b.doc[&#39;c&#39;].inherits, c.doc[&#39;c&#39;])
+        # While classes do inherit from superclasses, they just shouldn&#39;t always
+        # say so, because public classes do want to be exposed and linked to
+        self.assertNotEqual(b.inherits, a)
 
     def test_context(self):
         context = {}
@@ -549,7 +557,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(c.url(), &#39;example_pkg/index.html#example_pkg.D&#39;)
         self.assertEqual(c.url(link_prefix=&#39;/&#39;), &#39;/example_pkg/index.html#example_pkg.D&#39;)
         self.assertEqual(c.url(relative_to=c.module), &#39;#example_pkg.D&#39;)
-        self.assertEqual(c.url(top_ancestor=True), &#39;example_pkg/index.html#example_pkg.B&#39;)
+        self.assertEqual(c.url(top_ancestor=True), c.url())  # Public classes do link to themselves
 
         f = c.doc[&#39;overridden&#39;]
         self.assertEqual(f.url(), &#39;example_pkg/index.html#example_pkg.D.overridden&#39;)
@@ -684,17 +692,36 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 Nomatch:&lt;/p&gt;
 &lt;h2 id=&#34;args&#34;&gt;Args&lt;/h2&gt;
 &lt;dl&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg1&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;str&lt;/code&gt;, optional&lt;/dt&gt;
+&lt;dd&gt;Text1&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;List&lt;/code&gt;[&lt;code&gt;str&lt;/code&gt;], optional,\
+ default=&lt;code&gt;10&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;Text2&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;h2 id=&#34;args_1&#34;&gt;Args&lt;/h2&gt;
+&lt;dl&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg1&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;int&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Description of arg1&lt;/dd&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;str&lt;/code&gt; or &lt;code&gt;int&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Description of arg2&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;test_sequence&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;
+&lt;p&gt;2-dim numpy array of real numbers, size: N * D
+- the test observation sequence.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;test_sequence =
+code
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Continue.&lt;/p&gt;
+&lt;/dd&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;*args&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
 &lt;dd&gt;passed around&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;returns&#34;&gt;Returns&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;bool&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
-&lt;dd&gt;Description of return value&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;issue_10&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;description didn&#39;t work across multiple lines
+if only a single item was listed. &lt;code&gt;inspect.cleandoc()&lt;/code&gt;
+somehow stripped the required extra indentation.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;raises&#34;&gt;Raises&lt;/h2&gt;
 &lt;dl&gt;
@@ -706,6 +733,12 @@ that are relevant to the interface.&lt;/p&gt;
 &lt;/dd&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;ValueError&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
 &lt;dd&gt;If &lt;code&gt;arg2&lt;/code&gt; is equal to &lt;code&gt;arg1&lt;/code&gt;.&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;Test a title without a blank line before it.&lt;/p&gt;
+&lt;h2 id=&#34;args_2&#34;&gt;Args&lt;/h2&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;A&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;a&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
 &lt;p&gt;Examples in doctest format.&lt;/p&gt;
@@ -824,7 +857,7 @@ class HttpTest(unittest.TestCase):
 
 
 if __name__ == &#39;__main__&#39;:
-    unittest.main()}</code></pre>
+    unittest.main()</code></pre>
 </details>
 </section>
 <section>
@@ -855,7 +888,7 @@ def chdir(path):
         os.chdir(path)
         yield
     finally:
-        os.chdir(old)}</code></pre>
+        os.chdir(old)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.redirect_streams"><code class="name flex">
@@ -869,7 +902,7 @@ def chdir(path):
 def redirect_streams():
     stdout, stderr = StringIO(), StringIO()
     with redirect_stderr(stderr), redirect_stdout(stdout):
-        yield stdout, stderr}</code></pre>
+        yield stdout, stderr</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.run"><code class="name flex">
@@ -888,7 +921,7 @@ def redirect_streams():
         returncode = main(_args)
         return returncode or 0
     except SystemExit as e:
-        return e.code}</code></pre>
+        return e.code</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.run_html"><code class="name flex">
@@ -903,7 +936,7 @@ def run_html(*args, **kwargs):
     with temp_dir() as path:
         run(*args, html=None, html_dir=path, **kwargs)
         with chdir(path):
-            yield}</code></pre>
+            yield</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.temp_dir"><code class="name flex">
@@ -916,7 +949,7 @@ def run_html(*args, **kwargs):
 <pre><code class="python">@contextmanager
 def temp_dir():
     with TemporaryDirectory(prefix=&#39;pdoc-test-&#39;) as path:
-        yield path}</code></pre>
+        yield path</code></pre>
 </details>
 </dd>
 </dl>
@@ -970,6 +1003,12 @@ def temp_dir():
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
         var = mod.doc[&#39;B&#39;].doc[&#39;instance_var&#39;]
         self.assertTrue(var.instance_var)
+
+    def test_builtin_methoddescriptors(self):
+        import parser
+        with self.assertWarns(UserWarning):
+            c = pdoc.Class(&#39;STType&#39;, pdoc.Module(parser), parser.STType)
+        self.assertIsInstance(c.doc[&#39;compile&#39;], pdoc.Function)
 
     def test_refname(self):
         mod = EXAMPLE_MODULE + &#39;.&#39; + &#39;subpkg&#39;
@@ -1096,9 +1135,11 @@ def temp_dir():
         a = mod.doc[&#39;a&#39;].doc[&#39;A&#39;]
         b = mod.doc[&#39;b&#39;].doc[&#39;B&#39;]
         c = mod.doc[&#39;b&#39;].doc[&#39;c&#39;].doc[&#39;C&#39;]
-        self.assertEqual(b.inherits, a)
         self.assertEqual(b.doc[&#39;a&#39;].inherits, a.doc[&#39;a&#39;])
         self.assertEqual(b.doc[&#39;c&#39;].inherits, c.doc[&#39;c&#39;])
+        # While classes do inherit from superclasses, they just shouldn&#39;t always
+        # say so, because public classes do want to be exposed and linked to
+        self.assertNotEqual(b.inherits, a)
 
     def test_context(self):
         context = {}
@@ -1138,13 +1179,13 @@ def temp_dir():
         self.assertEqual(c.url(), &#39;example_pkg/index.html#example_pkg.D&#39;)
         self.assertEqual(c.url(link_prefix=&#39;/&#39;), &#39;/example_pkg/index.html#example_pkg.D&#39;)
         self.assertEqual(c.url(relative_to=c.module), &#39;#example_pkg.D&#39;)
-        self.assertEqual(c.url(top_ancestor=True), &#39;example_pkg/index.html#example_pkg.B&#39;)
+        self.assertEqual(c.url(top_ancestor=True), c.url())  # Public classes do link to themselves
 
         f = c.doc[&#39;overridden&#39;]
         self.assertEqual(f.url(), &#39;example_pkg/index.html#example_pkg.D.overridden&#39;)
         self.assertEqual(f.url(link_prefix=&#39;/&#39;), &#39;/example_pkg/index.html#example_pkg.D.overridden&#39;)
         self.assertEqual(f.url(relative_to=c.module), &#39;#example_pkg.D.overridden&#39;)
-        self.assertEqual(f.url(top_ancestor=1), &#39;example_pkg/index.html#example_pkg.B.overridden&#39;)}</code></pre>
+        self.assertEqual(f.url(top_ancestor=1), &#39;example_pkg/index.html#example_pkg.B.overridden&#39;)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -1156,7 +1197,7 @@ def temp_dir():
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def setUp(self):
-    pdoc.reset()}</code></pre>
+    pdoc.reset()</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_Function_private_params"><code class="name flex">
@@ -1177,7 +1218,7 @@ def temp_dir():
 
     func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc),
                          lambda a, b, *, _c=1: None)
-    self.assertEqual(func.params(), [&#39;a&#39;, &#39;b&#39;])}</code></pre>
+    self.assertEqual(func.params(), [&#39;a&#39;, &#39;b&#39;])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test__all__"><code class="name flex">
@@ -1193,7 +1234,7 @@ def temp_dir():
         mod = pdoc.Module(module)
         with self.assertWarns(UserWarning):  # Only B is used but __pdoc__ contains others
             pdoc.link_inheritance()
-        self.assertEqual(list(mod.doc.keys()), [&#39;B&#39;])}</code></pre>
+        self.assertEqual(list(mod.doc.keys()), [&#39;B&#39;])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test__pdoc__dict"><code class="name flex">
@@ -1216,7 +1257,7 @@ def temp_dir():
         pdoc.link_inheritance()
         self.assertIn(&#39;B&#39;, mod.doc)
         self.assertNotIn(&#39;__init__&#39;, mod.doc[&#39;B&#39;].doc)
-        self.assertIsInstance(mod.find_ident(&#39;B.__init__&#39;), pdoc.External)}</code></pre>
+        self.assertIsInstance(mod.find_ident(&#39;B.__init__&#39;), pdoc.External)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test__pdoc__invalid_value"><code class="name flex">
@@ -1231,7 +1272,21 @@ def temp_dir():
     with patch.object(module, &#39;__pdoc__&#39;, {&#39;B&#39;: 1}), \
             self.assertRaises(ValueError):
         pdoc.Module(module)
-        pdoc.link_inheritance()}</code></pre>
+        pdoc.link_inheritance()</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.ApiTest.test_builtin_methoddescriptors"><code class="name flex">
+<span>def <span class="ident">test_builtin_methoddescriptors</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def test_builtin_methoddescriptors(self):
+    import parser
+    with self.assertWarns(UserWarning):
+        c = pdoc.Class(&#39;STType&#39;, pdoc.Module(parser), parser.STType)
+    self.assertIsInstance(c.doc[&#39;compile&#39;], pdoc.Function)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_context"><code class="name flex">
@@ -1256,7 +1311,7 @@ def temp_dir():
     module = pdoc.Module(pdoc)
     self.assertIsInstance(module.find_ident(&#39;pdoc.Module&#39;), pdoc.Class)
     pdoc.reset()
-    self.assertIsInstance(module.find_ident(&#39;pdoc.Module&#39;), pdoc.External)}</code></pre>
+    self.assertIsInstance(module.find_ident(&#39;pdoc.Module&#39;), pdoc.External)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_find_ident"><code class="name flex">
@@ -1277,7 +1332,7 @@ def temp_dir():
     nonexistent = &#39;foo()&#39;
     result = mod.find_ident(nonexistent)
     self.assertIsInstance(result, pdoc.External)
-    self.assertEqual(result.name, nonexistent)}</code></pre>
+    self.assertEqual(result.name, nonexistent)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_import_filename"><code class="name flex">
@@ -1292,7 +1347,7 @@ def temp_dir():
     sys.path.clear()
     with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
         pdoc.import_module(&#39;index&#39;)
-    sys.path = old_sys_path}</code></pre>
+    sys.path = old_sys_path</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_inherited_members"><code class="name flex">
@@ -1309,7 +1364,7 @@ def temp_dir():
     b = mod.doc[&#39;B&#39;]
     self.assertEqual(b.inherited_members(), [(a, [a.doc[&#39;inherited&#39;],
                                                   a.doc[&#39;overridden_same_docstring&#39;]])])
-    self.assertEqual(a.inherited_members(), [])}</code></pre>
+    self.assertEqual(a.inherited_members(), [])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_inherits"><code class="name flex">
@@ -1335,7 +1390,7 @@ def temp_dir():
     c = module.doc[&#39;C&#39;]
     d = module.doc[&#39;D&#39;]
     self.assertEqual(d.doc[&#39;overridden&#39;].inherits, c.doc[&#39;overridden&#39;])
-    self.assertEqual(c.doc[&#39;overridden&#39;].inherits, b.doc[&#39;overridden&#39;])}</code></pre>
+    self.assertEqual(c.doc[&#39;overridden&#39;].inherits, b.doc[&#39;overridden&#39;])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_instance_var"><code class="name flex">
@@ -1349,7 +1404,7 @@ def temp_dir():
     pdoc.reset()
     mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
     var = mod.doc[&#39;B&#39;].doc[&#39;instance_var&#39;]
-    self.assertTrue(var.instance_var)}</code></pre>
+    self.assertTrue(var.instance_var)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_link_inheritance"><code class="name flex">
@@ -1377,9 +1432,11 @@ def temp_dir():
     a = mod.doc[&#39;a&#39;].doc[&#39;A&#39;]
     b = mod.doc[&#39;b&#39;].doc[&#39;B&#39;]
     c = mod.doc[&#39;b&#39;].doc[&#39;c&#39;].doc[&#39;C&#39;]
-    self.assertEqual(b.inherits, a)
     self.assertEqual(b.doc[&#39;a&#39;].inherits, a.doc[&#39;a&#39;])
-    self.assertEqual(b.doc[&#39;c&#39;].inherits, c.doc[&#39;c&#39;])}</code></pre>
+    self.assertEqual(b.doc[&#39;c&#39;].inherits, c.doc[&#39;c&#39;])
+    # While classes do inherit from superclasses, they just shouldn&#39;t always
+    # say so, because public classes do want to be exposed and linked to
+    self.assertNotEqual(b.inherits, a)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_module"><code class="name flex">
@@ -1401,7 +1458,7 @@ def temp_dir():
                 self.assertEqual(repr(m), &#34;&lt;Module &#39;{}&#39;&gt;&#34;.format(m.obj.__name__))
                 self.assertEqual(m.name, EXAMPLE_MODULE + name_suffix)
                 self.assertEqual(sorted(m.name for m in m.submodules()),
-                                 [EXAMPLE_MODULE + &#39;.&#39; + m for m in submodules])}</code></pre>
+                                 [EXAMPLE_MODULE + &#39;.&#39; + m for m in submodules])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_module_allsubmodules"><code class="name flex">
@@ -1414,7 +1471,7 @@ def temp_dir():
 <pre><code class="python">def test_module_allsubmodules(self):
     m = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + &#39;._private&#39;))
     self.assertEqual(sorted(m.name for m in m.submodules()),
-                     [EXAMPLE_MODULE + &#39;._private.module&#39;])}</code></pre>
+                     [EXAMPLE_MODULE + &#39;._private.module&#39;])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_qualname"><code class="name flex">
@@ -1438,7 +1495,7 @@ def temp_dir():
     self.assertEqual(cls.qualname, &#39;B&#39;)
     self.assertEqual(nested_cls.qualname, &#39;B.C&#39;)
     self.assertEqual(cls_var.qualname, &#39;B.var&#39;)
-    self.assertEqual(method.qualname, &#39;B.f&#39;)}</code></pre>
+    self.assertEqual(method.qualname, &#39;B.f&#39;)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_refname"><code class="name flex">
@@ -1467,7 +1524,7 @@ def temp_dir():
 
     # Inherited method&#39;s refname points to class&#39; implicit copy
     pdoc.link_inheritance()
-    self.assertEqual(cls.doc[&#39;inherited&#39;].refname, mod + &#39;.B.inherited&#39;)}</code></pre>
+    self.assertEqual(cls.doc[&#39;inherited&#39;].refname, mod + &#39;.B.inherited&#39;)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_url"><code class="name flex">
@@ -1485,13 +1542,13 @@ def temp_dir():
     self.assertEqual(c.url(), &#39;example_pkg/index.html#example_pkg.D&#39;)
     self.assertEqual(c.url(link_prefix=&#39;/&#39;), &#39;/example_pkg/index.html#example_pkg.D&#39;)
     self.assertEqual(c.url(relative_to=c.module), &#39;#example_pkg.D&#39;)
-    self.assertEqual(c.url(top_ancestor=True), &#39;example_pkg/index.html#example_pkg.B&#39;)
+    self.assertEqual(c.url(top_ancestor=True), c.url())  # Public classes do link to themselves
 
     f = c.doc[&#39;overridden&#39;]
     self.assertEqual(f.url(), &#39;example_pkg/index.html#example_pkg.D.overridden&#39;)
     self.assertEqual(f.url(link_prefix=&#39;/&#39;), &#39;/example_pkg/index.html#example_pkg.D.overridden&#39;)
     self.assertEqual(f.url(relative_to=c.module), &#39;#example_pkg.D.overridden&#39;)
-    self.assertEqual(f.url(top_ancestor=1), &#39;example_pkg/index.html#example_pkg.B.overridden&#39;)}</code></pre>
+    self.assertEqual(f.url(top_ancestor=1), &#39;example_pkg/index.html#example_pkg.B.overridden&#39;)</code></pre>
 </details>
 </dd>
 </dl>
@@ -1742,7 +1799,7 @@ def temp_dir():
         self.assertIn(&#39;A&#39;, out)
         self.assertIn(&#39;### Descendants\n\n    * example_pkg.B&#39;, out)
         self.assertNotIn(&#39;CONST&#39;, out)
-        self.assertNotIn(&#39;B docstring&#39;, out)}</code></pre>
+        self.assertNotIn(&#39;B docstring&#39;, out)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -1765,7 +1822,7 @@ def temp_dir():
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def setUp(self):
-    pdoc.reset()}</code></pre>
+    pdoc.reset()</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_external_links"><code class="name flex">
@@ -1782,7 +1839,7 @@ def temp_dir():
 
     with run_html(EXAMPLE_MODULE, external_links=None):
         self._basic_html_assertions()
-        self._check_files([&#39;&lt;a title=&#34;sys.version&#34; href=&#34;/sys.version.ext&#34;&#39;])}</code></pre>
+        self._check_files([&#39;&lt;a title=&#34;sys.version&#34; href=&#34;/sys.version.ext&#34;&#39;])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_html"><code class="name flex">
@@ -1851,7 +1908,7 @@ def temp_dir():
             with self.subTest(filename=&#39;,&#39;.join(filenames)):
                 with run_html(*(os.path.join(EXAMPLE_MODULE, f) for f in filenames)):
                     self._basic_html_assertions(expected_files)
-                    self._check_files(include_patterns, exclude_patterns)}</code></pre>
+                    self._check_files(include_patterns, exclude_patterns)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_html_identifier"><code class="name flex">
@@ -1867,7 +1924,7 @@ def temp_dir():
              self.assertWarns(UserWarning) as cm:
             with run_html(EXAMPLE_MODULE + package, filter=&#39;A&#39;, html_no_source=None):
                 self._check_files([&#39;A&#39;], [&#39;CONST&#39;, &#39;B docstring&#39;])
-    self.assertIn(&#39;__pdoc__&#39;, cm.warning.args[0])}</code></pre>
+    self.assertIn(&#39;__pdoc__&#39;, cm.warning.args[0])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_html_multiple_files"><code class="name flex">
@@ -1882,7 +1939,7 @@ def temp_dir():
         with run_html(EXAMPLE_MODULE + &#39;/module.py&#39;, EXAMPLE_MODULE + &#39;/subpkg2&#39;):
             self._basic_html_assertions(
                 [f for f in self.PUBLIC_FILES
-                 if &#39;module&#39; in f or &#39;subpkg2&#39; in f or f == EXAMPLE_MODULE])}</code></pre>
+                 if &#39;module&#39; in f or &#39;subpkg2&#39; in f or f == EXAMPLE_MODULE])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_html_no_source"><code class="name flex">
@@ -1895,7 +1952,7 @@ def temp_dir():
 <pre><code class="python">def test_html_no_source(self):
     with run_html(EXAMPLE_MODULE, html_no_source=None):
         self._basic_html_assertions()
-        self._check_files(exclude_patterns=[&#39;class=&#34;source&#34;&#39;, &#39;Hidden&#39;])}</code></pre>
+        self._check_files(exclude_patterns=[&#39;class=&#34;source&#34;&#39;, &#39;Hidden&#39;])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_html_ref_links"><code class="name flex">
@@ -1913,7 +1970,7 @@ def temp_dir():
                 &#39;href=&#34;#example_pkg.B&#34;&gt;&#39;,
                 &#39;href=&#34;#example_pkg.A&#34;&gt;&#39;,
             ],
-        )}</code></pre>
+        )</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_link_prefix"><code class="name flex">
@@ -1926,7 +1983,7 @@ def temp_dir():
 <pre><code class="python">def test_link_prefix(self):
     with run_html(EXAMPLE_MODULE, link_prefix=&#39;/foobar/&#39;):
         self._basic_html_assertions()
-        self._check_files([&#39;/foobar/&#39; + EXAMPLE_MODULE])}</code></pre>
+        self._check_files([&#39;/foobar/&#39; + EXAMPLE_MODULE])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_overwrite"><code class="name flex">
@@ -1946,7 +2003,7 @@ def temp_dir():
         with redirect_streams() as (stdout, stderr):
             returncode = run(EXAMPLE_MODULE, html=None, overwrite=None, html_dir=os.getcwd())
             self.assertEqual(returncode, 0)
-            self.assertEqual(stderr.getvalue(), &#39;&#39;)}</code></pre>
+            self.assertEqual(stderr.getvalue(), &#39;&#39;)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_template_dir"><code class="name flex">
@@ -1966,7 +2023,7 @@ def temp_dir():
             self._check_files([&#39;FOOBAR&#39;, &#39;/* Empty CSS */&#39;], [&#39;coding: utf-8&#39;])
     finally:
         pdoc.tpl_lookup.directories = old_tpl_dirs
-        pdoc.tpl_lookup._collection.clear()}</code></pre>
+        pdoc.tpl_lookup._collection.clear()</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_text"><code class="name flex">
@@ -2035,7 +2092,7 @@ def temp_dir():
                     out = stdout.getvalue()
                 for f in files:
                     header = &#39;Module {}.{}&#39;.format(EXAMPLE_MODULE, os.path.splitext(f)[0])
-                    self.assertIn(header, out)}</code></pre>
+                    self.assertIn(header, out)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_text_identifier"><code class="name flex">
@@ -2052,7 +2109,7 @@ def temp_dir():
     self.assertIn(&#39;A&#39;, out)
     self.assertIn(&#39;### Descendants\n\n    * example_pkg.B&#39;, out)
     self.assertNotIn(&#39;CONST&#39;, out)
-    self.assertNotIn(&#39;B docstring&#39;, out)}</code></pre>
+    self.assertNotIn(&#39;B docstring&#39;, out)</code></pre>
 </details>
 </dd>
 </dl>
@@ -2148,17 +2205,36 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 Nomatch:&lt;/p&gt;
 &lt;h2 id=&#34;args&#34;&gt;Args&lt;/h2&gt;
 &lt;dl&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg1&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;str&lt;/code&gt;, optional&lt;/dt&gt;
+&lt;dd&gt;Text1&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;List&lt;/code&gt;[&lt;code&gt;str&lt;/code&gt;], optional,\
+ default=&lt;code&gt;10&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;Text2&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;h2 id=&#34;args_1&#34;&gt;Args&lt;/h2&gt;
+&lt;dl&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg1&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;int&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Description of arg1&lt;/dd&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;str&lt;/code&gt; or &lt;code&gt;int&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Description of arg2&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;test_sequence&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;
+&lt;p&gt;2-dim numpy array of real numbers, size: N * D
+- the test observation sequence.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;test_sequence =
+code
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Continue.&lt;/p&gt;
+&lt;/dd&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;*args&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
 &lt;dd&gt;passed around&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;returns&#34;&gt;Returns&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;bool&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
-&lt;dd&gt;Description of return value&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;issue_10&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;description didn&#39;t work across multiple lines
+if only a single item was listed. &lt;code&gt;inspect.cleandoc()&lt;/code&gt;
+somehow stripped the required extra indentation.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;raises&#34;&gt;Raises&lt;/h2&gt;
 &lt;dl&gt;
@@ -2170,6 +2246,12 @@ that are relevant to the interface.&lt;/p&gt;
 &lt;/dd&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;ValueError&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
 &lt;dd&gt;If &lt;code&gt;arg2&lt;/code&gt; is equal to &lt;code&gt;arg1&lt;/code&gt;.&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;Test a title without a blank line before it.&lt;/p&gt;
+&lt;h2 id=&#34;args_2&#34;&gt;Args&lt;/h2&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;A&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;a&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
 &lt;p&gt;Examples in doctest format.&lt;/p&gt;
@@ -2235,7 +2317,7 @@ lines.&lt;/p&gt;
 &lt;/div&gt;&#39;&#39;&#39;
         text = inspect.getdoc(self._docmodule.reST_directives)
         html = to_html(text, module=self._module, link=self._link)
-        self.assertEqual(html, expected)}</code></pre>
+        self.assertEqual(html, expected)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -2255,7 +2337,7 @@ lines.&lt;/p&gt;
 &lt;/code&gt;&lt;/pre&gt;&#39;&#39;&#39;
         text = inspect.getdoc(self._docmodule.doctests)
         html = to_html(text, module=self._module, link=self._link)
-        self.assertEqual(html, expected)}</code></pre>
+        self.assertEqual(html, expected)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.Docformats.test_google"><code class="name flex">
@@ -2270,17 +2352,36 @@ lines.&lt;/p&gt;
 Nomatch:&lt;/p&gt;
 &lt;h2 id=&#34;args&#34;&gt;Args&lt;/h2&gt;
 &lt;dl&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg1&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;str&lt;/code&gt;, optional&lt;/dt&gt;
+&lt;dd&gt;Text1&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;List&lt;/code&gt;[&lt;code&gt;str&lt;/code&gt;], optional,\
+ default=&lt;code&gt;10&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;Text2&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;h2 id=&#34;args_1&#34;&gt;Args&lt;/h2&gt;
+&lt;dl&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg1&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;int&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Description of arg1&lt;/dd&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;str&lt;/code&gt; or &lt;code&gt;int&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Description of arg2&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;test_sequence&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;
+&lt;p&gt;2-dim numpy array of real numbers, size: N * D
+- the test observation sequence.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;test_sequence =
+code
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Continue.&lt;/p&gt;
+&lt;/dd&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;*args&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
 &lt;dd&gt;passed around&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;returns&#34;&gt;Returns&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;bool&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
-&lt;dd&gt;Description of return value&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;issue_10&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;description didn&#39;t work across multiple lines
+if only a single item was listed. &lt;code&gt;inspect.cleandoc()&lt;/code&gt;
+somehow stripped the required extra indentation.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;raises&#34;&gt;Raises&lt;/h2&gt;
 &lt;dl&gt;
@@ -2293,6 +2394,12 @@ that are relevant to the interface.&lt;/p&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;ValueError&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
 &lt;dd&gt;If &lt;code&gt;arg2&lt;/code&gt; is equal to &lt;code&gt;arg1&lt;/code&gt;.&lt;/dd&gt;
 &lt;/dl&gt;
+&lt;p&gt;Test a title without a blank line before it.&lt;/p&gt;
+&lt;h2 id=&#34;args_2&#34;&gt;Args&lt;/h2&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;A&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;a&lt;/dd&gt;
+&lt;/dl&gt;
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
 &lt;p&gt;Examples in doctest format.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; a = [1,2,3]
@@ -2303,7 +2410,7 @@ that are relevant to the interface.&lt;/p&gt;
 &lt;/ul&gt;&#39;&#39;&#39;
         text = inspect.getdoc(self._docmodule.google)
         html = to_html(text, module=self._module, link=self._link)
-        self.assertEqual(html, expected)}</code></pre>
+        self.assertEqual(html, expected)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.Docformats.test_numpy"><code class="name flex">
@@ -2357,7 +2464,7 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;p&gt;Foo bar.&lt;/p&gt;&#39;&#39;&#39;  # noqa: E501
         text = inspect.getdoc(self._docmodule.numpy)
         html = to_html(text, module=self._module, link=self._link)
-        self.assertEqual(html, expected)}</code></pre>
+        self.assertEqual(html, expected)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.Docformats.test_reST_directives"><code class="name flex">
@@ -2408,7 +2515,7 @@ lines.&lt;/p&gt;
 &lt;/div&gt;&#39;&#39;&#39;
         text = inspect.getdoc(self._docmodule.reST_directives)
         html = to_html(text, module=self._module, link=self._link)
-        self.assertEqual(html, expected)}</code></pre>
+        self.assertEqual(html, expected)</code></pre>
 </details>
 </dd>
 </dl>
@@ -2485,7 +2592,7 @@ lines.&lt;/p&gt;
 &lt;/ul&gt;
 &lt;/div&gt;&#39;&#39;&#39;
         toc = extract_toc(text)
-        self.assertEqual(toc, expected)}</code></pre>
+        self.assertEqual(toc, expected)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -2507,7 +2614,7 @@ lines.&lt;/p&gt;
 &lt;/ul&gt;
 &lt;/div&gt;&#39;&#39;&#39;
         toc = extract_toc(text)
-        self.assertEqual(toc, expected)}</code></pre>
+        self.assertEqual(toc, expected)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.HtmlHelpersTest.test_glimpse"><code class="name flex">
@@ -2521,7 +2628,7 @@ lines.&lt;/p&gt;
     text = &#39;foo bar\n\nbaz&#39;
     self.assertEqual(glimpse(text), &#39;foo bar …&#39;)
     self.assertEqual(glimpse(text, max_length=8, paragraph=False), &#39;foo …&#39;)
-    self.assertEqual(glimpse(&#39;Foo bar\n-------&#39;), &#39;Foo bar&#39;)}</code></pre>
+    self.assertEqual(glimpse(&#39;Foo bar\n-------&#39;), &#39;Foo bar&#39;)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.HtmlHelpersTest.test_minify_css"><code class="name flex">
@@ -2536,7 +2643,7 @@ lines.&lt;/p&gt;
     minified = minify_css(css)
     self.assertNotIn(&#39; &#39;, minified)
     self.assertNotIn(&#39;;}&#39;, minified)
-    self.assertNotIn(&#39;*&#39;, minified)}</code></pre>
+    self.assertNotIn(&#39;*&#39;, minified)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.HtmlHelpersTest.test_minify_html"><code class="name flex">
@@ -2550,7 +2657,7 @@ lines.&lt;/p&gt;
     html = &#39;  &lt;p&gt;   a   &lt;/p&gt;    &lt;pre&gt;    a\n    b&lt;/pre&gt;    c   \n    d   &#39;
     expected = &#39;\n&lt;p&gt;\na\n&lt;/p&gt;\n&lt;pre&gt;    a\n    b&lt;/pre&gt;\nc\nd\n&#39;
     minified = minify_html(html)
-    self.assertEqual(minified, expected)}</code></pre>
+    self.assertEqual(minified, expected)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.HtmlHelpersTest.test_to_html"><code class="name flex">
@@ -2576,7 +2683,7 @@ lines.&lt;/p&gt;
 
     self.assertIn(&#39;&lt;a href=&#39;, to_html(&#39;`pdoc.Doc.url()`&#39;, module=module, link=link))
 
-    self.assertIn(&#39;&lt;code&gt;foo.f()&lt;/code&gt;&#39;, to_html(&#39;`foo.f()`&#39;, module=module, link=link))}</code></pre>
+    self.assertIn(&#39;&lt;code&gt;foo.f()&lt;/code&gt;&#39;, to_html(&#39;`foo.f()`&#39;, module=module, link=link))</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.HtmlHelpersTest.test_to_html_refname_warning"><code class="name flex">
@@ -2596,7 +2703,7 @@ lines.&lt;/p&gt;
     with self.assertWarns(ReferenceWarning) as cm:
         mod.html()
     del mod.doc[&#39;__f&#39;]
-    self.assertIn(&#39;example_pkg.nonexisting&#39;, cm.warning.args[0])}</code></pre>
+    self.assertIn(&#39;example_pkg.nonexisting&#39;, cm.warning.args[0])</code></pre>
 </details>
 </dd>
 </dl>
@@ -2655,7 +2762,7 @@ lines.&lt;/p&gt;
                             self.assertIn(b&#39;DictReader&#39;, html)
                 finally:
                     pdoc.cli._httpd.shutdown()
-                    t.join()}</code></pre>
+                    t.join()</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -2698,7 +2805,7 @@ lines.&lt;/p&gt;
                         self.assertIn(b&#39;DictReader&#39;, html)
             finally:
                 pdoc.cli._httpd.shutdown()
-                t.join()}</code></pre>
+                t.join()</code></pre>
 </details>
 </dd>
 </dl>
@@ -2740,12 +2847,13 @@ lines.&lt;/p&gt;
 <ul>
 <li>
 <h4><code><a title="pdoc.test.ApiTest" href="#pdoc.test.ApiTest">ApiTest</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="pdoc.test.ApiTest.setUp" href="#pdoc.test.ApiTest.setUp">setUp</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_Function_private_params" href="#pdoc.test.ApiTest.test_Function_private_params">test_Function_private_params</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test__all__" href="#pdoc.test.ApiTest.test__all__">test__all__</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test__pdoc__dict" href="#pdoc.test.ApiTest.test__pdoc__dict">test__pdoc__dict</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test__pdoc__invalid_value" href="#pdoc.test.ApiTest.test__pdoc__invalid_value">test__pdoc__invalid_value</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_builtin_methoddescriptors" href="#pdoc.test.ApiTest.test_builtin_methoddescriptors">test_builtin_methoddescriptors</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_context" href="#pdoc.test.ApiTest.test_context">test_context</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_find_ident" href="#pdoc.test.ApiTest.test_find_ident">test_find_ident</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_import_filename" href="#pdoc.test.ApiTest.test_import_filename">test_import_filename</a></code></li>
@@ -2762,7 +2870,7 @@ lines.&lt;/p&gt;
 </li>
 <li>
 <h4><code><a title="pdoc.test.CliTest" href="#pdoc.test.CliTest">CliTest</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="pdoc.test.CliTest.ALL_FILES" href="#pdoc.test.CliTest.ALL_FILES">ALL_FILES</a></code></li>
 <li><code><a title="pdoc.test.CliTest.PUBLIC_FILES" href="#pdoc.test.CliTest.PUBLIC_FILES">PUBLIC_FILES</a></code></li>
 <li><code><a title="pdoc.test.CliTest.setUp" href="#pdoc.test.CliTest.setUp">setUp</a></code></li>
@@ -2790,7 +2898,7 @@ lines.&lt;/p&gt;
 </li>
 <li>
 <h4><code><a title="pdoc.test.HtmlHelpersTest" href="#pdoc.test.HtmlHelpersTest">HtmlHelpersTest</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="pdoc.test.HtmlHelpersTest.test_extract_toc" href="#pdoc.test.HtmlHelpersTest.test_extract_toc">test_extract_toc</a></code></li>
 <li><code><a title="pdoc.test.HtmlHelpersTest.test_glimpse" href="#pdoc.test.HtmlHelpersTest.test_glimpse">test_glimpse</a></code></li>
 <li><code><a title="pdoc.test.HtmlHelpersTest.test_minify_css" href="#pdoc.test.HtmlHelpersTest.test_minify_css">test_minify_css</a></code></li>
@@ -2812,7 +2920,7 @@ lines.&lt;/p&gt;
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.2</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

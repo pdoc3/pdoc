@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.5.1" />
+<meta name="generator" content="pdoc 0.5.2" />
 <title>pdoc API documentation</title>
 <meta name="description" content="Python package `pdoc` provides types, functions, and a command-line
 interface for accessing public documentation of Python modules, and
@@ -11,9 +11,9 @@ for presenting …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id=^header-]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:1px solid #ddd;margin:1em 0 1em 4ch}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}#index .two-column{column-count:2}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.name small{font-weight:normal}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{background:#ffc;font-weight:400;font-size:.8em;width:11em;text-transform:uppercase;padding:0px 8px;border:1px solid #fd6;border-radius:5px;cursor:pointer}.source summary:hover{background:#fe9 !important}.source[open] summary{background:#fda}.source pre{max-height:500px;overflow-y:scroll;margin-bottom:15px}.hlist{list-syle:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink;]</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}#index .two-column{column-count:2}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.name small{font-weight:normal}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
-<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a,a:visited{text-decoration:underline}a[href]:after{content:" (" attr(href) ")"}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 <style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em}</style>
 <link rel="canonical" href="https://pdoc3.github.io/pdoc/doc/pdoc/">
 <link rel="icon" href="https://pdoc.github.io/pdoc/logo.png">
@@ -123,13 +123,16 @@ and attached to <code>self</code> are considered and documented as
 instance variables.</p>
 <p>Class and instance variables can also <a href="#docstrings-inheritance">inherit docstrings</a>.</p>
 <h2 id="overriding-docstrings-with-__pdoc__">Overriding docstrings with <code>__pdoc__</code></h2>
-<p>Docstrings can be overridden with a special module-level
-<code>__pdoc__</code> dictionary that <a title="pdoc" href="#pdoc"><code>pdoc</code></a> counsels when it exists. The keys
-of <code>__pdoc__</code> should be identifiers within the scope of the module or,
+<p>Docstrings for objects can be disabled or overridden with a special
+module-level dictionary <code>__pdoc__</code>. The <em>keys</em>
+should be string identifiers within the scope of the module or,
 alternatively, fully-qualified reference names. E.g. for instance
-variable <code>self.variable</code> for class <code>C</code>, its module identifier is
-<code>C.variable</code>. The values of <code>__pdoc__</code> dict should be docstrings.</p>
-<p>This particular feature is useful when there's no feasible way of
+variable <code>self.variable</code> of class <code>C</code>, its module-level identifier is
+<code>'C.variable'</code>.</p>
+<p>If <code>__pdoc__[key] = False</code>, then <code>key</code> (and its members) will be
+<strong>excluded from the documentation</strong> of the module.</p>
+<p>Alternatively, the <em>values</em> of <code>__pdoc__</code> should be the overriding docstrings.
+This particular feature is useful when there's no feasible way of
 attaching a docstring to something. A good example of this is a
 <a href="https://docs.python.org/3/library/collections.html#collections.namedtuple">namedtuple</a>:</p>
 <pre><code>__pdoc__ = {}
@@ -141,8 +144,6 @@ __pdoc__['Table.rows'] = 'Lists corresponding to each row in the table.'
 </code></pre>
 <p><a title="pdoc" href="#pdoc"><code>pdoc</code></a> will then show <code>Table</code> as a class with documentation for the
 <code>types</code>, <code>names</code> and <code>rows</code> members.</p>
-<p>Additionally, if <code>__pdoc__[key] = False</code>, then <code>key</code> will be
-excluded from the public interface of the module.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The assignments to <code>__pdoc__</code> need to be placed where they'll be
@@ -152,7 +153,9 @@ of a module or in the definition of a class.</p>
 <h2 id="supported-docstring-formats">Supported docstring formats</h2>
 <p>Currently, pure Markdown (with <a href="https://python-markdown.github.io/extensions/#officially-supported-extensions">extensions</a>), <a href="https://numpydoc.readthedocs.io/">numpydoc</a>,
 and <a href="http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings">Google-style</a> docstrings formats are supported.
-Basic <abbr title="reStructuredText">reST</abbr> directives (such as e.g. <code>.. deprecated::</code>) should also work.</p>
+Basic <abbr title="reStructuredText">reST</abbr> directives (such as e.g.
+<code>.. versionadded::</code>, <code>.. deprecated::</code>, <code>.. note::</code>, <code>.. image::</code>, &hellip;)
+should also work.</p>
 <h2 id="linking-to-other-identifiers">Linking to other identifiers</h2>
 <p>In your documentation, you may refer to other identifiers in
 your modules. When exporting to HTML, linking is automatically
@@ -235,7 +238,8 @@ sub-templates:</p>
 modified templates into the <code>directories</code> list of the
 <a title="pdoc.tpl_lookup" href="#pdoc.tpl_lookup"><code>tpl_lookup</code></a> object.</p>
 <h2 id="compatibility">Compatibility</h2>
-<p><a title="pdoc" href="#pdoc"><code>pdoc</code></a> requires Python 3.5+.</p>
+<p><a title="pdoc" href="#pdoc"><code>pdoc</code></a> requires Python 3.5+.
+The last version to support Python 2.x is <a href="https://pypi.org/project/pdoc3/0.3.11/">pdoc3 0.3.x</a>.</p>
 <h2 id="contributing">Contributing</h2>
 <p><a title="pdoc" href="#pdoc"><code>pdoc</code></a> is <a href="https://github.com/pdoc3/pdoc">on GitHub</a>. Bug reports and pull requests are welcome.</p>
 <h2 id="license">License</h2>
@@ -417,13 +421,17 @@ Class and instance variables can also [inherit docstrings].
 
 Overriding docstrings with `__pdoc__`
 -------------------------------------
-Docstrings can be overridden with a special module-level
-`__pdoc__` dictionary that `pdoc` counsels when it exists. The keys
-of `__pdoc__` should be identifiers within the scope of the module or,
+Docstrings for objects can be disabled or overridden with a special
+module-level dictionary `__pdoc__`. The _keys_
+should be string identifiers within the scope of the module or,
 alternatively, fully-qualified reference names. E.g. for instance
-variable `self.variable` for class `C`, its module identifier is
-`C.variable`. The values of `__pdoc__` dict should be docstrings.
+variable `self.variable` of class `C`, its module-level identifier is
+`&#39;C.variable&#39;`.
 
+If `__pdoc__[key] = False`, then `key` (and its members) will be
+**excluded from the documentation** of the module.
+
+Alternatively, the _values_ of `__pdoc__` should be the overriding docstrings.
 This particular feature is useful when there&#39;s no feasible way of
 attaching a docstring to something. A good example of this is a
 [namedtuple](https://docs.python.org/3/library/collections.html#collections.namedtuple):
@@ -438,9 +446,6 @@ attaching a docstring to something. A good example of this is a
 `pdoc` will then show `Table` as a class with documentation for the
 `types`, `names` and `rows` members.
 
-Additionally, if `__pdoc__[key] = False`, then `key` will be
-excluded from the public interface of the module.
-
 .. note::
     The assignments to `__pdoc__` need to be placed where they&#39;ll be
     executed when the module is imported. For example, at the top level
@@ -451,7 +456,9 @@ Supported docstring formats
 ---------------------------
 Currently, pure Markdown (with [extensions]), [numpydoc],
 and [Google-style] docstrings formats are supported.
-Basic reST directives (such as e.g. `.. deprecated::`) should also work.
+Basic reST directives (such as e.g.
+`.. versionadded::`, `.. deprecated::`, `.. note::`, `.. image::`, ...)
+should also work.
 
 *[reST]: reStructuredText
 [extensions]: https://python-markdown.github.io/extensions/#officially-supported-extensions
@@ -552,7 +559,7 @@ afterwards, pass the directory path as a parameter to the
     see if you can do so by overriding just some of the following, placeholder
     sub-templates:
 
-    + _config.mako_: Basic template configuration, affects the way templates are rendered.
+    * _config.mako_: Basic template configuration, affects the way templates are rendered.
     * _head.mako_: Included just before `&lt;/head&gt;`. Best for adding resources and styles.
     * _logo.mako_: Included at the very top of the navigation sidebar. Empty by default.
     * _credits.mako_: Included in the footer, right before pdoc version string.
@@ -567,6 +574,9 @@ modified templates into the `directories` list of the
 Compatibility
 -------------
 `pdoc` requires Python 3.5+.
+The last version to support Python 2.x is [pdoc3 0.3.x].
+
+[pdoc3 0.3.x]: https://pypi.org/project/pdoc3/0.3.11/
 
 
 Contributing
@@ -1387,7 +1397,7 @@ class Class(Doc):
         for name, obj in public_objs:
             if name in self.doc and self.doc[name].docstring:
                 continue
-            if inspect.ismethod(obj) or inspect.isfunction(obj):
+            if inspect.isroutine(obj):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self,
                     method=not self._method_type(self.obj, name))
@@ -1398,7 +1408,7 @@ class Class(Doc):
                     name, self.module, inspect.getdoc(obj),
                     obj=getattr(obj, &#39;fget&#39;, obj),
                     cls=self, instance_var=True)
-            elif not inspect.isroutine(obj):
+            else:
                 self.doc[name] = Variable(
                     name, self.module,
                     docstring=isinstance(obj, type) and inspect.getdoc(obj) or &#34;&#34;,
@@ -1535,11 +1545,6 @@ class Class(Doc):
         &#34;&#34;&#34;
         if not hasattr(self, &#39;_super_members&#39;):
             return
-
-        # Set inheritence for the Class itself
-        parent_cls = next(iter(self.mro(only_documented=True)), None)
-        if parent_cls and self.docstring == parent_cls.docstring:
-            self.inherits = parent_cls
 
         for name, parent_dobj in self._super_members.items():
             dobj = self.doc[name]
@@ -1746,7 +1751,7 @@ class External(Doc):
         &#34;&#34;&#34;
         `External` objects return absolute urls matching `/{name}.ext`.
         &#34;&#34;&#34;
-        return &#39;/%s.ext&#39; % self.name}</code></pre>
+        return &#39;/%s.ext&#39; % self.name</code></pre>
 </details>
 </section>
 <section>
@@ -1833,7 +1838,7 @@ dramatically decrease performance when documenting large modules.</p></section>
     return mod.html(external_links=external_links,
                     link_prefix=link_prefix,
                     source=source,
-                    **kwargs)}</code></pre>
+                    **kwargs)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.import_module"><code class="name flex">
@@ -1906,7 +1911,7 @@ module path or a filesystem path to file/directory).</p></section>
         pass
     sys.modules[module_name] = module
 
-    return module}</code></pre>
+    return module</code></pre>
 </details>
 </dd>
 <dt id="pdoc.link_inheritance"><code class="name flex">
@@ -1939,7 +1944,7 @@ inherited <a title="pdoc.Doc.docstring" href="#pdoc.Doc.docstring"><code>Doc.doc
         cls._fill_inheritance()
 
     for module in _filter_type(Module, context):
-        module._link_inheritance()}</code></pre>
+        module._link_inheritance()</code></pre>
 </details>
 </dd>
 <dt id="pdoc.reset"><code class="name flex">
@@ -1960,7 +1965,7 @@ inherited <a title="pdoc.Doc.docstring" href="#pdoc.Doc.docstring"><code>Doc.doc
             if isinstance(method, property):
                 method = method.fget
             if hasattr(method, &#39;cache_clear&#39;):
-                method.cache_clear()}</code></pre>
+                method.cache_clear()</code></pre>
 </details>
 </dd>
 <dt id="pdoc.text"><code class="name flex">
@@ -1989,7 +1994,7 @@ that takes a single argument (a documentation object) and returns
     &#34;&#34;&#34;
     mod = Module(import_module(module_name), docfilter=docfilter)
     link_inheritance()
-    return mod.text(**kwargs)}</code></pre>
+    return mod.text(**kwargs)</code></pre>
 </details>
 </dd>
 </dl>
@@ -2031,7 +2036,7 @@ that takes a single argument (a documentation object) and returns
         for name, obj in public_objs:
             if name in self.doc and self.doc[name].docstring:
                 continue
-            if inspect.ismethod(obj) or inspect.isfunction(obj):
+            if inspect.isroutine(obj):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self,
                     method=not self._method_type(self.obj, name))
@@ -2042,7 +2047,7 @@ that takes a single argument (a documentation object) and returns
                     name, self.module, inspect.getdoc(obj),
                     obj=getattr(obj, &#39;fget&#39;, obj),
                     cls=self, instance_var=True)
-            elif not inspect.isroutine(obj):
+            else:
                 self.doc[name] = Variable(
                     name, self.module,
                     docstring=isinstance(obj, type) and inspect.getdoc(obj) or &#34;&#34;,
@@ -2180,18 +2185,13 @@ that takes a single argument (a documentation object) and returns
         if not hasattr(self, &#39;_super_members&#39;):
             return
 
-        # Set inheritence for the Class itself
-        parent_cls = next(iter(self.mro(only_documented=True)), None)
-        if parent_cls and self.docstring == parent_cls.docstring:
-            self.inherits = parent_cls
-
         for name, parent_dobj in self._super_members.items():
             dobj = self.doc[name]
             if (dobj.obj is parent_dobj.obj or
                     (dobj.docstring or parent_dobj.docstring) == parent_dobj.docstring):
                 dobj.inherits = parent_dobj
                 dobj.docstring = parent_dobj.docstring
-        del self._super_members}</code></pre>
+        del self._super_members</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -2216,7 +2216,7 @@ represent this class' class variables.</p></section>
     represent this class&#39; class variables.
     &#34;&#34;&#34;
     return self._filter_doc_objs(
-        Variable, include_inherited, lambda dobj: not dobj.instance_var)}</code></pre>
+        Variable, include_inherited, lambda dobj: not dobj.instance_var)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Class.functions"><code class="name flex">
@@ -2233,7 +2233,7 @@ represent this class' static functions.</p></section>
     represent this class&#39; static functions.
     &#34;&#34;&#34;
     return self._filter_doc_objs(
-        Function, include_inherited, lambda dobj: not dobj.method)}</code></pre>
+        Function, include_inherited, lambda dobj: not dobj.method)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Class.inherited_members"><code class="name flex">
@@ -2255,7 +2255,7 @@ sorted by MRO.</p></section>
                    for k, g in groupby((i.inherits
                                         for i in self.doc.values() if i.inherits),
                                        key=lambda i: i.cls)),
-                  key=lambda x, _mro_index=self.mro().index: _mro_index(x[0]))  # type: ignore}</code></pre>
+                  key=lambda x, _mro_index=self.mro().index: _mro_index(x[0]))  # type: ignore</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Class.instance_variables"><code class="name flex">
@@ -2274,7 +2274,7 @@ are those defined in a class's <code>__init__</code> as <code>self.variable = ..
     are those defined in a class&#39;s `__init__` as `self.variable = ...`.
     &#34;&#34;&#34;
     return self._filter_doc_objs(
-        Variable, include_inherited, lambda dobj: dobj.instance_var)}</code></pre>
+        Variable, include_inherited, lambda dobj: dobj.instance_var)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Class.methods"><code class="name flex">
@@ -2291,7 +2291,7 @@ represent this class' methods.</p></section>
     represent this class&#39; methods.
     &#34;&#34;&#34;
     return self._filter_doc_objs(
-        Function, include_inherited, lambda dobj: dobj.method)}</code></pre>
+        Function, include_inherited, lambda dobj: dobj.method)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Class.mro"><code class="name flex">
@@ -2317,7 +2317,7 @@ if the types are documented, and <a title="pdoc.External" href="#pdoc.External">
                if c not in (self.obj, object)]
     if only_documented:
         classes = _filter_type(Class, classes)
-    return classes}</code></pre>
+    return classes</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Class.subclasses"><code class="name flex">
@@ -2339,7 +2339,7 @@ and <a title="pdoc.External" href="#pdoc.External"><code>External</code></a> oth
     and `pdoc.External` otherwise.
     &#34;&#34;&#34;
     return [self.module.find_class(c)
-            for c in self.obj.__subclasses__()]}</code></pre>
+            for c in self.obj.__subclasses__()]</code></pre>
 </details>
 </dd>
 </dl>
@@ -2386,7 +2386,7 @@ a global context object will be used.</p></section>
 
     If you don&#39;t pass your own `Context` instance to `Module` constructor,
     a global context object will be used.
-    &#34;&#34;&#34;}</code></pre>
+    &#34;&#34;&#34;</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Doc"><code class="flex name class">
@@ -2537,7 +2537,7 @@ a class's ancestor list.)</p></section>
         return top
 
     def __lt__(self, other):
-        return self.name &lt; other.name}</code></pre>
+        return self.name &lt; other.name</code></pre>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
@@ -2582,7 +2582,7 @@ def qualname(self):
     Module-relative &#34;qualified&#34; name of this documentation
     object, used for show (e.g. &lt;code&gt;Doc.qualname&lt;/code&gt;).
     &#34;&#34;&#34;
-    return getattr(self.obj, &#39;__qualname__&#39;, self.name)}</code></pre>
+    return getattr(self.obj, &#39;__qualname__&#39;, self.name)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Doc.refname"><code class="name">var <span class="ident">refname</span></code></dt>
@@ -2602,7 +2602,7 @@ def refname(self):
     documentation object provides this property.
     &#34;&#34;&#34;
     # Ok for Module and External, the rest need it overriden
-    return self.name}</code></pre>
+    return self.name</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Doc.source"><code class="name">var <span class="ident">source</span></code></dt>
@@ -2622,7 +2622,7 @@ def source(self) -&gt; str:
         lines, _ = inspect.getsourcelines(self.obj)
     except (ValueError, TypeError, OSError):
         return &#39;&#39;
-    return inspect.cleandoc(&#39;&#39;.join([&#39;\n&#39;] + lines))}</code></pre>
+    return inspect.cleandoc(&#39;&#39;.join([&#39;\n&#39;] + lines))</code></pre>
 </details>
 </dd>
 </dl>
@@ -2671,7 +2671,7 @@ read with <code>inspect.getdoc()</code>.</p></section>
     &#34;&#34;&#34;
     The Doc object (Class, Function, or Variable) this object inherits from,
     if any.
-    &#34;&#34;&#34;}</code></pre>
+    &#34;&#34;&#34;</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Doc.url"><code class="name flex">
@@ -2716,7 +2716,7 @@ def url(self, relative_to: &#39;Module&#39; = None, *, link_prefix: str = &#39;&
     # We have one set of &#39;..&#39; too many
     if url.startswith(&#39;../&#39;):
         url = url[3:]
-    return url}</code></pre>
+    return url</code></pre>
 </details>
 </dd>
 </dl>
@@ -2768,7 +2768,7 @@ the ancestor list of a class).</p></section>
         &#34;&#34;&#34;
         `External` objects return absolute urls matching `/{name}.ext`.
         &#34;&#34;&#34;
-        return &#39;/%s.ext&#39; % self.name}</code></pre>
+        return &#39;/%s.ext&#39; % self.name</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -2785,7 +2785,7 @@ should be a fully qualified name.</p></section>
     Initializes an external identifier with `name`, where `name`
     should be a fully qualified name.
     &#34;&#34;&#34;
-    super().__init__(name, None, None)}</code></pre>
+    super().__init__(name, None, None)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.External.url"><code class="name flex">
@@ -2799,7 +2799,7 @@ should be a fully qualified name.</p></section>
     &#34;&#34;&#34;
     `External` objects return absolute urls matching `/{name}.ext`.
     &#34;&#34;&#34;
-    return &#39;/%s.ext&#39; % self.name}</code></pre>
+    return &#39;/%s.ext&#39; % self.name</code></pre>
 </details>
 </dd>
 </dl>
@@ -2946,7 +2946,7 @@ should be a fully qualified name.</p></section>
 
     @property
     def refname(self):
-        return (self.cls.refname if self.cls else self.module.refname) + &#39;.&#39; + self.name}</code></pre>
+        return (self.cls.refname if self.cls else self.module.refname) + &#39;.&#39; + self.name</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -3000,7 +3000,7 @@ all other cases, it should be <code>False</code>.</p></section>
     Whether this function is a normal bound method.
 
     In particular, static and class methods have this set to False.
-    &#34;&#34;&#34;}</code></pre>
+    &#34;&#34;&#34;</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Function.funcdef"><code class="name flex">
@@ -3016,7 +3016,7 @@ for example <code>def</code> or <code>async def</code>.</p></section>
     Generates the string of keywords used to define the function,
     for example `def` or `async def`.
     &#34;&#34;&#34;
-    return &#39;async def&#39; if self._is_async else &#39;def&#39;}</code></pre>
+    return &#39;async def&#39; if self._is_async else &#39;def&#39;</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Function.params"><code class="name flex">
@@ -3085,7 +3085,7 @@ def params(self) -&gt; List[str]:
         params.pop(-1)
 
     # TODO: The only thing now missing for Python 3 are type annotations
-    return params}</code></pre>
+    return params</code></pre>
 </details>
 </dd>
 </dl>
@@ -3373,7 +3373,7 @@ def params(self) -&gt; List[str]:
             return url + _URL_PACKAGE_SUFFIX
         elif url.endswith(&#39;/index&#39;):
             return url + _URL_INDEX_MODULE_SUFFIX
-        return url + _URL_MODULE_SUFFIX}</code></pre>
+        return url + _URL_MODULE_SUFFIX</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -3394,7 +3394,7 @@ def is_package(self):
 
     Works by checking whether the module has a `__path__` attribute.
     &#34;&#34;&#34;
-    return hasattr(self.obj, &#34;__path__&#34;)}</code></pre>
+    return hasattr(self.obj, &#34;__path__&#34;)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Module.supermodule"><code class="name">var <span class="ident">supermodule</span></code></dt>
@@ -3510,7 +3510,7 @@ global context object will be used.</p></section>
         self._context[docobj.refname] = docobj
         if isinstance(docobj, Class):
             self._context.update((obj.refname, obj)
-                                 for obj in docobj.doc.values())}</code></pre>
+                                 for obj in docobj.doc.values())</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Module.classes"><code class="name flex">
@@ -3526,7 +3526,7 @@ sorted alphabetically as a list of <a title="pdoc.Class" href="#pdoc.Class"><cod
     Returns all documented module-level classes in the module
     sorted alphabetically as a list of `pdoc.Class`.
     &#34;&#34;&#34;
-    return self._filter_doc_objs(Class)}</code></pre>
+    return self._filter_doc_objs(Class)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Module.find_class"><code class="name flex">
@@ -3545,7 +3545,7 @@ or in any of the exported identifiers of the submodules.</p></section>
     # XXX: Is this corrent? Does it always match
     # `Class.module.name + Class.qualname`?.
     # If not, see what was here before.
-    return self.find_ident(cls.__module__ + &#39;.&#39; + cls.__qualname__)}</code></pre>
+    return self.find_ident(cls.__module__ + &#39;.&#39; + cls.__qualname__)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Module.find_ident"><code class="name flex">
@@ -3574,7 +3574,7 @@ returned. If one cannot be found, then an instance of
     return (self.doc.get(_name) or
             self._context.get(_name) or
             self._context.get(self.name + &#39;.&#39; + _name) or
-            External(name))}</code></pre>
+            External(name))</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Module.functions"><code class="name flex">
@@ -3590,7 +3590,7 @@ sorted alphabetically as a list of <a title="pdoc.Function" href="#pdoc.Function
     Returns all documented module-level functions in the module
     sorted alphabetically as a list of `pdoc.Function`.
     &#34;&#34;&#34;
-    return self._filter_doc_objs(Function)}</code></pre>
+    return self._filter_doc_objs(Function)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Module.html"><code class="name flex">
@@ -3624,7 +3624,7 @@ self-contained HTML.</p>
     if minify:
         from pdoc.html_helpers import minify_html
         html = minify_html(html)
-    return html}</code></pre>
+    return html</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Module.submodules"><code class="name flex">
@@ -3640,7 +3640,7 @@ alphabetically as a list of <a title="pdoc.Module" href="#pdoc.Module"><code>Mod
     Returns all documented sub-modules of the module sorted
     alphabetically as a list of `pdoc.Module`.
     &#34;&#34;&#34;
-    return self._filter_doc_objs(Module)}</code></pre>
+    return self._filter_doc_objs(Module)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Module.text"><code class="name flex">
@@ -3655,7 +3655,7 @@ alphabetically as a list of <a title="pdoc.Module" href="#pdoc.Module"><code>Mod
     Returns the documentation for this module as plain text.
     &#34;&#34;&#34;
     txt = _render_template(&#39;/text.mako&#39;, module=self, **kwargs)
-    return re.sub(&#34;\n\n\n+&#34;, &#34;\n\n&#34;, txt)}</code></pre>
+    return re.sub(&#34;\n\n\n+&#34;, &#34;\n\n&#34;, txt)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Module.variables"><code class="name flex">
@@ -3671,7 +3671,7 @@ sorted alphabetically as a list of <a title="pdoc.Variable" href="#pdoc.Variable
     Returns all documented module-level variables in the module
     sorted alphabetically as a list of `pdoc.Variable`.
     &#34;&#34;&#34;
-    return self._filter_doc_objs(Variable)}</code></pre>
+    return self._filter_doc_objs(Variable)</code></pre>
 </details>
 </dd>
 </dl>
@@ -3737,7 +3737,7 @@ module, class, and instance variables.</p></section>
 
     @property
     def refname(self):
-        return (self.cls.refname if self.cls else self.module.refname) + &#39;.&#39; + self.name}</code></pre>
+        return (self.cls.refname if self.cls else self.module.refname) + &#39;.&#39; + self.name</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -3782,7 +3782,7 @@ variable.</p></section>
     &#34;&#34;&#34;
     True if variable is some class&#39; instance variable (as
     opposed to class variable).
-    &#34;&#34;&#34;}</code></pre>
+    &#34;&#34;&#34;</code></pre>
 </details>
 </dd>
 </dl>
@@ -3936,7 +3936,7 @@ variable.</p></section>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.2</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
