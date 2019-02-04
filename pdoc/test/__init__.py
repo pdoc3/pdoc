@@ -598,8 +598,8 @@ class HtmlHelpersTest(unittest.TestCase):
 
 
 class Docformats(unittest.TestCase):
-    _module = pdoc.Module(pdoc)
     _docmodule = pdoc.import_module(EXAMPLE_MODULE)
+    _module = pdoc.Module(_docmodule)
 
     @staticmethod
     def _link(dobj, *args, **kwargs):
@@ -762,7 +762,14 @@ lines.</p>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
 <p>Don't touch this!</p>
-</div>'''
+</div>
+<pre><code class="python">x = 2
+</code></pre>
+
+<p>1
+x = 2
+x = 3
+x =</p>'''
         text = inspect.getdoc(self._docmodule.reST_directives)
         html = to_html(text, module=self._module, link=self._link)
         self.assertEqual(html, expected)

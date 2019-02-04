@@ -199,12 +199,13 @@ class _ToMarkdown:
         return _googledoc_sections(text)
 
     @staticmethod
-    def _admonition(module, match):
+    def _admonition(match, module=None):
         indent, type, value, text = match.groups()
 
         if type == 'include' and module:
-            return _ToMarkdown.include(value, text, indent, module)
-        elif type in ('image', 'figure'):
+            return _ToMarkdown._include_file(indent, value,
+                                             _ToMarkdown._directive_options(text), module)
+        if type in ('image', 'figure'):
             return '{}![{}]({})\n'.format(
                 indent, text.translate(str.maketrans({'\n': ' ',
                                                       '[': '\\[',
@@ -240,47 +241,36 @@ class _ToMarkdown:
         """
         substitute = partial(re.compile(r'^(?P<indent> *)\.\. ?(\w+)::(?: *(.*))?'
                                         r'((?:\n(?:(?P=indent) +.*| *$))*)', re.MULTILINE).sub,
-                             partial(_ToMarkdown._admonition, module))
+                             partial(_ToMarkdown._admonition, module=module))
         # Apply twice for nested (e.g. image inside warning)
         return substitute(substitute(text))
 
     @staticmethod
-    def include(value: str, text: str, indent: str, module: pdoc.Module) -> str:
-        path = os.path.join(os.path.dirname(module.obj.__file__), value)
+    def _include_file(indent: str, path: str, options: dict, module: pdoc.Module) -> str:
+        start_line = int(options.get('start-line', 0))
+        end_line = int(options.get('end-line', 0)) or None
+        start_after = options.get('start-after')
+        end_before = options.get('end-before')
 
         try:
-            with open(path, 'rt', encoding='utf-8') as f:
-                lines = list(f)
+            with open(os.path.join(os.path.dirname(module.obj.__file__), path),
+                      encoding='utf-8') as f:
+                text = ''.join(list(f)[start_line:end_line])
         except Exception as e:
             raise RuntimeError('`.. include:: {}` error in module {!r}: {}'
-                               .format(value, module, e))
+                               .format(path, module.name, e))
 
-        options = _ToMarkdown._parse_directive_options(text)
-
-        start = int(options.get('start-line', 0))
-        end = int(options.get('end-line', len(lines)))
-
-        start_after = options.get('start-after')
         if start_after:
-            for start in range(start, end):
-                j = lines[start].find(start_after)
-                if j >= 0:
-                    lines[start] = lines[start][j + len(start_after):]
-                    break
-
-        end_before = options.get('end-before')
+            text = text[text.index(start_after) + len(start_after):]
         if end_before:
-            for end in range(end, start - 1, -1):
-                j = lines[end].find(end_before)
-                if j >= 0:
-                    lines[end] = lines[end][:j]
-                    break
+            text = text[:text.rindex(end_before)]
 
-        return ''.join(indent + l for l in lines[start:end + 1])
+        text = re.sub(r'\n', '\n' + indent, indent + text.rstrip())
+        return text
 
     @staticmethod
-    def _parse_directive_options(text: str):
-        return dict(re.findall(r'\n *:([^:]+): *([^\n]+)', text, re.MULTILINE))
+    def _directive_options(text: str) -> dict:
+        return dict(re.findall(r'^ *:([^:]+): *(.*)', text, re.MULTILINE))
 
     @staticmethod
     def doctests(text,
