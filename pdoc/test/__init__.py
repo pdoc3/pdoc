@@ -598,8 +598,8 @@ class HtmlHelpersTest(unittest.TestCase):
 
 
 class Docformats(unittest.TestCase):
+    _module = pdoc.Module(pdoc)
     _docmodule = pdoc.import_module(EXAMPLE_MODULE)
-    _module = pdoc.Module(_docmodule)
 
     @staticmethod
     def _link(dobj, *args, **kwargs):
