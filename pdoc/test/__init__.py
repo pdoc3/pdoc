@@ -485,9 +485,11 @@ class ApiTest(unittest.TestCase):
         a = mod.doc['a'].doc['A']
         b = mod.doc['b'].doc['B']
         c = mod.doc['b'].doc['c'].doc['C']
-        self.assertEqual(b.inherits, a)
         self.assertEqual(b.doc['a'].inherits, a.doc['a'])
         self.assertEqual(b.doc['c'].inherits, c.doc['c'])
+        # While classes do inherit from superclasses, they just shouldn't always
+        # say so, because public classes do want to be exposed and linked to
+        self.assertNotEqual(b.inherits, a)
 
     def test_context(self):
         context = {}
@@ -527,7 +529,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(c.url(), 'example_pkg/index.html#example_pkg.D')
         self.assertEqual(c.url(link_prefix='/'), '/example_pkg/index.html#example_pkg.D')
         self.assertEqual(c.url(relative_to=c.module), '#example_pkg.D')
-        self.assertEqual(c.url(top_ancestor=True), 'example_pkg/index.html#example_pkg.B')
+        self.assertEqual(c.url(top_ancestor=True), c.url())  # Public classes do link to themselves
 
         f = c.doc['overridden']
         self.assertEqual(f.url(), 'example_pkg/index.html#example_pkg.D.overridden')
