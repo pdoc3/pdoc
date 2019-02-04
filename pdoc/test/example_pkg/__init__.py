@@ -159,11 +159,13 @@ class Docformats:
             arg6 (str or int,optional,default = 10): Description of arg6
 
         Args:
-            test_sequence: 2-dim numpy array of real numbers, size: N * D
-              - the test observation sequence.
+          arg1 (int): Description of arg1
+          arg2 (str or int): Description of arg2
+          test_sequence: 2-dim numpy array of real numbers, size: N * D
+            - the test observation sequence.
 
-                  test_sequence =
-                  code
+                test_sequence =
+                code
 
             Continue.
           *args: passed around

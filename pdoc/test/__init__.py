@@ -623,7 +623,7 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <p class="admonition-title">Added in version:&ensp;1.5.0</p>
 </div>
 </dd>
-<dt><strong><code>x</code></strong> :&ensp;{ <code>NoneType</code>, <code>'B'</code>, <code>'C'</code> }, <code>optional</code></dt>
+<dt><strong><code>x</code></strong> :&ensp;{ <code>NoneType</code>, <code>'B'</code>, <code>'C'</code> }, optional</dt>
 <dd>&nbsp;</dd>
 <dt><strong><code>n</code></strong> :&ensp;<code>int</code> or <code>list</code> of <code>int</code></dt>
 <dd>Description of num</dd>
@@ -666,23 +666,15 @@ Nomatch:</p>
 <dd>Description of arg1</dd>
 <dt><strong><code>arg2</code></strong> :&ensp;<code>str</code> or <code>int</code></dt>
 <dd>Description of arg2</dd>
-<dt><strong><code>arg3</code></strong> :&ensp;<code>str</code>, <code>optional</code></dt>
-<dd>Description of arg3</dd>
-<dt><strong><code>arg4</code></strong> :&ensp;<code>str</code>, <code>optional</code>, <code>default=10</code></dt>
-<dd>Description of arg4</dd>
-<dt><strong><code>arg5</code></strong> :&ensp;<code>str</code>,<code>optional</code>,<code>default=10</code></dt>
-<dd>Description of arg5</dd>
-<dt><strong><code>arg6</code></strong> :&ensp;<code>str</code> or <code>int</code>,<code>optional</code>,<code>default = 10</code></dt>
-<dd>Description of arg6</dd>
-</dl>
-<h2 id="args_1">Args</h2>
-<p>test_sequence: 2-dim numpy array of real numbers, size: N * D
-    - the test observation sequence.</p>
-<pre><code>    test_sequence =
-    code
+<dt><strong><code>test_sequence</code></strong></dt>
+<dd>
+<p>2-dim numpy array of real numbers, size: N * D
+- the test observation sequence.</p>
+<pre><code>test_sequence =
+code
 </code></pre>
-<dl>
-<dt>Continue.</dt>
+<p>Continue.</p>
+</dd>
 <dt><strong><code>*args</code></strong></dt>
 <dd>passed around</dd>
 </dl>
@@ -717,7 +709,7 @@ that are relevant to the interface.</p>
 <h2 id="todos">Todos</h2>
 <ul>
 <li>For module TODOs</li>
-</ul>'''  # noqa: E501
+</ul>'''
         text = inspect.getdoc(self._docmodule.google)
         html = to_html(text, module=self._module, link=self._link)
         self.assertEqual(html, expected)
