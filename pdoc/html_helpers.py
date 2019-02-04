@@ -108,15 +108,12 @@ class _ToMarkdown:
     def _deflist(name, type, desc,
                  # Wraps any identifiers and string literals in parameter type spec
                  # in backticks while skipping common "stopwords" such as 'or', 'of',
-                 # 'optional'. See §4 Parameters:
+                 # 'optional' ... See §4 Parameters:
                  # https://numpydoc.readthedocs.io/en/latest/format.html#sections
                  _type_parts=partial(
-                     re.compile(r'(.*?)(,optional|,default\s*=\s*|)$').sub,
-                     lambda m, _backtick_idents=partial(
-                             re.compile(r'(default\s*=\s*[\d\'"]|[\w.\'"])+').sub,
-                             lambda m: ('{}' if m.group(0) in ('of', 'or') else
-                                        '`{}`').format(m.group(0))): (
-                         _backtick_idents(m.group(1)) + m.group(2)))):
+                     re.compile(r'[\w.\'"]+').sub,
+                     lambda m: ('{}' if m.group(0) in ('of', 'or', 'default', 'optional') else
+                                '`{}`').format(m.group(0)))):
         """
         Returns `name`, `type`, and `desc` formatted as a
         Python-Markdown definition list entry. See also:
