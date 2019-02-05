@@ -263,7 +263,7 @@ class _ToMarkdown:
         if start_after:
             text = text[text.index(start_after) + len(start_after):]
         if end_before:
-            text = text[:text.rindex(end_before)]
+            text = text[:text.index(end_before)]
 
         text = re.sub(r'\n', '\n' + indent, indent + text.rstrip())
         return text
