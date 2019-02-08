@@ -778,6 +778,20 @@ lines.</p>
         html = to_html(text, module=self._module, link=self._link)
         self.assertEqual(html, expected)
 
+    def test_reST_include(self):
+        expected = '''<pre><code class="python">    x = 2
+</code></pre>
+
+<p>1
+x = 2
+x = 3
+x =</p>'''
+        mod = pdoc.Module(pdoc.import_module(
+            os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_reST_include', 'test.py')))
+        text = inspect.getdoc(mod.obj)
+        html = to_html(text, module=mod)
+        self.assertEqual(html, expected)
+
 
 class HttpTest(unittest.TestCase):
     """

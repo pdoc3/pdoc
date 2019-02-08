@@ -2,6 +2,7 @@
 Helper functions for HTML output.
 """
 import inspect
+import os.path
 import re
 from functools import partial, lru_cache
 from typing import Callable
@@ -195,9 +196,16 @@ class _ToMarkdown:
         return _googledoc_sections(text)
 
     @staticmethod
-    def _admonition(match):
+    def _admonition(match, module=None):
         indent, type, value, text = match.groups()
 
+        if type == 'include' and module:
+            try:
+                return _ToMarkdown._include_file(indent, value,
+                                                 _ToMarkdown._directive_opts(text), module)
+            except Exception as e:
+                raise RuntimeError('`.. include:: {}` error in module {!r}: {}'
+                                   .format(value, module.name, e))
         if type in ('image', 'figure'):
             return '{}![{}]({})\n'.format(
                 indent, text.translate(str.maketrans({'\n': ' ',
@@ -224,11 +232,7 @@ class _ToMarkdown:
         return '{}!!! {} "{}"\n{}\n'.format(indent, type, title, text)
 
     @staticmethod
-    def admonitions(text,
-                    _admonitions=partial(
-                        re.compile(r'^(?P<indent> *)\.\. ?(\w+)::(?: *(.*))?'
-                                   r'((?:\n(?:(?P=indent) +.*| *$))*)', re.MULTILINE).sub,
-                        _admonition.__func__)):
+    def admonitions(text, module):
         """
         Process reStructuredText's block directives such as
         `.. warning::`, `.. deprecated::`, `.. versionadded::`, etc.
@@ -236,8 +240,34 @@ class _ToMarkdown:
 
         See: https://python-markdown.github.io/extensions/admonition/
         """
+        substitute = partial(re.compile(r'^(?P<indent> *)\.\. ?(\w+)::(?: *(.*))?'
+                                        r'((?:\n(?:(?P=indent) +.*| *$))*)', re.MULTILINE).sub,
+                             partial(_ToMarkdown._admonition, module=module))
         # Apply twice for nested (e.g. image inside warning)
-        return _admonitions(_admonitions(text))
+        return substitute(substitute(text))
+
+    @staticmethod
+    def _include_file(indent: str, path: str, options: dict, module: pdoc.Module) -> str:
+        start_line = int(options.get('start-line', 0))
+        end_line = int(options.get('end-line', 0)) or None
+        start_after = options.get('start-after')
+        end_before = options.get('end-before')
+
+        with open(os.path.join(os.path.dirname(module.obj.__file__), path),
+                  encoding='utf-8') as f:
+            text = ''.join(list(f)[start_line:end_line])
+
+        if start_after:
+            text = text[text.index(start_after) + len(start_after):]
+        if end_before:
+            text = text[:text.index(end_before)]
+
+        text = re.sub(r'\n', '\n' + indent, indent + text.rstrip())
+        return text
+
+    @staticmethod
+    def _directive_opts(text: str) -> dict:
+        return dict(re.findall(r'^ *:([^:]+): *(.*)', text, re.MULTILINE))
 
     @staticmethod
     def doctests(text,
@@ -273,7 +303,7 @@ def to_html(text: str, docformat: str = 'numpy,google', *,
     """
     assert all(i in (None, '', 'numpy', 'google') for i in docformat.split(',')), docformat
 
-    text = _ToMarkdown.admonitions(text)
+    text = _ToMarkdown.admonitions(text, module)
 
     if 'google' in docformat:
         text = _ToMarkdown.google(text)
