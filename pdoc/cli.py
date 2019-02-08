@@ -80,6 +80,12 @@ aa(
          "No link prefix results in all links being relative. "
          "No effect when combined with --http.",
 )
+aa(
+    "--close-stdin",
+    action="store_true",
+    help="When set, stdin will be closed before importing, to account for "
+         "ill-behaved modules that block on stdin."
+)
 
 DEFAULT_HOST, DEFAULT_PORT = 'localhost', 8080
 
@@ -280,9 +286,8 @@ def main(_args=None):
     global args
     args = _args or parser.parse_args()
 
-    # We close stdin because some modules, upon import, are not very polite
-    # and block on stdin.
-    sys.stdin.close()
+    if args.close_stdin:
+        sys.stdin.close()
 
     if args.template_dir is not None:
         if not path.isdir(args.template_dir):
