@@ -134,9 +134,10 @@
     #index h4 + ul {
       margin-bottom:.6em;
     }
-    #index .two-column {
-      column-count: 2;
-    }
+    /* Make TOC lists have 2+ columns when viewport is wide enough.
+       Assuming ~20-character identifiers and ~30% wide sidebar. */
+    @media (min-width: 200ex) { #index .two-column { column-count: 2 } }
+    @media (min-width: 300ex) { #index .two-column { column-count: 3 } }
 
   dl {
     margin-bottom: 2em;
