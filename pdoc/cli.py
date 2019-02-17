@@ -296,6 +296,9 @@ def main(_args=None):
             sys.exit(1)
         pdoc.tpl_lookup.directories.insert(0, args.template_dir)
 
+    # Support loading modules specified as python paths relative to cwd
+    sys.path.append(os.getcwd())
+
     if args.http:
         args.html = True
         args.external_links = True
@@ -329,9 +332,6 @@ def main(_args=None):
             return any(f in obj.refname or
                        isinstance(obj, pdoc.Class) and f in obj.doc
                        for f in _filters)
-
-    # Support loading modules specified as python paths relative to cwd
-    sys.path.append(os.getcwd())
 
     modules = [pdoc.Module(pdoc.import_module(module),
                            docfilter=docfilter)

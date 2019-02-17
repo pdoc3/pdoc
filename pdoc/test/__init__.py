@@ -807,39 +807,53 @@ class HttpTest(unittest.TestCase):
         yield
         signal.alarm(0)
 
-    def test_http(self):
-        host, port = 'localhost', randint(9000, 12000)
-        args = '--http :{} pdoc {}'.format(
-            port, os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)).split()
+    @contextmanager
+    def _http(self, modules: list):
+        port = randint(9000, 12000)
 
-        with self._timeout(10):
+        with self._timeout(1000):
             with redirect_streams() as (stdout, stderr):
-                t = threading.Thread(target=main, args=(parser.parse_args(args),))
+                t = threading.Thread(
+                    target=main, args=(parser.parse_args(['--http', ':%d' % port] + modules),))
                 t.start()
                 sleep(.1)
 
                 if not t.is_alive():
-                    sys.stderr.write(stderr.getvalue())
+                    sys.__stderr__.write(stderr.getvalue())
                     raise AssertionError
 
                 try:
-                    url = 'http://{}:{}/'.format(host, port)
-                    with self.subTest(url='/'):
-                        with urlopen(url, timeout=3) as resp:
-                            html = resp.read()
-                            self.assertIn(b'Python package <code>pdoc</code>', html)
-                            self.assertNotIn(b'gzip', html)
-                    with self.subTest(url='/' + EXAMPLE_MODULE):
-                        with urlopen(url + 'pdoc', timeout=3) as resp:
-                            html = resp.read()
-                            self.assertIn(b'__pdoc__', html)
-                    with self.subTest(url='/csv.ext'):
-                        with urlopen(url + 'csv.ext', timeout=3) as resp:
-                            html = resp.read()
-                            self.assertIn(b'DictReader', html)
+                    yield 'http://localhost:{}/'.format(port)
+                except Exception:
+                    sys.__stderr__.write(stderr.getvalue())
+                    sys.__stdout__.write(stdout.getvalue())
+                    raise
                 finally:
-                    pdoc.cli._httpd.shutdown()
+                    pdoc.cli._httpd.shutdown()  # type: ignore
                     t.join()
+
+    def test_http(self):
+        with self._http(['pdoc', os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)]) as url:
+            with self.subTest(url='/'):
+                with urlopen(url, timeout=3) as resp:
+                    html = resp.read()
+                    self.assertIn(b'Python package <code>pdoc</code>', html)
+                    self.assertNotIn(b'gzip', html)
+            with self.subTest(url='/' + EXAMPLE_MODULE):
+                with urlopen(url + 'pdoc', timeout=3) as resp:
+                    html = resp.read()
+                    self.assertIn(b'__pdoc__', html)
+            with self.subTest(url='/csv.ext'):
+                with urlopen(url + 'csv.ext', timeout=3) as resp:
+                    html = resp.read()
+                    self.assertIn(b'DictReader', html)
+
+    def test_file(self):
+        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
+            with self._http(['_relative_import']) as url:
+                with urlopen(url, timeout=3) as resp:
+                    html = resp.read()
+                    self.assertIn(b'<a href="/_relative_import">', html)
 
 
 if __name__ == '__main__':
