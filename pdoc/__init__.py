@@ -917,7 +917,8 @@ class Module(Doc):
                            for name, obj in inspect.getmembers(self.obj)
                            if (_is_public(name) and
                                is_from_this_module(obj))]
-
+            index = list(self.obj.__dict__).index
+            public_objs.sort(key=lambda i: index(i[0]))
         for name, obj in public_objs:
             if inspect.isroutine(obj):
                 self.doc[name] = Function(name, self, obj)
@@ -1076,29 +1077,30 @@ class Module(Doc):
                 self._context.get(self.name + '.' + _name) or
                 External(name))
 
-    def _filter_doc_objs(self, type: Type[T]) -> List[T]:
-        return sorted(_filter_type(type, self.doc))
+    def _filter_doc_objs(self, type: Type[T], sort=True) -> List[T]:
+        result = _filter_type(type, self.doc)
+        return sorted(result) if sort else result
 
-    def variables(self):
+    def variables(self, sort=True):
         """
-        Returns all documented module-level variables in the module
-        sorted alphabetically as a list of `pdoc.Variable`.
+        Returns all documented module-level variables in the module,
+        optionally sorted alphabetically, as a list of `pdoc.Variable`.
         """
-        return self._filter_doc_objs(Variable)
+        return self._filter_doc_objs(Variable, sort)
 
-    def classes(self):
+    def classes(self, sort=True):
         """
-        Returns all documented module-level classes in the module
-        sorted alphabetically as a list of `pdoc.Class`.
+        Returns all documented module-level classes in the module,
+        optionally sorted alphabetically, as a list of `pdoc.Class`.
         """
-        return self._filter_doc_objs(Class)
+        return self._filter_doc_objs(Class, sort)
 
-    def functions(self):
+    def functions(self, sort=True):
         """
-        Returns all documented module-level functions in the module
-        sorted alphabetically as a list of `pdoc.Function`.
+        Returns all documented module-level functions in the module,
+        optionally sorted alphabetically, as a list of `pdoc.Function`.
         """
-        return self._filter_doc_objs(Function)
+        return self._filter_doc_objs(Function, sort)
 
     def submodules(self):
         """
@@ -1137,6 +1139,8 @@ class Class(Doc):
                        # in Class._fill_inheritance()
                        if (name in self.obj.__dict__ and
                            (_is_public(name) or name == '__init__'))]
+        index = list(self.obj.__dict__).index
+        public_objs.sort(key=lambda i: index(i[0]))
 
         # Convert the public Python objects to documentation objects.
         for name, obj in public_objs:
@@ -1210,42 +1214,48 @@ class Class(Doc):
                 for c in self.obj.__subclasses__()]
 
     def _filter_doc_objs(self, type: Type[T], include_inherited=True,
-                         filter_func: Callable[[T], bool] = lambda x: True) -> List[T]:
-        return sorted(obj for obj in _filter_type(type, self.doc)
-                      if (include_inherited or not obj.inherits) and filter_func(obj))
+                         filter_func: Callable[[T], bool] = lambda x: True,
+                         sort=True) -> List[T]:
+        result = [obj for obj in _filter_type(type, self.doc)
+                  if (include_inherited or not obj.inherits) and filter_func(obj)]
+        return sorted(result) if sort else result
 
-    def class_variables(self, include_inherited=True):
+    def class_variables(self, include_inherited=True, sort=True):
         """
-        Returns a sorted list of `pdoc.Variable` objects that
+        Returns an optionally-sorted list of `pdoc.Variable` objects that
         represent this class' class variables.
         """
         return self._filter_doc_objs(
-            Variable, include_inherited, lambda dobj: not dobj.instance_var)
+            Variable, include_inherited, lambda dobj: not dobj.instance_var,
+            sort)
 
-    def instance_variables(self, include_inherited=True):
+    def instance_variables(self, include_inherited=True, sort=True):
         """
-        Returns a sorted list of `pdoc.Variable` objects that
+        Returns an optionally-sorted list of `pdoc.Variable` objects that
         represent this class' instance variables. Instance variables
         are those defined in a class's `__init__` as `self.variable = ...`.
         """
         return self._filter_doc_objs(
-            Variable, include_inherited, lambda dobj: dobj.instance_var)
+            Variable, include_inherited, lambda dobj: dobj.instance_var,
+            sort)
 
-    def methods(self, include_inherited=True):
+    def methods(self, include_inherited=True, sort=True):
         """
-        Returns a sorted list of `pdoc.Function` objects that
+        Returns an optionally-sorted list of `pdoc.Function` objects that
         represent this class' methods.
         """
         return self._filter_doc_objs(
-            Function, include_inherited, lambda dobj: dobj.method)
+            Function, include_inherited, lambda dobj: dobj.method,
+            sort)
 
-    def functions(self, include_inherited=True) -> List['Function']:
+    def functions(self, include_inherited=True, sort=True) -> List['Function']:
         """
-        Returns a sorted list of `pdoc.Function` objects that
+        Returns an optionally-sorted list of `pdoc.Function` objects that
         represent this class' static functions.
         """
         return self._filter_doc_objs(
-            Function, include_inherited, lambda dobj: not dobj.method)
+            Function, include_inherited, lambda dobj: not dobj.method,
+            sort)
 
     def inherited_members(self) -> List[Tuple['Class', List[Doc]]]:
         """

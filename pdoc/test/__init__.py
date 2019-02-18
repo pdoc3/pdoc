@@ -537,6 +537,32 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(f.url(relative_to=c.module), '#example_pkg.D.overridden')
         self.assertEqual(f.url(top_ancestor=1), 'example_pkg/index.html#example_pkg.B.overridden')
 
+    @unittest.skipIf(sys.version_info < (3, 6), reason="only deterministic on CPython 3.6+")
+    def test_sorting(self):
+        module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+
+        sorted_variables = module.variables()
+        unsorted_variables = module.variables(sort=False)
+        self.assertNotEqual(sorted_variables, unsorted_variables)
+        self.assertEqual(sorted_variables, sorted(unsorted_variables))
+
+        sorted_functions = module.functions()
+        unsorted_functions = module.functions(sort=False)
+        self.assertNotEqual(sorted_functions, unsorted_functions)
+        self.assertEqual(sorted_functions, sorted(unsorted_functions))
+
+        sorted_classes = module.classes()
+        unsorted_classes = module.classes(sort=False)
+        self.assertNotEqual(sorted_classes, unsorted_classes)
+        self.assertEqual(sorted_classes, sorted(unsorted_classes))
+
+        cls = module.doc["Docformats"]
+
+        sorted_methods = cls.methods()
+        unsorted_methods = cls.methods(sort=False)
+        self.assertNotEqual(sorted_methods, unsorted_methods)
+        self.assertEqual(sorted_methods, sorted(unsorted_methods))
+
 
 class HtmlHelpersTest(unittest.TestCase):
     """
