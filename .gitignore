@@ -1,5 +1,6 @@
 dist
 build
+*.eggs/*
 *.egg-info
 *.py[cod]
 
