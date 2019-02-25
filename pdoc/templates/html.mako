@@ -25,6 +25,7 @@
     extract_module_toc_into_sidebar = getattr(config.attr, 'extract_module_toc_into_sidebar', True)
     list_class_variables_in_index = getattr(config.attr, 'list_class_variables_in_index', False)
     sort_identifiers = getattr(config.attr, 'sort_identifiers', True)
+    hljs_stylename = getattr(config.attr, 'hljs_stylename', 'github')
 
     link = getattr(config.attr, 'link', link)
     to_html = getattr(config.attr, 'to_html', to_html)
@@ -350,7 +351,7 @@
   <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
   <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
   % if show_source_code:
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/${hljs_stylename}.min.css" rel="stylesheet">
   %endif
 
   <%namespace name="css" file="css.mako" />
