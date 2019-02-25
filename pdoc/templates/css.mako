@@ -213,6 +213,7 @@
       margin: 0;
     }
     .source pre code {
+      font-size: 12px;
       overflow: visible;
     }
   .hlist {
