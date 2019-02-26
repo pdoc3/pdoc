@@ -198,7 +198,7 @@ class WebDoc(BaseHTTPRequestHandler):
         the source code.
         """
         # Deny favicon shortcut early.
-        if self.path == "/favicon.ico":
+        if self.import_path_from_req_url == "favicon.ico":
             return None
 
         # TODO: pass extra pdoc.html() params
