@@ -818,6 +818,24 @@ x =</p>'''
         html = to_html(text, module=mod)
         self.assertEqual(html, expected)
 
+    def test_urls(self):
+        text = """Beautiful Soup
+http://www.foo.bar
+<https://foo.bar>
+
+Work [like this](http://foo/) and [like that].
+
+[like that]: ftp://bar
+
+data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"""
+        expected = """<p>Beautiful Soup
+<a href="http://www.foo.bar">http://www.foo.bar</a>
+<a href="https://foo.bar">https://foo.bar</a></p>
+<p>Work <a href="http://foo/">like this</a> and <a href="ftp://bar">like that</a>.</p>
+<p>data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D</p>"""
+        html = to_html(text)
+        self.assertEqual(html, expected)
+
 
 class HttpTest(unittest.TestCase):
     """

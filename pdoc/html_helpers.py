@@ -154,7 +154,7 @@ class _ToMarkdown:
     def numpy(text,
               # All kinds of numpydoc Parameters (optionally with types; descriptions)
               _params=partial(
-                  re.compile(r'^([\w*]+(?:, [\w*]+)*)(?: ?: ?(.*)(?<!\.)$)?'
+                  re.compile(r'^([\w*]+(?:, [\w*]+)*)(?: ?: (.*)(?<!\.)$)?'
                              r'((?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
                   _numpy_params.__func__),
               _seealso=partial(
@@ -285,6 +285,11 @@ class _ToMarkdown:
         """
         return _indent_doctests(text)
 
+    @staticmethod
+    def raw_urls(text):
+        """Wrap URLs in Python-Markdown-compatible <angle brackets>."""
+        return re.sub(r'(?<!<)(\s*)((?:http|ftp)s?://[^>)\s]+)(\s*)(?!>)', r'\1<\2>\3', text)
+
 
 def to_html(text: str, docformat: str = 'numpy,google', *,
             module: pdoc.Module = None, link: Callable[..., str] = None,
@@ -304,6 +309,7 @@ def to_html(text: str, docformat: str = 'numpy,google', *,
     assert all(i in (None, '', 'numpy', 'google') for i in docformat.split(',')), docformat
 
     text = _ToMarkdown.admonitions(text, module)
+    text = _ToMarkdown.raw_urls(text)
 
     if 'google' in docformat:
         text = _ToMarkdown.google(text)
