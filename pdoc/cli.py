@@ -127,6 +127,10 @@ class WebDoc(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
+        # Deny favicon shortcut early.
+        if self.path == "/favicon.ico":
+            return None
+
         importlib.invalidate_caches()
         code = 200
         if self.path == "/":
@@ -197,10 +201,6 @@ class WebDoc(BaseHTTPRequestHandler):
         generated and account for whether they are stale compared to
         the source code.
         """
-        # Deny favicon shortcut early.
-        if self.path == "/favicon.ico":
-            return None
-
         # TODO: pass extra pdoc.html() params
         return pdoc.html(self.import_path_from_req_url, http_server=True)
 
