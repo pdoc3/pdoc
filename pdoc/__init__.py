@@ -832,7 +832,7 @@ class Doc:
             return '#' + self.refname
 
         # Otherwise, compute relative path from current module to link target
-        url = os.path.relpath(self._url(), relative_to.url())
+        url = os.path.relpath(self._url(), relative_to.url()).replace(path.sep, '/')
         # We have one set of '..' too many
         if url.startswith('../'):
             url = url[3:]
