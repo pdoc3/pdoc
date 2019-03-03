@@ -833,8 +833,8 @@ class Doc:
 
         # Otherwise, compute relative path from current module to link target
         url = os.path.relpath(self._url(), relative_to.url())
-        # We have one set of '..' too many. Handle Windows and UNIX slashes
-        if re.match(r'^\.\.[\/\\]', url):
+        # We have one set of '..' too many
+        if url.startswith('..' + os.path.sep):
             url = url[3:]
         return url
 
