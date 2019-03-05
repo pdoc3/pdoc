@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.5.2" />
+<meta name="generator" content="pdoc 0.5.3" />
 <title>pdoc API documentation</title>
 <meta name="description" content="Python package `pdoc` provides types, functions, and a command-line
 interface for accessing public documentation of Python modules, and
@@ -11,7 +11,7 @@ for presenting …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}#index .two-column{column-count:2}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.name small{font-weight:normal}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.name small{font-weight:normal}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 <style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em}</style>
@@ -152,10 +152,20 @@ of a module or in the definition of a class.</p>
 </div>
 <h2 id="supported-docstring-formats">Supported docstring formats</h2>
 <p>Currently, pure Markdown (with <a href="https://python-markdown.github.io/extensions/#officially-supported-extensions">extensions</a>), <a href="https://numpydoc.readthedocs.io/">numpydoc</a>,
-and <a href="http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings">Google-style</a> docstrings formats are supported.
-Basic <abbr title="reStructuredText">reST</abbr> directives (such as e.g.
-<code>.. versionadded::</code>, <code>.. deprecated::</code>, <code>.. note::</code>, <code>.. image::</code>, &hellip;)
-should also work.</p>
+and <a href="http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings">Google-style</a> docstrings formats are supported,
+along with some <abbr title="reStructuredText">reST</abbr> directives.</p>
+<h3 id="supported-rest-directives">Supported <abbr title="reStructuredText">reST</abbr> directives</h3>
+<p>The following <abbr title="reStructuredText">reST</abbr> directives should work:</p>
+<ul>
+<li>specific and generic <a href="http://docutils.sourceforge.net/docs/ref/rst/directives.html#admonitions">admonitions</a>,</li>
+<li><a href="http://docutils.sourceforge.net/docs/ref/rst/directives.html#images"><code>.. image::</code></a> or <code>.. figure::</code> (without options),</li>
+<li><a href="http://docutils.sourceforge.net/docs/ref/rst/directives.html#including-an-external-document-fragment"><code>.. include::</code></a>, with support for the options:
+<code>:start-line:</code>, <code>:end-line:</code>, <code>:start-after:</code> and <code>:end-before:</code>.</li>
+<li><code>.. versionadded::</code></li>
+<li><code>.. versionchanged::</code></li>
+<li><code>.. deprecated::</code></li>
+<li><code>.. todo::</code></li>
+</ul>
 <h2 id="linking-to-other-identifiers">Linking to other identifiers</h2>
 <p>In your documentation, you may refer to other identifiers in
 your modules. When exporting to HTML, linking is automatically
@@ -455,15 +465,32 @@ attaching a docstring to something. A good example of this is a
 Supported docstring formats
 ---------------------------
 Currently, pure Markdown (with [extensions]), [numpydoc],
-and [Google-style] docstrings formats are supported.
-Basic reST directives (such as e.g.
-`.. versionadded::`, `.. deprecated::`, `.. note::`, `.. image::`, ...)
-should also work.
+and [Google-style] docstrings formats are supported,
+along with some reST directives.
 
 *[reST]: reStructuredText
 [extensions]: https://python-markdown.github.io/extensions/#officially-supported-extensions
 [numpydoc]: https://numpydoc.readthedocs.io/
 [Google-style]: http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
+
+
+### Supported reST directives
+
+The following reST directives should work:
+
+* specific and generic [admonitions],
+* [`.. image::`][image] or `.. figure::` (without options),
+* [`.. include::`][include], with support for the options:
+  `:start-line:`, `:end-line:`, `:start-after:` and `:end-before:`.
+* `.. versionadded::`
+* `.. versionchanged::`
+* `.. deprecated::`
+* `.. todo::`
+
+[admonitions]: http://docutils.sourceforge.net/docs/ref/rst/directives.html#admonitions
+[image]: http://docutils.sourceforge.net/docs/ref/rst/directives.html#images
+[include]: \
+http://docutils.sourceforge.net/docs/ref/rst/directives.html#including-an-external-document-fragment
 
 
 Linking to other identifiers
@@ -1087,7 +1114,7 @@ class Doc:
             return &#39;#&#39; + self.refname
 
         # Otherwise, compute relative path from current module to link target
-        url = os.path.relpath(self._url(), relative_to.url())
+        url = os.path.relpath(self._url(), relative_to.url()).replace(path.sep, &#39;/&#39;)
         # We have one set of &#39;..&#39; too many
         if url.startswith(&#39;../&#39;):
             url = url[3:]
@@ -1172,7 +1199,8 @@ class Module(Doc):
                            for name, obj in inspect.getmembers(self.obj)
                            if (_is_public(name) and
                                is_from_this_module(obj))]
-
+            index = list(self.obj.__dict__).index
+            public_objs.sort(key=lambda i: index(i[0]))
         for name, obj in public_objs:
             if inspect.isroutine(obj):
                 self.doc[name] = Function(name, self, obj)
@@ -1331,29 +1359,30 @@ class Module(Doc):
                 self._context.get(self.name + &#39;.&#39; + _name) or
                 External(name))
 
-    def _filter_doc_objs(self, type: Type[T]) -&gt; List[T]:
-        return sorted(_filter_type(type, self.doc))
+    def _filter_doc_objs(self, type: Type[T], sort=True) -&gt; List[T]:
+        result = _filter_type(type, self.doc)
+        return sorted(result) if sort else result
 
-    def variables(self):
+    def variables(self, sort=True):
         &#34;&#34;&#34;
-        Returns all documented module-level variables in the module
-        sorted alphabetically as a list of `pdoc.Variable`.
+        Returns all documented module-level variables in the module,
+        optionally sorted alphabetically, as a list of `pdoc.Variable`.
         &#34;&#34;&#34;
-        return self._filter_doc_objs(Variable)
+        return self._filter_doc_objs(Variable, sort)
 
-    def classes(self):
+    def classes(self, sort=True):
         &#34;&#34;&#34;
-        Returns all documented module-level classes in the module
-        sorted alphabetically as a list of `pdoc.Class`.
+        Returns all documented module-level classes in the module,
+        optionally sorted alphabetically, as a list of `pdoc.Class`.
         &#34;&#34;&#34;
-        return self._filter_doc_objs(Class)
+        return self._filter_doc_objs(Class, sort)
 
-    def functions(self):
+    def functions(self, sort=True):
         &#34;&#34;&#34;
-        Returns all documented module-level functions in the module
-        sorted alphabetically as a list of `pdoc.Function`.
+        Returns all documented module-level functions in the module,
+        optionally sorted alphabetically, as a list of `pdoc.Function`.
         &#34;&#34;&#34;
-        return self._filter_doc_objs(Function)
+        return self._filter_doc_objs(Function, sort)
 
     def submodules(self):
         &#34;&#34;&#34;
@@ -1392,6 +1421,8 @@ class Class(Doc):
                        # in Class._fill_inheritance()
                        if (name in self.obj.__dict__ and
                            (_is_public(name) or name == &#39;__init__&#39;))]
+        index = list(self.obj.__dict__).index
+        public_objs.sort(key=lambda i: index(i[0]))
 
         # Convert the public Python objects to documentation objects.
         for name, obj in public_objs:
@@ -1465,42 +1496,48 @@ class Class(Doc):
                 for c in self.obj.__subclasses__()]
 
     def _filter_doc_objs(self, type: Type[T], include_inherited=True,
-                         filter_func: Callable[[T], bool] = lambda x: True) -&gt; List[T]:
-        return sorted(obj for obj in _filter_type(type, self.doc)
-                      if (include_inherited or not obj.inherits) and filter_func(obj))
+                         filter_func: Callable[[T], bool] = lambda x: True,
+                         sort=True) -&gt; List[T]:
+        result = [obj for obj in _filter_type(type, self.doc)
+                  if (include_inherited or not obj.inherits) and filter_func(obj)]
+        return sorted(result) if sort else result
 
-    def class_variables(self, include_inherited=True):
+    def class_variables(self, include_inherited=True, sort=True):
         &#34;&#34;&#34;
-        Returns a sorted list of `pdoc.Variable` objects that
+        Returns an optionally-sorted list of `pdoc.Variable` objects that
         represent this class&#39; class variables.
         &#34;&#34;&#34;
         return self._filter_doc_objs(
-            Variable, include_inherited, lambda dobj: not dobj.instance_var)
+            Variable, include_inherited, lambda dobj: not dobj.instance_var,
+            sort)
 
-    def instance_variables(self, include_inherited=True):
+    def instance_variables(self, include_inherited=True, sort=True):
         &#34;&#34;&#34;
-        Returns a sorted list of `pdoc.Variable` objects that
+        Returns an optionally-sorted list of `pdoc.Variable` objects that
         represent this class&#39; instance variables. Instance variables
         are those defined in a class&#39;s `__init__` as `self.variable = ...`.
         &#34;&#34;&#34;
         return self._filter_doc_objs(
-            Variable, include_inherited, lambda dobj: dobj.instance_var)
+            Variable, include_inherited, lambda dobj: dobj.instance_var,
+            sort)
 
-    def methods(self, include_inherited=True):
+    def methods(self, include_inherited=True, sort=True):
         &#34;&#34;&#34;
-        Returns a sorted list of `pdoc.Function` objects that
+        Returns an optionally-sorted list of `pdoc.Function` objects that
         represent this class&#39; methods.
         &#34;&#34;&#34;
         return self._filter_doc_objs(
-            Function, include_inherited, lambda dobj: dobj.method)
+            Function, include_inherited, lambda dobj: dobj.method,
+            sort)
 
-    def functions(self, include_inherited=True) -&gt; List[&#39;Function&#39;]:
+    def functions(self, include_inherited=True, sort=True) -&gt; List[&#39;Function&#39;]:
         &#34;&#34;&#34;
-        Returns a sorted list of `pdoc.Function` objects that
+        Returns an optionally-sorted list of `pdoc.Function` objects that
         represent this class&#39; static functions.
         &#34;&#34;&#34;
         return self._filter_doc_objs(
-            Function, include_inherited, lambda dobj: not dobj.method)
+            Function, include_inherited, lambda dobj: not dobj.method,
+            sort)
 
     def inherited_members(self) -&gt; List[Tuple[&#39;Class&#39;, List[Doc]]]:
         &#34;&#34;&#34;
@@ -2031,6 +2068,8 @@ that takes a single argument (a documentation object) and returns
                        # in Class._fill_inheritance()
                        if (name in self.obj.__dict__ and
                            (_is_public(name) or name == &#39;__init__&#39;))]
+        index = list(self.obj.__dict__).index
+        public_objs.sort(key=lambda i: index(i[0]))
 
         # Convert the public Python objects to documentation objects.
         for name, obj in public_objs:
@@ -2104,42 +2143,48 @@ that takes a single argument (a documentation object) and returns
                 for c in self.obj.__subclasses__()]
 
     def _filter_doc_objs(self, type: Type[T], include_inherited=True,
-                         filter_func: Callable[[T], bool] = lambda x: True) -&gt; List[T]:
-        return sorted(obj for obj in _filter_type(type, self.doc)
-                      if (include_inherited or not obj.inherits) and filter_func(obj))
+                         filter_func: Callable[[T], bool] = lambda x: True,
+                         sort=True) -&gt; List[T]:
+        result = [obj for obj in _filter_type(type, self.doc)
+                  if (include_inherited or not obj.inherits) and filter_func(obj)]
+        return sorted(result) if sort else result
 
-    def class_variables(self, include_inherited=True):
+    def class_variables(self, include_inherited=True, sort=True):
         &#34;&#34;&#34;
-        Returns a sorted list of `pdoc.Variable` objects that
+        Returns an optionally-sorted list of `pdoc.Variable` objects that
         represent this class&#39; class variables.
         &#34;&#34;&#34;
         return self._filter_doc_objs(
-            Variable, include_inherited, lambda dobj: not dobj.instance_var)
+            Variable, include_inherited, lambda dobj: not dobj.instance_var,
+            sort)
 
-    def instance_variables(self, include_inherited=True):
+    def instance_variables(self, include_inherited=True, sort=True):
         &#34;&#34;&#34;
-        Returns a sorted list of `pdoc.Variable` objects that
+        Returns an optionally-sorted list of `pdoc.Variable` objects that
         represent this class&#39; instance variables. Instance variables
         are those defined in a class&#39;s `__init__` as `self.variable = ...`.
         &#34;&#34;&#34;
         return self._filter_doc_objs(
-            Variable, include_inherited, lambda dobj: dobj.instance_var)
+            Variable, include_inherited, lambda dobj: dobj.instance_var,
+            sort)
 
-    def methods(self, include_inherited=True):
+    def methods(self, include_inherited=True, sort=True):
         &#34;&#34;&#34;
-        Returns a sorted list of `pdoc.Function` objects that
+        Returns an optionally-sorted list of `pdoc.Function` objects that
         represent this class&#39; methods.
         &#34;&#34;&#34;
         return self._filter_doc_objs(
-            Function, include_inherited, lambda dobj: dobj.method)
+            Function, include_inherited, lambda dobj: dobj.method,
+            sort)
 
-    def functions(self, include_inherited=True) -&gt; List[&#39;Function&#39;]:
+    def functions(self, include_inherited=True, sort=True) -&gt; List[&#39;Function&#39;]:
         &#34;&#34;&#34;
-        Returns a sorted list of `pdoc.Function` objects that
+        Returns an optionally-sorted list of `pdoc.Function` objects that
         represent this class&#39; static functions.
         &#34;&#34;&#34;
         return self._filter_doc_objs(
-            Function, include_inherited, lambda dobj: not dobj.method)
+            Function, include_inherited, lambda dobj: not dobj.method,
+            sort)
 
     def inherited_members(self) -&gt; List[Tuple[&#39;Class&#39;, List[Doc]]]:
         &#34;&#34;&#34;
@@ -2203,37 +2248,39 @@ that takes a single argument (a documentation object) and returns
 <h3>Methods</h3>
 <dl>
 <dt id="pdoc.Class.class_variables"><code class="name flex">
-<span>def <span class="ident">class_variables</span></span>(<span>self, include_inherited=True)</span>
+<span>def <span class="ident">class_variables</span></span>(<span>self, include_inherited=True, sort=True)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Returns a sorted list of <a title="pdoc.Variable" href="#pdoc.Variable"><code>Variable</code></a> objects that
+<section class="desc"><p>Returns an optionally-sorted list of <a title="pdoc.Variable" href="#pdoc.Variable"><code>Variable</code></a> objects that
 represent this class' class variables.</p></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def class_variables(self, include_inherited=True):
+<pre><code class="python">def class_variables(self, include_inherited=True, sort=True):
     &#34;&#34;&#34;
-    Returns a sorted list of `pdoc.Variable` objects that
+    Returns an optionally-sorted list of `pdoc.Variable` objects that
     represent this class&#39; class variables.
     &#34;&#34;&#34;
     return self._filter_doc_objs(
-        Variable, include_inherited, lambda dobj: not dobj.instance_var)</code></pre>
+        Variable, include_inherited, lambda dobj: not dobj.instance_var,
+        sort)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Class.functions"><code class="name flex">
-<span>def <span class="ident">functions</span></span>(<span>self, include_inherited=True)</span>
+<span>def <span class="ident">functions</span></span>(<span>self, include_inherited=True, sort=True)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Returns a sorted list of <a title="pdoc.Function" href="#pdoc.Function"><code>Function</code></a> objects that
+<section class="desc"><p>Returns an optionally-sorted list of <a title="pdoc.Function" href="#pdoc.Function"><code>Function</code></a> objects that
 represent this class' static functions.</p></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def functions(self, include_inherited=True) -&gt; List[&#39;Function&#39;]:
+<pre><code class="python">def functions(self, include_inherited=True, sort=True) -&gt; List[&#39;Function&#39;]:
     &#34;&#34;&#34;
-    Returns a sorted list of `pdoc.Function` objects that
+    Returns an optionally-sorted list of `pdoc.Function` objects that
     represent this class&#39; static functions.
     &#34;&#34;&#34;
     return self._filter_doc_objs(
-        Function, include_inherited, lambda dobj: not dobj.method)</code></pre>
+        Function, include_inherited, lambda dobj: not dobj.method,
+        sort)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Class.inherited_members"><code class="name flex">
@@ -2259,39 +2306,41 @@ sorted by MRO.</p></section>
 </details>
 </dd>
 <dt id="pdoc.Class.instance_variables"><code class="name flex">
-<span>def <span class="ident">instance_variables</span></span>(<span>self, include_inherited=True)</span>
+<span>def <span class="ident">instance_variables</span></span>(<span>self, include_inherited=True, sort=True)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Returns a sorted list of <a title="pdoc.Variable" href="#pdoc.Variable"><code>Variable</code></a> objects that
+<section class="desc"><p>Returns an optionally-sorted list of <a title="pdoc.Variable" href="#pdoc.Variable"><code>Variable</code></a> objects that
 represent this class' instance variables. Instance variables
 are those defined in a class's <code>__init__</code> as <code>self.variable = ...</code>.</p></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def instance_variables(self, include_inherited=True):
+<pre><code class="python">def instance_variables(self, include_inherited=True, sort=True):
     &#34;&#34;&#34;
-    Returns a sorted list of `pdoc.Variable` objects that
+    Returns an optionally-sorted list of `pdoc.Variable` objects that
     represent this class&#39; instance variables. Instance variables
     are those defined in a class&#39;s `__init__` as `self.variable = ...`.
     &#34;&#34;&#34;
     return self._filter_doc_objs(
-        Variable, include_inherited, lambda dobj: dobj.instance_var)</code></pre>
+        Variable, include_inherited, lambda dobj: dobj.instance_var,
+        sort)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Class.methods"><code class="name flex">
-<span>def <span class="ident">methods</span></span>(<span>self, include_inherited=True)</span>
+<span>def <span class="ident">methods</span></span>(<span>self, include_inherited=True, sort=True)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Returns a sorted list of <a title="pdoc.Function" href="#pdoc.Function"><code>Function</code></a> objects that
+<section class="desc"><p>Returns an optionally-sorted list of <a title="pdoc.Function" href="#pdoc.Function"><code>Function</code></a> objects that
 represent this class' methods.</p></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def methods(self, include_inherited=True):
+<pre><code class="python">def methods(self, include_inherited=True, sort=True):
     &#34;&#34;&#34;
-    Returns a sorted list of `pdoc.Function` objects that
+    Returns an optionally-sorted list of `pdoc.Function` objects that
     represent this class&#39; methods.
     &#34;&#34;&#34;
     return self._filter_doc_objs(
-        Function, include_inherited, lambda dobj: dobj.method)</code></pre>
+        Function, include_inherited, lambda dobj: dobj.method,
+        sort)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Class.mro"><code class="name flex">
@@ -2518,7 +2567,7 @@ a class's ancestor list.)</p></section>
             return &#39;#&#39; + self.refname
 
         # Otherwise, compute relative path from current module to link target
-        url = os.path.relpath(self._url(), relative_to.url())
+        url = os.path.relpath(self._url(), relative_to.url()).replace(path.sep, &#39;/&#39;)
         # We have one set of &#39;..&#39; too many
         if url.startswith(&#39;../&#39;):
             url = url[3:]
@@ -2712,7 +2761,7 @@ def url(self, relative_to: &#39;Module&#39; = None, *, link_prefix: str = &#39;&
         return &#39;#&#39; + self.refname
 
     # Otherwise, compute relative path from current module to link target
-    url = os.path.relpath(self._url(), relative_to.url())
+    url = os.path.relpath(self._url(), relative_to.url()).replace(path.sep, &#39;/&#39;)
     # We have one set of &#39;..&#39; too many
     if url.startswith(&#39;../&#39;):
         url = url[3:]
@@ -3177,7 +3226,8 @@ def params(self) -&gt; List[str]:
                            for name, obj in inspect.getmembers(self.obj)
                            if (_is_public(name) and
                                is_from_this_module(obj))]
-
+            index = list(self.obj.__dict__).index
+            public_objs.sort(key=lambda i: index(i[0]))
         for name, obj in public_objs:
             if inspect.isroutine(obj):
                 self.doc[name] = Function(name, self, obj)
@@ -3336,29 +3386,30 @@ def params(self) -&gt; List[str]:
                 self._context.get(self.name + &#39;.&#39; + _name) or
                 External(name))
 
-    def _filter_doc_objs(self, type: Type[T]) -&gt; List[T]:
-        return sorted(_filter_type(type, self.doc))
+    def _filter_doc_objs(self, type: Type[T], sort=True) -&gt; List[T]:
+        result = _filter_type(type, self.doc)
+        return sorted(result) if sort else result
 
-    def variables(self):
+    def variables(self, sort=True):
         &#34;&#34;&#34;
-        Returns all documented module-level variables in the module
-        sorted alphabetically as a list of `pdoc.Variable`.
+        Returns all documented module-level variables in the module,
+        optionally sorted alphabetically, as a list of `pdoc.Variable`.
         &#34;&#34;&#34;
-        return self._filter_doc_objs(Variable)
+        return self._filter_doc_objs(Variable, sort)
 
-    def classes(self):
+    def classes(self, sort=True):
         &#34;&#34;&#34;
-        Returns all documented module-level classes in the module
-        sorted alphabetically as a list of `pdoc.Class`.
+        Returns all documented module-level classes in the module,
+        optionally sorted alphabetically, as a list of `pdoc.Class`.
         &#34;&#34;&#34;
-        return self._filter_doc_objs(Class)
+        return self._filter_doc_objs(Class, sort)
 
-    def functions(self):
+    def functions(self, sort=True):
         &#34;&#34;&#34;
-        Returns all documented module-level functions in the module
-        sorted alphabetically as a list of `pdoc.Function`.
+        Returns all documented module-level functions in the module,
+        optionally sorted alphabetically, as a list of `pdoc.Function`.
         &#34;&#34;&#34;
-        return self._filter_doc_objs(Function)
+        return self._filter_doc_objs(Function, sort)
 
     def submodules(self):
         &#34;&#34;&#34;
@@ -3470,7 +3521,8 @@ global context object will be used.</p></section>
                        for name, obj in inspect.getmembers(self.obj)
                        if (_is_public(name) and
                            is_from_this_module(obj))]
-
+        index = list(self.obj.__dict__).index
+        public_objs.sort(key=lambda i: index(i[0]))
     for name, obj in public_objs:
         if inspect.isroutine(obj):
             self.doc[name] = Function(name, self, obj)
@@ -3514,19 +3566,19 @@ global context object will be used.</p></section>
 </details>
 </dd>
 <dt id="pdoc.Module.classes"><code class="name flex">
-<span>def <span class="ident">classes</span></span>(<span>self)</span>
+<span>def <span class="ident">classes</span></span>(<span>self, sort=True)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Returns all documented module-level classes in the module
-sorted alphabetically as a list of <a title="pdoc.Class" href="#pdoc.Class"><code>Class</code></a>.</p></section>
+<section class="desc"><p>Returns all documented module-level classes in the module,
+optionally sorted alphabetically, as a list of <a title="pdoc.Class" href="#pdoc.Class"><code>Class</code></a>.</p></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def classes(self):
+<pre><code class="python">def classes(self, sort=True):
     &#34;&#34;&#34;
-    Returns all documented module-level classes in the module
-    sorted alphabetically as a list of `pdoc.Class`.
+    Returns all documented module-level classes in the module,
+    optionally sorted alphabetically, as a list of `pdoc.Class`.
     &#34;&#34;&#34;
-    return self._filter_doc_objs(Class)</code></pre>
+    return self._filter_doc_objs(Class, sort)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Module.find_class"><code class="name flex">
@@ -3578,19 +3630,19 @@ returned. If one cannot be found, then an instance of
 </details>
 </dd>
 <dt id="pdoc.Module.functions"><code class="name flex">
-<span>def <span class="ident">functions</span></span>(<span>self)</span>
+<span>def <span class="ident">functions</span></span>(<span>self, sort=True)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Returns all documented module-level functions in the module
-sorted alphabetically as a list of <a title="pdoc.Function" href="#pdoc.Function"><code>Function</code></a>.</p></section>
+<section class="desc"><p>Returns all documented module-level functions in the module,
+optionally sorted alphabetically, as a list of <a title="pdoc.Function" href="#pdoc.Function"><code>Function</code></a>.</p></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def functions(self):
+<pre><code class="python">def functions(self, sort=True):
     &#34;&#34;&#34;
-    Returns all documented module-level functions in the module
-    sorted alphabetically as a list of `pdoc.Function`.
+    Returns all documented module-level functions in the module,
+    optionally sorted alphabetically, as a list of `pdoc.Function`.
     &#34;&#34;&#34;
-    return self._filter_doc_objs(Function)</code></pre>
+    return self._filter_doc_objs(Function, sort)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.Module.html"><code class="name flex">
@@ -3659,19 +3711,19 @@ alphabetically as a list of <a title="pdoc.Module" href="#pdoc.Module"><code>Mod
 </details>
 </dd>
 <dt id="pdoc.Module.variables"><code class="name flex">
-<span>def <span class="ident">variables</span></span>(<span>self)</span>
+<span>def <span class="ident">variables</span></span>(<span>self, sort=True)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Returns all documented module-level variables in the module
-sorted alphabetically as a list of <a title="pdoc.Variable" href="#pdoc.Variable"><code>Variable</code></a>.</p></section>
+<section class="desc"><p>Returns all documented module-level variables in the module,
+optionally sorted alphabetically, as a list of <a title="pdoc.Variable" href="#pdoc.Variable"><code>Variable</code></a>.</p></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def variables(self):
+<pre><code class="python">def variables(self, sort=True):
     &#34;&#34;&#34;
-    Returns all documented module-level variables in the module
-    sorted alphabetically as a list of `pdoc.Variable`.
+    Returns all documented module-level variables in the module,
+    optionally sorted alphabetically, as a list of `pdoc.Variable`.
     &#34;&#34;&#34;
-    return self._filter_doc_objs(Variable)</code></pre>
+    return self._filter_doc_objs(Variable, sort)</code></pre>
 </details>
 </dd>
 </dl>
@@ -3822,7 +3874,10 @@ variable.</p></section>
 </ul>
 </li>
 <li><a href="#overriding-docstrings-with-__pdoc__">Overriding docstrings with __pdoc__</a></li>
-<li><a href="#supported-docstring-formats">Supported docstring formats</a></li>
+<li><a href="#supported-docstring-formats">Supported docstring formats</a><ul>
+<li><a href="#supported-rest-directives">Supported reST directives</a></li>
+</ul>
+</li>
 <li><a href="#linking-to-other-identifiers">Linking to other identifiers</a></li>
 <li><a href="#command-line-interface">Command-line interface</a></li>
 <li><a href="#programmatic-usage">Programmatic usage</a></li>
@@ -3936,7 +3991,7 @@ variable.</p></section>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.3</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
