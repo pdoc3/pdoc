@@ -1,3 +1,20 @@
+0.5.3
+=====
+  - Only close standard input if `--close-stdin` is used. This flips
+    the previous (hopefully rarely required) default.
+  - Fix backslashes in relative `Doc.url()` on Windos.
+  - New support for `.. include::` reST directive that includes
+    verbatim content from another file.
+  - Dev web server (`--http`) fixes:
+    - Unify `--http` and non-`--http` behavior by always adding
+      cwd to `sys.path`.
+    - Fix favicon.ico errors in `--http` mode.
+  - HTML template:
+    - Make TOC reference lists two- or three-column only if enough room for it.
+    - Fix: Hyperlink raw URLs.
+    - New optional sorting of variables, functions, classes.
+    - New configurable Highlight.js style.
+
 0.5.2
 =====
   - Add `__main__.py` so users can invoke `python -m pdoc`.
