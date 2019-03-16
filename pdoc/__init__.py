@@ -1340,8 +1340,14 @@ class Parameter(inspect.Parameter):
         r += self.name
 
         if self.annotation is not Parameter.empty:
-            # FIXME: This is probably not the correct thing to do with complex types
-            r += ': ' + self.annotation.__name__
+            r += ': '
+
+            if isinstance(self.annotation, str):
+                r += self.annotation
+            elif hasattr(self.annotation, '__name__'):
+                r += self.annotation.__name__
+            else:
+                r += repr(self.annotation)
 
         if self.default is not Parameter.empty:
             r += ' = ' + repr(self.default)
