@@ -1395,21 +1395,10 @@ class Function(Doc):
 
 
         parameters = [ Parameter.of_inspect(p) for p in sig.parameters.values() ]
+        pos_params = [ p for p in parameters
+                       if p.should_show and p.kind in Parameter.POSITIONAL ]
         kw_params = [ p for p in parameters
                       if p.should_show and p.kind in Parameter.KEYWORD ]
-
-        pos_params, tmp = [], []
-        for p in parameters:
-            if p.kind not in Parameter.POSITIONAL:
-                break
-
-            if p.should_show:
-                pos_params += tmp
-                pos_params.append(p)
-                tmp = []
-
-            else:
-                tmp.append(p)
 
         if not pos_params and kw_params:
             return ['*'] + kw_params
