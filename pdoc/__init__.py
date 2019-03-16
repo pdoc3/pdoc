@@ -331,7 +331,7 @@ from functools import lru_cache, reduce
 from itertools import tee, groupby
 from types import ModuleType
 from typing import Dict, List, Set, Tuple
-from typing import NamedTuple, Optional, Union, Type, TypeVar
+from typing import Optional, Union, Type, TypeVar
 from typing import Callable, Iterable, Generator
 from warnings import warn
 
@@ -638,16 +638,11 @@ def _var_docstrings(doc_obj: Union['Module', 'Class'], *,
     return vs
 
 
-def _is_public(ident):
+def _is_public(ident_name):
     """
     Returns `True` if `ident_name` matches the export criteria for an
     identifier name.
     """
-    if isinstance(ident, Parameter):
-        ident_name = ident.name.lstrip('*')
-    else:
-        ident_name = ident
-
     return not ident_name.startswith("_")
 
 
@@ -1289,22 +1284,44 @@ class Class(Doc):
         del self._super_members
 
 
-class Parameter(NamedTuple('Parameter',
-                           [('name', str),
-                            ('hint', Optional[str]),
-                            ('default', Optional[str])])):
+class Parameter(inspect.Parameter):
     """Representation of a function parameter, incl. type hint & default value."""
 
+    POSITIONAL = (
+        inspect.Parameter.POSITIONAL_ONLY,
+        inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        inspect.Parameter.VAR_POSITIONAL,
+    )
+
+    KEYWORD = (
+        inspect.Parameter.KEYWORD_ONLY,
+        inspect.Parameter.VAR_KEYWORD
+    )
+
+    STARS = {
+        inspect.Parameter.VAR_POSITIONAL: '*',
+        inspect.Parameter.VAR_KEYWORD:    '**',
+    }
+
+    @property
+    def should_show(self) -> bool:
+        return _is_public(self.name) or self.default is Parameter.empty
+
     def __str__(self) -> str:
-        r = self.name
+        r = Parameter.STARS.get(self.kind, '')
+        r += self.name
 
-        if self.hint is not None:
-            r += ': ' + self.hint
+        if self.annotation is not Parameter.empty:
+            # FIXME: This is probably not the correct thing to do with complex types
+            r += ': ' + self.annotation.__name__
 
-        if self.default is not None:
-            r += ' = ' + self.default
+        if self.default is not Parameter.empty:
+            r += ' = ' + repr(self.default)
 
         return r
+
+    def of_inspect(p: inspect.Parameter) -> 'Parameter':
+        return Parameter(p.name, p.kind, default=p.default, annotation=p.annotation)
 
 
 class Function(Doc):
@@ -1363,7 +1380,7 @@ class Function(Doc):
             return False
 
     @lru_cache()
-    def params(self) -> List[Parameter]:
+    def params(self) -> List[Union[str, Parameter]]:
         """
         Returns a list representing each parameter of this function, with a
         nicely-formatted string conversion. This includes argument lists,
@@ -1371,62 +1388,33 @@ class Function(Doc):
         optional arguments whose names begin with an underscore.
         """
         try:
-            s = inspect.getfullargspec(inspect.unwrap(self.obj))
+            sig = inspect.signature(inspect.unwrap(self.obj))
         except TypeError:
             # I guess this is for C builtin functions?
             return [Parameter('...', None, None)]
 
-        params = []
 
-        for i, param in enumerate(s.args):
-            default = None
-            if s.defaults is not None and len(s.args) - i <= len(s.defaults):
-                defind = len(s.defaults) - (len(s.args) - i)
-                default = repr(s.defaults[defind])
+        parameters = [ Parameter.of_inspect(p) for p in sig.parameters.values() ]
+        kw_params = [ p for p in parameters
+                      if p.should_show and p.kind in Parameter.KEYWORD ]
 
-            params.append(Parameter(name=param,
-                                    hint=None,  # XXXTODO
-                                    default=default))
-
-        kwonlyargs = getattr(s, "kwonlyargs", None)
-        if kwonlyargs or s.varargs is not None:
-            params.append(Parameter(name='*' + s.varargs if s.varargs else '*',
-                                    hint=None,
-                                    default=None))
-
-        if kwonlyargs:
-            for param in kwonlyargs:
-                if param in s.kwonlydefaults:
-                    default = repr(s.kwonlydefaults[param])
-                else:
-                    default = None
-
-                params.append(Parameter(name=param, default=default,
-                                        hint=None))  # XXXTODO
-
-        keywords = getattr(s, "varkw", getattr(s, "keywords", None))
-        if keywords is not None:
-            params.append(Parameter(name='**' + keywords, hint=None, default=None))
-
-        # Remove "_private" params following catch-all *args and from the end
-        iter_params = iter(params)
-        params = []
-        for p in iter_params:
-            params.append(p)
-            if p.name.startswith('*'):
+        pos_params, tmp = [], []
+        for p in parameters:
+            if p.kind not in Parameter.POSITIONAL:
                 break
-        while len(params) > 1 and not _is_public(params[-2]) and params[-2].default is not None:
-            params.pop(-2)
-        for p in iter_params:
-            if _is_public(p.name):
-                params.append(p)
-        while params and not _is_public(params[-1]) and params[-1].default is not None:
-            params.pop(-1)
-        if params and params[-1].name == "*":
-            params.pop(-1)
 
-        # TODO: The only thing now missing for Python 3 are type annotations
-        return params
+            if p.should_show:
+                pos_params += tmp
+                pos_params.append(p)
+                tmp = []
+
+            else:
+                tmp.append(p)
+
+        if not pos_params and kw_params:
+            return ['*'] + kw_params
+
+        return pos_params + kw_params
 
     def __lt__(self, other):
         # Push __init__ to the top.
