@@ -1,3 +1,38 @@
+0.5.3
+=====
+  - Only close standard input if `--close-stdin` is used. This flips
+    the previous (hopefully rarely required) default.
+  - Fix backslashes in relative `Doc.url()` on Windos.
+  - New support for `.. include::` reST directive that includes
+    verbatim content from another file.
+  - Dev web server (`--http`) fixes:
+    - Unify `--http` and non-`--http` behavior by always adding
+      cwd to `sys.path`.
+    - Fix favicon.ico errors in `--http` mode.
+  - HTML template:
+    - Make TOC reference lists two- or three-column only if enough room for it.
+    - Fix: Hyperlink raw URLs.
+    - New optional sorting of variables, functions, classes.
+    - New configurable Highlight.js style.
+
+0.5.2
+=====
+  - Add `__main__.py` so users can invoke `python -m pdoc`.
+  - Fix: List builtin class method descriptors
+  - Google docstring format fixes:
+    - Support for 2-space indents.
+    - Recognize sections even when not preceded by an empty line.
+    - Recognize additional characters (`,=[]`) in type specifications.
+  - HTML template fixes:
+    - Fixed some CSS typos.
+    - Re-styled View Source button in HTML template.
+    - Two-column TOC reference lists only when all names are short.
+    - TOC links for some class no longer lead to its ancestor class.
+
+0.5.1
+=====
+  - Markdown >= 3.0.0 requirement.
+
 0.5.0
 =====
   - Relicensed as AGPL-3.0.

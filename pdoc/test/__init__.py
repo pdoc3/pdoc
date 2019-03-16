@@ -354,6 +354,12 @@ class ApiTest(unittest.TestCase):
         var = mod.doc['B'].doc['instance_var']
         self.assertTrue(var.instance_var)
 
+    def test_builtin_methoddescriptors(self):
+        import parser
+        with self.assertWarns(UserWarning):
+            c = pdoc.Class('STType', pdoc.Module(parser), parser.STType)
+        self.assertIsInstance(c.doc['compile'], pdoc.Function)
+
     def test_refname(self):
         mod = EXAMPLE_MODULE + '.' + 'subpkg'
         module = pdoc.Module(pdoc.import_module(mod))
@@ -479,9 +485,11 @@ class ApiTest(unittest.TestCase):
         a = mod.doc['a'].doc['A']
         b = mod.doc['b'].doc['B']
         c = mod.doc['b'].doc['c'].doc['C']
-        self.assertEqual(b.inherits, a)
         self.assertEqual(b.doc['a'].inherits, a.doc['a'])
         self.assertEqual(b.doc['c'].inherits, c.doc['c'])
+        # While classes do inherit from superclasses, they just shouldn't always
+        # say so, because public classes do want to be exposed and linked to
+        self.assertNotEqual(b.inherits, a)
 
     def test_context(self):
         context = {}
@@ -521,13 +529,39 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(c.url(), 'example_pkg/index.html#example_pkg.D')
         self.assertEqual(c.url(link_prefix='/'), '/example_pkg/index.html#example_pkg.D')
         self.assertEqual(c.url(relative_to=c.module), '#example_pkg.D')
-        self.assertEqual(c.url(top_ancestor=True), 'example_pkg/index.html#example_pkg.B')
+        self.assertEqual(c.url(top_ancestor=True), c.url())  # Public classes do link to themselves
 
         f = c.doc['overridden']
         self.assertEqual(f.url(), 'example_pkg/index.html#example_pkg.D.overridden')
         self.assertEqual(f.url(link_prefix='/'), '/example_pkg/index.html#example_pkg.D.overridden')
         self.assertEqual(f.url(relative_to=c.module), '#example_pkg.D.overridden')
         self.assertEqual(f.url(top_ancestor=1), 'example_pkg/index.html#example_pkg.B.overridden')
+
+    @unittest.skipIf(sys.version_info < (3, 6), reason="only deterministic on CPython 3.6+")
+    def test_sorting(self):
+        module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+
+        sorted_variables = module.variables()
+        unsorted_variables = module.variables(sort=False)
+        self.assertNotEqual(sorted_variables, unsorted_variables)
+        self.assertEqual(sorted_variables, sorted(unsorted_variables))
+
+        sorted_functions = module.functions()
+        unsorted_functions = module.functions(sort=False)
+        self.assertNotEqual(sorted_functions, unsorted_functions)
+        self.assertEqual(sorted_functions, sorted(unsorted_functions))
+
+        sorted_classes = module.classes()
+        unsorted_classes = module.classes(sort=False)
+        self.assertNotEqual(sorted_classes, unsorted_classes)
+        self.assertEqual(sorted_classes, sorted(unsorted_classes))
+
+        cls = module.doc["Docformats"]
+
+        sorted_methods = cls.methods()
+        unsorted_methods = cls.methods(sort=False)
+        self.assertNotEqual(sorted_methods, unsorted_methods)
+        self.assertEqual(sorted_methods, sorted(unsorted_methods))
 
 
 class HtmlHelpersTest(unittest.TestCase):
@@ -656,17 +690,36 @@ description of <code>x1</code>, <code>x2</code>.</p>
 Nomatch:</p>
 <h2 id="args">Args</h2>
 <dl>
+<dt><strong><code>arg1</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Text1</dd>
+<dt><strong><code>arg2</code></strong> :&ensp;<code>List</code>[<code>str</code>], optional,\
+ default=<code>10</code></dt>
+<dd>Text2</dd>
+</dl>
+<h2 id="args_1">Args</h2>
+<dl>
 <dt><strong><code>arg1</code></strong> :&ensp;<code>int</code></dt>
 <dd>Description of arg1</dd>
 <dt><strong><code>arg2</code></strong> :&ensp;<code>str</code> or <code>int</code></dt>
 <dd>Description of arg2</dd>
+<dt><strong><code>test_sequence</code></strong></dt>
+<dd>
+<p>2-dim numpy array of real numbers, size: N * D
+- the test observation sequence.</p>
+<pre><code>test_sequence =
+code
+</code></pre>
+<p>Continue.</p>
+</dd>
 <dt><strong><code>*args</code></strong></dt>
 <dd>passed around</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>bool</code></strong></dt>
-<dd>Description of return value</dd>
+<dt><strong><code>issue_10</code></strong></dt>
+<dd>description didn't work across multiple lines
+if only a single item was listed. <code>inspect.cleandoc()</code>
+somehow stripped the required extra indentation.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
@@ -678,6 +731,12 @@ that are relevant to the interface.</p>
 </dd>
 <dt><strong><code>ValueError</code></strong></dt>
 <dd>If <code>arg2</code> is equal to <code>arg1</code>.</dd>
+</dl>
+<p>Test a title without a blank line before it.</p>
+<h2 id="args_2">Args</h2>
+<dl>
+<dt><strong><code>A</code></strong></dt>
+<dd>a</dd>
 </dl>
 <h2 id="examples">Examples</h2>
 <p>Examples in doctest format.</p>
@@ -745,6 +804,38 @@ lines.</p>
         html = to_html(text, module=self._module, link=self._link)
         self.assertEqual(html, expected)
 
+    def test_reST_include(self):
+        expected = '''<pre><code class="python">    x = 2
+</code></pre>
+
+<p>1
+x = 2
+x = 3
+x =</p>'''
+        mod = pdoc.Module(pdoc.import_module(
+            os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_reST_include', 'test.py')))
+        text = inspect.getdoc(mod.obj)
+        html = to_html(text, module=mod)
+        self.assertEqual(html, expected)
+
+    def test_urls(self):
+        text = """Beautiful Soup
+http://www.foo.bar
+<https://foo.bar>
+
+Work [like this](http://foo/) and [like that].
+
+[like that]: ftp://bar
+
+data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"""
+        expected = """<p>Beautiful Soup
+<a href="http://www.foo.bar">http://www.foo.bar</a>
+<a href="https://foo.bar">https://foo.bar</a></p>
+<p>Work <a href="http://foo/">like this</a> and <a href="ftp://bar">like that</a>.</p>
+<p>data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D</p>"""
+        html = to_html(text)
+        self.assertEqual(html, expected)
+
 
 class HttpTest(unittest.TestCase):
     """
@@ -760,39 +851,53 @@ class HttpTest(unittest.TestCase):
         yield
         signal.alarm(0)
 
-    def test_http(self):
-        host, port = 'localhost', randint(9000, 12000)
-        args = '--http :{} pdoc {}'.format(
-            port, os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)).split()
+    @contextmanager
+    def _http(self, modules: list):
+        port = randint(9000, 12000)
 
-        with self._timeout(10):
+        with self._timeout(1000):
             with redirect_streams() as (stdout, stderr):
-                t = threading.Thread(target=main, args=(parser.parse_args(args),))
+                t = threading.Thread(
+                    target=main, args=(parser.parse_args(['--http', ':%d' % port] + modules),))
                 t.start()
                 sleep(.1)
 
                 if not t.is_alive():
-                    sys.stderr.write(stderr.getvalue())
+                    sys.__stderr__.write(stderr.getvalue())
                     raise AssertionError
 
                 try:
-                    url = 'http://{}:{}/'.format(host, port)
-                    with self.subTest(url='/'):
-                        with urlopen(url, timeout=3) as resp:
-                            html = resp.read()
-                            self.assertIn(b'Python package <code>pdoc</code>', html)
-                            self.assertNotIn(b'gzip', html)
-                    with self.subTest(url='/' + EXAMPLE_MODULE):
-                        with urlopen(url + 'pdoc', timeout=3) as resp:
-                            html = resp.read()
-                            self.assertIn(b'__pdoc__', html)
-                    with self.subTest(url='/csv.ext'):
-                        with urlopen(url + 'csv.ext', timeout=3) as resp:
-                            html = resp.read()
-                            self.assertIn(b'DictReader', html)
+                    yield 'http://localhost:{}/'.format(port)
+                except Exception:
+                    sys.__stderr__.write(stderr.getvalue())
+                    sys.__stdout__.write(stdout.getvalue())
+                    raise
                 finally:
-                    pdoc.cli._httpd.shutdown()
+                    pdoc.cli._httpd.shutdown()  # type: ignore
                     t.join()
+
+    def test_http(self):
+        with self._http(['pdoc', os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)]) as url:
+            with self.subTest(url='/'):
+                with urlopen(url, timeout=3) as resp:
+                    html = resp.read()
+                    self.assertIn(b'Python package <code>pdoc</code>', html)
+                    self.assertNotIn(b'gzip', html)
+            with self.subTest(url='/' + EXAMPLE_MODULE):
+                with urlopen(url + 'pdoc', timeout=3) as resp:
+                    html = resp.read()
+                    self.assertIn(b'__pdoc__', html)
+            with self.subTest(url='/csv.ext'):
+                with urlopen(url + 'csv.ext', timeout=3) as resp:
+                    html = resp.read()
+                    self.assertIn(b'DictReader', html)
+
+    def test_file(self):
+        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
+            with self._http(['_relative_import']) as url:
+                with urlopen(url, timeout=3) as resp:
+                    html = resp.read()
+                    self.assertIn(b'<a href="/_relative_import">', html)
 
 
 if __name__ == '__main__':

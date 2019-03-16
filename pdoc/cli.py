@@ -80,6 +80,12 @@ aa(
          "No link prefix results in all links being relative. "
          "No effect when combined with --http.",
 )
+aa(
+    "--close-stdin",
+    action="store_true",
+    help="When set, stdin will be closed before importing, to account for "
+         "ill-behaved modules that block on stdin."
+)
 
 DEFAULT_HOST, DEFAULT_PORT = 'localhost', 8080
 
@@ -121,6 +127,10 @@ class WebDoc(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
+        # Deny favicon shortcut early.
+        if self.path == "/favicon.ico":
+            return None
+
         importlib.invalidate_caches()
         code = 200
         if self.path == "/":
@@ -191,10 +201,6 @@ class WebDoc(BaseHTTPRequestHandler):
         generated and account for whether they are stale compared to
         the source code.
         """
-        # Deny favicon shortcut early.
-        if self.path == "/favicon.ico":
-            return None
-
         # TODO: pass extra pdoc.html() params
         return pdoc.html(self.import_path_from_req_url, http_server=True)
 
@@ -280,9 +286,8 @@ def main(_args=None):
     global args
     args = _args or parser.parse_args()
 
-    # We close stdin because some modules, upon import, are not very polite
-    # and block on stdin.
-    sys.stdin.close()
+    if args.close_stdin:
+        sys.stdin.close()
 
     if args.template_dir is not None:
         if not path.isdir(args.template_dir):
@@ -290,6 +295,9 @@ def main(_args=None):
                   file=sys.stderr)
             sys.exit(1)
         pdoc.tpl_lookup.directories.insert(0, args.template_dir)
+
+    # Support loading modules specified as python paths relative to cwd
+    sys.path.append(os.getcwd())
 
     if args.http:
         args.html = True
@@ -324,9 +332,6 @@ def main(_args=None):
             return any(f in obj.refname or
                        isinstance(obj, pdoc.Class) and f in obj.doc
                        for f in _filters)
-
-    # Support loading modules specified as python paths relative to cwd
-    sys.path.append(os.getcwd())
 
     modules = [pdoc.Module(pdoc.import_module(module),
                            docfilter=docfilter)

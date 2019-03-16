@@ -55,7 +55,9 @@ See _doc/README.md_. All documentation is generated from
 
 Pull requests
 -------------
-Please use explicit commit messages. See [NumPy's development workflow]
-for inspiration.
+If you're new to proposing changes on GitHub, help yourself to an
+[appropriate guide]. Additionally, please use explicit commit messages.
+See [NumPy's development workflow] for inspiration.
 
+[appropriate guide]: https://gist.github.com/Chaser324/ce0505fbed06b947d962
 [NumPy's development workflow]: https://docs.scipy.org/doc/numpy/dev/gitwash/development_workflow.html

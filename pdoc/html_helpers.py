@@ -2,6 +2,7 @@
 Helper functions for HTML output.
 """
 import inspect
+import os.path
 import re
 from functools import partial, lru_cache
 from typing import Callable
@@ -108,15 +109,12 @@ class _ToMarkdown:
     def _deflist(name, type, desc,
                  # Wraps any identifiers and string literals in parameter type spec
                  # in backticks while skipping common "stopwords" such as 'or', 'of',
-                 # 'optional'. See §4 Parameters:
+                 # 'optional' ... See §4 Parameters:
                  # https://numpydoc.readthedocs.io/en/latest/format.html#sections
                  _type_parts=partial(
-                     re.compile(r'(.*?)(, optional\.?|)$').sub,
-                     lambda m, _backtick_idents=partial(
-                             re.compile(r'[\w.\'"]+').sub,
-                             lambda m: ('{}' if m.group(0) in ('of', 'or') else
-                                        '`{}`').format(m.group(0))): (
-                         _backtick_idents(m.group(1)) + m.group(2)))):
+                     re.compile(r'[\w.\'"]+').sub,
+                     lambda m: ('{}' if m.group(0) in ('of', 'or', 'default', 'optional') else
+                                '`{}`').format(m.group(0)))):
         """
         Returns `name`, `type`, and `desc` formatted as a
         Python-Markdown definition list entry. See also:
@@ -124,6 +122,7 @@ class _ToMarkdown:
         """
         type = _type_parts(type or '')
         desc = desc or '&nbsp;'
+        assert _ToMarkdown._is_indented_4_spaces(desc)
         if type:
             return '**`{}`** :&ensp;{}\n:   {}\n\n'.format(name, type, desc)
         return '**`{}`**\n:   {}\n\n'.format(name, desc)
@@ -155,7 +154,7 @@ class _ToMarkdown:
     def numpy(text,
               # All kinds of numpydoc Parameters (optionally with types; descriptions)
               _params=partial(
-                  re.compile(r'^([\w*]+(?:, [\w*]+)*)(?: ?: ?(.*)(?<!\.)$)?'
+                  re.compile(r'^([\w*]+(?:, [\w*]+)*)(?: ?: (.*)(?<!\.)$)?'
                              r'((?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
                   _numpy_params.__func__),
               _seealso=partial(
@@ -170,15 +169,26 @@ class _ToMarkdown:
         return text
 
     @staticmethod
+    def _is_indented_4_spaces(txt, _3_spaces_or_less=re.compile(r'\n\s{0,3}\S').search):
+        return '\n' not in txt or not _3_spaces_or_less(txt)
+
+    @staticmethod
+    def _fix_indent(name, type, desc):
+        """Mazbe fix indent from 2 to 4 spaces."""
+        if not _ToMarkdown._is_indented_4_spaces(desc):
+            desc = desc.replace('\n', '\n  ')
+        return name, type, desc
+
+    @staticmethod
     def google(text,
                _googledoc_sections=partial(
-                   re.compile(r'(?<=\n\n)(\w+):$\n((?:\n?(?: {4}.*|$))+)', re.MULTILINE).sub,
+                   re.compile(r'^([A-Z]\w+):$\n((?:\n?(?: {2,}.*|$))+)', re.MULTILINE).sub,
                    lambda m, _params=partial(
-                           re.compile(r'^([\w*]+)(?: \(([\w. ]+)\))?: '
-                                      r'((?:.*)(?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
-                           lambda m: _ToMarkdown._deflist(*m.groups())): (
-                       '\n{}\n-----\n{}'.format(
-                           m.group(1), _params(inspect.cleandoc(m.group(2))))))):
+                           re.compile(r'^([\w*]+)(?: \(([\w.,=\[\] ]+)\))?: '
+                                      r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub,
+                           lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups()))): (
+                       m.group() if not m.group(2) else '\n{}\n-----\n{}'.format(
+                           m.group(1), _params(inspect.cleandoc('\n' + m.group(2))))))):
         """
         Convert `text` in Google-style docstring format to Markdown
         to be further converted later.
@@ -186,9 +196,16 @@ class _ToMarkdown:
         return _googledoc_sections(text)
 
     @staticmethod
-    def _admonition(match):
+    def _admonition(match, module=None):
         indent, type, value, text = match.groups()
 
+        if type == 'include' and module:
+            try:
+                return _ToMarkdown._include_file(indent, value,
+                                                 _ToMarkdown._directive_opts(text), module)
+            except Exception as e:
+                raise RuntimeError('`.. include:: {}` error in module {!r}: {}'
+                                   .format(value, module.name, e))
         if type in ('image', 'figure'):
             return '{}![{}]({})\n'.format(
                 indent, text.translate(str.maketrans({'\n': ' ',
@@ -215,11 +232,7 @@ class _ToMarkdown:
         return '{}!!! {} "{}"\n{}\n'.format(indent, type, title, text)
 
     @staticmethod
-    def admonitions(text,
-                    _admonitions=partial(
-                        re.compile(r'^(?P<indent> *)\.\. ?(\w+)::(?: *(.*))?'
-                                   r'((?:\n(?:(?P=indent) +.*| *$))*)', re.MULTILINE).sub,
-                        _admonition.__func__)):
+    def admonitions(text, module):
         """
         Process reStructuredText's block directives such as
         `.. warning::`, `.. deprecated::`, `.. versionadded::`, etc.
@@ -227,8 +240,34 @@ class _ToMarkdown:
 
         See: https://python-markdown.github.io/extensions/admonition/
         """
+        substitute = partial(re.compile(r'^(?P<indent> *)\.\. ?(\w+)::(?: *(.*))?'
+                                        r'((?:\n(?:(?P=indent) +.*| *$))*)', re.MULTILINE).sub,
+                             partial(_ToMarkdown._admonition, module=module))
         # Apply twice for nested (e.g. image inside warning)
-        return _admonitions(_admonitions(text))
+        return substitute(substitute(text))
+
+    @staticmethod
+    def _include_file(indent: str, path: str, options: dict, module: pdoc.Module) -> str:
+        start_line = int(options.get('start-line', 0))
+        end_line = int(options.get('end-line', 0)) or None
+        start_after = options.get('start-after')
+        end_before = options.get('end-before')
+
+        with open(os.path.join(os.path.dirname(module.obj.__file__), path),
+                  encoding='utf-8') as f:
+            text = ''.join(list(f)[start_line:end_line])
+
+        if start_after:
+            text = text[text.index(start_after) + len(start_after):]
+        if end_before:
+            text = text[:text.index(end_before)]
+
+        text = re.sub(r'\n', '\n' + indent, indent + text.rstrip())
+        return text
+
+    @staticmethod
+    def _directive_opts(text: str) -> dict:
+        return dict(re.findall(r'^ *:([^:]+): *(.*)', text, re.MULTILINE))
 
     @staticmethod
     def doctests(text,
@@ -245,6 +284,11 @@ class _ToMarkdown:
         doctest blocks so they render as code.
         """
         return _indent_doctests(text)
+
+    @staticmethod
+    def raw_urls(text):
+        """Wrap URLs in Python-Markdown-compatible <angle brackets>."""
+        return re.sub(r'(?<!<)(\s*)((?:http|ftp)s?://[^>)\s]+)(\s*)(?!>)', r'\1<\2>\3', text)
 
 
 def to_html(text: str, docformat: str = 'numpy,google', *,
@@ -264,7 +308,8 @@ def to_html(text: str, docformat: str = 'numpy,google', *,
     """
     assert all(i in (None, '', 'numpy', 'google') for i in docformat.split(',')), docformat
 
-    text = _ToMarkdown.admonitions(text)
+    text = _ToMarkdown.admonitions(text, module)
+    text = _ToMarkdown.raw_urls(text)
 
     if 'google' in docformat:
         text = _ToMarkdown.google(text)

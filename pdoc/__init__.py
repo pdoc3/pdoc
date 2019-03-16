@@ -149,13 +149,17 @@ Class and instance variables can also [inherit docstrings].
 
 Overriding docstrings with `__pdoc__`
 -------------------------------------
-Docstrings can be overridden with a special module-level
-`__pdoc__` dictionary that `pdoc` counsels when it exists. The keys
-of `__pdoc__` should be identifiers within the scope of the module or,
+Docstrings for objects can be disabled or overridden with a special
+module-level dictionary `__pdoc__`. The _keys_
+should be string identifiers within the scope of the module or,
 alternatively, fully-qualified reference names. E.g. for instance
-variable `self.variable` for class `C`, its module identifier is
-`C.variable`. The values of `__pdoc__` dict should be docstrings.
+variable `self.variable` of class `C`, its module-level identifier is
+`'C.variable'`.
 
+If `__pdoc__[key] = False`, then `key` (and its members) will be
+**excluded from the documentation** of the module.
+
+Alternatively, the _values_ of `__pdoc__` should be the overriding docstrings.
 This particular feature is useful when there's no feasible way of
 attaching a docstring to something. A good example of this is a
 [namedtuple](https://docs.python.org/3/library/collections.html#collections.namedtuple):
@@ -170,9 +174,6 @@ attaching a docstring to something. A good example of this is a
 `pdoc` will then show `Table` as a class with documentation for the
 `types`, `names` and `rows` members.
 
-Additionally, if `__pdoc__[key] = False`, then `key` will be
-excluded from the public interface of the module.
-
 .. note::
     The assignments to `__pdoc__` need to be placed where they'll be
     executed when the module is imported. For example, at the top level
@@ -182,13 +183,32 @@ excluded from the public interface of the module.
 Supported docstring formats
 ---------------------------
 Currently, pure Markdown (with [extensions]), [numpydoc],
-and [Google-style] docstrings formats are supported.
-Basic reST directives (such as e.g. `.. deprecated::`) should also work.
+and [Google-style] docstrings formats are supported,
+along with some reST directives.
 
 *[reST]: reStructuredText
 [extensions]: https://python-markdown.github.io/extensions/#officially-supported-extensions
 [numpydoc]: https://numpydoc.readthedocs.io/
 [Google-style]: http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
+
+
+### Supported reST directives
+
+The following reST directives should work:
+
+* specific and generic [admonitions],
+* [`.. image::`][image] or `.. figure::` (without options),
+* [`.. include::`][include], with support for the options:
+  `:start-line:`, `:end-line:`, `:start-after:` and `:end-before:`.
+* `.. versionadded::`
+* `.. versionchanged::`
+* `.. deprecated::`
+* `.. todo::`
+
+[admonitions]: http://docutils.sourceforge.net/docs/ref/rst/directives.html#admonitions
+[image]: http://docutils.sourceforge.net/docs/ref/rst/directives.html#images
+[include]: \
+http://docutils.sourceforge.net/docs/ref/rst/directives.html#including-an-external-document-fragment
 
 
 Linking to other identifiers
@@ -284,7 +304,7 @@ afterwards, pass the directory path as a parameter to the
     see if you can do so by overriding just some of the following, placeholder
     sub-templates:
 
-    + _config.mako_: Basic template configuration, affects the way templates are rendered.
+    * _config.mako_: Basic template configuration, affects the way templates are rendered.
     * _head.mako_: Included just before `</head>`. Best for adding resources and styles.
     * _logo.mako_: Included at the very top of the navigation sidebar. Empty by default.
     * _credits.mako_: Included in the footer, right before pdoc version string.
@@ -299,6 +319,9 @@ modified templates into the `directories` list of the
 Compatibility
 -------------
 `pdoc` requires Python 3.5+.
+The last version to support Python 2.x is [pdoc3 0.3.x].
+
+[pdoc3 0.3.x]: https://pypi.org/project/pdoc3/0.3.11/
 
 
 Contributing
@@ -811,7 +834,7 @@ class Doc:
             return '#' + self.refname
 
         # Otherwise, compute relative path from current module to link target
-        url = os.path.relpath(self._url(), relative_to.url())
+        url = os.path.relpath(self._url(), relative_to.url()).replace(path.sep, '/')
         # We have one set of '..' too many
         if url.startswith('../'):
             url = url[3:]
@@ -896,7 +919,8 @@ class Module(Doc):
                            for name, obj in inspect.getmembers(self.obj)
                            if (_is_public(name) and
                                is_from_this_module(obj))]
-
+            index = list(self.obj.__dict__).index
+            public_objs.sort(key=lambda i: index(i[0]))
         for name, obj in public_objs:
             if inspect.isroutine(obj):
                 self.doc[name] = Function(name, self, obj)
@@ -1055,29 +1079,30 @@ class Module(Doc):
                 self._context.get(self.name + '.' + _name) or
                 External(name))
 
-    def _filter_doc_objs(self, type: Type[T]) -> List[T]:
-        return sorted(_filter_type(type, self.doc))
+    def _filter_doc_objs(self, type: Type[T], sort=True) -> List[T]:
+        result = _filter_type(type, self.doc)
+        return sorted(result) if sort else result
 
-    def variables(self):
+    def variables(self, sort=True):
         """
-        Returns all documented module-level variables in the module
-        sorted alphabetically as a list of `pdoc.Variable`.
+        Returns all documented module-level variables in the module,
+        optionally sorted alphabetically, as a list of `pdoc.Variable`.
         """
-        return self._filter_doc_objs(Variable)
+        return self._filter_doc_objs(Variable, sort)
 
-    def classes(self):
+    def classes(self, sort=True):
         """
-        Returns all documented module-level classes in the module
-        sorted alphabetically as a list of `pdoc.Class`.
+        Returns all documented module-level classes in the module,
+        optionally sorted alphabetically, as a list of `pdoc.Class`.
         """
-        return self._filter_doc_objs(Class)
+        return self._filter_doc_objs(Class, sort)
 
-    def functions(self):
+    def functions(self, sort=True):
         """
-        Returns all documented module-level functions in the module
-        sorted alphabetically as a list of `pdoc.Function`.
+        Returns all documented module-level functions in the module,
+        optionally sorted alphabetically, as a list of `pdoc.Function`.
         """
-        return self._filter_doc_objs(Function)
+        return self._filter_doc_objs(Function, sort)
 
     def submodules(self):
         """
@@ -1116,12 +1141,14 @@ class Class(Doc):
                        # in Class._fill_inheritance()
                        if (name in self.obj.__dict__ and
                            (_is_public(name) or name == '__init__'))]
+        index = list(self.obj.__dict__).index
+        public_objs.sort(key=lambda i: index(i[0]))
 
         # Convert the public Python objects to documentation objects.
         for name, obj in public_objs:
             if name in self.doc and self.doc[name].docstring:
                 continue
-            if inspect.ismethod(obj) or inspect.isfunction(obj):
+            if inspect.isroutine(obj):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self,
                     method=not self._method_type(self.obj, name))
@@ -1132,7 +1159,7 @@ class Class(Doc):
                     name, self.module, inspect.getdoc(obj),
                     obj=getattr(obj, 'fget', obj),
                     cls=self, instance_var=True)
-            elif not inspect.isroutine(obj):
+            else:
                 self.doc[name] = Variable(
                     name, self.module,
                     docstring=isinstance(obj, type) and inspect.getdoc(obj) or "",
@@ -1189,42 +1216,48 @@ class Class(Doc):
                 for c in self.obj.__subclasses__()]
 
     def _filter_doc_objs(self, type: Type[T], include_inherited=True,
-                         filter_func: Callable[[T], bool] = lambda x: True) -> List[T]:
-        return sorted(obj for obj in _filter_type(type, self.doc)
-                      if (include_inherited or not obj.inherits) and filter_func(obj))
+                         filter_func: Callable[[T], bool] = lambda x: True,
+                         sort=True) -> List[T]:
+        result = [obj for obj in _filter_type(type, self.doc)
+                  if (include_inherited or not obj.inherits) and filter_func(obj)]
+        return sorted(result) if sort else result
 
-    def class_variables(self, include_inherited=True):
+    def class_variables(self, include_inherited=True, sort=True):
         """
-        Returns a sorted list of `pdoc.Variable` objects that
+        Returns an optionally-sorted list of `pdoc.Variable` objects that
         represent this class' class variables.
         """
         return self._filter_doc_objs(
-            Variable, include_inherited, lambda dobj: not dobj.instance_var)
+            Variable, include_inherited, lambda dobj: not dobj.instance_var,
+            sort)
 
-    def instance_variables(self, include_inherited=True):
+    def instance_variables(self, include_inherited=True, sort=True):
         """
-        Returns a sorted list of `pdoc.Variable` objects that
+        Returns an optionally-sorted list of `pdoc.Variable` objects that
         represent this class' instance variables. Instance variables
         are those defined in a class's `__init__` as `self.variable = ...`.
         """
         return self._filter_doc_objs(
-            Variable, include_inherited, lambda dobj: dobj.instance_var)
+            Variable, include_inherited, lambda dobj: dobj.instance_var,
+            sort)
 
-    def methods(self, include_inherited=True):
+    def methods(self, include_inherited=True, sort=True):
         """
-        Returns a sorted list of `pdoc.Function` objects that
+        Returns an optionally-sorted list of `pdoc.Function` objects that
         represent this class' methods.
         """
         return self._filter_doc_objs(
-            Function, include_inherited, lambda dobj: dobj.method)
+            Function, include_inherited, lambda dobj: dobj.method,
+            sort)
 
-    def functions(self, include_inherited=True) -> List['Function']:
+    def functions(self, include_inherited=True, sort=True) -> List['Function']:
         """
-        Returns a sorted list of `pdoc.Function` objects that
+        Returns an optionally-sorted list of `pdoc.Function` objects that
         represent this class' static functions.
         """
         return self._filter_doc_objs(
-            Function, include_inherited, lambda dobj: not dobj.method)
+            Function, include_inherited, lambda dobj: not dobj.method,
+            sort)
 
     def inherited_members(self) -> List[Tuple['Class', List[Doc]]]:
         """
@@ -1269,11 +1302,6 @@ class Class(Doc):
         """
         if not hasattr(self, '_super_members'):
             return
-
-        # Set inheritence for the Class itself
-        parent_cls = next(iter(self.mro(only_documented=True)), None)
-        if parent_cls and self.docstring == parent_cls.docstring:
-            self.inherits = parent_cls
 
         for name, parent_dobj in self._super_members.items():
             dobj = self.doc[name]

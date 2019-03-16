@@ -71,7 +71,7 @@
   .title code {
     font-weight: bold;
   }
-  h2[id=^header-] {
+  h2[id^="header-"] {
     margin-top: 2em;
   }
   .ident {
@@ -92,8 +92,11 @@
 
   pre {
     background: #f8f8f8;
-    border: 1px solid #ddd;
-    margin: 1em 0 1em 4ch;
+    border: 0;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 1ex;
   }
 
   #http-server-module-list {
@@ -131,9 +134,10 @@
     #index h4 + ul {
       margin-bottom:.6em;
     }
-    #index .two-column {
-      column-count: 2;
-    }
+    /* Make TOC lists have 2+ columns when viewport is wide enough.
+       Assuming ~20-character identifiers and ~30% wide sidebar. */
+    @media (min-width: 200ex) { #index .two-column { column-count: 2 } }
+    @media (min-width: 300ex) { #index .two-column { column-count: 3 } }
 
   dl {
     margin-bottom: 2em;
@@ -196,29 +200,24 @@
     }
 
     .source summary {
-      background: #ffc;
+      color: #666;
+      text-align: right;
       font-weight: 400;
       font-size: .8em;
-      width: 11em;
       text-transform: uppercase;
-      padding: 0px 8px;
-      border: 1px solid #fd6;
-      border-radius: 5px;
       cursor: pointer;
     }
-      .source summary:hover {
-        background: #fe9 !important;
-      }
-      .source[open] summary {
-        background: #fda;
-      }
     .source pre {
       max-height: 500px;
-      overflow-y: scroll;
-      margin-bottom: 15px;
+      overflow: auto;
+      margin: 0;
+    }
+    .source pre code {
+      font-size: 12px;
+      overflow: visible;
     }
   .hlist {
-    list-syle: none;
+    list-style: none;
   }
     .hlist li {
       display: inline;
@@ -264,7 +263,7 @@
     .admonition.danger,
     .admonition.caution {
       background: lightpink;
-    ]
+    }
 </%def>
 
 <%def name="desktop()" filter="minify_css">
@@ -316,13 +315,14 @@
         text-shadow: none !important;
     }
 
-    a,
-    a:visited {
-        text-decoration: underline;
-    }
-
     a[href]:after {
         content: " (" attr(href) ")";
+        font-size: 90%;
+    }
+    /* Internal, documentation links, recognized by having a title,
+       don't need the URL explicity stated. */
+    a[href][title]:after {
+        content: none;
     }
 
     abbr[title]:after {

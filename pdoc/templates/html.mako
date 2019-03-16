@@ -24,6 +24,8 @@
     show_inherited_members = getattr(config.attr, 'show_inherited_members', True)
     extract_module_toc_into_sidebar = getattr(config.attr, 'extract_module_toc_into_sidebar', True)
     list_class_variables_in_index = getattr(config.attr, 'list_class_variables_in_index', False)
+    sort_identifiers = getattr(config.attr, 'sort_identifiers', True)
+    hljs_style = getattr(config.attr, 'hljs_style', 'github')
 
     link = getattr(config.attr, 'link', link)
     to_html = getattr(config.attr, 'to_html', to_html)
@@ -37,7 +39,7 @@
     % if show_source_code and d.source and d.obj is not getattr(d.inherits, 'obj', None):
         <details class="source">
             <summary>Source code</summary>
-            <pre><code class="python">${d.source | h}}</code></pre>
+            <pre><code class="python">${d.source | h}</code></pre>
         </details>
     %endif
 </%def>
@@ -81,7 +83,10 @@
 </%def>
 
 <%def name="show_column_list(items)">
-  <ul class="${'two-column' if len(items) >= 6 else ''}">
+  <%
+      two_column = len(items) >= 6 and all(len(i.name) < 20 for i in items)
+  %>
+  <ul class="${'two-column' if two_column else ''}">
   % for item in items:
     <li><code>${link(item, item.name)}</code></li>
   % endfor
@@ -90,9 +95,9 @@
 
 <%def name="show_module(module)">
   <%
-  variables = module.variables()
-  classes = module.classes()
-  functions = module.functions()
+  variables = module.variables(sort=sort_identifiers)
+  classes = module.classes(sort=sort_identifiers)
+  functions = module.functions(sort=sort_identifiers)
   submodules = module.submodules()
   %>
 
@@ -163,10 +168,10 @@
     <dl>
     % for c in classes:
       <%
-      class_vars = c.class_variables(show_inherited_members)
-      smethods = c.functions(show_inherited_members)
-      inst_vars = c.instance_variables(show_inherited_members)
-      methods = c.methods(show_inherited_members)
+      class_vars = c.class_variables(show_inherited_members, sort=sort_identifiers)
+      smethods = c.functions(show_inherited_members, sort=sort_identifiers)
+      inst_vars = c.instance_variables(show_inherited_members, sort=sort_identifiers)
+      methods = c.methods(show_inherited_members, sort=sort_identifiers)
       mro = c.mro()
       subclasses = c.subclasses()
       %>
@@ -252,9 +257,9 @@
 
 <%def name="module_index(module)">
   <%
-  variables = module.variables()
-  classes = module.classes()
-  functions = module.functions()
+  variables = module.variables(sort=sort_identifiers)
+  classes = module.classes(sort=sort_identifiers)
+  functions = module.functions(sort=sort_identifiers)
   submodules = module.submodules()
   supermodule = module.supermodule
   %>
@@ -302,12 +307,14 @@
         <li>
         <h4><code>${link(c)}</code></h4>
         <%
-            members = c.functions() + c.methods()
+            members = c.functions(sort=sort_identifiers) + c.methods(sort=sort_identifiers)
             if list_class_variables_in_index:
-                members += c.instance_variables() + c.class_variables()
+                members += (c.instance_variables(sort=sort_identifiers) +
+                            c.class_variables(sort=sort_identifiers))
             if not show_inherited_members:
                 members = [i for i in members if not i.inherits]
-            members = sorted(members)
+            if sort_identifiers:
+              members = sorted(members)
         %>
         % if members:
           ${show_column_list(members)}
@@ -344,7 +351,7 @@
   <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
   <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
   % if show_source_code:
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/${hljs_style}.min.css" rel="stylesheet">
   %endif
 
   <%namespace name="css" file="css.mako" />
