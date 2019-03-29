@@ -1210,6 +1210,8 @@ class Class(Doc):
         The objects in the list are of type `pdoc.Class` if available,
         and `pdoc.External` otherwise.
         """
+        if type(self.obj) == type:
+            return []
         return [self.module.find_class(c)
                 for c in self.obj.__subclasses__()]
 
