@@ -468,10 +468,17 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(a.inherited_members(), [])
 
     def test_subclasses(self):
-        class A: pass
-        class B(type): pass
-        class C(A): pass
-        class D(B): pass
+        class A:
+            pass
+
+        class B(type):
+            pass
+
+        class C(A):
+            pass
+        
+        class D(B):
+            pass
         a_subclasses = type.__subclasses__(A)
         b_subclasses = type.__subclasses__(B)
         self.assertTrue(C in a_subclasses)
