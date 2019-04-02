@@ -1210,12 +1210,8 @@ class Class(Doc):
         The objects in the list are of type `pdoc.Class` if available,
         and `pdoc.External` otherwise.
         """
-        if issubclass(self.obj, type):
-            return [self.module.find_class(c)
-                    for c in self.obj.__subclasses__(self.obj)]
-
         return [self.module.find_class(c)
-                for c in self.obj.__subclasses__()]
+                for c in type.__subclasses__(self.obj)]
 
     def _filter_doc_objs(self, type: Type[T], include_inherited=True,
                          filter_func: Callable[[T], bool] = lambda x: True,
