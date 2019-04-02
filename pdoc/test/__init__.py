@@ -476,7 +476,7 @@ class ApiTest(unittest.TestCase):
 
         class C(A):
             pass
-        
+
         class D(B):
             pass
         a_subclasses = type.__subclasses__(A)
