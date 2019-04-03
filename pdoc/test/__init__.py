@@ -480,11 +480,13 @@ class ApiTest(unittest.TestCase):
         class D(B):
             pass
         any_module = pdoc.Module(pdoc)
-        self.assertEqual(list(map(lambda x: x.refname, pdoc.Class('A', any_module, A).subclasses())),
+        self.assertEqual(list(map(lambda x: x.refname,
+                                  pdoc.Class('A', any_module, A).subclasses())),
                          [any_module.find_class(C).refname])
-        self.assertEqual(list(map(lambda x: x.refname, pdoc.Class('B', any_module, B).subclasses())),
+        self.assertEqual(list(map(lambda x: x.refname,
+                                  pdoc.Class('B', any_module, B).subclasses())),
                          [any_module.find_class(D).refname])
-        
+
     def test_link_inheritance(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
         with warnings.catch_warnings(record=True) as w:
