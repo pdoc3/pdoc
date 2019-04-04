@@ -467,6 +467,25 @@ class ApiTest(unittest.TestCase):
                                                       a.doc['overridden_same_docstring']])])
         self.assertEqual(a.inherited_members(), [])
 
+    def test_subclasses(self):
+        class A:
+            pass
+
+        class B(type):
+            pass
+
+        class C(A):
+            pass
+
+        class D(B):
+            pass
+
+        mod = pdoc.Module(pdoc)
+        self.assertEqual([x.refname for x in pdoc.Class('A', mod, A).subclasses()],
+                         [mod.find_class(C).refname])
+        self.assertEqual([x.refname for x in pdoc.Class('B', mod, B).subclasses()],
+                         [mod.find_class(D).refname])
+
     def test_link_inheritance(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
         with warnings.catch_warnings(record=True) as w:
