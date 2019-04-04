@@ -580,7 +580,7 @@ def _var_docstrings(doc_obj: Union['Module', 'Class'], *,
         tree = _init_tree  # type: Union[ast.Module, ast.FunctionDef]
     else:
         try:
-            tree = ast.parse(inspect.getsource(doc_obj.obj))
+            tree = ast.parse(inspect.getsource(doc_obj.obj))  # type: ignore
         except (OSError, TypeError, SyntaxError):
             warn("Couldn't get/parse source of '{!r}'".format(doc_obj))
             return {}
