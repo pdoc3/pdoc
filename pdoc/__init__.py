@@ -1396,7 +1396,7 @@ class Function(Doc):
             for param in kwonlyargs:
                 try:
                     params.append("%s=%s" % (param, repr(s.kwonlydefaults[param])))
-                except KeyError:
+                except (KeyError, TypeError):
                     params.append(param)
 
         keywords = getattr(s, "varkw", getattr(s, "keywords", None))
