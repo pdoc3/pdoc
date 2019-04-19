@@ -9,6 +9,7 @@ import threading
 import unittest
 import warnings
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
+from functools import wraps
 from glob import glob
 from io import StringIO
 from itertools import chain
@@ -72,6 +73,15 @@ def redirect_streams():
     stdout, stderr = StringIO(), StringIO()
     with redirect_stderr(stderr), redirect_stdout(stdout):
         yield stdout, stderr
+
+
+def ignore_warnings(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            func(*args, **kwargs)
+    return wrapper
 
 
 class CliTest(unittest.TestCase):
@@ -467,6 +477,7 @@ class ApiTest(unittest.TestCase):
                                                       a.doc['overridden_same_docstring']])])
         self.assertEqual(a.inherited_members(), [])
 
+    @ignore_warnings
     def test_subclasses(self):
         class A:
             pass
