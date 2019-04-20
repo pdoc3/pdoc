@@ -560,6 +560,19 @@ class ApiTest(unittest.TestCase):
                              lambda a=os.environ: None)
         self.assertEqual(func.params(), ['a=os.environ'])
 
+        # typed
+        def f(a: int, *b, c: str = ''): pass
+        func = pdoc.Function('f', mod, f)
+        self.assertEqual(func.params(), ['a', '*b', "c=''"])
+        self.assertEqual(func.params(annotate=True), ['a:\xA0int', '*b', "c:\xA0str\xA0=\xA0''"])
+
+    def test_Function_return_annotation(self):
+        import typing
+
+        def f() -> typing.List[typing.Union[str, pdoc.Doc]]: pass
+        func = pdoc.Function('f', pdoc.Module(pdoc), f)
+        self.assertEqual(func.return_annotation, 'List[Union[str,\xA0pdoc.Doc]]')
+
     def test_url(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
         pdoc.link_inheritance()

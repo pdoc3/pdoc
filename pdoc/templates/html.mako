@@ -25,6 +25,7 @@
     extract_module_toc_into_sidebar = getattr(config.attr, 'extract_module_toc_into_sidebar', True)
     list_class_variables_in_index = getattr(config.attr, 'list_class_variables_in_index', False)
     sort_identifiers = getattr(config.attr, 'sort_identifiers', True)
+    show_type_annotations = getattr(config.attr, 'show_type_annotations', False)
     hljs_style = getattr(config.attr, 'hljs_style', 'github')
 
     link = getattr(config.attr, 'link', link)
@@ -103,7 +104,13 @@
 
   <%def name="show_func(f)">
     <dt id="${f.refname}"><code class="name flex">
-        <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${', '.join(f.params()) | h})</span>
+        <%
+            params = ', '.join(f.params(annotate=show_type_annotations))
+            returns = show_type_annotations and f.return_annotation or ''
+            if returns:
+                returns = ' 🡢\xA0' + returns
+        %>
+        <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${params | h})${returns | h}</span>
     </code></dt>
     <dd>${show_desc(f)}</dd>
   </%def>

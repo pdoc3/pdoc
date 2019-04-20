@@ -349,6 +349,7 @@ import os.path as path
 import pkgutil
 import re
 import sys
+import typing
 from copy import copy
 from functools import lru_cache, reduce
 from itertools import tee, groupby
@@ -1365,67 +1366,74 @@ class Function(Doc):
         except AttributeError:
             return False
 
-    @lru_cache()
-    def params(self) -> List[str]:
+    @property
+    def return_annotation(self):
+        """Formatted function return type annotation or empty string if none."""
+        try:
+            annot = typing.get_type_hints(self.obj).get('return', '')
+        except NameError as e:
+            warn("Error handling return annotation for {}: {}", self.name, e.args[0])
+            annot = inspect.signature(inspect.unwrap(self.obj)).return_annotation
+            if annot == inspect.Parameter.empty:
+                annot = ''
+        if not annot:
+            return ''
+        return inspect.formatannotation(annot).replace(' ', '\xA0')  # NBSP for better line breaks
+
+    def params(self, *, annotate: bool = False) -> List[str]:
         """
         Returns a list where each element is a nicely formatted
         parameter of this function. This includes argument lists,
         keyword arguments and default values, and it doesn't include any
         optional arguments whose names begin with an underscore.
+
+        If `annotate` is True, the parameter strings include [PEP 484]
+        type hint annotations.
+
+        [PEP 484]: https://www.python.org/dev/peps/pep-0484/
         """
         try:
-            s = inspect.getfullargspec(inspect.unwrap(self.obj))
-        except TypeError:
+            signature = inspect.signature(inspect.unwrap(self.obj))
+        except ValueError:
             # I guess this is for C builtin functions?
             return ["..."]
 
-        def format_default_value(value):
-            if value is os.environ:
-                return 'os.environ'
-            return repr(value)
+        def safe_default_value(p: inspect.Parameter):
+            if p.default is os.environ:
+                class mock:
+                    def __repr__(self):
+                        return 'os.environ'
+                return p.replace(default=mock())
+            return p
 
         params = []
-        for i, param in enumerate(s.args):
-            if s.defaults is not None and len(s.args) - i <= len(s.defaults):
-                defind = len(s.defaults) - (len(s.args) - i)
-                params.append("%s=%s" % (param, format_default_value(s.defaults[defind])))
-            else:
-                params.append(param)
-        if s.varargs is not None:
-            params.append("*%s" % s.varargs)
+        kw_only = False
+        EMPTY = inspect.Parameter.empty
 
-        kwonlyargs = getattr(s, "kwonlyargs", None)
-        if kwonlyargs:
-            if s.varargs is None:
-                params.append("*")
-            for param in kwonlyargs:
-                try:
-                    params.append("%s=%s" % (param, format_default_value(s.kwonlydefaults[param])))
-                except (KeyError, TypeError):
-                    params.append(param)
+        for p in signature.parameters.values():  # type: inspect.Parameter
+            if not _is_public(p.name) and p.default is not EMPTY:
+                continue
 
-        keywords = getattr(s, "varkw", getattr(s, "keywords", None))
-        if keywords is not None:
-            params.append("**%s" % keywords)
+            if p.kind == p.VAR_POSITIONAL:
+                kw_only = True
+            if p.kind == p.KEYWORD_ONLY and not kw_only:
+                kw_only = True
+                params.append('*')
 
-        # Remove "_private" params following catch-all *args and from the end
-        iter_params = iter(params)
-        params = []
-        for p in iter_params:
-            params.append(p)
-            if p.startswith('*'):
-                break
-        while len(params) > 1 and not _is_public(params[-2]) and '=' in params[-2]:
-            params.pop(-2)
-        for p in iter_params:
-            if _is_public(p.lstrip('*')):
-                params.append(p)
-        while params and not _is_public(params[-1]) and '=' in params[-1]:
-            params.pop(-1)
-        if params and params[-1] == '*':
-            params.pop(-1)
+            p = safe_default_value(p)
 
-        # TODO: The only thing now missing for Python 3 are type annotations
+            if not annotate:
+                p = p.replace(annotation=EMPTY)
+
+            s = str(p)
+            if p.annotation is not EMPTY:
+                s = s.replace(':', ': ', 1).replace('=', ' = ', 1)
+                if isinstance(p.annotation, str):
+                    s = s.replace(": '", ': ', 1).replace("' = ", " = ", 1)
+                s = s.replace(' ', '\xA0')  # Neater line breaking with NBSPs
+
+            params.append(s)
+
         return params
 
     def __lt__(self, other):
