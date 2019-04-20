@@ -415,12 +415,12 @@ class ApiTest(unittest.TestCase):
             self.assertIn('A', mod.doc)
             self.assertNotIn('B', mod.doc)
 
-        with patch.object(module, '__pdoc__', {'B.__init__': False}):
+        with patch.object(module, '__pdoc__', {'B.f': False}):
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
             self.assertIn('B', mod.doc)
-            self.assertNotIn('__init__', mod.doc['B'].doc)
-            self.assertIsInstance(mod.find_ident('B.__init__'), pdoc.External)
+            self.assertNotIn('f', mod.doc['B'].doc)
+            self.assertIsInstance(mod.find_ident('B.f'), pdoc.External)
 
     def test__pdoc__invalid_value(self):
         module = pdoc.import_module(EXAMPLE_MODULE)
@@ -449,6 +449,10 @@ class ApiTest(unittest.TestCase):
         result = mod.find_ident(nonexistent)
         self.assertIsInstance(result, pdoc.External)
         self.assertEqual(result.name, nonexistent)
+
+        # Ref by class __init__
+        mod = pdoc.Module(pdoc)
+        self.assertIs(mod.find_ident('pdoc.Doc.__init__').obj, pdoc.Doc)
 
     def test_inherits(self):
         module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
@@ -572,6 +576,44 @@ class ApiTest(unittest.TestCase):
         def f() -> typing.List[typing.Union[str, pdoc.Doc]]: pass
         func = pdoc.Function('f', pdoc.Module(pdoc), f)
         self.assertEqual(func.return_annotation, 'List[Union[str,\xA0pdoc.Doc]]')
+
+    @ignore_warnings
+    def test_Class_docstring(self):
+        class A:
+            """foo"""
+
+        class B:
+            def __init__(self):
+                """foo"""
+
+        class C:
+            """foo"""
+            def __init__(self):
+                """bar"""
+
+        class D(C):
+            """baz"""
+
+        class E(C):
+            def __init__(self):
+                """baz"""
+
+        self.assertEqual(pdoc.Class('A', pdoc.Module(pdoc), A).docstring, """foo""")
+        self.assertEqual(pdoc.Class('B', pdoc.Module(pdoc), B).docstring, """foo""")
+        self.assertEqual(pdoc.Class('C', pdoc.Module(pdoc), C).docstring, """foo\n\nbar""")
+        self.assertEqual(pdoc.Class('D', pdoc.Module(pdoc), D).docstring, """baz\n\nbar""")
+        self.assertEqual(pdoc.Class('E', pdoc.Module(pdoc), E).docstring, """foo\n\nbaz""")
+
+    @ignore_warnings
+    def test_Class_params(self):
+        class C:
+            def __init__(self, x):
+                pass
+
+        mod = pdoc.Module(pdoc)
+        self.assertEqual(pdoc.Class('C', mod, C).params(), ['x'])
+        with patch.dict(mod.obj.__pdoc__, {'C.__init__': False}):
+            self.assertEqual(pdoc.Class('C', mod, C).params(), [])
 
     def test_url(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))

@@ -401,6 +401,7 @@ class Context(dict):
     If you don't pass your own `Context` instance to `Module` constructor,
     a global context object will be used.
     """
+    __pdoc__['Context.__init__'] = False
 
 
 _global_context = Context()
@@ -981,7 +982,8 @@ class Module(Doc):
                          'use `__pdoc__[key] = False` '
                          '(key: {!r}, module: {!r}).'.format(name, self.name))
 
-                if name not in self.doc and refname not in self._context:
+                if (not name.endswith('.__init__') and
+                        name not in self.doc and refname not in self._context):
                     warn('__pdoc__-overriden key {!r} does not exist '
                          'in module {!r}'.format(name, self.name))
 
@@ -1073,6 +1075,10 @@ class Module(Doc):
         `External` is returned populated with the given identifier.
         """
         _name = name.rstrip('()')  # Function specified with parentheses
+
+        if _name.endswith('.__init__'):  # Ref to class' init is ref to class itself
+            _name = _name[:-len('.__init__')]
+
         return (self.doc.get(_name) or
                 self._context.get(_name) or
                 self._context.get(self.name + '.' + _name) or
@@ -1127,6 +1133,11 @@ class Class(Doc):
 
     def __init__(self, name, module, obj, *, docstring=None):
         assert isinstance(obj, type)
+        if docstring is None:
+            init_doc = inspect.getdoc(obj.__init__) or ''
+            if init_doc == object.__init__.__doc__:
+                init_doc = ''
+            docstring = ((inspect.getdoc(obj) or '') + '\n\n' + init_doc).strip()
         super().__init__(name, module, obj, docstring=docstring)
 
         self.doc = {}
@@ -1138,8 +1149,7 @@ class Class(Doc):
                        for name, obj in inspect.getmembers(self.obj)
                        # Filter only *own* members. The rest are inherited
                        # in Class._fill_inheritance()
-                       if (name in self.obj.__dict__ and
-                           (_is_public(name) or name == '__init__'))]
+                       if name in self.obj.__dict__ and _is_public(name)]
         index = list(self.obj.__dict__).index
         public_objs.sort(key=lambda i: index(i[0]))
 
@@ -1213,6 +1223,22 @@ class Class(Doc):
         """
         return [self.module.find_class(c)
                 for c in type.__subclasses__(self.obj)]
+
+    def params(self, *, annotate=False) -> List['str']:
+        """
+        Return a list of formatted parameters accepted by the
+        class constructor (method `__init__`). See `pdoc.Function.params`.
+        """
+        name = self.name + '.__init__'
+        qualname = self.qualname + '.__init__'
+        refname = self.refname + '.__init__'
+        exclusions = getattr(self.module.obj, "__pdoc__", {})
+        if name in exclusions or qualname in exclusions or refname in exclusions:
+            return []
+
+        params = Function._params(self.obj.__init__, annotate=annotate)
+        params = params[1:] if params[0] == 'self' else params
+        return params
 
     def _filter_doc_objs(self, type: Type[T], include_inherited=True,
                          filter_func: Callable[[T], bool] = lambda x: True,
@@ -1319,7 +1345,7 @@ class Function(Doc):
 
     def __init__(self, name, module, obj, *, cls: Class = None, method=False):
         """
-        Same as `pdoc.Doc.__init__`, except `obj` must be a
+        Same as `pdoc.Doc`, except `obj` must be a
         Python function object. The docstring is gathered automatically.
 
         `cls` should be set when this is a method or a static function
@@ -1392,8 +1418,12 @@ class Function(Doc):
 
         [PEP 484]: https://www.python.org/dev/peps/pep-0484/
         """
+        return self._params(self.obj, annotate=annotate)
+
+    @staticmethod
+    def _params(func_obj, annotate=False):
         try:
-            signature = inspect.signature(inspect.unwrap(self.obj))
+            signature = inspect.signature(inspect.unwrap(func_obj))
         except ValueError:
             # I guess this is for C builtin functions?
             return ["..."]
@@ -1436,10 +1466,6 @@ class Function(Doc):
 
         return params
 
-    def __lt__(self, other):
-        # Push __init__ to the top.
-        return self.name == '__init__' or super().__lt__(other)
-
     @property
     def refname(self):
         return (self.cls.refname if self.cls else self.module.refname) + '.' + self.name
@@ -1455,7 +1481,7 @@ class Variable(Doc):
     def __init__(self, name, module, docstring, *,
                  obj=None, cls: Class = None, instance_var=False):
         """
-        Same as `pdoc.Doc.__init__`, except `cls` should be provided
+        Same as `pdoc.Doc`, except `cls` should be provided
         as a `pdoc.Class` object when this is a class or instance
         variable.
         """

@@ -181,15 +181,25 @@
       methods = c.methods(show_inherited_members, sort=sort_identifiers)
       mro = c.mro()
       subclasses = c.subclasses()
+      params = ', '.join(c.params(annotate=show_type_annotations))
       %>
       <dt id="${c.refname}"><code class="flex name class">
           <span>class ${ident(c.name)}</span>
-          % if mro:
-              <span>(</span><span><small>ancestors:</small> ${', '.join(link(cls) for cls in mro)})</span>
-          %endif
+          % if params:
+              <span>(</span><span>${params | h})</span>
+          % endif
       </code></dt>
 
       <dd>${show_desc(c)}
+
+      % if mro:
+          <h3>Ancestors</h3>
+          <ul class="hlist">
+          % for cls in mro:
+              <li>${link(cls)}</li>
+          % endfor
+          </ul>
+      %endif
 
       % if subclasses:
           <h3>Subclasses</h3>

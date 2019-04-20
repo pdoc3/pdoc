@@ -174,9 +174,6 @@
       .name.class > span:nth-child(2) {
         margin-left: .4em;
       }
-      .name small {
-        font-weight: normal;
-      }
     .inherited {
       color: #999;
       border-left: 5px solid #eee;
