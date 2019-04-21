@@ -1,5 +1,6 @@
 """Module docstring"""
 import subprocess
+import os
 
 CONST = 'const'
 """CONST docstring"""
@@ -13,7 +14,7 @@ foreign_var = subprocess.CalledProcessError(0, '')
 
 __pdoc__ = {}
 
-import os
+
 def foo(env=os.environ):
     """Doesn't leak environ"""
     pass
