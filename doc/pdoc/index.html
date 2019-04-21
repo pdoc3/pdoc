@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.5.3" />
+<meta name="generator" content="pdoc 0.5.4" />
 <title>pdoc API documentation</title>
 <meta name="description" content="Python package `pdoc` provides types, functions, and a command-line
 interface for accessing public documentation of Python modules, and
@@ -17,7 +17,7 @@ for presenting …" />
 <style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em}</style>
 <link rel="canonical" href="https://pdoc3.github.io/pdoc/doc/pdoc/">
 <link rel="icon" href="https://pdoc.github.io/pdoc/logo.png">
-</head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><script>(adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:"ca-pub-2900001379782823",enable_page_level_ads:true});</script></head>
 <body>
 <main>
 <article id="content">
@@ -38,13 +38,13 @@ hierarchical APIs.</p>
 <li>variables (including globals, class variables, and instance variables).</li>
 </ul>
 <p>Documentation is extracted from live objects' <a href="https://docs.python.org/3/glossary.html#term-docstring">docstrings</a>
-using Python's <code>__doc__</code> attribute<sup id="fnref:execution"><a class="footnote-ref" href="#fn:execution" rel="footnote">1</a></sup>. Documentation for
+using Python's <code>__doc__</code> attribute<sup id="fnref:execution"><a class="footnote-ref" href="#fn:execution">1</a></sup>. Documentation for
 variables is found by examining objects' abstract syntax trees.</p>
 <h2 id="what-objects-are-documented">What objects are documented?</h2>
-<p><a title="pdoc" href="#pdoc"><code>pdoc</code></a> only extracts <em>public API</em> documentation.<sup id="fnref:public"><a class="footnote-ref" href="#fn:public" rel="footnote">2</a></sup>
+<p><a title="pdoc" href="#pdoc"><code>pdoc</code></a> only extracts <em>public API</em> documentation.<sup id="fnref:public"><a class="footnote-ref" href="#fn:public">2</a></sup>
 All objects (modules, functions, classes, variables) are only
 considered public if their <em>identifiers don't begin with an
-underscore</em> ( _ ).<sup id="fnref:private"><a class="footnote-ref" href="#fn:private" rel="footnote">3</a></sup></p>
+underscore</em> ( _ ).<sup id="fnref:private"><a class="footnote-ref" href="#fn:private">3</a></sup></p>
 <p>In addition, if a module defines <a href="https://docs.python.org/3/tutorial/modules.html#importing-from-a-package"><code>__all__</code></a>, then only
 the identifiers contained in this list will be considered public.
 Otherwise, a module's global identifiers are considered public
@@ -264,17 +264,17 @@ itself find their way back to the community.</p>
 <li id="fn:execution">
 <p>Documented modules are executed in order to provide <code>__doc__</code>
 attributes. Any non-fenced global code in imported modules will
-affect the current environment.&#160;<a class="footnote-backref" href="#fnref:execution" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+affect the current environment.&#160;<a class="footnote-backref" href="#fnref:execution" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 <li id="fn:public">
 <p>Here, public API refers to the API that is made available
 to your project end-users, not the public API e.g. of a
 private class that can be reasonably extended elsewhere
-by your project developers.&#160;<a class="footnote-backref" href="#fnref:public" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+by your project developers.&#160;<a class="footnote-backref" href="#fnref:public" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 <li id="fn:private">
 <p>Prefixing private, implementation-specific objects with
-an underscore is <a href="https://docs.python.org/3/tutorial/classes.html#private-variables">a common convention</a>.&#160;<a class="footnote-backref" href="#fnref:private" rev="footnote" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+an underscore is <a href="https://docs.python.org/3/tutorial/classes.html#private-variables">a common convention</a>.&#160;<a class="footnote-backref" href="#fnref:private" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
@@ -862,7 +862,7 @@ def _var_docstrings(doc_obj: Union[&#39;Module&#39;, &#39;Class&#39;], *,
         tree = _init_tree  # type: Union[ast.Module, ast.FunctionDef]
     else:
         try:
-            tree = ast.parse(inspect.getsource(doc_obj.obj))
+            tree = ast.parse(inspect.getsource(doc_obj.obj))  # type: ignore
         except (OSError, TypeError, SyntaxError):
             warn(&#34;Couldn&#39;t get/parse source of &#39;{!r}&#39;&#34;.format(doc_obj))
             return {}
@@ -1493,7 +1493,7 @@ class Class(Doc):
         and `pdoc.External` otherwise.
         &#34;&#34;&#34;
         return [self.module.find_class(c)
-                for c in self.obj.__subclasses__()]
+                for c in type.__subclasses__(self.obj)]
 
     def _filter_doc_objs(self, type: Type[T], include_inherited=True,
                          filter_func: Callable[[T], bool] = lambda x: True,
@@ -1661,11 +1661,16 @@ class Function(Doc):
             # I guess this is for C builtin functions?
             return [&#34;...&#34;]
 
+        def format_default_value(value):
+            if value is os.environ:
+                return &#39;os.environ&#39;
+            return repr(value)
+
         params = []
         for i, param in enumerate(s.args):
             if s.defaults is not None and len(s.args) - i &lt;= len(s.defaults):
                 defind = len(s.defaults) - (len(s.args) - i)
-                params.append(&#34;%s=%s&#34; % (param, repr(s.defaults[defind])))
+                params.append(&#34;%s=%s&#34; % (param, format_default_value(s.defaults[defind])))
             else:
                 params.append(param)
         if s.varargs is not None:
@@ -1677,8 +1682,8 @@ class Function(Doc):
                 params.append(&#34;*&#34;)
             for param in kwonlyargs:
                 try:
-                    params.append(&#34;%s=%s&#34; % (param, repr(s.kwonlydefaults[param])))
-                except KeyError:
+                    params.append(&#34;%s=%s&#34; % (param, format_default_value(s.kwonlydefaults[param])))
+                except (KeyError, TypeError):
                     params.append(param)
 
         keywords = getattr(s, &#34;varkw&#34;, getattr(s, &#34;keywords&#34;, None))
@@ -2140,7 +2145,7 @@ that takes a single argument (a documentation object) and returns
         and `pdoc.External` otherwise.
         &#34;&#34;&#34;
         return [self.module.find_class(c)
-                for c in self.obj.__subclasses__()]
+                for c in type.__subclasses__(self.obj)]
 
     def _filter_doc_objs(self, type: Type[T], include_inherited=True,
                          filter_func: Callable[[T], bool] = lambda x: True,
@@ -2388,7 +2393,7 @@ and <a title="pdoc.External" href="#pdoc.External"><code>External</code></a> oth
     and `pdoc.External` otherwise.
     &#34;&#34;&#34;
     return [self.module.find_class(c)
-            for c in self.obj.__subclasses__()]</code></pre>
+            for c in type.__subclasses__(self.obj)]</code></pre>
 </details>
 </dd>
 </dl>
@@ -2945,11 +2950,16 @@ should be a fully qualified name.</p></section>
             # I guess this is for C builtin functions?
             return [&#34;...&#34;]
 
+        def format_default_value(value):
+            if value is os.environ:
+                return &#39;os.environ&#39;
+            return repr(value)
+
         params = []
         for i, param in enumerate(s.args):
             if s.defaults is not None and len(s.args) - i &lt;= len(s.defaults):
                 defind = len(s.defaults) - (len(s.args) - i)
-                params.append(&#34;%s=%s&#34; % (param, repr(s.defaults[defind])))
+                params.append(&#34;%s=%s&#34; % (param, format_default_value(s.defaults[defind])))
             else:
                 params.append(param)
         if s.varargs is not None:
@@ -2961,8 +2971,8 @@ should be a fully qualified name.</p></section>
                 params.append(&#34;*&#34;)
             for param in kwonlyargs:
                 try:
-                    params.append(&#34;%s=%s&#34; % (param, repr(s.kwonlydefaults[param])))
-                except KeyError:
+                    params.append(&#34;%s=%s&#34; % (param, format_default_value(s.kwonlydefaults[param])))
+                except (KeyError, TypeError):
                     params.append(param)
 
         keywords = getattr(s, &#34;varkw&#34;, getattr(s, &#34;keywords&#34;, None))
@@ -3092,11 +3102,16 @@ def params(self) -&gt; List[str]:
         # I guess this is for C builtin functions?
         return [&#34;...&#34;]
 
+    def format_default_value(value):
+        if value is os.environ:
+            return &#39;os.environ&#39;
+        return repr(value)
+
     params = []
     for i, param in enumerate(s.args):
         if s.defaults is not None and len(s.args) - i &lt;= len(s.defaults):
             defind = len(s.defaults) - (len(s.args) - i)
-            params.append(&#34;%s=%s&#34; % (param, repr(s.defaults[defind])))
+            params.append(&#34;%s=%s&#34; % (param, format_default_value(s.defaults[defind])))
         else:
             params.append(param)
     if s.varargs is not None:
@@ -3108,8 +3123,8 @@ def params(self) -&gt; List[str]:
             params.append(&#34;*&#34;)
         for param in kwonlyargs:
             try:
-                params.append(&#34;%s=%s&#34; % (param, repr(s.kwonlydefaults[param])))
-            except KeyError:
+                params.append(&#34;%s=%s&#34; % (param, format_default_value(s.kwonlydefaults[param])))
+            except (KeyError, TypeError):
                 params.append(param)
 
     keywords = getattr(s, &#34;varkw&#34;, getattr(s, &#34;keywords&#34;, None))
@@ -3991,7 +4006,7 @@ variable.</p></section>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.4</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

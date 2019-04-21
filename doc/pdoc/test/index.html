@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.5.3" />
+<meta name="generator" content="pdoc 0.5.4" />
 <title>pdoc.test API documentation</title>
 <meta name="description" content="Unit tests for pdoc package." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -15,7 +15,7 @@
 <style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em}</style>
 <link rel="canonical" href="https://pdoc3.github.io/pdoc/doc/pdoc/test/">
 <link rel="icon" href="https://pdoc.github.io/pdoc/logo.png">
-</head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><script>(adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:"ca-pub-2900001379782823",enable_page_level_ads:true});</script></head>
 <body>
 <main>
 <article id="content">
@@ -37,6 +37,7 @@ import threading
 import unittest
 import warnings
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
+from functools import wraps
 from glob import glob
 from io import StringIO
 from itertools import chain
@@ -100,6 +101,15 @@ def redirect_streams():
     stdout, stderr = StringIO(), StringIO()
     with redirect_stderr(stderr), redirect_stdout(stdout):
         yield stdout, stderr
+
+
+def ignore_warnings(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        with warnings.catch_warnings():
+            warnings.simplefilter(&#39;ignore&#39;)
+            func(*args, **kwargs)
+    return wrapper
 
 
 class CliTest(unittest.TestCase):
@@ -495,6 +505,26 @@ class ApiTest(unittest.TestCase):
                                                       a.doc[&#39;overridden_same_docstring&#39;]])])
         self.assertEqual(a.inherited_members(), [])
 
+    @ignore_warnings
+    def test_subclasses(self):
+        class A:
+            pass
+
+        class B(type):
+            pass
+
+        class C(A):
+            pass
+
+        class D(B):
+            pass
+
+        mod = pdoc.Module(pdoc)
+        self.assertEqual([x.refname for x in pdoc.Class(&#39;A&#39;, mod, A).subclasses()],
+                         [mod.find_class(C).refname])
+        self.assertEqual([x.refname for x in pdoc.Class(&#39;B&#39;, mod, B).subclasses()],
+                         [mod.find_class(D).refname])
+
     def test_link_inheritance(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
         with warnings.catch_warnings(record=True) as w:
@@ -536,18 +566,27 @@ class ApiTest(unittest.TestCase):
         pdoc.reset()
         self.assertIsInstance(module.find_ident(&#39;pdoc.Module&#39;), pdoc.External)
 
-    def test_Function_private_params(self):
-        func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc),
+    def test_Function_params(self):
+        mod = pdoc.Module(pdoc)
+        func = pdoc.Function(&#39;f&#39;, mod,
                              lambda a, _a, _b=None: None)
         self.assertEqual(func.params(), [&#39;a&#39;, &#39;_a&#39;])
 
-        func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc),
+        func = pdoc.Function(&#39;f&#39;, mod,
                              lambda _ok, a, _a, *args, _b=None, c=None, _d=None: None)
         self.assertEqual(func.params(), [&#39;_ok&#39;, &#39;a&#39;, &#39;_a&#39;, &#39;*args&#39;, &#39;c=None&#39;])
 
-        func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc),
+        func = pdoc.Function(&#39;f&#39;, mod,
                              lambda a, b, *, _c=1: None)
         self.assertEqual(func.params(), [&#39;a&#39;, &#39;b&#39;])
+
+        func = pdoc.Function(&#39;f&#39;, mod,
+                             lambda a, *, b, c: None)
+        self.assertEqual(func.params(), [&#39;a&#39;, &#39;*&#39;, &#39;b&#39;, &#39;c&#39;])
+
+        func = pdoc.Function(&#39;f&#39;, mod,
+                             lambda a=os.environ: None)
+        self.assertEqual(func.params(), [&#39;a=os.environ&#39;])
 
     def test_url(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
@@ -963,6 +1002,22 @@ def chdir(path):
         os.chdir(old)</code></pre>
 </details>
 </dd>
+<dt id="pdoc.test.ignore_warnings"><code class="name flex">
+<span>def <span class="ident">ignore_warnings</span></span>(<span>func)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def ignore_warnings(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        with warnings.catch_warnings():
+            warnings.simplefilter(&#39;ignore&#39;)
+            func(*args, **kwargs)
+    return wrapper</code></pre>
+</details>
+</dd>
 <dt id="pdoc.test.redirect_streams"><code class="name flex">
 <span>def <span class="ident">redirect_streams</span></span>(<span>)</span>
 </code></dt>
@@ -1189,6 +1244,26 @@ def temp_dir():
                                                       a.doc[&#39;overridden_same_docstring&#39;]])])
         self.assertEqual(a.inherited_members(), [])
 
+    @ignore_warnings
+    def test_subclasses(self):
+        class A:
+            pass
+
+        class B(type):
+            pass
+
+        class C(A):
+            pass
+
+        class D(B):
+            pass
+
+        mod = pdoc.Module(pdoc)
+        self.assertEqual([x.refname for x in pdoc.Class(&#39;A&#39;, mod, A).subclasses()],
+                         [mod.find_class(C).refname])
+        self.assertEqual([x.refname for x in pdoc.Class(&#39;B&#39;, mod, B).subclasses()],
+                         [mod.find_class(D).refname])
+
     def test_link_inheritance(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
         with warnings.catch_warnings(record=True) as w:
@@ -1230,18 +1305,27 @@ def temp_dir():
         pdoc.reset()
         self.assertIsInstance(module.find_ident(&#39;pdoc.Module&#39;), pdoc.External)
 
-    def test_Function_private_params(self):
-        func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc),
+    def test_Function_params(self):
+        mod = pdoc.Module(pdoc)
+        func = pdoc.Function(&#39;f&#39;, mod,
                              lambda a, _a, _b=None: None)
         self.assertEqual(func.params(), [&#39;a&#39;, &#39;_a&#39;])
 
-        func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc),
+        func = pdoc.Function(&#39;f&#39;, mod,
                              lambda _ok, a, _a, *args, _b=None, c=None, _d=None: None)
         self.assertEqual(func.params(), [&#39;_ok&#39;, &#39;a&#39;, &#39;_a&#39;, &#39;*args&#39;, &#39;c=None&#39;])
 
-        func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc),
+        func = pdoc.Function(&#39;f&#39;, mod,
                              lambda a, b, *, _c=1: None)
         self.assertEqual(func.params(), [&#39;a&#39;, &#39;b&#39;])
+
+        func = pdoc.Function(&#39;f&#39;, mod,
+                             lambda a, *, b, c: None)
+        self.assertEqual(func.params(), [&#39;a&#39;, &#39;*&#39;, &#39;b&#39;, &#39;c&#39;])
+
+        func = pdoc.Function(&#39;f&#39;, mod,
+                             lambda a=os.environ: None)
+        self.assertEqual(func.params(), [&#39;a=os.environ&#39;])
 
     def test_url(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
@@ -1298,25 +1382,34 @@ def temp_dir():
     pdoc.reset()</code></pre>
 </details>
 </dd>
-<dt id="pdoc.test.ApiTest.test_Function_private_params"><code class="name flex">
-<span>def <span class="ident">test_Function_private_params</span></span>(<span>self)</span>
+<dt id="pdoc.test.ApiTest.test_Function_params"><code class="name flex">
+<span>def <span class="ident">test_Function_params</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <section class="desc"></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def test_Function_private_params(self):
-    func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc),
+<pre><code class="python">def test_Function_params(self):
+    mod = pdoc.Module(pdoc)
+    func = pdoc.Function(&#39;f&#39;, mod,
                          lambda a, _a, _b=None: None)
     self.assertEqual(func.params(), [&#39;a&#39;, &#39;_a&#39;])
 
-    func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc),
+    func = pdoc.Function(&#39;f&#39;, mod,
                          lambda _ok, a, _a, *args, _b=None, c=None, _d=None: None)
     self.assertEqual(func.params(), [&#39;_ok&#39;, &#39;a&#39;, &#39;_a&#39;, &#39;*args&#39;, &#39;c=None&#39;])
 
-    func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc),
+    func = pdoc.Function(&#39;f&#39;, mod,
                          lambda a, b, *, _c=1: None)
-    self.assertEqual(func.params(), [&#39;a&#39;, &#39;b&#39;])</code></pre>
+    self.assertEqual(func.params(), [&#39;a&#39;, &#39;b&#39;])
+
+    func = pdoc.Function(&#39;f&#39;, mod,
+                         lambda a, *, b, c: None)
+    self.assertEqual(func.params(), [&#39;a&#39;, &#39;*&#39;, &#39;b&#39;, &#39;c&#39;])
+
+    func = pdoc.Function(&#39;f&#39;, mod,
+                         lambda a=os.environ: None)
+    self.assertEqual(func.params(), [&#39;a=os.environ&#39;])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test__all__"><code class="name flex">
@@ -1657,6 +1750,34 @@ def test_sorting(self):
     unsorted_methods = cls.methods(sort=False)
     self.assertNotEqual(sorted_methods, unsorted_methods)
     self.assertEqual(sorted_methods, sorted(unsorted_methods))</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.ApiTest.test_subclasses"><code class="name flex">
+<span>def <span class="ident">test_subclasses</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">@ignore_warnings
+def test_subclasses(self):
+    class A:
+        pass
+
+    class B(type):
+        pass
+
+    class C(A):
+        pass
+
+    class D(B):
+        pass
+
+    mod = pdoc.Module(pdoc)
+    self.assertEqual([x.refname for x in pdoc.Class(&#39;A&#39;, mod, A).subclasses()],
+                     [mod.find_class(C).refname])
+    self.assertEqual([x.refname for x in pdoc.Class(&#39;B&#39;, mod, B).subclasses()],
+                     [mod.find_class(D).refname])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_url"><code class="name flex">
@@ -2267,10 +2388,10 @@ should not change the signature of their <strong>init</strong> method, since ins
 of the classes are instantiated automatically by parts of the framework
 in order to be run.</p>
 <p>When subclassing TestCase, you can set these attributes:
-<em> failureException: determines which exception will be raised when
+* failureException: determines which exception will be raised when
 the instance's assertion methods fail; test methods raising this
 exception will be deemed to have 'failed' rather than 'errored'.
-</em> longMessage: determines whether long messages (including repr of
+* longMessage: determines whether long messages (including repr of
 objects used in assert methods) will be printed on failure in <em>addition</em>
 to any explicit message passed.
 * maxDiff: sets the maximum length of a diff in failure messages
@@ -3058,8 +3179,9 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="pdoc.test.chdir" href="#pdoc.test.chdir">chdir</a></code></li>
+<li><code><a title="pdoc.test.ignore_warnings" href="#pdoc.test.ignore_warnings">ignore_warnings</a></code></li>
 <li><code><a title="pdoc.test.redirect_streams" href="#pdoc.test.redirect_streams">redirect_streams</a></code></li>
 <li><code><a title="pdoc.test.run" href="#pdoc.test.run">run</a></code></li>
 <li><code><a title="pdoc.test.run_html" href="#pdoc.test.run_html">run_html</a></code></li>
@@ -3072,7 +3194,7 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
 <h4><code><a title="pdoc.test.ApiTest" href="#pdoc.test.ApiTest">ApiTest</a></code></h4>
 <ul class="">
 <li><code><a title="pdoc.test.ApiTest.setUp" href="#pdoc.test.ApiTest.setUp">setUp</a></code></li>
-<li><code><a title="pdoc.test.ApiTest.test_Function_private_params" href="#pdoc.test.ApiTest.test_Function_private_params">test_Function_private_params</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_Function_params" href="#pdoc.test.ApiTest.test_Function_params">test_Function_params</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test__all__" href="#pdoc.test.ApiTest.test__all__">test__all__</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test__pdoc__dict" href="#pdoc.test.ApiTest.test__pdoc__dict">test__pdoc__dict</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test__pdoc__invalid_value" href="#pdoc.test.ApiTest.test__pdoc__invalid_value">test__pdoc__invalid_value</a></code></li>
@@ -3089,6 +3211,7 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
 <li><code><a title="pdoc.test.ApiTest.test_qualname" href="#pdoc.test.ApiTest.test_qualname">test_qualname</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_refname" href="#pdoc.test.ApiTest.test_refname">test_refname</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_sorting" href="#pdoc.test.ApiTest.test_sorting">test_sorting</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_subclasses" href="#pdoc.test.ApiTest.test_subclasses">test_subclasses</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_url" href="#pdoc.test.ApiTest.test_url">test_url</a></code></li>
 </ul>
 </li>
@@ -3147,7 +3270,7 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.4</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
