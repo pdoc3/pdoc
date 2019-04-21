@@ -556,6 +556,10 @@ class ApiTest(unittest.TestCase):
                              lambda a, *, b, c: None)
         self.assertEqual(func.params(), ['a', '*', 'b', 'c'])
 
+        func = pdoc.Function('f', mod,
+                             lambda a=os.environ: None)
+        self.assertEqual(func.params(), ['a=os.environ'])
+
     def test_url(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
         pdoc.link_inheritance()
