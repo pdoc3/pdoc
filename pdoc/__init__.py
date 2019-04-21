@@ -1457,9 +1457,11 @@ class Function(Doc):
 
             s = str(p)
             if p.annotation is not EMPTY:
-                s = s.replace(':', ': ', 1).replace('=', ' = ', 1)
-                if isinstance(p.annotation, str):
-                    s = s.replace(": '", ': ', 1).replace("' = ", " = ", 1)
+                if sys.version_info < (3, 7):
+                    # PEP8-normalize whitespace
+                    s = re.sub(r'(?<!\s)=(?!\s)', ' = ', re.sub(r':(?!\s)', ': ', s, 1), 1)
+                # "Eval" forward-declarations (typing string literals)
+                s = re.sub(r'(?<=: )[\'"]|[\'"](?= = )', '', s, 2)
                 s = s.replace(' ', '\xA0')  # Neater line breaking with NBSPs
 
             params.append(s)
