@@ -1,3 +1,12 @@
+0.5.4
+=====
+  - Bugfixes:
+    - Added support for metaclass subclasses.
+    - Fix pdoc.Function.params() error in case when keyword-only
+      parameters have no default values.
+    - Don't expand `os.environ` parameter default value as exposing it
+      is a security issue.
+
 0.5.3
 =====
   - Only close standard input if `--close-stdin` is used. This flips
