@@ -1,16 +1,3 @@
----
-description: |
-    API documentation for modules: ${', '.join(m.name for m in modules)}.
-
-lang: en
-
-classoption: oneside
-geometry: margin=1in
-papersize: a4
-
-linkcolor: blue
-links-as-notes: true
-...
 <%!
     import re
     import pdoc
@@ -59,6 +46,19 @@ ${('#' * level) + ' ' + string + id}
 > `class ${c.name}(${', '.join(c.params(annotate=show_type_annotations))})`
 </%def>
 
+---
+description: |
+    API documentation for modules: ${', '.join(m.name for m in modules)}.
+
+lang: en
+
+classoption: oneside
+geometry: margin=1in
+papersize: a4
+
+linkcolor: blue
+links-as-notes: true
+...
 % for module in modules:
 <%
     submodules = module.submodules()
