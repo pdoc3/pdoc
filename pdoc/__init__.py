@@ -359,6 +359,7 @@ from warnings import warn
 
 from mako.lookup import TemplateLookup
 from mako.exceptions import TopLevelLookupException
+from mako.template import Template
 
 try:
     from pdoc._version import version as __version__  # noqa: F401
@@ -426,6 +427,17 @@ def _render_template(template_name, **kwargs):
     Returns the Mako template with the given name.  If the template
     cannot be found, a nicer error message is displayed.
     """
+    # Apply config.mako configuration
+    MAKO_INTERNALS = Template('').module.__dict__.keys()
+    DEFAULT_CONFIG = path.join(path.dirname(__file__), 'templates', 'config.mako')
+    config = {}
+    for config_module in (Template(filename=DEFAULT_CONFIG).module,
+                          tpl_lookup.get_template('/config.mako').module):
+        config.update((var, getattr(config_module, var, None))
+                      for var in config_module.__dict__
+                      if var not in MAKO_INTERNALS)
+    config.update(kwargs)
+
     try:
         t = tpl_lookup.get_template(template_name)
     except TopLevelLookupException:
@@ -434,7 +446,7 @@ def _render_template(template_name, **kwargs):
                 ', '.join(path.join(p, template_name.lstrip("/"))
                           for p in tpl_lookup.directories)))
     try:
-        return t.render(**kwargs).strip()
+        return t.render(**config).strip()
     except Exception:
         from mako import exceptions
         print(exceptions.text_error_template().render(),

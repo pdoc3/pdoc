@@ -25,14 +25,6 @@
         return re.sub(r'\n(#+) +(.+)\n', r'\n%s\1 \2\n' % ('#' * level), text)
 %>
 
-## Import template configuration from potentially-overridden config.mako.
-<%namespace file="config.mako" name="config"/>
-<%
-    show_inherited_members = getattr(config.attr, 'show_inherited_members', True)
-    sort_identifiers = getattr(config.attr, 'sort_identifiers', True)
-    show_type_annotations = getattr(config.attr, 'show_type_annotations', False)
-%>
-
 <%def name="title(level, string, id=None)">
     <% id = ' {#%s}' % id if id is not None else '' %>
 ${('#' * level) + ' ' + string + id}

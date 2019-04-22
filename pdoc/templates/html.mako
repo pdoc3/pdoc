@@ -16,24 +16,6 @@
     return _to_html(text, module=module, link=link)
 %>
 
-## Import template configuration from potentially-overridden config.mako.
-## It may override above imported/defined functions as well.
-<%namespace file="config.mako" name="config"/>
-<%
-    html_lang = getattr(config.attr, 'html_lang', 'en')
-    show_inherited_members = getattr(config.attr, 'show_inherited_members', True)
-    extract_module_toc_into_sidebar = getattr(config.attr, 'extract_module_toc_into_sidebar', True)
-    list_class_variables_in_index = getattr(config.attr, 'list_class_variables_in_index', False)
-    sort_identifiers = getattr(config.attr, 'sort_identifiers', True)
-    show_type_annotations = getattr(config.attr, 'show_type_annotations', False)
-    hljs_style = getattr(config.attr, 'hljs_style', 'github')
-
-    link = getattr(config.attr, 'link', link)
-    to_html = getattr(config.attr, 'to_html', to_html)
-    glimpse = getattr(config.attr, 'glimpse', glimpse)
-    extract_toc = getattr(config.attr, 'extract_toc', extract_toc)
-%>
-
 <%def name="ident(name)"><span class="ident">${name}</span></%def>
 
 <%def name="show_source(d)">

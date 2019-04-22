@@ -1,5 +1,6 @@
 <%!
-    # Template configuration. Copy over and adapt as required.
+    # Template configuration. Copy over in your template directory
+    # (used with --template-dir) and adapt as required.
     html_lang = 'en'
     show_inherited_members = False
     extract_module_toc_into_sidebar = True
