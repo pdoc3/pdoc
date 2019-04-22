@@ -351,7 +351,7 @@ import re
 import sys
 import typing
 from copy import copy
-from functools import lru_cache, reduce
+from functools import lru_cache, reduce, partial
 from itertools import tee, groupby
 from types import ModuleType
 from typing import Dict, Iterable, List, Set, Type, TypeVar, Union, Tuple, Generator, Callable
@@ -1226,7 +1226,7 @@ class Class(Doc):
         return [self.module.find_class(c)
                 for c in type.__subclasses__(self.obj)]
 
-    def params(self, *, annotate=False) -> List['str']:
+    def params(self, *, annotate=False, link=None) -> List['str']:
         """
         Return a list of formatted parameters accepted by the
         class constructor (method `__init__`). See `pdoc.Function.params`.
@@ -1238,7 +1238,8 @@ class Class(Doc):
         if name in exclusions or qualname in exclusions or refname in exclusions:
             return []
 
-        params = Function._params(self.obj.__init__, annotate=annotate)
+        params = Function._params(self.obj.__init__,
+                                  annotate=annotate, link=link, module=self.module)
         params = params[1:] if params[0] == 'self' else params
         return params
 
@@ -1394,8 +1395,7 @@ class Function(Doc):
         except AttributeError:
             return False
 
-    @property
-    def return_annotation(self):
+    def return_annotation(self, *, link=None):
         """Formatted function return type annotation or empty string if none."""
         try:
             annot = typing.get_type_hints(self.obj).get('return', '')
@@ -1406,9 +1406,13 @@ class Function(Doc):
                 annot = ''
         if not annot:
             return ''
-        return inspect.formatannotation(annot).replace(' ', '\xA0')  # NBSP for better line breaks
+        s = inspect.formatannotation(annot).replace(' ', '\xA0')  # NBSP for better line breaks
+        if link:
+            from pdoc.html_helpers import _linkify
+            s = re.sub(r'[\w\.]+', partial(_linkify, link=link, module=self.module), s)
+        return s
 
-    def params(self, *, annotate: bool = False) -> List[str]:
+    def params(self, *, annotate: bool = False, link: Callable[[Doc], str] = None) -> List[str]:
         """
         Returns a list where each element is a nicely formatted
         parameter of this function. This includes argument lists,
@@ -1420,10 +1424,10 @@ class Function(Doc):
 
         [PEP 484]: https://www.python.org/dev/peps/pep-0484/
         """
-        return self._params(self.obj, annotate=annotate)
+        return self._params(self.obj, annotate=annotate, link=link, module=self.module)
 
     @staticmethod
-    def _params(func_obj, annotate=False):
+    def _params(func_obj, annotate=False, link=None, module=None):
         try:
             signature = inspect.signature(inspect.unwrap(func_obj))
         except ValueError:
@@ -1441,6 +1445,10 @@ class Function(Doc):
         params = []
         kw_only = False
         EMPTY = inspect.Parameter.empty
+
+        if link:
+            from pdoc.html_helpers import _linkify
+            _linkify = partial(_linkify, link=link, module=module)
 
         for p in signature.parameters.values():  # type: inspect.Parameter
             if not _is_public(p.name) and p.default is not EMPTY:
@@ -1465,6 +1473,9 @@ class Function(Doc):
                 # "Eval" forward-declarations (typing string literals)
                 s = re.sub(r'(?<=: )[\'"]|[\'"](?= = )', '', s, 2)
                 s = s.replace(' ', '\xA0')  # Neater line breaking with NBSPs
+
+                if link:
+                    s = re.sub(r'[\w\.]+', _linkify, s)
 
             params.append(s)
 

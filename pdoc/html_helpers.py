@@ -5,7 +5,7 @@ import inspect
 import os.path
 import re
 from functools import partial, lru_cache
-from typing import Callable
+from typing import Callable, Match
 from warnings import warn
 
 import markdown
@@ -84,15 +84,6 @@ _md = markdown.Markdown(
         ),
     },
 )
-
-
-class ReferenceWarning(UserWarning):
-    """
-    This warning is raised in `to_html` when a object reference in markdown
-    doesn't match any documented objects.
-
-    Look for this warning to catch typos / references to obsolete symbols.
-    """
 
 
 class _ToMarkdown:
@@ -335,27 +326,36 @@ def to_markdown(text: str, docformat: str = 'numpy,google', *,
     text = _ToMarkdown.doctests(text)
 
     if module and link:
-
-        def linkify(match, _is_pyident=re.compile(r'^[a-zA-Z_]\w*(\.\w+)+$').match):
-            nonlocal link, module
-            matched = match.group(0)
-            refname = matched[1:-1]
-            dobj = module.find_ident(refname)
-            if isinstance(dobj, pdoc.External):
-                if not _is_pyident(refname):
-                    return matched
-                # If refname in documentation has a typo or is obsolete, warn.
-                # XXX: Assume at least the first part of refname, i.e. the package, is correct.
-                module_part = module.find_ident(refname.split('.')[0])
-                if not isinstance(module_part, pdoc.External):
-                    warn('Code reference `{}` in module "{}" does not match any '
-                         'documented object.'.format(refname, module.refname),
-                         ReferenceWarning, stacklevel=3)
-            return link(dobj, fmt='`{}`')
-
-        text = _code_refs(linkify, text)
+        text = _code_refs(partial(_linkify, link=link, module=module, fmt='`{}`'), text)
 
     return text
+
+
+class ReferenceWarning(UserWarning):
+    """
+    This warning is raised in `to_html` when a object reference in markdown
+    doesn't match any documented objects.
+
+    Look for this warning to catch typos / references to obsolete symbols.
+    """
+
+
+def _linkify(match: Match, link: Callable[..., str], module: pdoc.Module,
+             _is_pyident=re.compile(r'^[a-zA-Z_]\w*(\.\w+)+$').match, **kwargs):
+    matched = match.group(0)
+    refname = matched.strip('`')
+    dobj = module.find_ident(refname)
+    if isinstance(dobj, pdoc.External):
+        if not _is_pyident(refname):
+            return matched
+        # If refname in documentation has a typo or is obsolete, warn.
+        # XXX: Assume at least the first part of refname, i.e. the package, is correct.
+        module_part = module.find_ident(refname.split('.')[0])
+        if not isinstance(module_part, pdoc.External):
+            warn('Code reference `{}` in module "{}" does not match any '
+                 'documented object.'.format(refname, module.refname),
+                 ReferenceWarning, stacklevel=3)
+    return link(dobj, **kwargs)
 
 
 def extract_toc(text: str):

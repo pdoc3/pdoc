@@ -105,12 +105,12 @@
   <%def name="show_func(f)">
     <dt id="${f.refname}"><code class="name flex">
         <%
-            params = ', '.join(f.params(annotate=show_type_annotations))
-            returns = show_type_annotations and f.return_annotation or ''
+            params = ', '.join(f.params(annotate=show_type_annotations, link=link))
+            returns = show_type_annotations and f.return_annotation(link=link) or ''
             if returns:
                 returns = ' 🡢\xA0' + returns
         %>
-        <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${params | h})${returns | h}</span>
+        <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${params})${returns}</span>
     </code></dt>
     <dd>${show_desc(f)}</dd>
   </%def>
@@ -181,12 +181,12 @@
       methods = c.methods(show_inherited_members, sort=sort_identifiers)
       mro = c.mro()
       subclasses = c.subclasses()
-      params = ', '.join(c.params(annotate=show_type_annotations))
+      params = ', '.join(c.params(annotate=show_type_annotations, link=link))
       %>
       <dt id="${c.refname}"><code class="flex name class">
           <span>class ${ident(c.name)}</span>
           % if params:
-              <span>(</span><span>${params | h})</span>
+              <span>(</span><span>${params})</span>
           % endif
       </code></dt>
 
