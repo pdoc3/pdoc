@@ -22,7 +22,7 @@ ${var.docstring | deflist}
 </%def>
 
 <%def name="class_(cls)" buffered="True">
-`${cls.name}`
+`${cls.name}(${", ".join(cls.params())})`
 ${cls.docstring | deflist}
 <%
   class_vars = cls.class_variables()
