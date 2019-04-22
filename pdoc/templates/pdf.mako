@@ -38,17 +38,25 @@ links-as-notes: true
         return re.sub(r'\n(#+) +(.+)\n', r'\n%s\1 \2\n' % ('#' * level), text)
 %>
 
+## Import template configuration from potentially-overridden config.mako.
+<%namespace file="config.mako" name="config"/>
+<%
+    show_inherited_members = getattr(config.attr, 'show_inherited_members', True)
+    sort_identifiers = getattr(config.attr, 'sort_identifiers', True)
+    show_type_annotations = getattr(config.attr, 'show_type_annotations', False)
+%>
+
 <%def name="title(level, string, id=None)">
     <% id = ' {#%s}' % id if id is not None else '' %>
 ${('#' * level) + ' ' + string + id}
 </%def>
 
 <%def name="funcdef(f)">
-> `${f.funcdef()} ${f.name}(${', '.join(f.params())})`
+> `${f.funcdef()} ${f.name}(${', '.join(f.params(annotate=show_type_annotations))})`
 </%def>
 
 <%def name="classdef(c)">
-> `class ${c.name}(${', '.join(c.params())})`
+> `class ${c.name}(${', '.join(c.params(annotate=show_type_annotations))})`
 </%def>
 
 % for module in modules:
@@ -99,10 +107,10 @@ ${classdef(cls)}
 
 ${cls.docstring | to_md, subh}
 <%
-    class_vars = cls.class_variables()
-    static_methods = cls.functions()
-    inst_vars = cls.instance_variables()
-    methods = cls.methods()
+    class_vars = cls.class_variables(show_inherited_members, sort=sort_identifiers)
+    static_methods = cls.functions(show_inherited_members, sort=sort_identifiers)
+    inst_vars = cls.instance_variables(show_inherited_members, sort=sort_identifiers)
+    methods = cls.methods(show_inherited_members, sort=sort_identifiers)
     mro = cls.mro()
     subclasses = cls.subclasses()
 %>

@@ -6,6 +6,14 @@
       return ' ' * spaces + new.strip()
 %>
 
+## Import template configuration from potentially-overridden config.mako.
+<%namespace file="config.mako" name="config"/>
+<%
+    show_inherited_members = getattr(config.attr, 'show_inherited_members', True)
+    sort_identifiers = getattr(config.attr, 'sort_identifiers', True)
+    show_type_annotations = getattr(config.attr, 'show_type_annotations', False)
+%>
+
 <%def name="deflist(s)">:${indent(s)[1:]}</%def>
 
 <%def name="h3(s)">### ${s}
@@ -22,13 +30,13 @@ ${var.docstring | deflist}
 </%def>
 
 <%def name="class_(cls)" buffered="True">
-`${cls.name}(${", ".join(cls.params())})`
+`${cls.name}(${", ".join(cls.params(annotate=show_type_annotations))})`
 ${cls.docstring | deflist}
 <%
-  class_vars = cls.class_variables()
-  static_methods = cls.functions()
-  inst_vars = cls.instance_variables()
-  methods = cls.methods()
+  class_vars = cls.class_variables(show_inherited_members, sort=sort_identifiers)
+  static_methods = cls.functions(show_inherited_members, sort=sort_identifiers)
+  inst_vars = cls.instance_variables(show_inherited_members, sort=sort_identifiers)
+  methods = cls.methods(show_inherited_members, sort=sort_identifiers)
   mro = cls.mro()
   subclasses = cls.subclasses()
 %>
