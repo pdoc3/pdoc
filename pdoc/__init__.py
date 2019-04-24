@@ -454,14 +454,7 @@ def _render_template(template_name, **kwargs):
         raise
 
 
-def html(
-    module_name,
-    docfilter=None,
-    external_links=False,
-    link_prefix="",
-    source=True,
-    **kwargs
-) -> str:
+def html(module_name, docfilter=None, **kwargs) -> str:
     """
     Returns the documentation for the module `module_name` in HTML
     format. The module must be a module or an importable string.
@@ -470,24 +463,10 @@ def html(
     documentation objects are shown in the output. It is a function
     that takes a single argument (a documentation object) and returns
     `True` or `False`. If `False`, that object will not be documented.
-
-    If `external_links` is `True`, then identifiers to external modules
-    are always turned into links.
-
-    If `link_prefix` is a non-empty string, all links will be relative
-    to the top module and will have that prefix.
-    Otherwise, all links will be relative.
-
-    If `source` is `True`, then source code will be retrieved,
-    and outputted, for every Python object whenever possible. This can
-    dramatically decrease performance when documenting large modules.
     """
     mod = Module(import_module(module_name), docfilter=docfilter)
     link_inheritance()
-    return mod.html(external_links=external_links,
-                    link_prefix=link_prefix,
-                    source=source,
-                    **kwargs)
+    return mod.html(**kwargs)
 
 
 def text(module_name, docfilter=None, **kwargs) -> str:
@@ -1037,7 +1016,7 @@ class Module(Doc):
         txt = _render_template('/text.mako', module=self, **kwargs)
         return re.sub("\n\n\n+", "\n\n", txt)
 
-    def html(self, external_links=False, link_prefix="", source=True, minify=True, **kwargs) -> str:
+    def html(self, minify=True, **kwargs) -> str:
         """
         Returns the documentation for this module as
         self-contained HTML.
@@ -1048,12 +1027,7 @@ class Module(Doc):
 
         `kwargs` is passed to the `mako` render function.
         """
-        html = _render_template('/html.mako',
-                                module=self,
-                                external_links=external_links,
-                                link_prefix=link_prefix,
-                                show_source_code=source,
-                                **kwargs)
+        html = _render_template('/html.mako', module=self, **kwargs)
         if minify:
             from pdoc.html_helpers import minify_html
             html = minify_html(html)

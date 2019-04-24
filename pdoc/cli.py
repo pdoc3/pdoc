@@ -7,8 +7,10 @@ import inspect
 import os
 import os.path as path
 import sys
+import warnings
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Sequence
+from warnings import warn
 
 import pdoc
 
@@ -16,7 +18,10 @@ parser = argparse.ArgumentParser(
     description="Automatically generate API docs for Python modules.",
 )
 aa = parser.add_argument
-aa('--version', action='version', version='%(prog)s ' + pdoc.__version__)
+mode_aa = parser.add_mutually_exclusive_group().add_argument
+
+aa(
+    '--version', action='version', version='%(prog)s ' + pdoc.__version__)
 aa(
     "modules",
     type=str,
@@ -25,6 +30,16 @@ aa(
     help="The Python module name. This may be an import path resolvable in "
     "the current environment, or a file path to a Python module or "
     "package.",
+)
+aa(
+    "-c", "--config",
+    type=str,
+    metavar='OPTION=VALUE',
+    action='append',
+    default=[],
+    help="Override template options. This is an alternative to using "
+         "a custom config.mako file in --template-dir. This option "
+         "can be specified multiple times.",
 )
 aa(
     "--filter",
@@ -36,36 +51,50 @@ aa(
          "will be shown in the output. Search is case sensitive. "
          "Has no effect when --http is set.",
 )
-aa("--html", action="store_true", help="When set, the output will be HTML formatted.")
+aa(
+    "-f", "--force",
+    action="store_true",
+    help="Overwrite any existing generated (--output-dir) files.",
+)
+mode_aa(
+    "--html",
+    action="store_true",
+    help="When set, the output will be HTML formatted.",
+)
+mode_aa(
+    "--pdf",
+    action="store_true",
+    help="When set, the specified modules will be printed to standard output, "
+         "formatted in Markdown-Extra, compatible with most "
+         "Markdown-(to-HTML-)to-PDF converters.",
+)
 aa(
     "--html-dir",
     type=str,
+    help=argparse.SUPPRESS,
+)
+aa(
+    "-o", "--output-dir",
+    type=str,
     metavar='DIR',
-    default="html",
-    help="The directory to output HTML files to (default: ./html). "
-         "Only in effect when --html is.",
+    default='html',
+    help="The directory to output generated HTML/text files to "
+         "(default: ./html for --html).",
 )
 aa(
     "--html-no-source",
     action="store_true",
-    help="When set, source code will not be viewable in the generated HTML. "
-    "This can speed up the time required to document large modules.",
+    help=argparse.SUPPRESS,
 )
 aa(
     "--overwrite",
     action="store_true",
-    help="Overwrites any existing HTML files instead of producing an error.",
+    help=argparse.SUPPRESS,
 )
-aa("--pdf",
-   action="store_true",
-   help="When set, the specified modules will be printed to standard output, "
-        "formatted in Markdown-Extra, compatible with most "
-        "Markdown-(to-HTML-)to-PDF converters.")
 aa(
     "--external-links",
     action="store_true",
-    help="When set, identifiers to external modules are turned into links. "
-         "This is automatically set when --http is.",
+    help=argparse.SUPPRESS,
 )
 aa(
     "--template-dir",
@@ -73,18 +102,14 @@ aa(
     metavar='DIR',
     default=None,
     help="Specify a directory containing Mako templates "
-         "(html.mako or text.mako, and any templates they include). "
+         "(html.mako, text.mako, config.mako and/or any templates they include). "
          "Alternatively, put your templates in $XDG_CONFIG_HOME/pdoc and "
          "pdoc will automatically find them.",
 )
 aa(
     "--link-prefix",
     type=str,
-    metavar='STRING',
-    default="",
-    help="A prefix to use for every link in the generated documentation. "
-         "No link prefix results in all links being relative. "
-         "No effect when combined with --http.",
+    help=argparse.SUPPRESS,
 )
 aa(
     "--close-stdin",
@@ -119,6 +144,7 @@ args = argparse.Namespace()
 
 class WebDoc(BaseHTTPRequestHandler):
     args = None  # Set before server instantiated
+    template_config = None
 
     def do_HEAD(self):
         if self.path != "/":
@@ -146,7 +172,7 @@ class WebDoc(BaseHTTPRequestHandler):
                              for module in modules)
             out = pdoc._render_template('/html.mako',
                                         modules=modules,
-                                        link_prefix=self.args.link_prefix)
+                                        **self.template_config)
         elif self.path.endswith(".ext"):
             # External links are a bit weird. You should view them as a giant
             # hack. Basically, the idea is to "guess" where something lives
@@ -166,7 +192,7 @@ class WebDoc(BaseHTTPRequestHandler):
             if resolved is None:  # Try to generate the HTML...
                 print("Generating HTML for %s on the fly..." % import_path, file=sys.stderr)
                 try:
-                    out = pdoc.html(import_path.split(".")[0])
+                    out = pdoc.html(import_path.split(".")[0], **self.template_config)
                 except Exception as e:
                     print('Error generating docs: {}'.format(e), file=sys.stderr)
                     # All hope is lost.
@@ -208,18 +234,19 @@ class WebDoc(BaseHTTPRequestHandler):
         the source code.
         """
         # TODO: pass extra pdoc.html() params
-        return pdoc.html(self.import_path_from_req_url, http_server=True)
+        return pdoc.html(self.import_path_from_req_url,
+                         http_server=True, external_links=True, **self.template_config)
 
     def resolve_ext(self, import_path):
         def exists(p):
-            p = path.join(args.html_dir, p)
+            p = path.join(args.output_dir, p)
             pkg = path.join(p, pdoc._URL_PACKAGE_SUFFIX.lstrip('/'))
             mod = p + pdoc._URL_MODULE_SUFFIX
 
             if path.isfile(pkg):
-                return pkg[len(args.html_dir):]
+                return pkg[len(args.output_dir):]
             elif path.isfile(mod):
-                return mod[len(args.html_dir):]
+                return mod[len(args.output_dir):]
             return None
 
         parts = import_path.split(".")
@@ -244,11 +271,11 @@ class WebDoc(BaseHTTPRequestHandler):
 
 
 def module_html_path(m: pdoc.Module):
-    return path.join(args.html_dir, *m.url().split('/'))
+    return path.join(args.output_dir, *m.url().split('/'))
 
 
 def _quit_if_exists(m: pdoc.Module):
-    if args.overwrite:
+    if args.force:
         return
 
     paths = [module_html_path(m)]
@@ -257,12 +284,12 @@ def _quit_if_exists(m: pdoc.Module):
 
     for pth in paths:
         if path.lexists(pth):
-            print("File '%s' already exists. Delete it or run with --overwrite" % pth,
+            print("File '%s' already exists. Delete it, or run with --force" % pth,
                   file=sys.stderr)
             sys.exit(1)
 
 
-def write_html_files(m: pdoc.Module):
+def write_html_files(m: pdoc.Module, **kwargs):
     f = module_html_path(m)
 
     dirpath = path.dirname(f)
@@ -271,11 +298,7 @@ def write_html_files(m: pdoc.Module):
 
     try:
         with open(f, 'w+', encoding='utf-8') as w:
-            w.write(m.html(
-                external_links=args.external_links,
-                link_prefix=args.link_prefix,
-                source=not args.html_no_source,
-            ))
+            w.write(m.html(**kwargs))
     except Exception:
         try:
             os.unlink(f)
@@ -284,7 +307,7 @@ def write_html_files(m: pdoc.Module):
         raise
 
     for submodule in m.submodules():
-        write_html_files(submodule)
+        write_html_files(submodule, **kwargs)
 
 
 def _flatten_submodules(modules: Sequence[pdoc.Module]):
@@ -299,13 +322,48 @@ def print_pdf(modules, **kwargs):
     print(pdoc._render_template('/pdf.mako', modules=modules, **kwargs))
 
 
+def _warn_deprecated(option, alternative='', use_config_mako=False):
+    msg = 'Program option `{}` is deprecated.'.format(option)
+    if alternative:
+        msg += ' Use `' + alternative + '`'
+        if use_config_mako:
+            msg += ' or override config.mako template'
+        msg += '.'
+    warn(msg, DeprecationWarning, stacklevel=2)
+
+
 def main(_args=None):
     """ Command-line entry point """
     global args
     args = _args or parser.parse_args()
 
+    warnings.simplefilter("once", DeprecationWarning)
+
     if args.close_stdin:
         sys.stdin.close()
+
+    if args.html_dir:
+        _warn_deprecated('--html-dir', '--output-dir')
+        args.output_dir = args.html_dir
+    if args.overwrite:
+        _warn_deprecated('--overwrite', '--force')
+        args.force = args.overwrite
+
+    try:
+        template_config = {opt.split('=', 1)[0]: eval(opt.split('=', 1)[1], {})
+                           for opt in args.config}
+    except Exception as e:
+        raise RuntimeError('Error evaluating config values {}: {}\n'
+                           'Make sure string values are quoted?'.format(args.config, e))
+    if args.html_no_source:
+        _warn_deprecated('--html-no-source', '-c show_source_code=False', True)
+        template_config['show_source_code'] = False
+    if args.link_prefix:
+        _warn_deprecated('--link-prefix', '-c link_prefix="foo"', True)
+        template_config['link_prefix'] = args.link_prefix
+    if args.external_links:
+        _warn_deprecated('--external-links')
+        template_config['external_links'] = True
 
     if args.template_dir is not None:
         if not path.isdir(args.template_dir):
@@ -318,13 +376,11 @@ def main(_args=None):
     sys.path.append(os.getcwd())
 
     if args.http:
-        args.html = True
-        args.external_links = True
-        args.overwrite = True
-        args.link_prefix = "/"
+        template_config['link_prefix'] = "/"
 
         # Run the HTTP server.
         WebDoc.args = args  # Pass params to HTTPServer xP
+        WebDoc.template_config = template_config
 
         host, _, port = args.http.partition(':')
         host = host or DEFAULT_HOST
@@ -357,7 +413,7 @@ def main(_args=None):
     pdoc.link_inheritance()
 
     if args.pdf:
-        print_pdf(modules)
+        print_pdf(modules, **template_config)
         print("""
 PDF-ready markdown written to standard output.
                               ^^^^^^^^^^^^^^^
@@ -393,9 +449,9 @@ or similar, at your own discretion.""",
     for module in modules:
         if args.html:
             _quit_if_exists(module)
-            write_html_files(module)
+            write_html_files(module, **template_config)
         else:
-            sys.stdout.write(module.text())
+            sys.stdout.write(module.text(**template_config))
             # Two blank lines between two modules' texts
             sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
 

@@ -98,7 +98,7 @@
   </%def>
 
   <header>
-  % if 'http_server' in context.keys():
+  % if http_server:
     <nav class="http-server-breadcrumbs">
       <a href="/">All packages</a>
       <% parts = module.name.split('.')[:-1] %>

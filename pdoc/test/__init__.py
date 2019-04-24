@@ -65,7 +65,7 @@ def run(*args, _check=True, **kwargs) -> int:
 @contextmanager
 def run_html(*args, **kwargs):
     with temp_dir() as path:
-        run(*args, html=None, html_dir=path, **kwargs)
+        run(*args, html=None, output_dir=path, **kwargs)
         with chdir(path):
             yield
 
@@ -200,12 +200,13 @@ class CliTest(unittest.TestCase):
         for package in ('', '._private'):
             with self.subTest(package=package), \
                  self.assertWarns(UserWarning) as cm:
-                with run_html(EXAMPLE_MODULE + package, filter='A', html_no_source=None):
+                with run_html(EXAMPLE_MODULE + package, filter='A',
+                              config='show_source_code=False'):
                     self._check_files(['A'], ['CONST', 'B docstring'])
         self.assertIn('__pdoc__', cm.warning.args[0])
 
     def test_html_ref_links(self):
-        with run_html(EXAMPLE_MODULE, html_no_source=None):
+        with run_html(EXAMPLE_MODULE, config='show_source_code=False'):
             self._check_files(
                 file_pattern=EXAMPLE_MODULE + '/index.html',
                 include_patterns=[
@@ -215,19 +216,20 @@ class CliTest(unittest.TestCase):
             )
 
     def test_html_no_source(self):
-        with run_html(EXAMPLE_MODULE, html_no_source=None):
+        with self.assertWarns(DeprecationWarning),\
+                run_html(EXAMPLE_MODULE, html_no_source=None):
             self._basic_html_assertions()
             self._check_files(exclude_patterns=['class="source"', 'Hidden'])
 
-    def test_overwrite(self):
+    def test_force(self):
         with run_html(EXAMPLE_MODULE):
             with redirect_streams() as (stdout, stderr):
-                returncode = run(EXAMPLE_MODULE, _check=False, html=None, html_dir=os.getcwd())
+                returncode = run(EXAMPLE_MODULE, _check=False, html=None, output_dir=os.getcwd())
                 self.assertNotEqual(returncode, 0)
                 self.assertNotEqual(stderr.getvalue(), '')
 
             with redirect_streams() as (stdout, stderr):
-                returncode = run(EXAMPLE_MODULE, html=None, overwrite=None, html_dir=os.getcwd())
+                returncode = run(EXAMPLE_MODULE, html=None, force=None, output_dir=os.getcwd())
                 self.assertEqual(returncode, 0)
                 self.assertEqual(stderr.getvalue(), '')
 
@@ -236,7 +238,8 @@ class CliTest(unittest.TestCase):
             self._basic_html_assertions()
             self._check_files(exclude_patterns=['<a href="/sys.version.ext"'])
 
-        with run_html(EXAMPLE_MODULE, external_links=None):
+        with self.assertWarns(DeprecationWarning),\
+                run_html(EXAMPLE_MODULE, external_links=None):
             self._basic_html_assertions()
             self._check_files(['<a title="sys.version" href="/sys.version.ext"'])
 
@@ -253,7 +256,8 @@ class CliTest(unittest.TestCase):
             pdoc.tpl_lookup._collection.clear()
 
     def test_link_prefix(self):
-        with run_html(EXAMPLE_MODULE, link_prefix='/foobar/'):
+        with self.assertWarns(DeprecationWarning),\
+                run_html(EXAMPLE_MODULE, link_prefix='/foobar/'):
             self._basic_html_assertions()
             self._check_files(['/foobar/' + EXAMPLE_MODULE])
 
@@ -338,6 +342,11 @@ class CliTest(unittest.TestCase):
 
         self.assertIn(str(inspect.signature(pdoc.Doc.__init__)).replace('self, ', ''),
                       out)
+
+    def test_config(self):
+        with run_html(EXAMPLE_MODULE, config='link_prefix="/foobar/"'):
+            self._basic_html_assertions()
+            self._check_files(['/foobar/' + EXAMPLE_MODULE])
 
 
 class ApiTest(unittest.TestCase):
