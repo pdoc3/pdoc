@@ -290,6 +290,7 @@ def _quit_if_exists(m: pdoc.Module, ext: str):
 
 
 def write_files(m: pdoc.Module, ext: str, **kwargs):
+    assert ext in ('.html', '.md')
     f = module_path(m, ext=ext)
 
     dirpath = path.dirname(f)
@@ -298,9 +299,10 @@ def write_files(m: pdoc.Module, ext: str, **kwargs):
 
     try:
         with open(f, 'w+', encoding='utf-8') as w:
-            method = {'.html': m.html,
-                      '.md': m.text}[ext]
-            w.write(method(**kwargs))
+            if ext == '.html':
+                w.write(m.html(**kwargs))
+            elif ext == '.md':
+                w.write(m.html(**kwargs))
     except Exception:
         try:
             os.unlink(f)

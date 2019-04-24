@@ -596,11 +596,11 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(func.params(), ['a=os.environ'])
 
         # typed
-        def f(a: int, *b, c: typing.List[pdoc.Doc] = ''): pass
+        def f(a: int, *b, c: typing.List[pdoc.Doc] = []): pass
         func = pdoc.Function('f', mod, f)
-        self.assertEqual(func.params(), ['a', '*b', "c=''"])
+        self.assertEqual(func.params(), ['a', '*b', "c=[]"])
         self.assertEqual(func.params(annotate=True),
-                         ['a:\xA0int', '*b', "c:\xA0List[pdoc.Doc]\xA0=\xA0''"])
+                         ['a:\xA0int', '*b', "c:\xA0List[pdoc.Doc]\xA0=\xA0[]"])
 
         # typed, linked
         def link(dobj):
@@ -608,7 +608,7 @@ class ApiTest(unittest.TestCase):
 
         self.assertEqual(func.params(annotate=True, link=link),
                          ['a:\xA0int', '*b',
-                          "c:\xa0List[<a href=\"#pdoc.Doc\">Doc</a>]\xa0=\xa0''"])
+                          "c:\xa0List[<a href=\"#pdoc.Doc\">Doc</a>]\xa0=\xa0[]"])
 
     def test_Function_return_annotation(self):
         import typing
