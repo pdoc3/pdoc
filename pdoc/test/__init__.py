@@ -348,6 +348,13 @@ class CliTest(unittest.TestCase):
             self._basic_html_assertions()
             self._check_files(['/foobar/' + EXAMPLE_MODULE])
 
+    def test_output_text(self):
+        with temp_dir() as path:
+            run(EXAMPLE_MODULE, output_dir=path)
+            with chdir(path):
+                self._basic_html_assertions([file.replace('.html', '.md')
+                                             for file in self.PUBLIC_FILES])
+
 
 class ApiTest(unittest.TestCase):
     """

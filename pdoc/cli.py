@@ -6,6 +6,7 @@ import importlib
 import inspect
 import os
 import os.path as path
+import re
 import sys
 import warnings
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -77,8 +78,7 @@ aa(
     "-o", "--output-dir",
     type=str,
     metavar='DIR',
-    default='html',
-    help="The directory to output generated HTML/text files to "
+    help="The directory to output generated HTML/markdown files to "
          "(default: ./html for --html).",
 )
 aa(
@@ -270,15 +270,15 @@ class WebDoc(BaseHTTPRequestHandler):
         return pth.replace('/', '.')
 
 
-def module_html_path(m: pdoc.Module):
-    return path.join(args.output_dir, *m.url().split('/'))
+def module_path(m: pdoc.Module, ext: str):
+    return path.join(args.output_dir, *re.sub(r'\.html$', ext, m.url()).split('/'))
 
 
-def _quit_if_exists(m: pdoc.Module):
+def _quit_if_exists(m: pdoc.Module, ext: str):
     if args.force:
         return
 
-    paths = [module_html_path(m)]
+    paths = [module_path(m, ext)]
     if m.is_package:  # If package, make sure the dir doesn't exist either
         paths.append(path.dirname(paths[0]))
 
@@ -289,8 +289,8 @@ def _quit_if_exists(m: pdoc.Module):
             sys.exit(1)
 
 
-def write_html_files(m: pdoc.Module, **kwargs):
-    f = module_html_path(m)
+def write_files(m: pdoc.Module, ext: str, **kwargs):
+    f = module_path(m, ext=ext)
 
     dirpath = path.dirname(f)
     if not os.access(dirpath, os.R_OK):
@@ -298,7 +298,9 @@ def write_html_files(m: pdoc.Module, **kwargs):
 
     try:
         with open(f, 'w+', encoding='utf-8') as w:
-            w.write(m.html(**kwargs))
+            method = {'.html': m.html,
+                      '.md': m.text}[ext]
+            w.write(method(**kwargs))
     except Exception:
         try:
             os.unlink(f)
@@ -307,7 +309,7 @@ def write_html_files(m: pdoc.Module, **kwargs):
         raise
 
     for submodule in m.submodules():
-        write_html_files(submodule, **kwargs)
+        write_files(submodule, ext=ext, **kwargs)
 
 
 def _flatten_submodules(modules: Sequence[pdoc.Module]):
@@ -341,6 +343,9 @@ def main(_args=None):
 
     if args.close_stdin:
         sys.stdin.close()
+
+    if (args.html or args.http) and not args.output_dir:
+        args.output_dir = 'html'
 
     if args.html_dir:
         _warn_deprecated('--html-dir', '--output-dir')
@@ -448,8 +453,11 @@ or similar, at your own discretion.""",
 
     for module in modules:
         if args.html:
-            _quit_if_exists(module)
-            write_html_files(module, **template_config)
+            _quit_if_exists(module, ext='.html')
+            write_files(module, ext='.html', **template_config)
+        elif args.output_dir:  # Generate text files
+            _quit_if_exists(module, ext='.md')
+            write_files(module, ext='.md', **template_config)
         else:
             sys.stdout.write(module.text(**template_config))
             # Two blank lines between two modules' texts
