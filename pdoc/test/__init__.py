@@ -960,6 +960,8 @@ x =</p>'''
     def test_urls(self):
         text = """Beautiful Soup
 http://www.foo.bar
+http://www.foo.bar?q="foo"
+<a href="https://travis-ci.org/cs01/pygdbmi"><img src="https://foo" /></a>
 <https://foo.bar>
 
 Work [like this](http://foo/) and [like that].
@@ -969,6 +971,8 @@ Work [like this](http://foo/) and [like that].
 data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"""
         expected = """<p>Beautiful Soup
 <a href="http://www.foo.bar">http://www.foo.bar</a>
+<a href="http://www.foo.bar?q=&quot;foo&quot;">http://www.foo.bar?q="foo"</a>
+<a href="https://travis-ci.org/cs01/pygdbmi"><img src="https://foo" /></a>
 <a href="https://foo.bar">https://foo.bar</a></p>
 <p>Work <a href="http://foo/">like this</a> and <a href="ftp://bar">like that</a>.</p>
 <p>data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D</p>"""

@@ -279,7 +279,7 @@ class _ToMarkdown:
     @staticmethod
     def raw_urls(text):
         """Wrap URLs in Python-Markdown-compatible <angle brackets>."""
-        return re.sub(r'(?<!<)(\s*)((?:http|ftp)s?://[^>)\s]+)(\s*)(?!>)', r'\1<\2>\3', text)
+        return re.sub(r'(?<![<"\'])(\s*)((?:http|ftp)s?://[^>)\s]+)(\s*)', r'\1<\2>\3', text)
 
 
 def to_html(text: str, docformat: str = 'numpy,google', *,
