@@ -110,6 +110,9 @@ class Docformats:
         """
         Summary line.
 
+        **Documentation**: https://pdoc3.github.io/pdoc/doc/pdoc/
+        **Source Code**: https://github.com/pdoc3/
+
         Parameters
         ----------
         x1, x2 : array_like

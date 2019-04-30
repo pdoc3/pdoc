@@ -145,7 +145,7 @@ class _ToMarkdown:
     def numpy(text,
               # All kinds of numpydoc Parameters (optionally with types; descriptions)
               _params=partial(
-                  re.compile(r'^([\w*]+(?:, [\w*]+)*)(?: ?: (.*)(?<!\.)$)?'
+                  re.compile(r'^(\*{0,2}\w+(?:, \*{0,2}\w+)*)(?: ?: (.*)(?<!\.)$)?'
                              r'((?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
                   _numpy_params.__func__),
               _seealso=partial(

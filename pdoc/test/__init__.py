@@ -780,6 +780,8 @@ class Docformats(unittest.TestCase):
 
     def test_numpy(self):
         expected = '''<p>Summary line.</p>
+<p><strong>Documentation</strong>: <a href="https://pdoc3.github.io/pdoc/doc/pdoc/">https://pdoc3.github.io/pdoc/doc/pdoc/</a>
+<strong>Source Code</strong>: <a href="https://github.com/pdoc3/">https://github.com/pdoc3/</a></p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>x1</code></strong>, <strong><code>x2</code></strong> :&ensp;<code>array_like</code></dt>
