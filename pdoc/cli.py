@@ -17,6 +17,7 @@ import pdoc
 
 parser = argparse.ArgumentParser(
     description="Automatically generate API docs for Python modules.",
+    epilog="Further documentation is available at <https://pdoc3.github.io/pdoc/doc>.",
 )
 aa = parser.add_argument
 mode_aa = parser.add_mutually_exclusive_group().add_argument
