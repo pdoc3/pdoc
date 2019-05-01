@@ -17,8 +17,8 @@ variables is found by examining objects' abstract syntax trees.
     affect the current environment.
 
 
-What objects are documented?
-----------------------------
+## What objects are documented?
+
 `pdoc` only extracts _public API_ documentation.[^public]
 All objects (modules, functions, classes, variables) are only
 considered public if their _identifiers don't begin with an
@@ -49,8 +49,8 @@ By transitivity, sub-objects of non-public objects
 are not public and thus not documented.
 
 
-Where does `pdoc` get documentation from?
------------------------------------------
+## Where does `pdoc` get documentation from?
+
 In Python, objects like modules, functions, classes, and methods
 have a special attribute `__doc__` which contains that object's
 documentation string ([docstring][docstrings]).
@@ -140,8 +140,8 @@ Class and instance variables can also [inherit docstrings].
 [inherit docstrings]: #docstrings-inheritance
 
 
-Overriding docstrings with `__pdoc__`
--------------------------------------
+## Overriding docstrings with `__pdoc__`
+
 Docstrings for objects can be disabled or overridden with a special
 module-level dictionary `__pdoc__`. The _keys_
 should be string identifiers within the scope of the module or,
@@ -173,8 +173,8 @@ attaching a docstring to something. A good example of this is a
     of a module or in the definition of a class.
 
 
-Supported docstring formats
----------------------------
+## Supported docstring formats
+
 Currently, pure Markdown (with [extensions]), [numpydoc],
 and [Google-style] docstrings formats are supported,
 along with some reST directives.
@@ -203,8 +203,8 @@ The following reST directives should work:
 [include]: http://docutils.sourceforge.net/docs/ref/rst/directives.html#including-an-external-document-fragment
 
 
-Linking to other identifiers
-----------------------------
+## Linking to other identifiers
+
 In your documentation, you may refer to other identifiers in
 your modules. When exporting to HTML, linking is automatically
 done whenever you surround an identifier with [backticks] ( \` ).
@@ -215,8 +215,8 @@ The identifier name must be fully qualified, for example
 [backticks]: https://en.wikipedia.org/wiki/Grave_accent#Use_in_programming
 
 
-Command-line interface
-----------------------
+## Command-line interface
+
 [cmd]: #command-line-interface
 `pdoc` includes a feature-rich "binary" program for producing
 HTML and plain text documentation of your modules.
@@ -244,8 +244,8 @@ For brief usage instructions, type:
     $ pdoc --help
 
 
-Programmatic usage
-------------------
+## Programmatic usage
+
 The main entry point is `pdoc.Module` which wraps a module object
 and recursively imports and wraps any submodules and their members.
 
@@ -283,8 +283,8 @@ For importing arbitrary modules/files, use `pdoc.import_module`.
 Alternatively, use the [runnable script][cmd] included with this package.
 
 
-Custom templates
-----------------
+## Custom templates
+
 To override the built-in HTML/CSS and plain text templates, copy
 the relevant templates from `pdoc/templates` directory into a directory
 of your choosing and edit them. When you run [pdoc command][cmd]
@@ -308,23 +308,23 @@ modified templates into the `directories` list of the
 `pdoc.tpl_lookup` object.
 
 
-Compatibility
--------------
+## Compatibility
+
 `pdoc` requires Python 3.5+.
 The last version to support Python 2.x is [pdoc3 0.3.x].
 
 [pdoc3 0.3.x]: https://pypi.org/project/pdoc3/0.3.11/
 
 
-Contributing
-------------
+## Contributing
+
 `pdoc` is [on GitHub]. Bug reports and pull requests are welcome.
 
 [on GitHub]: https://github.com/pdoc3/pdoc
 
 
-License
--------
+## License
+
 `pdoc` is licensed under the terms of GNU [AGPL-3.0]{: rel=license} or later,
 meaning you can use it for any reasonable purpose and remain in
 complete ownership of all the documentation you produce,
