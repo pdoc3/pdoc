@@ -31,7 +31,12 @@ ${('#' * level) + ' ' + string + id}
 </%def>
 
 <%def name="funcdef(f)">
-> `${f.funcdef()} ${f.name}(${', '.join(f.params(annotate=show_type_annotations))})`
+    <%
+        returns = show_type_annotations and f.return_annotation() or ''
+        if returns:
+            returns = ' -> ' + returns
+    %>
+> `${f.funcdef()} ${f.name}(${', '.join(f.params(annotate=show_type_annotations))})${returns}`
 </%def>
 
 <%def name="classdef(c)">
