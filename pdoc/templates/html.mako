@@ -90,7 +90,7 @@
             params = ', '.join(f.params(annotate=show_type_annotations, link=link))
             returns = show_type_annotations and f.return_annotation(link=link) or ''
             if returns:
-                returns = ' \u2192\xA0' + returns
+                returns = ' ->\xA0' + returns
         %>
         <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${params})${returns}</span>
     </code></dt>
