@@ -22,7 +22,7 @@ What objects are documented?
 `pdoc` only extracts _public API_ documentation.[^public]
 All objects (modules, functions, classes, variables) are only
 considered public if their _identifiers don't begin with an
-underscore_ ( \\_ ).[^private]
+underscore_ ( \_ ).[^private]
 
 [^public]:
     Here, public API refers to the API that is made available
@@ -58,7 +58,7 @@ For example, the following code defines a function with a docstring
 and shows how to access its contents:
 
     >>> def test():
-    ...     \"""This is a docstring.\"""
+    ...     """This is a docstring."""
     ...     pass
     ...
     >>> test.__doc__
@@ -85,7 +85,7 @@ Consider the following code example:
 
     >>> class A:
     ...     def test(self):
-    ...         \"""Docstring for A.\"""
+    ...         """Docstring for A."""
     ...         pass
     ...
     >>> class B(A):
@@ -117,15 +117,15 @@ For example:
 [PEP-224]: http://www.python.org/dev/peps/pep-0224
 
     module_variable = 1
-    \"""Docstring for module_variable.\"""
+    """Docstring for module_variable."""
 
     class C:
         class_variable = 2
-        \"""Docstring for class_variable.\"""
+        """Docstring for class_variable."""
 
         def __init__(self):
             self.variable = 3
-            \"""Docstring for instance variable.\"""
+            """Docstring for instance variable."""
 
 While the resulting variables have no `__doc__` attribute,
 `pdoc` compensates by reading the source code (when available)
@@ -207,10 +207,10 @@ Linking to other identifiers
 ----------------------------
 In your documentation, you may refer to other identifiers in
 your modules. When exporting to HTML, linking is automatically
-done whenever you surround an identifier with [backticks] ( \\` ).
+done whenever you surround an identifier with [backticks] ( \` ).
 The identifier name must be fully qualified, for example
-<code>\\`pdoc.Doc.docstring\\`</code> is correct (and will link to
-`pdoc.Doc.docstring`) while <code>\\`Doc.docstring\\`</code> is _not_.
+<code>\`pdoc.Doc.docstring\`</code> is correct (and will link to
+`pdoc.Doc.docstring`) while <code>\`Doc.docstring\`</code> is _not_.
 
 [backticks]: https://en.wikipedia.org/wiki/Grave_accent#Use_in_programming
 
