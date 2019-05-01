@@ -200,8 +200,7 @@ The following reST directives should work:
 
 [admonitions]: http://docutils.sourceforge.net/docs/ref/rst/directives.html#admonitions
 [image]: http://docutils.sourceforge.net/docs/ref/rst/directives.html#images
-[include]: \
-http://docutils.sourceforge.net/docs/ref/rst/directives.html#including-an-external-document-fragment
+[include]: http://docutils.sourceforge.net/docs/ref/rst/directives.html#including-an-external-document-fragment
 
 
 Linking to other identifiers
