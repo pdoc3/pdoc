@@ -21,7 +21,7 @@ rm -r "$BUILDROOT" 2>/dev/null || true
 pushd "$DOCROOT/.." >/dev/null
 pdoc3 --html \
      ${IS_RELEASE+--template-dir "$DOCROOT/pdoc_template"} \
-     --html-dir "$BUILDROOT" \
+     --output-dir "$BUILDROOT" \
      pdoc
 popd >/dev/null
 
