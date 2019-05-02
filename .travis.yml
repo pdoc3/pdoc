@@ -19,6 +19,7 @@ matrix:
       before_script:
         - pip install flake8 coverage mypy
       script:
+        - find -name '*.md' | xargs .github/lint-markdown.sh
         - flake8
         - mypy pdoc
         - time catchsegv coverage run setup.py test
