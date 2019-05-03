@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" itemscope itemtype="https://schema.org/SoftwareApplication">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <meta name="description" content="Auto-generate API documentation for Python projects from docstrings in numpydoc, Google, or plain Markdown format.">
+    <meta name="description" content="Auto-generate API documentation for Python projects from docstrings in numpydoc, Google, or plain Markdown format." itemprop="description">
     <meta name="keywords" content="python, documentation, generator, api, docstrings, numpydoc, markdown">
     <title>pdoc – Auto-generate API documentation for Python projects</title>
 
@@ -19,8 +19,16 @@
     </style>
     <style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
 
-    <link rel="icon" type="image/png" href="logo.png" sizes="512x512">
-    <link rel="canonical home" href="https://pdoc3.github.io/pdoc/">
+    <link rel="icon" type="image/png" href="logo.png" sizes="512x512" itemprop="image">
+    <link rel="canonical home" href="https://pdoc3.github.io/pdoc/" itemprop="url">
+
+    <link href="https://en.wikipedia.org/wiki/Pdoc" itemprop="sameAs">
+    <link href="https://github.com/pdoc3/pdoc" itemprop="sameAs">
+    <link href="https://pypi.org/project/pdoc3/" itemprop="sameAs">
+    <link itemprop="license" href="https://www.gnu.org/licenses/agpl-3.0.html">
+    <meta itemprop="isAccessibleForFree" content="True">
+    <meta itemprop="operatingSystem" content="any">
+    <meta itemprop="applicationCategory" content="DeveloperApplication">
 </head>
 <body>
 
@@ -71,7 +79,8 @@
             </div>
 
             <p>
-                Enter <b>pdoc</b>, the perfect documentation generator for small-to-medium-sized, tidy Python projects.
+                Enter <b itemprop="name">pdoc</b>, the perfect <span itemprop="applicationSubCategory">documentation generator</span>
+                for small-to-medium-sized, tidy Python projects.
                 It generates <b>documentation simply from your project's already-existing public modules' and objects' docstrings</b>,
                 like <cite>sphinx-apidoc</cite> or <cite>sphinx.ext.autodoc</cite>,
                 but without the hassle of these tools.
@@ -80,12 +89,12 @@
             </p>
         </div>
 
-        <div class="columns" style="margin-top:3em">
+        <div class="columns" style="margin-top:3em" itemprop="featureList">
             <ul class="column">
                 <li class="media">
                     <div class="media-left"><span class="icon is-medium"><i class="fab fa-2x fa-python"></i></span></div>
                     <div class="media-content">
-                        <p><b>Compatible with Python 3+</b></p>
+                        <p><b>Compatible with <span itemprop="softwareRequirements">Python</span> 3+</b></p>
                         <p>Python 3.5 and up. Best choice for new or forward-looking projects.</p>
                     </div>
                 </li>
@@ -176,7 +185,7 @@
             <div class="column is-narrow has-text-centered buttons">
                 <a class="button is-success is-large"
                    title="pdoc on PyPI" href="https://pypi.org/project/pdoc3/" style="margin-right:.8em;"
-                   data-ga-event-category="PyPI">
+                   itemprop="downloadUrl" data-ga-event-category="PyPI">
                     <span class="icon"><i class="fa fa-download"></i></span>
                     <span>PyPI</span>
                 </a>
@@ -191,9 +200,9 @@
 
         <p class="has-text-centered">
             <span class="is-size-5">*</span>
-            PyPI package <b><a href="https://pypi.org/project/pdoc3/">pdoc3</a></b>.
+            PyPI package <b itemprop="alternateName"><a href="https://pypi.org/project/pdoc3/">pdoc3</a></b>.
             Not to be confused with an older package
-            <a href="https://pypi.org/project/pdoc/" rel="nofollow">pdoc</a>
+            <a href="https://pypi.org/project/pdoc/" rel="nofollow" itemprop="isBasedOn">pdoc</a>
             this package is a fork of. <span class="icon" ><i class="fa fa-code-branch"></i></span>
         </p>
     </div>
@@ -217,7 +226,8 @@
             </div>
             <div class="column is-narrow has-text-centered is-size-3 has-text-centered">produces</div>
             <div class="column is-narrow has-text-centered">
-                <a class="button is-large is-link" title="pdoc documentation" href="doc/pdoc/">
+                <a class="button is-large is-link" title="pdoc documentation" href="doc/pdoc/"
+                   itemprop="softwareHelp mainEntityOfPage">
                     <span class="icon"><i class="fa fa-file-alt"></i></span>
                     <span>Documentation</span>
                 </a>
