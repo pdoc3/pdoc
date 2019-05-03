@@ -162,7 +162,7 @@ def import_module(module, *, reload: bool = False) -> ModuleType:
     @contextmanager
     def _module_path(module):
         from os.path import isfile, isdir, split, abspath, splitext
-        path, module = None, module
+        path, module = '_pdoc_dummy_nonexistent', module
         if isdir(module) or isfile(module) and module.endswith(_SOURCE_SUFFIXES):
             path, module = split(splitext(abspath(module))[0])
         try:
