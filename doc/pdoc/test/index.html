@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.5.4" />
+<meta name="generator" content="pdoc 0.6.0" />
 <title>pdoc.test API documentation</title>
 <meta name="description" content="Unit tests for pdoc package." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.name small{font-weight:normal}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 <style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em}</style>
@@ -20,7 +20,7 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title"><code>pdoc.test</code> module</h1>
+<h1 class="title">Module <code>pdoc.test</code></h1>
 </header>
 <section id="section-intro">
 <p>Unit tests for pdoc package.</p>
@@ -46,6 +46,8 @@ from tempfile import TemporaryDirectory
 from time import sleep
 from unittest.mock import patch
 from urllib.request import urlopen
+
+import typing
 
 import pdoc
 from pdoc.cli import main, parser
@@ -91,7 +93,7 @@ def run(*args, _check=True, **kwargs) -&gt; int:
 @contextmanager
 def run_html(*args, **kwargs):
     with temp_dir() as path:
-        run(*args, html=None, html_dir=path, **kwargs)
+        run(*args, html=None, output_dir=path, **kwargs)
         with chdir(path):
             yield
 
@@ -173,6 +175,7 @@ class CliTest(unittest.TestCase):
             &#39;b=1&#39;,
             &#39;*args&#39;,
             &#39;**kwargs&#39;,
+            &#39;x, y, z, w&#39;,
             &#39;__init__ docstring&#39;,
             &#39;instance_var&#39;,
             &#39;instance var docstring&#39;,
@@ -203,9 +206,9 @@ class CliTest(unittest.TestCase):
                     self._check_files(include_patterns, exclude_patterns)
 
         filenames_files = {
-            (&#39;module.py&#39;,): [EXAMPLE_MODULE, EXAMPLE_MODULE + &#39;/module.html&#39;],
-            (&#39;module.py&#39;, &#39;subpkg2&#39;): [f for f in self.PUBLIC_FILES
-                                       if &#39;module&#39; in f or &#39;subpkg2&#39; in f or f == EXAMPLE_MODULE],
+            (&#39;module.py&#39;,): [&#39;module.html&#39;],
+            (&#39;module.py&#39;, &#39;subpkg2&#39;): [&#39;module.html&#39;, &#39;subpkg2&#39;,
+                                       &#39;subpkg2/index.html&#39;, &#39;subpkg2/module.html&#39;],
         }
         with chdir(TESTS_BASEDIR):
             for filenames, expected_files in filenames_files.items():
@@ -218,19 +221,19 @@ class CliTest(unittest.TestCase):
         with chdir(TESTS_BASEDIR):
             with run_html(EXAMPLE_MODULE + &#39;/module.py&#39;, EXAMPLE_MODULE + &#39;/subpkg2&#39;):
                 self._basic_html_assertions(
-                    [f for f in self.PUBLIC_FILES
-                     if &#39;module&#39; in f or &#39;subpkg2&#39; in f or f == EXAMPLE_MODULE])
+                    [&#39;module.html&#39;, &#39;subpkg2&#39;, &#39;subpkg2/index.html&#39;, &#39;subpkg2/module.html&#39;])
 
     def test_html_identifier(self):
         for package in (&#39;&#39;, &#39;._private&#39;):
             with self.subTest(package=package), \
                  self.assertWarns(UserWarning) as cm:
-                with run_html(EXAMPLE_MODULE + package, filter=&#39;A&#39;, html_no_source=None):
+                with run_html(EXAMPLE_MODULE + package, filter=&#39;A&#39;,
+                              config=&#39;show_source_code=False&#39;):
                     self._check_files([&#39;A&#39;], [&#39;CONST&#39;, &#39;B docstring&#39;])
         self.assertIn(&#39;__pdoc__&#39;, cm.warning.args[0])
 
     def test_html_ref_links(self):
-        with run_html(EXAMPLE_MODULE, html_no_source=None):
+        with run_html(EXAMPLE_MODULE, config=&#39;show_source_code=False&#39;):
             self._check_files(
                 file_pattern=EXAMPLE_MODULE + &#39;/index.html&#39;,
                 include_patterns=[
@@ -240,19 +243,20 @@ class CliTest(unittest.TestCase):
             )
 
     def test_html_no_source(self):
-        with run_html(EXAMPLE_MODULE, html_no_source=None):
+        with self.assertWarns(DeprecationWarning),\
+                run_html(EXAMPLE_MODULE, html_no_source=None):
             self._basic_html_assertions()
             self._check_files(exclude_patterns=[&#39;class=&#34;source&#34;&#39;, &#39;Hidden&#39;])
 
-    def test_overwrite(self):
+    def test_force(self):
         with run_html(EXAMPLE_MODULE):
             with redirect_streams() as (stdout, stderr):
-                returncode = run(EXAMPLE_MODULE, _check=False, html=None, html_dir=os.getcwd())
+                returncode = run(EXAMPLE_MODULE, _check=False, html=None, output_dir=os.getcwd())
                 self.assertNotEqual(returncode, 0)
                 self.assertNotEqual(stderr.getvalue(), &#39;&#39;)
 
             with redirect_streams() as (stdout, stderr):
-                returncode = run(EXAMPLE_MODULE, html=None, overwrite=None, html_dir=os.getcwd())
+                returncode = run(EXAMPLE_MODULE, html=None, force=None, output_dir=os.getcwd())
                 self.assertEqual(returncode, 0)
                 self.assertEqual(stderr.getvalue(), &#39;&#39;)
 
@@ -261,7 +265,8 @@ class CliTest(unittest.TestCase):
             self._basic_html_assertions()
             self._check_files(exclude_patterns=[&#39;&lt;a href=&#34;/sys.version.ext&#34;&#39;])
 
-        with run_html(EXAMPLE_MODULE, external_links=None):
+        with self.assertWarns(DeprecationWarning),\
+                run_html(EXAMPLE_MODULE, external_links=None):
             self._basic_html_assertions()
             self._check_files([&#39;&lt;a title=&#34;sys.version&#34; href=&#34;/sys.version.ext&#34;&#39;])
 
@@ -278,7 +283,8 @@ class CliTest(unittest.TestCase):
             pdoc.tpl_lookup._collection.clear()
 
     def test_link_prefix(self):
-        with run_html(EXAMPLE_MODULE, link_prefix=&#39;/foobar/&#39;):
+        with self.assertWarns(DeprecationWarning),\
+                run_html(EXAMPLE_MODULE, link_prefix=&#39;/foobar/&#39;):
             self._basic_html_assertions()
             self._check_files([&#39;/foobar/&#39; + EXAMPLE_MODULE])
 
@@ -299,6 +305,7 @@ class CliTest(unittest.TestCase):
             &#39;sys.version&#39;,
             &#39;B.CONST docstring&#39;,
             &#39;B.var docstring&#39;,
+            &#39;x, y, z, w&#39;,
             &#39;__init__ docstring&#39;,
             &#39;instance_var&#39;,
             &#39;instance var docstring&#39;,
@@ -340,7 +347,7 @@ class CliTest(unittest.TestCase):
                         run(*(os.path.join(EXAMPLE_MODULE, f) for f in files))
                         out = stdout.getvalue()
                     for f in files:
-                        header = &#39;Module {}.{}&#39;.format(EXAMPLE_MODULE, os.path.splitext(f)[0])
+                        header = &#39;Module {}\n&#39;.format(os.path.splitext(f)[0])
                         self.assertIn(header, out)
 
     def test_text_identifier(self):
@@ -351,6 +358,29 @@ class CliTest(unittest.TestCase):
         self.assertIn(&#39;### Descendants\n\n    * example_pkg.B&#39;, out)
         self.assertNotIn(&#39;CONST&#39;, out)
         self.assertNotIn(&#39;B docstring&#39;, out)
+
+    def test_pdf(self):
+        with redirect_streams() as (stdout, stderr):
+            run(&#39;pdoc&#39;, pdf=None)
+            out = stdout.getvalue()
+            err = stderr.getvalue()
+        self.assertIn(&#39;pdoc3.github.io&#39;, out)
+        self.assertIn(&#39;pandoc&#39;, err)
+
+        self.assertIn(str(inspect.signature(pdoc.Doc.__init__)).replace(&#39;self, &#39;, &#39;&#39;),
+                      out)
+
+    def test_config(self):
+        with run_html(EXAMPLE_MODULE, config=&#39;link_prefix=&#34;/foobar/&#34;&#39;):
+            self._basic_html_assertions()
+            self._check_files([&#39;/foobar/&#39; + EXAMPLE_MODULE])
+
+    def test_output_text(self):
+        with temp_dir() as path:
+            run(EXAMPLE_MODULE, output_dir=path)
+            with chdir(path):
+                self._basic_html_assertions([file.replace(&#39;.html&#39;, &#39;.md&#39;)
+                                             for file in self.PUBLIC_FILES])
 
 
 class ApiTest(unittest.TestCase):
@@ -363,7 +393,7 @@ class ApiTest(unittest.TestCase):
     def test_module(self):
         modules = {
             EXAMPLE_MODULE: (&#39;&#39;, (&#39;index&#39;, &#39;module&#39;, &#39;subpkg&#39;, &#39;subpkg2&#39;)),
-            os.path.join(EXAMPLE_MODULE, &#39;subpkg2&#39;): (&#39;.subpkg2&#39;, (&#39;subpkg2.module&#39;,)),
+            EXAMPLE_MODULE + &#39;.subpkg2&#39;: (&#39;.subpkg2&#39;, (&#39;subpkg2.module&#39;,)),
         }
         with chdir(TESTS_BASEDIR):
             for module, (name_suffix, submodules) in modules.items():
@@ -375,11 +405,23 @@ class ApiTest(unittest.TestCase):
                                      [EXAMPLE_MODULE + &#39;.&#39; + m for m in submodules])
 
     def test_import_filename(self):
-        old_sys_path = sys.path.copy()
-        sys.path.clear()
-        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
+        with patch.object(sys, &#39;path&#39;, [&#39;&#39;]), \
+             chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
             pdoc.import_module(&#39;index&#39;)
-        sys.path = old_sys_path
+
+    def test_imported_once(self):
+        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
+            pdoc.import_module(&#39;_imported_once.py&#39;)
+
+    def test_namespace(self):
+        # Test the three namespace types
+        # https://packaging.python.org/guides/packaging-namespace-packages/#creating-a-namespace-package
+        for i in range(1, 4):
+            path = os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, &#39;_namespace&#39;, str(i))
+            with patch.object(sys, &#39;path&#39;, [os.path.join(path, &#39;a&#39;),
+                                            os.path.join(path, &#39;b&#39;)]):
+                mod = pdoc.Module(pdoc.import_module(&#39;a.main&#39;))
+                self.assertIn(&#39;D&#39;, mod.doc)
 
     def test_module_allsubmodules(self):
         m = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + &#39;._private&#39;))
@@ -443,12 +485,12 @@ class ApiTest(unittest.TestCase):
             self.assertIn(&#39;A&#39;, mod.doc)
             self.assertNotIn(&#39;B&#39;, mod.doc)
 
-        with patch.object(module, &#39;__pdoc__&#39;, {&#39;B.__init__&#39;: False}):
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;B.f&#39;: False}):
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
             self.assertIn(&#39;B&#39;, mod.doc)
-            self.assertNotIn(&#39;__init__&#39;, mod.doc[&#39;B&#39;].doc)
-            self.assertIsInstance(mod.find_ident(&#39;B.__init__&#39;), pdoc.External)
+            self.assertNotIn(&#39;f&#39;, mod.doc[&#39;B&#39;].doc)
+            self.assertIsInstance(mod.find_ident(&#39;B.f&#39;), pdoc.External)
 
     def test__pdoc__invalid_value(self):
         module = pdoc.import_module(EXAMPLE_MODULE)
@@ -477,6 +519,10 @@ class ApiTest(unittest.TestCase):
         result = mod.find_ident(nonexistent)
         self.assertIsInstance(result, pdoc.External)
         self.assertEqual(result.name, nonexistent)
+
+        # Ref by class __init__
+        mod = pdoc.Module(pdoc)
+        self.assertIs(mod.find_ident(&#39;pdoc.Doc.__init__&#39;).obj, pdoc.Doc)
 
     def test_inherits(self):
         module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
@@ -588,6 +634,66 @@ class ApiTest(unittest.TestCase):
                              lambda a=os.environ: None)
         self.assertEqual(func.params(), [&#39;a=os.environ&#39;])
 
+        # typed
+        def f(a: int, *b, c: typing.List[pdoc.Doc] = []): pass
+        func = pdoc.Function(&#39;f&#39;, mod, f)
+        self.assertEqual(func.params(), [&#39;a&#39;, &#39;*b&#39;, &#34;c=[]&#34;])
+        self.assertEqual(func.params(annotate=True),
+                         [&#39;a:\xA0int&#39;, &#39;*b&#39;, &#34;c:\xA0List[pdoc.Doc]\xA0=\xA0[]&#34;])
+
+        # typed, linked
+        def link(dobj):
+            return &#39;&lt;a href=&#34;{}&#34;&gt;{}&lt;/a&gt;&#39;.format(dobj.url(relative_to=mod), dobj.qualname)
+
+        self.assertEqual(func.params(annotate=True, link=link),
+                         [&#39;a:\xA0int&#39;, &#39;*b&#39;,
+                          &#34;c:\xa0List[&lt;a href=\&#34;#pdoc.Doc\&#34;&gt;Doc&lt;/a&gt;]\xa0=\xa0[]&#34;])
+
+    def test_Function_return_annotation(self):
+        import typing
+
+        def f() -&gt; typing.List[typing.Union[str, pdoc.Doc]]: pass
+        func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc), f)
+        self.assertEqual(func.return_annotation(), &#39;List[Union[str,\xA0pdoc.Doc]]&#39;)
+
+    @ignore_warnings
+    def test_Class_docstring(self):
+        class A:
+            &#34;&#34;&#34;foo&#34;&#34;&#34;
+
+        class B:
+            def __init__(self):
+                &#34;&#34;&#34;foo&#34;&#34;&#34;
+
+        class C:
+            &#34;&#34;&#34;foo&#34;&#34;&#34;
+            def __init__(self):
+                &#34;&#34;&#34;bar&#34;&#34;&#34;
+
+        class D(C):
+            &#34;&#34;&#34;baz&#34;&#34;&#34;
+
+        class E(C):
+            def __init__(self):
+                &#34;&#34;&#34;baz&#34;&#34;&#34;
+
+        self.assertEqual(pdoc.Class(&#39;A&#39;, pdoc.Module(pdoc), A).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;B&#39;, pdoc.Module(pdoc), B).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;C&#39;, pdoc.Module(pdoc), C).docstring, &#34;&#34;&#34;foo\n\nbar&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;D&#39;, pdoc.Module(pdoc), D).docstring, &#34;&#34;&#34;baz\n\nbar&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;E&#39;, pdoc.Module(pdoc), E).docstring, &#34;&#34;&#34;foo\n\nbaz&#34;&#34;&#34;)
+
+    @ignore_warnings
+    def test_Class_params(self):
+        class C:
+            def __init__(self, x):
+                pass
+
+        mod = pdoc.Module(pdoc)
+        self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).params(), [&#39;x&#39;])
+        with patch.dict(mod.obj.__pdoc__, {&#39;C.__init__&#39;: False}):
+            self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).params(), [])
+
     def test_url(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
         pdoc.link_inheritance()
@@ -629,6 +735,11 @@ class ApiTest(unittest.TestCase):
         unsorted_methods = cls.methods(sort=False)
         self.assertNotEqual(sorted_methods, unsorted_methods)
         self.assertEqual(sorted_methods, sorted(unsorted_methods))
+
+    def test_module_init(self):
+        mod = pdoc.Module(pdoc.import_module(&#39;pdoc.__init__&#39;))
+        self.assertEqual(mod.name, &#39;pdoc&#39;)
+        self.assertIn(&#39;Module&#39;, mod.doc)
 
 
 class HtmlHelpersTest(unittest.TestCase):
@@ -699,8 +810,10 @@ class HtmlHelpersTest(unittest.TestCase):
 
 
 class Docformats(unittest.TestCase):
-    _module = pdoc.Module(pdoc)
-    _docmodule = pdoc.import_module(EXAMPLE_MODULE)
+    @classmethod
+    def setUpClass(cls):
+        cls._module = pdoc.Module(pdoc)
+        cls._docmodule = pdoc.import_module(EXAMPLE_MODULE)
 
     @staticmethod
     def _link(dobj, *args, **kwargs):
@@ -708,6 +821,8 @@ class Docformats(unittest.TestCase):
 
     def test_numpy(self):
         expected = &#39;&#39;&#39;&lt;p&gt;Summary line.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Documentation&lt;/strong&gt;: &lt;a href=&#34;https://pdoc3.github.io/pdoc/doc/pdoc/&#34;&gt;https://pdoc3.github.io/pdoc/doc/pdoc/&lt;/a&gt;
+&lt;strong&gt;Source Code&lt;/strong&gt;: &lt;a href=&#34;https://github.com/pdoc3/&#34;&gt;https://github.com/pdoc3/&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&#34;parameters&#34;&gt;Parameters&lt;/h2&gt;
 &lt;dl&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;x1&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;x2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;array_like&lt;/code&gt;&lt;/dt&gt;
@@ -836,7 +951,7 @@ that are relevant to the interface.&lt;/p&gt;
 &lt;div class=&#34;admonition admonition&#34;&gt;
 &lt;p class=&#34;admonition-title&#34;&gt;Example&lt;/p&gt;
 &lt;p&gt;Image shows something.&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;&#34; src=&#34;/logo.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;&#34; src=&#34;https://www.debian.org/logos/openlogo-nd-100.png&#34;&gt;&lt;/p&gt;
 &lt;div class=&#34;admonition note&#34;&gt;
 &lt;p class=&#34;admonition-title&#34;&gt;Note&lt;/p&gt;
 &lt;p&gt;Can only nest admonitions two levels.&lt;/p&gt;
@@ -885,9 +1000,16 @@ x =&lt;/p&gt;&#39;&#39;&#39;
         html = to_html(text, module=mod)
         self.assertEqual(html, expected)
 
+        # Ensure includes are resolved within docstrings already,
+        # e.g. for `pdoc.html_helpers.extract_toc()` to work
+        self.assertIn(&#39;Command-line interface&#39;,
+                      pdoc.Module(pdoc.import_module(pdoc)).docstring)
+
     def test_urls(self):
         text = &#34;&#34;&#34;Beautiful Soup
 http://www.foo.bar
+http://www.foo.bar?q=&#34;foo&#34;
+&lt;a href=&#34;https://travis-ci.org/cs01/pygdbmi&#34;&gt;&lt;img src=&#34;https://foo&#34; /&gt;&lt;/a&gt;
 &lt;https://foo.bar&gt;
 
 Work [like this](http://foo/) and [like that].
@@ -897,6 +1019,8 @@ Work [like this](http://foo/) and [like that].
 data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
         expected = &#34;&#34;&#34;&lt;p&gt;Beautiful Soup
 &lt;a href=&#34;http://www.foo.bar&#34;&gt;http://www.foo.bar&lt;/a&gt;
+&lt;a href=&#34;http://www.foo.bar?q=&amp;quot;foo&amp;quot;&#34;&gt;http://www.foo.bar?q=&#34;foo&#34;&lt;/a&gt;
+&lt;a href=&#34;https://travis-ci.org/cs01/pygdbmi&#34;&gt;&lt;img src=&#34;https://foo&#34; /&gt;&lt;/a&gt;
 &lt;a href=&#34;https://foo.bar&#34;&gt;https://foo.bar&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Work &lt;a href=&#34;http://foo/&#34;&gt;like this&lt;/a&gt; and &lt;a href=&#34;ftp://bar&#34;&gt;like that&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&lt;/p&gt;&#34;&#34;&#34;
@@ -1061,7 +1185,7 @@ def redirect_streams():
 <pre><code class="python">@contextmanager
 def run_html(*args, **kwargs):
     with temp_dir() as path:
-        run(*args, html=None, html_dir=path, **kwargs)
+        run(*args, html=None, output_dir=path, **kwargs)
         with chdir(path):
             yield</code></pre>
 </details>
@@ -1086,10 +1210,13 @@ def temp_dir():
 <dl>
 <dt id="pdoc.test.ApiTest"><code class="flex name class">
 <span>class <span class="ident">ApiTest</span></span>
-<span>(</span><span><small>ancestors:</small> unittest.case.TestCase)</span>
+<span>(</span><span>methodName='runTest')</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Programmatic/API unit tests.</p></section>
+<section class="desc"><p>Programmatic/API unit tests.</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">class ApiTest(unittest.TestCase):
@@ -1102,7 +1229,7 @@ def temp_dir():
     def test_module(self):
         modules = {
             EXAMPLE_MODULE: (&#39;&#39;, (&#39;index&#39;, &#39;module&#39;, &#39;subpkg&#39;, &#39;subpkg2&#39;)),
-            os.path.join(EXAMPLE_MODULE, &#39;subpkg2&#39;): (&#39;.subpkg2&#39;, (&#39;subpkg2.module&#39;,)),
+            EXAMPLE_MODULE + &#39;.subpkg2&#39;: (&#39;.subpkg2&#39;, (&#39;subpkg2.module&#39;,)),
         }
         with chdir(TESTS_BASEDIR):
             for module, (name_suffix, submodules) in modules.items():
@@ -1114,11 +1241,23 @@ def temp_dir():
                                      [EXAMPLE_MODULE + &#39;.&#39; + m for m in submodules])
 
     def test_import_filename(self):
-        old_sys_path = sys.path.copy()
-        sys.path.clear()
-        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
+        with patch.object(sys, &#39;path&#39;, [&#39;&#39;]), \
+             chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
             pdoc.import_module(&#39;index&#39;)
-        sys.path = old_sys_path
+
+    def test_imported_once(self):
+        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
+            pdoc.import_module(&#39;_imported_once.py&#39;)
+
+    def test_namespace(self):
+        # Test the three namespace types
+        # https://packaging.python.org/guides/packaging-namespace-packages/#creating-a-namespace-package
+        for i in range(1, 4):
+            path = os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, &#39;_namespace&#39;, str(i))
+            with patch.object(sys, &#39;path&#39;, [os.path.join(path, &#39;a&#39;),
+                                            os.path.join(path, &#39;b&#39;)]):
+                mod = pdoc.Module(pdoc.import_module(&#39;a.main&#39;))
+                self.assertIn(&#39;D&#39;, mod.doc)
 
     def test_module_allsubmodules(self):
         m = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + &#39;._private&#39;))
@@ -1182,12 +1321,12 @@ def temp_dir():
             self.assertIn(&#39;A&#39;, mod.doc)
             self.assertNotIn(&#39;B&#39;, mod.doc)
 
-        with patch.object(module, &#39;__pdoc__&#39;, {&#39;B.__init__&#39;: False}):
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;B.f&#39;: False}):
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
             self.assertIn(&#39;B&#39;, mod.doc)
-            self.assertNotIn(&#39;__init__&#39;, mod.doc[&#39;B&#39;].doc)
-            self.assertIsInstance(mod.find_ident(&#39;B.__init__&#39;), pdoc.External)
+            self.assertNotIn(&#39;f&#39;, mod.doc[&#39;B&#39;].doc)
+            self.assertIsInstance(mod.find_ident(&#39;B.f&#39;), pdoc.External)
 
     def test__pdoc__invalid_value(self):
         module = pdoc.import_module(EXAMPLE_MODULE)
@@ -1216,6 +1355,10 @@ def temp_dir():
         result = mod.find_ident(nonexistent)
         self.assertIsInstance(result, pdoc.External)
         self.assertEqual(result.name, nonexistent)
+
+        # Ref by class __init__
+        mod = pdoc.Module(pdoc)
+        self.assertIs(mod.find_ident(&#39;pdoc.Doc.__init__&#39;).obj, pdoc.Doc)
 
     def test_inherits(self):
         module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
@@ -1327,6 +1470,66 @@ def temp_dir():
                              lambda a=os.environ: None)
         self.assertEqual(func.params(), [&#39;a=os.environ&#39;])
 
+        # typed
+        def f(a: int, *b, c: typing.List[pdoc.Doc] = []): pass
+        func = pdoc.Function(&#39;f&#39;, mod, f)
+        self.assertEqual(func.params(), [&#39;a&#39;, &#39;*b&#39;, &#34;c=[]&#34;])
+        self.assertEqual(func.params(annotate=True),
+                         [&#39;a:\xA0int&#39;, &#39;*b&#39;, &#34;c:\xA0List[pdoc.Doc]\xA0=\xA0[]&#34;])
+
+        # typed, linked
+        def link(dobj):
+            return &#39;&lt;a href=&#34;{}&#34;&gt;{}&lt;/a&gt;&#39;.format(dobj.url(relative_to=mod), dobj.qualname)
+
+        self.assertEqual(func.params(annotate=True, link=link),
+                         [&#39;a:\xA0int&#39;, &#39;*b&#39;,
+                          &#34;c:\xa0List[&lt;a href=\&#34;#pdoc.Doc\&#34;&gt;Doc&lt;/a&gt;]\xa0=\xa0[]&#34;])
+
+    def test_Function_return_annotation(self):
+        import typing
+
+        def f() -&gt; typing.List[typing.Union[str, pdoc.Doc]]: pass
+        func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc), f)
+        self.assertEqual(func.return_annotation(), &#39;List[Union[str,\xA0pdoc.Doc]]&#39;)
+
+    @ignore_warnings
+    def test_Class_docstring(self):
+        class A:
+            &#34;&#34;&#34;foo&#34;&#34;&#34;
+
+        class B:
+            def __init__(self):
+                &#34;&#34;&#34;foo&#34;&#34;&#34;
+
+        class C:
+            &#34;&#34;&#34;foo&#34;&#34;&#34;
+            def __init__(self):
+                &#34;&#34;&#34;bar&#34;&#34;&#34;
+
+        class D(C):
+            &#34;&#34;&#34;baz&#34;&#34;&#34;
+
+        class E(C):
+            def __init__(self):
+                &#34;&#34;&#34;baz&#34;&#34;&#34;
+
+        self.assertEqual(pdoc.Class(&#39;A&#39;, pdoc.Module(pdoc), A).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;B&#39;, pdoc.Module(pdoc), B).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;C&#39;, pdoc.Module(pdoc), C).docstring, &#34;&#34;&#34;foo\n\nbar&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;D&#39;, pdoc.Module(pdoc), D).docstring, &#34;&#34;&#34;baz\n\nbar&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;E&#39;, pdoc.Module(pdoc), E).docstring, &#34;&#34;&#34;foo\n\nbaz&#34;&#34;&#34;)
+
+    @ignore_warnings
+    def test_Class_params(self):
+        class C:
+            def __init__(self, x):
+                pass
+
+        mod = pdoc.Module(pdoc)
+        self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).params(), [&#39;x&#39;])
+        with patch.dict(mod.obj.__pdoc__, {&#39;C.__init__&#39;: False}):
+            self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).params(), [])
+
     def test_url(self):
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
         pdoc.link_inheritance()
@@ -1367,8 +1570,17 @@ def temp_dir():
         sorted_methods = cls.methods()
         unsorted_methods = cls.methods(sort=False)
         self.assertNotEqual(sorted_methods, unsorted_methods)
-        self.assertEqual(sorted_methods, sorted(unsorted_methods))</code></pre>
+        self.assertEqual(sorted_methods, sorted(unsorted_methods))
+
+    def test_module_init(self):
+        mod = pdoc.Module(pdoc.import_module(&#39;pdoc.__init__&#39;))
+        self.assertEqual(mod.name, &#39;pdoc&#39;)
+        self.assertIn(&#39;Module&#39;, mod.doc)</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="pdoc.test.ApiTest.setUp"><code class="name flex">
@@ -1380,6 +1592,60 @@ def temp_dir():
 <summary>Source code</summary>
 <pre><code class="python">def setUp(self):
     pdoc.reset()</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.ApiTest.test_Class_docstring"><code class="name flex">
+<span>def <span class="ident">test_Class_docstring</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">@ignore_warnings
+def test_Class_docstring(self):
+    class A:
+        &#34;&#34;&#34;foo&#34;&#34;&#34;
+
+    class B:
+        def __init__(self):
+            &#34;&#34;&#34;foo&#34;&#34;&#34;
+
+    class C:
+        &#34;&#34;&#34;foo&#34;&#34;&#34;
+        def __init__(self):
+            &#34;&#34;&#34;bar&#34;&#34;&#34;
+
+    class D(C):
+        &#34;&#34;&#34;baz&#34;&#34;&#34;
+
+    class E(C):
+        def __init__(self):
+            &#34;&#34;&#34;baz&#34;&#34;&#34;
+
+    self.assertEqual(pdoc.Class(&#39;A&#39;, pdoc.Module(pdoc), A).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
+    self.assertEqual(pdoc.Class(&#39;B&#39;, pdoc.Module(pdoc), B).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
+    self.assertEqual(pdoc.Class(&#39;C&#39;, pdoc.Module(pdoc), C).docstring, &#34;&#34;&#34;foo\n\nbar&#34;&#34;&#34;)
+    self.assertEqual(pdoc.Class(&#39;D&#39;, pdoc.Module(pdoc), D).docstring, &#34;&#34;&#34;baz\n\nbar&#34;&#34;&#34;)
+    self.assertEqual(pdoc.Class(&#39;E&#39;, pdoc.Module(pdoc), E).docstring, &#34;&#34;&#34;foo\n\nbaz&#34;&#34;&#34;)</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.ApiTest.test_Class_params"><code class="name flex">
+<span>def <span class="ident">test_Class_params</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">@ignore_warnings
+def test_Class_params(self):
+    class C:
+        def __init__(self, x):
+            pass
+
+    mod = pdoc.Module(pdoc)
+    self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).params(), [&#39;x&#39;])
+    with patch.dict(mod.obj.__pdoc__, {&#39;C.__init__&#39;: False}):
+        self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).params(), [])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_Function_params"><code class="name flex">
@@ -1409,7 +1675,37 @@ def temp_dir():
 
     func = pdoc.Function(&#39;f&#39;, mod,
                          lambda a=os.environ: None)
-    self.assertEqual(func.params(), [&#39;a=os.environ&#39;])</code></pre>
+    self.assertEqual(func.params(), [&#39;a=os.environ&#39;])
+
+    # typed
+    def f(a: int, *b, c: typing.List[pdoc.Doc] = []): pass
+    func = pdoc.Function(&#39;f&#39;, mod, f)
+    self.assertEqual(func.params(), [&#39;a&#39;, &#39;*b&#39;, &#34;c=[]&#34;])
+    self.assertEqual(func.params(annotate=True),
+                     [&#39;a:\xA0int&#39;, &#39;*b&#39;, &#34;c:\xA0List[pdoc.Doc]\xA0=\xA0[]&#34;])
+
+    # typed, linked
+    def link(dobj):
+        return &#39;&lt;a href=&#34;{}&#34;&gt;{}&lt;/a&gt;&#39;.format(dobj.url(relative_to=mod), dobj.qualname)
+
+    self.assertEqual(func.params(annotate=True, link=link),
+                     [&#39;a:\xA0int&#39;, &#39;*b&#39;,
+                      &#34;c:\xa0List[&lt;a href=\&#34;#pdoc.Doc\&#34;&gt;Doc&lt;/a&gt;]\xa0=\xa0[]&#34;])</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.ApiTest.test_Function_return_annotation"><code class="name flex">
+<span>def <span class="ident">test_Function_return_annotation</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def test_Function_return_annotation(self):
+    import typing
+
+    def f() -&gt; typing.List[typing.Union[str, pdoc.Doc]]: pass
+    func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc), f)
+    self.assertEqual(func.return_annotation(), &#39;List[Union[str,\xA0pdoc.Doc]]&#39;)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test__all__"><code class="name flex">
@@ -1443,12 +1739,12 @@ def temp_dir():
         self.assertIn(&#39;A&#39;, mod.doc)
         self.assertNotIn(&#39;B&#39;, mod.doc)
 
-    with patch.object(module, &#39;__pdoc__&#39;, {&#39;B.__init__&#39;: False}):
+    with patch.object(module, &#39;__pdoc__&#39;, {&#39;B.f&#39;: False}):
         mod = pdoc.Module(module)
         pdoc.link_inheritance()
         self.assertIn(&#39;B&#39;, mod.doc)
-        self.assertNotIn(&#39;__init__&#39;, mod.doc[&#39;B&#39;].doc)
-        self.assertIsInstance(mod.find_ident(&#39;B.__init__&#39;), pdoc.External)</code></pre>
+        self.assertNotIn(&#39;f&#39;, mod.doc[&#39;B&#39;].doc)
+        self.assertIsInstance(mod.find_ident(&#39;B.f&#39;), pdoc.External)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test__pdoc__invalid_value"><code class="name flex">
@@ -1523,7 +1819,11 @@ def temp_dir():
     nonexistent = &#39;foo()&#39;
     result = mod.find_ident(nonexistent)
     self.assertIsInstance(result, pdoc.External)
-    self.assertEqual(result.name, nonexistent)</code></pre>
+    self.assertEqual(result.name, nonexistent)
+
+    # Ref by class __init__
+    mod = pdoc.Module(pdoc)
+    self.assertIs(mod.find_ident(&#39;pdoc.Doc.__init__&#39;).obj, pdoc.Doc)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_import_filename"><code class="name flex">
@@ -1534,11 +1834,21 @@ def temp_dir():
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def test_import_filename(self):
-    old_sys_path = sys.path.copy()
-    sys.path.clear()
+    with patch.object(sys, &#39;path&#39;, [&#39;&#39;]), \
+         chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
+        pdoc.import_module(&#39;index&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.ApiTest.test_imported_once"><code class="name flex">
+<span>def <span class="ident">test_imported_once</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def test_imported_once(self):
     with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
-        pdoc.import_module(&#39;index&#39;)
-    sys.path = old_sys_path</code></pre>
+        pdoc.import_module(&#39;_imported_once.py&#39;)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_inherited_members"><code class="name flex">
@@ -1640,7 +1950,7 @@ def temp_dir():
 <pre><code class="python">def test_module(self):
     modules = {
         EXAMPLE_MODULE: (&#39;&#39;, (&#39;index&#39;, &#39;module&#39;, &#39;subpkg&#39;, &#39;subpkg2&#39;)),
-        os.path.join(EXAMPLE_MODULE, &#39;subpkg2&#39;): (&#39;.subpkg2&#39;, (&#39;subpkg2.module&#39;,)),
+        EXAMPLE_MODULE + &#39;.subpkg2&#39;: (&#39;.subpkg2&#39;, (&#39;subpkg2.module&#39;,)),
     }
     with chdir(TESTS_BASEDIR):
         for module, (name_suffix, submodules) in modules.items():
@@ -1663,6 +1973,37 @@ def temp_dir():
     m = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + &#39;._private&#39;))
     self.assertEqual(sorted(m.name for m in m.submodules()),
                      [EXAMPLE_MODULE + &#39;._private.module&#39;])</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.ApiTest.test_module_init"><code class="name flex">
+<span>def <span class="ident">test_module_init</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def test_module_init(self):
+    mod = pdoc.Module(pdoc.import_module(&#39;pdoc.__init__&#39;))
+    self.assertEqual(mod.name, &#39;pdoc&#39;)
+    self.assertIn(&#39;Module&#39;, mod.doc)</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.ApiTest.test_namespace"><code class="name flex">
+<span>def <span class="ident">test_namespace</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def test_namespace(self):
+    # Test the three namespace types
+    # https://packaging.python.org/guides/packaging-namespace-packages/#creating-a-namespace-package
+    for i in range(1, 4):
+        path = os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, &#39;_namespace&#39;, str(i))
+        with patch.object(sys, &#39;path&#39;, [os.path.join(path, &#39;a&#39;),
+                                        os.path.join(path, &#39;b&#39;)]):
+            mod = pdoc.Module(pdoc.import_module(&#39;a.main&#39;))
+            self.assertIn(&#39;D&#39;, mod.doc)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_qualname"><code class="name flex">
@@ -1808,10 +2149,13 @@ def test_subclasses(self):
 </dd>
 <dt id="pdoc.test.CliTest"><code class="flex name class">
 <span>class <span class="ident">CliTest</span></span>
-<span>(</span><span><small>ancestors:</small> unittest.case.TestCase)</span>
+<span>(</span><span>methodName='runTest')</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Command-line interface unit tests.</p></section>
+<section class="desc"><p>Command-line interface unit tests.</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">class CliTest(unittest.TestCase):
@@ -1875,6 +2219,7 @@ def test_subclasses(self):
             &#39;b=1&#39;,
             &#39;*args&#39;,
             &#39;**kwargs&#39;,
+            &#39;x, y, z, w&#39;,
             &#39;__init__ docstring&#39;,
             &#39;instance_var&#39;,
             &#39;instance var docstring&#39;,
@@ -1905,9 +2250,9 @@ def test_subclasses(self):
                     self._check_files(include_patterns, exclude_patterns)
 
         filenames_files = {
-            (&#39;module.py&#39;,): [EXAMPLE_MODULE, EXAMPLE_MODULE + &#39;/module.html&#39;],
-            (&#39;module.py&#39;, &#39;subpkg2&#39;): [f for f in self.PUBLIC_FILES
-                                       if &#39;module&#39; in f or &#39;subpkg2&#39; in f or f == EXAMPLE_MODULE],
+            (&#39;module.py&#39;,): [&#39;module.html&#39;],
+            (&#39;module.py&#39;, &#39;subpkg2&#39;): [&#39;module.html&#39;, &#39;subpkg2&#39;,
+                                       &#39;subpkg2/index.html&#39;, &#39;subpkg2/module.html&#39;],
         }
         with chdir(TESTS_BASEDIR):
             for filenames, expected_files in filenames_files.items():
@@ -1920,19 +2265,19 @@ def test_subclasses(self):
         with chdir(TESTS_BASEDIR):
             with run_html(EXAMPLE_MODULE + &#39;/module.py&#39;, EXAMPLE_MODULE + &#39;/subpkg2&#39;):
                 self._basic_html_assertions(
-                    [f for f in self.PUBLIC_FILES
-                     if &#39;module&#39; in f or &#39;subpkg2&#39; in f or f == EXAMPLE_MODULE])
+                    [&#39;module.html&#39;, &#39;subpkg2&#39;, &#39;subpkg2/index.html&#39;, &#39;subpkg2/module.html&#39;])
 
     def test_html_identifier(self):
         for package in (&#39;&#39;, &#39;._private&#39;):
             with self.subTest(package=package), \
                  self.assertWarns(UserWarning) as cm:
-                with run_html(EXAMPLE_MODULE + package, filter=&#39;A&#39;, html_no_source=None):
+                with run_html(EXAMPLE_MODULE + package, filter=&#39;A&#39;,
+                              config=&#39;show_source_code=False&#39;):
                     self._check_files([&#39;A&#39;], [&#39;CONST&#39;, &#39;B docstring&#39;])
         self.assertIn(&#39;__pdoc__&#39;, cm.warning.args[0])
 
     def test_html_ref_links(self):
-        with run_html(EXAMPLE_MODULE, html_no_source=None):
+        with run_html(EXAMPLE_MODULE, config=&#39;show_source_code=False&#39;):
             self._check_files(
                 file_pattern=EXAMPLE_MODULE + &#39;/index.html&#39;,
                 include_patterns=[
@@ -1942,19 +2287,20 @@ def test_subclasses(self):
             )
 
     def test_html_no_source(self):
-        with run_html(EXAMPLE_MODULE, html_no_source=None):
+        with self.assertWarns(DeprecationWarning),\
+                run_html(EXAMPLE_MODULE, html_no_source=None):
             self._basic_html_assertions()
             self._check_files(exclude_patterns=[&#39;class=&#34;source&#34;&#39;, &#39;Hidden&#39;])
 
-    def test_overwrite(self):
+    def test_force(self):
         with run_html(EXAMPLE_MODULE):
             with redirect_streams() as (stdout, stderr):
-                returncode = run(EXAMPLE_MODULE, _check=False, html=None, html_dir=os.getcwd())
+                returncode = run(EXAMPLE_MODULE, _check=False, html=None, output_dir=os.getcwd())
                 self.assertNotEqual(returncode, 0)
                 self.assertNotEqual(stderr.getvalue(), &#39;&#39;)
 
             with redirect_streams() as (stdout, stderr):
-                returncode = run(EXAMPLE_MODULE, html=None, overwrite=None, html_dir=os.getcwd())
+                returncode = run(EXAMPLE_MODULE, html=None, force=None, output_dir=os.getcwd())
                 self.assertEqual(returncode, 0)
                 self.assertEqual(stderr.getvalue(), &#39;&#39;)
 
@@ -1963,7 +2309,8 @@ def test_subclasses(self):
             self._basic_html_assertions()
             self._check_files(exclude_patterns=[&#39;&lt;a href=&#34;/sys.version.ext&#34;&#39;])
 
-        with run_html(EXAMPLE_MODULE, external_links=None):
+        with self.assertWarns(DeprecationWarning),\
+                run_html(EXAMPLE_MODULE, external_links=None):
             self._basic_html_assertions()
             self._check_files([&#39;&lt;a title=&#34;sys.version&#34; href=&#34;/sys.version.ext&#34;&#39;])
 
@@ -1980,7 +2327,8 @@ def test_subclasses(self):
             pdoc.tpl_lookup._collection.clear()
 
     def test_link_prefix(self):
-        with run_html(EXAMPLE_MODULE, link_prefix=&#39;/foobar/&#39;):
+        with self.assertWarns(DeprecationWarning),\
+                run_html(EXAMPLE_MODULE, link_prefix=&#39;/foobar/&#39;):
             self._basic_html_assertions()
             self._check_files([&#39;/foobar/&#39; + EXAMPLE_MODULE])
 
@@ -2001,6 +2349,7 @@ def test_subclasses(self):
             &#39;sys.version&#39;,
             &#39;B.CONST docstring&#39;,
             &#39;B.var docstring&#39;,
+            &#39;x, y, z, w&#39;,
             &#39;__init__ docstring&#39;,
             &#39;instance_var&#39;,
             &#39;instance var docstring&#39;,
@@ -2042,7 +2391,7 @@ def test_subclasses(self):
                         run(*(os.path.join(EXAMPLE_MODULE, f) for f in files))
                         out = stdout.getvalue()
                     for f in files:
-                        header = &#39;Module {}.{}&#39;.format(EXAMPLE_MODULE, os.path.splitext(f)[0])
+                        header = &#39;Module {}\n&#39;.format(os.path.splitext(f)[0])
                         self.assertIn(header, out)
 
     def test_text_identifier(self):
@@ -2052,8 +2401,35 @@ def test_subclasses(self):
         self.assertIn(&#39;A&#39;, out)
         self.assertIn(&#39;### Descendants\n\n    * example_pkg.B&#39;, out)
         self.assertNotIn(&#39;CONST&#39;, out)
-        self.assertNotIn(&#39;B docstring&#39;, out)</code></pre>
+        self.assertNotIn(&#39;B docstring&#39;, out)
+
+    def test_pdf(self):
+        with redirect_streams() as (stdout, stderr):
+            run(&#39;pdoc&#39;, pdf=None)
+            out = stdout.getvalue()
+            err = stderr.getvalue()
+        self.assertIn(&#39;pdoc3.github.io&#39;, out)
+        self.assertIn(&#39;pandoc&#39;, err)
+
+        self.assertIn(str(inspect.signature(pdoc.Doc.__init__)).replace(&#39;self, &#39;, &#39;&#39;),
+                      out)
+
+    def test_config(self):
+        with run_html(EXAMPLE_MODULE, config=&#39;link_prefix=&#34;/foobar/&#34;&#39;):
+            self._basic_html_assertions()
+            self._check_files([&#39;/foobar/&#39; + EXAMPLE_MODULE])
+
+    def test_output_text(self):
+        with temp_dir() as path:
+            run(EXAMPLE_MODULE, output_dir=path)
+            with chdir(path):
+                self._basic_html_assertions([file.replace(&#39;.html&#39;, &#39;.md&#39;)
+                                             for file in self.PUBLIC_FILES])</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
 <h3>Class variables</h3>
 <dl>
 <dt id="pdoc.test.CliTest.ALL_FILES"><code class="name">var <span class="ident">ALL_FILES</span></code></dt>
@@ -2078,6 +2454,19 @@ def test_subclasses(self):
     pdoc.reset()</code></pre>
 </details>
 </dd>
+<dt id="pdoc.test.CliTest.test_config"><code class="name flex">
+<span>def <span class="ident">test_config</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def test_config(self):
+    with run_html(EXAMPLE_MODULE, config=&#39;link_prefix=&#34;/foobar/&#34;&#39;):
+        self._basic_html_assertions()
+        self._check_files([&#39;/foobar/&#39; + EXAMPLE_MODULE])</code></pre>
+</details>
+</dd>
 <dt id="pdoc.test.CliTest.test_external_links"><code class="name flex">
 <span>def <span class="ident">test_external_links</span></span>(<span>self)</span>
 </code></dt>
@@ -2090,9 +2479,30 @@ def test_subclasses(self):
         self._basic_html_assertions()
         self._check_files(exclude_patterns=[&#39;&lt;a href=&#34;/sys.version.ext&#34;&#39;])
 
-    with run_html(EXAMPLE_MODULE, external_links=None):
+    with self.assertWarns(DeprecationWarning),\
+            run_html(EXAMPLE_MODULE, external_links=None):
         self._basic_html_assertions()
         self._check_files([&#39;&lt;a title=&#34;sys.version&#34; href=&#34;/sys.version.ext&#34;&#39;])</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.CliTest.test_force"><code class="name flex">
+<span>def <span class="ident">test_force</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def test_force(self):
+    with run_html(EXAMPLE_MODULE):
+        with redirect_streams() as (stdout, stderr):
+            returncode = run(EXAMPLE_MODULE, _check=False, html=None, output_dir=os.getcwd())
+            self.assertNotEqual(returncode, 0)
+            self.assertNotEqual(stderr.getvalue(), &#39;&#39;)
+
+        with redirect_streams() as (stdout, stderr):
+            returncode = run(EXAMPLE_MODULE, html=None, force=None, output_dir=os.getcwd())
+            self.assertEqual(returncode, 0)
+            self.assertEqual(stderr.getvalue(), &#39;&#39;)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_html"><code class="name flex">
@@ -2122,6 +2532,7 @@ def test_subclasses(self):
         &#39;b=1&#39;,
         &#39;*args&#39;,
         &#39;**kwargs&#39;,
+        &#39;x, y, z, w&#39;,
         &#39;__init__ docstring&#39;,
         &#39;instance_var&#39;,
         &#39;instance var docstring&#39;,
@@ -2152,9 +2563,9 @@ def test_subclasses(self):
                 self._check_files(include_patterns, exclude_patterns)
 
     filenames_files = {
-        (&#39;module.py&#39;,): [EXAMPLE_MODULE, EXAMPLE_MODULE + &#39;/module.html&#39;],
-        (&#39;module.py&#39;, &#39;subpkg2&#39;): [f for f in self.PUBLIC_FILES
-                                   if &#39;module&#39; in f or &#39;subpkg2&#39; in f or f == EXAMPLE_MODULE],
+        (&#39;module.py&#39;,): [&#39;module.html&#39;],
+        (&#39;module.py&#39;, &#39;subpkg2&#39;): [&#39;module.html&#39;, &#39;subpkg2&#39;,
+                                   &#39;subpkg2/index.html&#39;, &#39;subpkg2/module.html&#39;],
     }
     with chdir(TESTS_BASEDIR):
         for filenames, expected_files in filenames_files.items():
@@ -2175,7 +2586,8 @@ def test_subclasses(self):
     for package in (&#39;&#39;, &#39;._private&#39;):
         with self.subTest(package=package), \
              self.assertWarns(UserWarning) as cm:
-            with run_html(EXAMPLE_MODULE + package, filter=&#39;A&#39;, html_no_source=None):
+            with run_html(EXAMPLE_MODULE + package, filter=&#39;A&#39;,
+                          config=&#39;show_source_code=False&#39;):
                 self._check_files([&#39;A&#39;], [&#39;CONST&#39;, &#39;B docstring&#39;])
     self.assertIn(&#39;__pdoc__&#39;, cm.warning.args[0])</code></pre>
 </details>
@@ -2191,8 +2603,7 @@ def test_subclasses(self):
     with chdir(TESTS_BASEDIR):
         with run_html(EXAMPLE_MODULE + &#39;/module.py&#39;, EXAMPLE_MODULE + &#39;/subpkg2&#39;):
             self._basic_html_assertions(
-                [f for f in self.PUBLIC_FILES
-                 if &#39;module&#39; in f or &#39;subpkg2&#39; in f or f == EXAMPLE_MODULE])</code></pre>
+                [&#39;module.html&#39;, &#39;subpkg2&#39;, &#39;subpkg2/index.html&#39;, &#39;subpkg2/module.html&#39;])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_html_no_source"><code class="name flex">
@@ -2203,7 +2614,8 @@ def test_subclasses(self):
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def test_html_no_source(self):
-    with run_html(EXAMPLE_MODULE, html_no_source=None):
+    with self.assertWarns(DeprecationWarning),\
+            run_html(EXAMPLE_MODULE, html_no_source=None):
         self._basic_html_assertions()
         self._check_files(exclude_patterns=[&#39;class=&#34;source&#34;&#39;, &#39;Hidden&#39;])</code></pre>
 </details>
@@ -2216,7 +2628,7 @@ def test_subclasses(self):
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def test_html_ref_links(self):
-    with run_html(EXAMPLE_MODULE, html_no_source=None):
+    with run_html(EXAMPLE_MODULE, config=&#39;show_source_code=False&#39;):
         self._check_files(
             file_pattern=EXAMPLE_MODULE + &#39;/index.html&#39;,
             include_patterns=[
@@ -2234,29 +2646,44 @@ def test_subclasses(self):
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def test_link_prefix(self):
-    with run_html(EXAMPLE_MODULE, link_prefix=&#39;/foobar/&#39;):
+    with self.assertWarns(DeprecationWarning),\
+            run_html(EXAMPLE_MODULE, link_prefix=&#39;/foobar/&#39;):
         self._basic_html_assertions()
         self._check_files([&#39;/foobar/&#39; + EXAMPLE_MODULE])</code></pre>
 </details>
 </dd>
-<dt id="pdoc.test.CliTest.test_overwrite"><code class="name flex">
-<span>def <span class="ident">test_overwrite</span></span>(<span>self)</span>
+<dt id="pdoc.test.CliTest.test_output_text"><code class="name flex">
+<span>def <span class="ident">test_output_text</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <section class="desc"></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def test_overwrite(self):
-    with run_html(EXAMPLE_MODULE):
-        with redirect_streams() as (stdout, stderr):
-            returncode = run(EXAMPLE_MODULE, _check=False, html=None, html_dir=os.getcwd())
-            self.assertNotEqual(returncode, 0)
-            self.assertNotEqual(stderr.getvalue(), &#39;&#39;)
+<pre><code class="python">def test_output_text(self):
+    with temp_dir() as path:
+        run(EXAMPLE_MODULE, output_dir=path)
+        with chdir(path):
+            self._basic_html_assertions([file.replace(&#39;.html&#39;, &#39;.md&#39;)
+                                         for file in self.PUBLIC_FILES])</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.CliTest.test_pdf"><code class="name flex">
+<span>def <span class="ident">test_pdf</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def test_pdf(self):
+    with redirect_streams() as (stdout, stderr):
+        run(&#39;pdoc&#39;, pdf=None)
+        out = stdout.getvalue()
+        err = stderr.getvalue()
+    self.assertIn(&#39;pdoc3.github.io&#39;, out)
+    self.assertIn(&#39;pandoc&#39;, err)
 
-        with redirect_streams() as (stdout, stderr):
-            returncode = run(EXAMPLE_MODULE, html=None, overwrite=None, html_dir=os.getcwd())
-            self.assertEqual(returncode, 0)
-            self.assertEqual(stderr.getvalue(), &#39;&#39;)</code></pre>
+    self.assertIn(str(inspect.signature(pdoc.Doc.__init__)).replace(&#39;self, &#39;, &#39;&#39;),
+                  out)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_template_dir"><code class="name flex">
@@ -2303,6 +2730,7 @@ def test_subclasses(self):
         &#39;sys.version&#39;,
         &#39;B.CONST docstring&#39;,
         &#39;B.var docstring&#39;,
+        &#39;x, y, z, w&#39;,
         &#39;__init__ docstring&#39;,
         &#39;instance_var&#39;,
         &#39;instance var docstring&#39;,
@@ -2344,7 +2772,7 @@ def test_subclasses(self):
                     run(*(os.path.join(EXAMPLE_MODULE, f) for f in files))
                     out = stdout.getvalue()
                 for f in files:
-                    header = &#39;Module {}.{}&#39;.format(EXAMPLE_MODULE, os.path.splitext(f)[0])
+                    header = &#39;Module {}\n&#39;.format(os.path.splitext(f)[0])
                     self.assertIn(header, out)</code></pre>
 </details>
 </dd>
@@ -2369,7 +2797,7 @@ def test_subclasses(self):
 </dd>
 <dt id="pdoc.test.Docformats"><code class="flex name class">
 <span>class <span class="ident">Docformats</span></span>
-<span>(</span><span><small>ancestors:</small> unittest.case.TestCase)</span>
+<span>(</span><span>methodName='runTest')</span>
 </code></dt>
 <dd>
 <section class="desc"><p>A class whose instances are single test cases.</p>
@@ -2396,12 +2824,17 @@ objects used in assert methods) will be printed on failure in <em>addition</em>
 to any explicit message passed.
 * maxDiff: sets the maximum length of a diff in failure messages
 by assert methods using difflib. It is looked up as an instance
-attribute so can be configured by individual tests if required.</p></section>
+attribute so can be configured by individual tests if required.</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">class Docformats(unittest.TestCase):
-    _module = pdoc.Module(pdoc)
-    _docmodule = pdoc.import_module(EXAMPLE_MODULE)
+    @classmethod
+    def setUpClass(cls):
+        cls._module = pdoc.Module(pdoc)
+        cls._docmodule = pdoc.import_module(EXAMPLE_MODULE)
 
     @staticmethod
     def _link(dobj, *args, **kwargs):
@@ -2409,6 +2842,8 @@ attribute so can be configured by individual tests if required.</p></section>
 
     def test_numpy(self):
         expected = &#39;&#39;&#39;&lt;p&gt;Summary line.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Documentation&lt;/strong&gt;: &lt;a href=&#34;https://pdoc3.github.io/pdoc/doc/pdoc/&#34;&gt;https://pdoc3.github.io/pdoc/doc/pdoc/&lt;/a&gt;
+&lt;strong&gt;Source Code&lt;/strong&gt;: &lt;a href=&#34;https://github.com/pdoc3/&#34;&gt;https://github.com/pdoc3/&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&#34;parameters&#34;&gt;Parameters&lt;/h2&gt;
 &lt;dl&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;x1&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;x2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;array_like&lt;/code&gt;&lt;/dt&gt;
@@ -2537,7 +2972,7 @@ that are relevant to the interface.&lt;/p&gt;
 &lt;div class=&#34;admonition admonition&#34;&gt;
 &lt;p class=&#34;admonition-title&#34;&gt;Example&lt;/p&gt;
 &lt;p&gt;Image shows something.&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;&#34; src=&#34;/logo.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;&#34; src=&#34;https://www.debian.org/logos/openlogo-nd-100.png&#34;&gt;&lt;/p&gt;
 &lt;div class=&#34;admonition note&#34;&gt;
 &lt;p class=&#34;admonition-title&#34;&gt;Note&lt;/p&gt;
 &lt;p&gt;Can only nest admonitions two levels.&lt;/p&gt;
@@ -2586,9 +3021,16 @@ x =&lt;/p&gt;&#39;&#39;&#39;
         html = to_html(text, module=mod)
         self.assertEqual(html, expected)
 
+        # Ensure includes are resolved within docstrings already,
+        # e.g. for `pdoc.html_helpers.extract_toc()` to work
+        self.assertIn(&#39;Command-line interface&#39;,
+                      pdoc.Module(pdoc.import_module(pdoc)).docstring)
+
     def test_urls(self):
         text = &#34;&#34;&#34;Beautiful Soup
 http://www.foo.bar
+http://www.foo.bar?q=&#34;foo&#34;
+&lt;a href=&#34;https://travis-ci.org/cs01/pygdbmi&#34;&gt;&lt;img src=&#34;https://foo&#34; /&gt;&lt;/a&gt;
 &lt;https://foo.bar&gt;
 
 Work [like this](http://foo/) and [like that].
@@ -2598,12 +3040,34 @@ Work [like this](http://foo/) and [like that].
 data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
         expected = &#34;&#34;&#34;&lt;p&gt;Beautiful Soup
 &lt;a href=&#34;http://www.foo.bar&#34;&gt;http://www.foo.bar&lt;/a&gt;
+&lt;a href=&#34;http://www.foo.bar?q=&amp;quot;foo&amp;quot;&#34;&gt;http://www.foo.bar?q=&#34;foo&#34;&lt;/a&gt;
+&lt;a href=&#34;https://travis-ci.org/cs01/pygdbmi&#34;&gt;&lt;img src=&#34;https://foo&#34; /&gt;&lt;/a&gt;
 &lt;a href=&#34;https://foo.bar&#34;&gt;https://foo.bar&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Work &lt;a href=&#34;http://foo/&#34;&gt;like this&lt;/a&gt; and &lt;a href=&#34;ftp://bar&#34;&gt;like that&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&lt;/p&gt;&#34;&#34;&#34;
         html = to_html(text)
         self.assertEqual(html, expected)</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="pdoc.test.Docformats.setUpClass"><code class="name flex">
+<span>def <span class="ident">setUpClass</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Hook method for setting up class fixture before running tests in the class.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">@classmethod
+def setUpClass(cls):
+    cls._module = pdoc.Module(pdoc)
+    cls._docmodule = pdoc.import_module(EXAMPLE_MODULE)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="pdoc.test.Docformats.test_doctests"><code class="name flex">
@@ -2707,6 +3171,8 @@ that are relevant to the interface.&lt;/p&gt;
 <summary>Source code</summary>
 <pre><code class="python">    def test_numpy(self):
         expected = &#39;&#39;&#39;&lt;p&gt;Summary line.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Documentation&lt;/strong&gt;: &lt;a href=&#34;https://pdoc3.github.io/pdoc/doc/pdoc/&#34;&gt;https://pdoc3.github.io/pdoc/doc/pdoc/&lt;/a&gt;
+&lt;strong&gt;Source Code&lt;/strong&gt;: &lt;a href=&#34;https://github.com/pdoc3/&#34;&gt;https://github.com/pdoc3/&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&#34;parameters&#34;&gt;Parameters&lt;/h2&gt;
 &lt;dl&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;x1&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;x2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;array_like&lt;/code&gt;&lt;/dt&gt;
@@ -2767,7 +3233,7 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;div class=&#34;admonition admonition&#34;&gt;
 &lt;p class=&#34;admonition-title&#34;&gt;Example&lt;/p&gt;
 &lt;p&gt;Image shows something.&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;&#34; src=&#34;/logo.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;&#34; src=&#34;https://www.debian.org/logos/openlogo-nd-100.png&#34;&gt;&lt;/p&gt;
 &lt;div class=&#34;admonition note&#34;&gt;
 &lt;p class=&#34;admonition-title&#34;&gt;Note&lt;/p&gt;
 &lt;p&gt;Can only nest admonitions two levels.&lt;/p&gt;
@@ -2822,7 +3288,12 @@ x =&lt;/p&gt;&#39;&#39;&#39;
             os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, &#39;_reST_include&#39;, &#39;test.py&#39;)))
         text = inspect.getdoc(mod.obj)
         html = to_html(text, module=mod)
-        self.assertEqual(html, expected)</code></pre>
+        self.assertEqual(html, expected)
+
+        # Ensure includes are resolved within docstrings already,
+        # e.g. for `pdoc.html_helpers.extract_toc()` to work
+        self.assertIn(&#39;Command-line interface&#39;,
+                      pdoc.Module(pdoc.import_module(pdoc)).docstring)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.Docformats.test_urls"><code class="name flex">
@@ -2835,6 +3306,8 @@ x =&lt;/p&gt;&#39;&#39;&#39;
 <pre><code class="python">    def test_urls(self):
         text = &#34;&#34;&#34;Beautiful Soup
 http://www.foo.bar
+http://www.foo.bar?q=&#34;foo&#34;
+&lt;a href=&#34;https://travis-ci.org/cs01/pygdbmi&#34;&gt;&lt;img src=&#34;https://foo&#34; /&gt;&lt;/a&gt;
 &lt;https://foo.bar&gt;
 
 Work [like this](http://foo/) and [like that].
@@ -2844,6 +3317,8 @@ Work [like this](http://foo/) and [like that].
 data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
         expected = &#34;&#34;&#34;&lt;p&gt;Beautiful Soup
 &lt;a href=&#34;http://www.foo.bar&#34;&gt;http://www.foo.bar&lt;/a&gt;
+&lt;a href=&#34;http://www.foo.bar?q=&amp;quot;foo&amp;quot;&#34;&gt;http://www.foo.bar?q=&#34;foo&#34;&lt;/a&gt;
+&lt;a href=&#34;https://travis-ci.org/cs01/pygdbmi&#34;&gt;&lt;img src=&#34;https://foo&#34; /&gt;&lt;/a&gt;
 &lt;a href=&#34;https://foo.bar&#34;&gt;https://foo.bar&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Work &lt;a href=&#34;http://foo/&#34;&gt;like this&lt;/a&gt; and &lt;a href=&#34;ftp://bar&#34;&gt;like that&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&lt;/p&gt;&#34;&#34;&#34;
@@ -2855,10 +3330,13 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
 </dd>
 <dt id="pdoc.test.HtmlHelpersTest"><code class="flex name class">
 <span>class <span class="ident">HtmlHelpersTest</span></span>
-<span>(</span><span><small>ancestors:</small> unittest.case.TestCase)</span>
+<span>(</span><span>methodName='runTest')</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Unit tests for helper functions for producing HTML.</p></section>
+<section class="desc"><p>Unit tests for helper functions for producing HTML.</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">class HtmlHelpersTest(unittest.TestCase):
@@ -2927,6 +3405,10 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
         toc = extract_toc(text)
         self.assertEqual(toc, expected)</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="pdoc.test.HtmlHelpersTest.test_extract_toc"><code class="name flex">
@@ -3043,10 +3525,13 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
 </dd>
 <dt id="pdoc.test.HttpTest"><code class="flex name class">
 <span>class <span class="ident">HttpTest</span></span>
-<span>(</span><span><small>ancestors:</small> unittest.case.TestCase)</span>
+<span>(</span><span>methodName='runTest')</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Unit tests for the HTTP server functionality.</p></section>
+<section class="desc"><p>Unit tests for the HTTP server functionality.</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">class HttpTest(unittest.TestCase):
@@ -3111,6 +3596,10 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
                     html = resp.read()
                     self.assertIn(b&#39;&lt;a href=&#34;/_relative_import&#34;&gt;&#39;, html)</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="pdoc.test.HttpTest.test_file"><code class="name flex">
@@ -3194,7 +3683,10 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
 <h4><code><a title="pdoc.test.ApiTest" href="#pdoc.test.ApiTest">ApiTest</a></code></h4>
 <ul class="">
 <li><code><a title="pdoc.test.ApiTest.setUp" href="#pdoc.test.ApiTest.setUp">setUp</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_Class_docstring" href="#pdoc.test.ApiTest.test_Class_docstring">test_Class_docstring</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_Class_params" href="#pdoc.test.ApiTest.test_Class_params">test_Class_params</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_Function_params" href="#pdoc.test.ApiTest.test_Function_params">test_Function_params</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_Function_return_annotation" href="#pdoc.test.ApiTest.test_Function_return_annotation">test_Function_return_annotation</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test__all__" href="#pdoc.test.ApiTest.test__all__">test__all__</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test__pdoc__dict" href="#pdoc.test.ApiTest.test__pdoc__dict">test__pdoc__dict</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test__pdoc__invalid_value" href="#pdoc.test.ApiTest.test__pdoc__invalid_value">test__pdoc__invalid_value</a></code></li>
@@ -3202,12 +3694,15 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
 <li><code><a title="pdoc.test.ApiTest.test_context" href="#pdoc.test.ApiTest.test_context">test_context</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_find_ident" href="#pdoc.test.ApiTest.test_find_ident">test_find_ident</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_import_filename" href="#pdoc.test.ApiTest.test_import_filename">test_import_filename</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_imported_once" href="#pdoc.test.ApiTest.test_imported_once">test_imported_once</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_inherited_members" href="#pdoc.test.ApiTest.test_inherited_members">test_inherited_members</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_inherits" href="#pdoc.test.ApiTest.test_inherits">test_inherits</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_instance_var" href="#pdoc.test.ApiTest.test_instance_var">test_instance_var</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_link_inheritance" href="#pdoc.test.ApiTest.test_link_inheritance">test_link_inheritance</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_module" href="#pdoc.test.ApiTest.test_module">test_module</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_module_allsubmodules" href="#pdoc.test.ApiTest.test_module_allsubmodules">test_module_allsubmodules</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_module_init" href="#pdoc.test.ApiTest.test_module_init">test_module_init</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_namespace" href="#pdoc.test.ApiTest.test_namespace">test_namespace</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_qualname" href="#pdoc.test.ApiTest.test_qualname">test_qualname</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_refname" href="#pdoc.test.ApiTest.test_refname">test_refname</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_sorting" href="#pdoc.test.ApiTest.test_sorting">test_sorting</a></code></li>
@@ -3221,14 +3716,17 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
 <li><code><a title="pdoc.test.CliTest.ALL_FILES" href="#pdoc.test.CliTest.ALL_FILES">ALL_FILES</a></code></li>
 <li><code><a title="pdoc.test.CliTest.PUBLIC_FILES" href="#pdoc.test.CliTest.PUBLIC_FILES">PUBLIC_FILES</a></code></li>
 <li><code><a title="pdoc.test.CliTest.setUp" href="#pdoc.test.CliTest.setUp">setUp</a></code></li>
+<li><code><a title="pdoc.test.CliTest.test_config" href="#pdoc.test.CliTest.test_config">test_config</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_external_links" href="#pdoc.test.CliTest.test_external_links">test_external_links</a></code></li>
+<li><code><a title="pdoc.test.CliTest.test_force" href="#pdoc.test.CliTest.test_force">test_force</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html" href="#pdoc.test.CliTest.test_html">test_html</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html_identifier" href="#pdoc.test.CliTest.test_html_identifier">test_html_identifier</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html_multiple_files" href="#pdoc.test.CliTest.test_html_multiple_files">test_html_multiple_files</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html_no_source" href="#pdoc.test.CliTest.test_html_no_source">test_html_no_source</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html_ref_links" href="#pdoc.test.CliTest.test_html_ref_links">test_html_ref_links</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_link_prefix" href="#pdoc.test.CliTest.test_link_prefix">test_link_prefix</a></code></li>
-<li><code><a title="pdoc.test.CliTest.test_overwrite" href="#pdoc.test.CliTest.test_overwrite">test_overwrite</a></code></li>
+<li><code><a title="pdoc.test.CliTest.test_output_text" href="#pdoc.test.CliTest.test_output_text">test_output_text</a></code></li>
+<li><code><a title="pdoc.test.CliTest.test_pdf" href="#pdoc.test.CliTest.test_pdf">test_pdf</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_template_dir" href="#pdoc.test.CliTest.test_template_dir">test_template_dir</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_text" href="#pdoc.test.CliTest.test_text">test_text</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_text_identifier" href="#pdoc.test.CliTest.test_text_identifier">test_text_identifier</a></code></li>
@@ -3237,6 +3735,7 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
 <li>
 <h4><code><a title="pdoc.test.Docformats" href="#pdoc.test.Docformats">Docformats</a></code></h4>
 <ul class="">
+<li><code><a title="pdoc.test.Docformats.setUpClass" href="#pdoc.test.Docformats.setUpClass">setUpClass</a></code></li>
 <li><code><a title="pdoc.test.Docformats.test_doctests" href="#pdoc.test.Docformats.test_doctests">test_doctests</a></code></li>
 <li><code><a title="pdoc.test.Docformats.test_google" href="#pdoc.test.Docformats.test_google">test_google</a></code></li>
 <li><code><a title="pdoc.test.Docformats.test_numpy" href="#pdoc.test.Docformats.test_numpy">test_numpy</a></code></li>
@@ -3270,7 +3769,7 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.4</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.0</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

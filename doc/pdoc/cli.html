@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.5.4" />
+<meta name="generator" content="pdoc 0.6.0" />
 <title>pdoc.cli API documentation</title>
 <meta name="description" content="pdoc&#39;s CLI interface and helper functions." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.name small{font-weight:normal}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 <style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em}</style>
@@ -20,7 +20,7 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title"><code>pdoc.cli</code> module</h1>
+<h1 class="title">Module <code>pdoc.cli</code></h1>
 </header>
 <section id="section-intro">
 <p>pdoc's CLI interface and helper functions.</p>
@@ -34,16 +34,24 @@ import importlib
 import inspect
 import os
 import os.path as path
+import re
 import sys
+import warnings
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from typing import Sequence
+from warnings import warn
 
 import pdoc
 
 parser = argparse.ArgumentParser(
     description=&#34;Automatically generate API docs for Python modules.&#34;,
+    epilog=&#34;Further documentation is available at &lt;https://pdoc3.github.io/pdoc/doc&gt;.&#34;,
 )
 aa = parser.add_argument
-aa(&#39;--version&#39;, action=&#39;version&#39;, version=&#39;%(prog)s &#39; + pdoc.__version__)
+mode_aa = parser.add_mutually_exclusive_group().add_argument
+
+aa(
+    &#39;--version&#39;, action=&#39;version&#39;, version=&#39;%(prog)s &#39; + pdoc.__version__)
 aa(
     &#34;modules&#34;,
     type=str,
@@ -52,6 +60,16 @@ aa(
     help=&#34;The Python module name. This may be an import path resolvable in &#34;
     &#34;the current environment, or a file path to a Python module or &#34;
     &#34;package.&#34;,
+)
+aa(
+    &#34;-c&#34;, &#34;--config&#34;,
+    type=str,
+    metavar=&#39;OPTION=VALUE&#39;,
+    action=&#39;append&#39;,
+    default=[],
+    help=&#34;Override template options. This is an alternative to using &#34;
+         &#34;a custom config.mako file in --template-dir. This option &#34;
+         &#34;can be specified multiple times.&#34;,
 )
 aa(
     &#34;--filter&#34;,
@@ -63,31 +81,49 @@ aa(
          &#34;will be shown in the output. Search is case sensitive. &#34;
          &#34;Has no effect when --http is set.&#34;,
 )
-aa(&#34;--html&#34;, action=&#34;store_true&#34;, help=&#34;When set, the output will be HTML formatted.&#34;)
+aa(
+    &#34;-f&#34;, &#34;--force&#34;,
+    action=&#34;store_true&#34;,
+    help=&#34;Overwrite any existing generated (--output-dir) files.&#34;,
+)
+mode_aa(
+    &#34;--html&#34;,
+    action=&#34;store_true&#34;,
+    help=&#34;When set, the output will be HTML formatted.&#34;,
+)
+mode_aa(
+    &#34;--pdf&#34;,
+    action=&#34;store_true&#34;,
+    help=&#34;When set, the specified modules will be printed to standard output, &#34;
+         &#34;formatted in Markdown-Extra, compatible with most &#34;
+         &#34;Markdown-(to-HTML-)to-PDF converters.&#34;,
+)
 aa(
     &#34;--html-dir&#34;,
     type=str,
+    help=argparse.SUPPRESS,
+)
+aa(
+    &#34;-o&#34;, &#34;--output-dir&#34;,
+    type=str,
     metavar=&#39;DIR&#39;,
-    default=&#34;html&#34;,
-    help=&#34;The directory to output HTML files to (default: ./html). &#34;
-         &#34;Only in effect when --html is.&#34;,
+    help=&#34;The directory to output generated HTML/markdown files to &#34;
+         &#34;(default: ./html for --html).&#34;,
 )
 aa(
     &#34;--html-no-source&#34;,
     action=&#34;store_true&#34;,
-    help=&#34;When set, source code will not be viewable in the generated HTML. &#34;
-    &#34;This can speed up the time required to document large modules.&#34;,
+    help=argparse.SUPPRESS,
 )
 aa(
     &#34;--overwrite&#34;,
     action=&#34;store_true&#34;,
-    help=&#34;Overwrites any existing HTML files instead of producing an error.&#34;,
+    help=argparse.SUPPRESS,
 )
 aa(
     &#34;--external-links&#34;,
     action=&#34;store_true&#34;,
-    help=&#34;When set, identifiers to external modules are turned into links. &#34;
-         &#34;This is automatically set when --http is.&#34;,
+    help=argparse.SUPPRESS,
 )
 aa(
     &#34;--template-dir&#34;,
@@ -95,18 +131,14 @@ aa(
     metavar=&#39;DIR&#39;,
     default=None,
     help=&#34;Specify a directory containing Mako templates &#34;
-         &#34;(html.mako or text.mako, and any templates they include). &#34;
+         &#34;(html.mako, text.mako, config.mako and/or any templates they include). &#34;
          &#34;Alternatively, put your templates in $XDG_CONFIG_HOME/pdoc and &#34;
          &#34;pdoc will automatically find them.&#34;,
 )
 aa(
     &#34;--link-prefix&#34;,
     type=str,
-    metavar=&#39;STRING&#39;,
-    default=&#34;&#34;,
-    help=&#34;A prefix to use for every link in the generated documentation. &#34;
-         &#34;No link prefix results in all links being relative. &#34;
-         &#34;No effect when combined with --http.&#34;,
+    help=argparse.SUPPRESS,
 )
 aa(
     &#34;--close-stdin&#34;,
@@ -141,6 +173,7 @@ args = argparse.Namespace()
 
 class WebDoc(BaseHTTPRequestHandler):
     args = None  # Set before server instantiated
+    template_config = None
 
     def do_HEAD(self):
         if self.path != &#34;/&#34;:
@@ -162,13 +195,13 @@ class WebDoc(BaseHTTPRequestHandler):
         importlib.invalidate_caches()
         code = 200
         if self.path == &#34;/&#34;:
-            modules = [pdoc.import_module(module)
+            modules = [pdoc.import_module(module, reload=True)
                        for module in self.args.modules]
             modules = sorted((module.__name__, inspect.getdoc(module))
                              for module in modules)
             out = pdoc._render_template(&#39;/html.mako&#39;,
                                         modules=modules,
-                                        link_prefix=self.args.link_prefix)
+                                        **self.template_config)
         elif self.path.endswith(&#34;.ext&#34;):
             # External links are a bit weird. You should view them as a giant
             # hack. Basically, the idea is to &#34;guess&#34; where something lives
@@ -188,7 +221,7 @@ class WebDoc(BaseHTTPRequestHandler):
             if resolved is None:  # Try to generate the HTML...
                 print(&#34;Generating HTML for %s on the fly...&#34; % import_path, file=sys.stderr)
                 try:
-                    out = pdoc.html(import_path.split(&#34;.&#34;)[0])
+                    out = pdoc.html(import_path.split(&#34;.&#34;)[0], **self.template_config)
                 except Exception as e:
                     print(&#39;Error generating docs: {}&#39;.format(e), file=sys.stderr)
                     # All hope is lost.
@@ -230,18 +263,20 @@ class WebDoc(BaseHTTPRequestHandler):
         the source code.
         &#34;&#34;&#34;
         # TODO: pass extra pdoc.html() params
-        return pdoc.html(self.import_path_from_req_url, http_server=True)
+        return pdoc.html(self.import_path_from_req_url,
+                         reload=True, http_server=True, external_links=True,
+                         **self.template_config)
 
     def resolve_ext(self, import_path):
         def exists(p):
-            p = path.join(args.html_dir, p)
+            p = path.join(args.output_dir, p)
             pkg = path.join(p, pdoc._URL_PACKAGE_SUFFIX.lstrip(&#39;/&#39;))
             mod = p + pdoc._URL_MODULE_SUFFIX
 
             if path.isfile(pkg):
-                return pkg[len(args.html_dir):]
+                return pkg[len(args.output_dir):]
             elif path.isfile(mod):
-                return mod[len(args.html_dir):]
+                return mod[len(args.output_dir):]
             return None
 
         parts = import_path.split(&#34;.&#34;)
@@ -265,27 +300,28 @@ class WebDoc(BaseHTTPRequestHandler):
         return pth.replace(&#39;/&#39;, &#39;.&#39;)
 
 
-def module_html_path(m: pdoc.Module):
-    return path.join(args.html_dir, *m.url().split(&#39;/&#39;))
+def module_path(m: pdoc.Module, ext: str):
+    return path.join(args.output_dir, *re.sub(r&#39;\.html$&#39;, ext, m.url()).split(&#39;/&#39;))
 
 
-def _quit_if_exists(m: pdoc.Module):
-    if args.overwrite:
+def _quit_if_exists(m: pdoc.Module, ext: str):
+    if args.force:
         return
 
-    paths = [module_html_path(m)]
+    paths = [module_path(m, ext)]
     if m.is_package:  # If package, make sure the dir doesn&#39;t exist either
         paths.append(path.dirname(paths[0]))
 
     for pth in paths:
         if path.lexists(pth):
-            print(&#34;File &#39;%s&#39; already exists. Delete it or run with --overwrite&#34; % pth,
+            print(&#34;File &#39;%s&#39; already exists. Delete it, or run with --force&#34; % pth,
                   file=sys.stderr)
             sys.exit(1)
 
 
-def write_html_files(m: pdoc.Module):
-    f = module_html_path(m)
+def write_files(m: pdoc.Module, ext: str, **kwargs):
+    assert ext in (&#39;.html&#39;, &#39;.md&#39;)
+    f = module_path(m, ext=ext)
 
     dirpath = path.dirname(f)
     if not os.access(dirpath, os.R_OK):
@@ -293,11 +329,10 @@ def write_html_files(m: pdoc.Module):
 
     try:
         with open(f, &#39;w+&#39;, encoding=&#39;utf-8&#39;) as w:
-            w.write(m.html(
-                external_links=args.external_links,
-                link_prefix=args.link_prefix,
-                source=not args.html_no_source,
-            ))
+            if ext == &#39;.html&#39;:
+                w.write(m.html(**kwargs))
+            elif ext == &#39;.md&#39;:
+                w.write(m.html(**kwargs))
     except Exception:
         try:
             os.unlink(f)
@@ -306,7 +341,29 @@ def write_html_files(m: pdoc.Module):
         raise
 
     for submodule in m.submodules():
-        write_html_files(submodule)
+        write_files(submodule, ext=ext, **kwargs)
+
+
+def _flatten_submodules(modules: Sequence[pdoc.Module]):
+    for module in modules:
+        yield module
+        for submodule in module.submodules():
+            yield from _flatten_submodules((submodule,))
+
+
+def print_pdf(modules, **kwargs):
+    modules = list(_flatten_submodules(modules))
+    print(pdoc._render_template(&#39;/pdf.mako&#39;, modules=modules, **kwargs))
+
+
+def _warn_deprecated(option, alternative=&#39;&#39;, use_config_mako=False):
+    msg = &#39;Program option `{}` is deprecated.&#39;.format(option)
+    if alternative:
+        msg += &#39; Use `&#39; + alternative + &#39;`&#39;
+        if use_config_mako:
+            msg += &#39; or override config.mako template&#39;
+        msg += &#39;.&#39;
+    warn(msg, DeprecationWarning, stacklevel=2)
 
 
 def main(_args=None):
@@ -314,8 +371,36 @@ def main(_args=None):
     global args
     args = _args or parser.parse_args()
 
+    warnings.simplefilter(&#34;once&#34;, DeprecationWarning)
+
     if args.close_stdin:
         sys.stdin.close()
+
+    if (args.html or args.http) and not args.output_dir:
+        args.output_dir = &#39;html&#39;
+
+    if args.html_dir:
+        _warn_deprecated(&#39;--html-dir&#39;, &#39;--output-dir&#39;)
+        args.output_dir = args.html_dir
+    if args.overwrite:
+        _warn_deprecated(&#39;--overwrite&#39;, &#39;--force&#39;)
+        args.force = args.overwrite
+
+    try:
+        template_config = {opt.split(&#39;=&#39;, 1)[0]: eval(opt.split(&#39;=&#39;, 1)[1], {})
+                           for opt in args.config}
+    except Exception as e:
+        raise RuntimeError(&#39;Error evaluating config values {}: {}\n&#39;
+                           &#39;Make sure string values are quoted?&#39;.format(args.config, e))
+    if args.html_no_source:
+        _warn_deprecated(&#39;--html-no-source&#39;, &#39;-c show_source_code=False&#39;, True)
+        template_config[&#39;show_source_code&#39;] = False
+    if args.link_prefix:
+        _warn_deprecated(&#39;--link-prefix&#39;, &#39;-c link_prefix=&#34;foo&#34;&#39;, True)
+        template_config[&#39;link_prefix&#39;] = args.link_prefix
+    if args.external_links:
+        _warn_deprecated(&#39;--external-links&#39;)
+        template_config[&#39;external_links&#39;] = True
 
     if args.template_dir is not None:
         if not path.isdir(args.template_dir):
@@ -328,13 +413,11 @@ def main(_args=None):
     sys.path.append(os.getcwd())
 
     if args.http:
-        args.html = True
-        args.external_links = True
-        args.overwrite = True
-        args.link_prefix = &#34;/&#34;
+        template_config[&#39;link_prefix&#39;] = &#34;/&#34;
 
         # Run the HTTP server.
         WebDoc.args = args  # Pass params to HTTPServer xP
+        WebDoc.template_config = template_config
 
         host, _, port = args.http.partition(&#39;:&#39;)
         host = host or DEFAULT_HOST
@@ -366,12 +449,49 @@ def main(_args=None):
                for module in args.modules]
     pdoc.link_inheritance()
 
+    if args.pdf:
+        print_pdf(modules, **template_config)
+        print(&#34;&#34;&#34;
+PDF-ready markdown written to standard output.
+                              ^^^^^^^^^^^^^^^
+Convert this file to PDF using e.g. Pandoc:
+
+    pandoc --metadata=title:&#34;MyProject Documentation&#34;             \\
+           --toc --toc-depth=4 --from=markdown+abbreviations      \\
+           --pdf-engine=xelatex --variable=mainfont:&#34;DejaVu Sans&#34; \\
+           --output=pdf.pdf pdf.md
+
+or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
+
+    markdown_py --extension=meta         \\
+                --extension=abbr         \\
+                --extension=attr_list    \\
+                --extension=def_list     \\
+                --extension=fenced_code  \\
+                --extension=footnotes    \\
+                --extension=tables       \\
+                --extension=admonition   \\
+                --extension=smarty       \\
+                --extension=toc          \\
+                pdf.md &gt; pdf.html
+
+    chromium --headless --disable-gpu --print-to-pdf=pdf.pdf pdf.html
+
+    wkhtmltopdf -s A4 --print-media-type pdf.html pdf.pdf
+
+or similar, at your own discretion.&#34;&#34;&#34;,
+              file=sys.stderr)
+        sys.exit(0)
+
     for module in modules:
         if args.html:
-            _quit_if_exists(module)
-            write_html_files(module)
+            _quit_if_exists(module, ext=&#39;.html&#39;)
+            write_files(module, ext=&#39;.html&#39;, **template_config)
+        elif args.output_dir:  # Generate text files
+            _quit_if_exists(module, ext=&#39;.md&#39;)
+            write_files(module, ext=&#39;.md&#39;, **template_config)
         else:
-            sys.stdout.write(module.text())
+            sys.stdout.write(module.text(**template_config))
             # Two blank lines between two modules&#39; texts
             sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
 
@@ -399,8 +519,36 @@ if __name__ == &#34;__main__&#34;:
     global args
     args = _args or parser.parse_args()
 
+    warnings.simplefilter(&#34;once&#34;, DeprecationWarning)
+
     if args.close_stdin:
         sys.stdin.close()
+
+    if (args.html or args.http) and not args.output_dir:
+        args.output_dir = &#39;html&#39;
+
+    if args.html_dir:
+        _warn_deprecated(&#39;--html-dir&#39;, &#39;--output-dir&#39;)
+        args.output_dir = args.html_dir
+    if args.overwrite:
+        _warn_deprecated(&#39;--overwrite&#39;, &#39;--force&#39;)
+        args.force = args.overwrite
+
+    try:
+        template_config = {opt.split(&#39;=&#39;, 1)[0]: eval(opt.split(&#39;=&#39;, 1)[1], {})
+                           for opt in args.config}
+    except Exception as e:
+        raise RuntimeError(&#39;Error evaluating config values {}: {}\n&#39;
+                           &#39;Make sure string values are quoted?&#39;.format(args.config, e))
+    if args.html_no_source:
+        _warn_deprecated(&#39;--html-no-source&#39;, &#39;-c show_source_code=False&#39;, True)
+        template_config[&#39;show_source_code&#39;] = False
+    if args.link_prefix:
+        _warn_deprecated(&#39;--link-prefix&#39;, &#39;-c link_prefix=&#34;foo&#34;&#39;, True)
+        template_config[&#39;link_prefix&#39;] = args.link_prefix
+    if args.external_links:
+        _warn_deprecated(&#39;--external-links&#39;)
+        template_config[&#39;external_links&#39;] = True
 
     if args.template_dir is not None:
         if not path.isdir(args.template_dir):
@@ -413,13 +561,11 @@ if __name__ == &#34;__main__&#34;:
     sys.path.append(os.getcwd())
 
     if args.http:
-        args.html = True
-        args.external_links = True
-        args.overwrite = True
-        args.link_prefix = &#34;/&#34;
+        template_config[&#39;link_prefix&#39;] = &#34;/&#34;
 
         # Run the HTTP server.
         WebDoc.args = args  # Pass params to HTTPServer xP
+        WebDoc.template_config = template_config
 
         host, _, port = args.http.partition(&#39;:&#39;)
         host = host or DEFAULT_HOST
@@ -451,36 +597,86 @@ if __name__ == &#34;__main__&#34;:
                for module in args.modules]
     pdoc.link_inheritance()
 
+    if args.pdf:
+        print_pdf(modules, **template_config)
+        print(&#34;&#34;&#34;
+PDF-ready markdown written to standard output.
+                              ^^^^^^^^^^^^^^^
+Convert this file to PDF using e.g. Pandoc:
+
+    pandoc --metadata=title:&#34;MyProject Documentation&#34;             \\
+           --toc --toc-depth=4 --from=markdown+abbreviations      \\
+           --pdf-engine=xelatex --variable=mainfont:&#34;DejaVu Sans&#34; \\
+           --output=pdf.pdf pdf.md
+
+or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
+
+    markdown_py --extension=meta         \\
+                --extension=abbr         \\
+                --extension=attr_list    \\
+                --extension=def_list     \\
+                --extension=fenced_code  \\
+                --extension=footnotes    \\
+                --extension=tables       \\
+                --extension=admonition   \\
+                --extension=smarty       \\
+                --extension=toc          \\
+                pdf.md &gt; pdf.html
+
+    chromium --headless --disable-gpu --print-to-pdf=pdf.pdf pdf.html
+
+    wkhtmltopdf -s A4 --print-media-type pdf.html pdf.pdf
+
+or similar, at your own discretion.&#34;&#34;&#34;,
+              file=sys.stderr)
+        sys.exit(0)
+
     for module in modules:
         if args.html:
-            _quit_if_exists(module)
-            write_html_files(module)
+            _quit_if_exists(module, ext=&#39;.html&#39;)
+            write_files(module, ext=&#39;.html&#39;, **template_config)
+        elif args.output_dir:  # Generate text files
+            _quit_if_exists(module, ext=&#39;.md&#39;)
+            write_files(module, ext=&#39;.md&#39;, **template_config)
         else:
-            sys.stdout.write(module.text())
+            sys.stdout.write(module.text(**template_config))
             # Two blank lines between two modules&#39; texts
             sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))</code></pre>
 </details>
 </dd>
-<dt id="pdoc.cli.module_html_path"><code class="name flex">
-<span>def <span class="ident">module_html_path</span></span>(<span>m)</span>
+<dt id="pdoc.cli.module_path"><code class="name flex">
+<span>def <span class="ident">module_path</span></span>(<span>m, ext)</span>
 </code></dt>
 <dd>
 <section class="desc"></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def module_html_path(m: pdoc.Module):
-    return path.join(args.html_dir, *m.url().split(&#39;/&#39;))</code></pre>
+<pre><code class="python">def module_path(m: pdoc.Module, ext: str):
+    return path.join(args.output_dir, *re.sub(r&#39;\.html$&#39;, ext, m.url()).split(&#39;/&#39;))</code></pre>
 </details>
 </dd>
-<dt id="pdoc.cli.write_html_files"><code class="name flex">
-<span>def <span class="ident">write_html_files</span></span>(<span>m)</span>
+<dt id="pdoc.cli.print_pdf"><code class="name flex">
+<span>def <span class="ident">print_pdf</span></span>(<span>modules, **kwargs)</span>
 </code></dt>
 <dd>
 <section class="desc"></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def write_html_files(m: pdoc.Module):
-    f = module_html_path(m)
+<pre><code class="python">def print_pdf(modules, **kwargs):
+    modules = list(_flatten_submodules(modules))
+    print(pdoc._render_template(&#39;/pdf.mako&#39;, modules=modules, **kwargs))</code></pre>
+</details>
+</dd>
+<dt id="pdoc.cli.write_files"><code class="name flex">
+<span>def <span class="ident">write_files</span></span>(<span>m, ext, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def write_files(m: pdoc.Module, ext: str, **kwargs):
+    assert ext in (&#39;.html&#39;, &#39;.md&#39;)
+    f = module_path(m, ext=ext)
 
     dirpath = path.dirname(f)
     if not os.access(dirpath, os.R_OK):
@@ -488,11 +684,10 @@ if __name__ == &#34;__main__&#34;:
 
     try:
         with open(f, &#39;w+&#39;, encoding=&#39;utf-8&#39;) as w:
-            w.write(m.html(
-                external_links=args.external_links,
-                link_prefix=args.link_prefix,
-                source=not args.html_no_source,
-            ))
+            if ext == &#39;.html&#39;:
+                w.write(m.html(**kwargs))
+            elif ext == &#39;.md&#39;:
+                w.write(m.html(**kwargs))
     except Exception:
         try:
             os.unlink(f)
@@ -501,7 +696,7 @@ if __name__ == &#34;__main__&#34;:
         raise
 
     for submodule in m.submodules():
-        write_html_files(submodule)</code></pre>
+        write_files(submodule, ext=ext, **kwargs)</code></pre>
 </details>
 </dd>
 </dl>
@@ -511,7 +706,7 @@ if __name__ == &#34;__main__&#34;:
 <dl>
 <dt id="pdoc.cli.WebDoc"><code class="flex name class">
 <span>class <span class="ident">WebDoc</span></span>
-<span>(</span><span><small>ancestors:</small> http.server.BaseHTTPRequestHandler, socketserver.StreamRequestHandler, socketserver.BaseRequestHandler)</span>
+<span>(</span><span>request, client_address, server)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>HTTP request handler base class.</p>
@@ -609,6 +804,7 @@ e.g. "text/html" or "text/plain".</p></section>
 <summary>Source code</summary>
 <pre><code class="python">class WebDoc(BaseHTTPRequestHandler):
     args = None  # Set before server instantiated
+    template_config = None
 
     def do_HEAD(self):
         if self.path != &#34;/&#34;:
@@ -630,13 +826,13 @@ e.g. "text/html" or "text/plain".</p></section>
         importlib.invalidate_caches()
         code = 200
         if self.path == &#34;/&#34;:
-            modules = [pdoc.import_module(module)
+            modules = [pdoc.import_module(module, reload=True)
                        for module in self.args.modules]
             modules = sorted((module.__name__, inspect.getdoc(module))
                              for module in modules)
             out = pdoc._render_template(&#39;/html.mako&#39;,
                                         modules=modules,
-                                        link_prefix=self.args.link_prefix)
+                                        **self.template_config)
         elif self.path.endswith(&#34;.ext&#34;):
             # External links are a bit weird. You should view them as a giant
             # hack. Basically, the idea is to &#34;guess&#34; where something lives
@@ -656,7 +852,7 @@ e.g. "text/html" or "text/plain".</p></section>
             if resolved is None:  # Try to generate the HTML...
                 print(&#34;Generating HTML for %s on the fly...&#34; % import_path, file=sys.stderr)
                 try:
-                    out = pdoc.html(import_path.split(&#34;.&#34;)[0])
+                    out = pdoc.html(import_path.split(&#34;.&#34;)[0], **self.template_config)
                 except Exception as e:
                     print(&#39;Error generating docs: {}&#39;.format(e), file=sys.stderr)
                     # All hope is lost.
@@ -698,18 +894,20 @@ e.g. "text/html" or "text/plain".</p></section>
         the source code.
         &#34;&#34;&#34;
         # TODO: pass extra pdoc.html() params
-        return pdoc.html(self.import_path_from_req_url, http_server=True)
+        return pdoc.html(self.import_path_from_req_url,
+                         reload=True, http_server=True, external_links=True,
+                         **self.template_config)
 
     def resolve_ext(self, import_path):
         def exists(p):
-            p = path.join(args.html_dir, p)
+            p = path.join(args.output_dir, p)
             pkg = path.join(p, pdoc._URL_PACKAGE_SUFFIX.lstrip(&#39;/&#39;))
             mod = p + pdoc._URL_MODULE_SUFFIX
 
             if path.isfile(pkg):
-                return pkg[len(args.html_dir):]
+                return pkg[len(args.output_dir):]
             elif path.isfile(mod):
-                return mod[len(args.html_dir):]
+                return mod[len(args.output_dir):]
             return None
 
         parts = import_path.split(&#34;.&#34;)
@@ -732,9 +930,19 @@ e.g. "text/html" or "text/plain".</p></section>
                 break
         return pth.replace(&#39;/&#39;, &#39;.&#39;)</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>http.server.BaseHTTPRequestHandler</li>
+<li>socketserver.StreamRequestHandler</li>
+<li>socketserver.BaseRequestHandler</li>
+</ul>
 <h3>Class variables</h3>
 <dl>
 <dt id="pdoc.cli.WebDoc.args"><code class="name">var <span class="ident">args</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="pdoc.cli.WebDoc.template_config"><code class="name">var <span class="ident">template_config</span></code></dt>
 <dd>
 <section class="desc"></section>
 </dd>
@@ -777,13 +985,13 @@ def import_path_from_req_url(self):
     importlib.invalidate_caches()
     code = 200
     if self.path == &#34;/&#34;:
-        modules = [pdoc.import_module(module)
+        modules = [pdoc.import_module(module, reload=True)
                    for module in self.args.modules]
         modules = sorted((module.__name__, inspect.getdoc(module))
                          for module in modules)
         out = pdoc._render_template(&#39;/html.mako&#39;,
                                     modules=modules,
-                                    link_prefix=self.args.link_prefix)
+                                    **self.template_config)
     elif self.path.endswith(&#34;.ext&#34;):
         # External links are a bit weird. You should view them as a giant
         # hack. Basically, the idea is to &#34;guess&#34; where something lives
@@ -803,7 +1011,7 @@ def import_path_from_req_url(self):
         if resolved is None:  # Try to generate the HTML...
             print(&#34;Generating HTML for %s on the fly...&#34; % import_path, file=sys.stderr)
             try:
-                out = pdoc.html(import_path.split(&#34;.&#34;)[0])
+                out = pdoc.html(import_path.split(&#34;.&#34;)[0], **self.template_config)
             except Exception as e:
                 print(&#39;Error generating docs: {}&#39;.format(e), file=sys.stderr)
                 # All hope is lost.
@@ -879,7 +1087,9 @@ the source code.</p></section>
     the source code.
     &#34;&#34;&#34;
     # TODO: pass extra pdoc.html() params
-    return pdoc.html(self.import_path_from_req_url, http_server=True)</code></pre>
+    return pdoc.html(self.import_path_from_req_url,
+                     reload=True, http_server=True, external_links=True,
+                     **self.template_config)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.cli.WebDoc.redirect"><code class="name flex">
@@ -904,14 +1114,14 @@ the source code.</p></section>
 <summary>Source code</summary>
 <pre><code class="python">def resolve_ext(self, import_path):
     def exists(p):
-        p = path.join(args.html_dir, p)
+        p = path.join(args.output_dir, p)
         pkg = path.join(p, pdoc._URL_PACKAGE_SUFFIX.lstrip(&#39;/&#39;))
         mod = p + pdoc._URL_MODULE_SUFFIX
 
         if path.isfile(pkg):
-            return pkg[len(args.html_dir):]
+            return pkg[len(args.output_dir):]
         elif path.isfile(mod):
-            return mod[len(args.html_dir):]
+            return mod[len(args.output_dir):]
         return None
 
     parts = import_path.split(&#34;.&#34;)
@@ -947,8 +1157,9 @@ the source code.</p></section>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="pdoc.cli.main" href="#pdoc.cli.main">main</a></code></li>
-<li><code><a title="pdoc.cli.module_html_path" href="#pdoc.cli.module_html_path">module_html_path</a></code></li>
-<li><code><a title="pdoc.cli.write_html_files" href="#pdoc.cli.write_html_files">write_html_files</a></code></li>
+<li><code><a title="pdoc.cli.module_path" href="#pdoc.cli.module_path">module_path</a></code></li>
+<li><code><a title="pdoc.cli.print_pdf" href="#pdoc.cli.print_pdf">print_pdf</a></code></li>
+<li><code><a title="pdoc.cli.write_files" href="#pdoc.cli.write_files">write_files</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
@@ -964,6 +1175,7 @@ the source code.</p></section>
 <li><code><a title="pdoc.cli.WebDoc.import_path_from_req_url" href="#pdoc.cli.WebDoc.import_path_from_req_url">import_path_from_req_url</a></code></li>
 <li><code><a title="pdoc.cli.WebDoc.redirect" href="#pdoc.cli.WebDoc.redirect">redirect</a></code></li>
 <li><code><a title="pdoc.cli.WebDoc.resolve_ext" href="#pdoc.cli.WebDoc.resolve_ext">resolve_ext</a></code></li>
+<li><code><a title="pdoc.cli.WebDoc.template_config" href="#pdoc.cli.WebDoc.template_config">template_config</a></code></li>
 </ul>
 </li>
 </ul>
@@ -973,7 +1185,7 @@ the source code.</p></section>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.4</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.0</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
