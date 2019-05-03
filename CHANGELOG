@@ -1,3 +1,27 @@
+0.6.0  (2019-05-03)
+=====
+  - New support for PEP 484 Python type annotations.
+  - Class `__init__` methods are no longer documented separately.
+    Instead, class docstring now contains `__init__` method's docstring,
+    and class definition line now shows `__init__` parameters.
+    This is in line with Sphinx / Python stdlib documentation.
+  - PDF docs generation via Markdown, ingestible by various
+    Markdown-to-PDF converters.
+  - New module import mechanism with improved support for
+    namespace packages.
+  - CLI changes:
+    - New `--config` switch for easier setting of config.mako tunables.
+    - Deprecated switches in favor of new/standard ones:
+      - `--overwrite`  →  `-f, --force`
+      - `--html-dir`   →  `-o, --output-dir`
+      - `--html-no-source`, `--external-links` and `--link-prefix` are
+        removed in favor of new tunables settable with `--config`.
+    - `--output-dir` without `--html` outputs a tree of raw Markdown files.
+    - The semantics of module specified as filesystem path has changed:
+      before the full relative path was used to construct the python module
+      path, now only the basename is.
+  - Bugfixes regarding raw URLs and numpydoc transformations.
+
 0.5.4  (2019-04-21)
 =====
   - Bugfixes:
