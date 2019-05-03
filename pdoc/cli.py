@@ -167,7 +167,7 @@ class WebDoc(BaseHTTPRequestHandler):
         importlib.invalidate_caches()
         code = 200
         if self.path == "/":
-            modules = [pdoc.import_module(module)
+            modules = [pdoc.import_module(module, reload=True)
                        for module in self.args.modules]
             modules = sorted((module.__name__, inspect.getdoc(module))
                              for module in modules)
@@ -236,7 +236,8 @@ class WebDoc(BaseHTTPRequestHandler):
         """
         # TODO: pass extra pdoc.html() params
         return pdoc.html(self.import_path_from_req_url,
-                         http_server=True, external_links=True, **self.template_config)
+                         reload=True, http_server=True, external_links=True,
+                         **self.template_config)
 
     def resolve_ext(self, import_path):
         def exists(p):

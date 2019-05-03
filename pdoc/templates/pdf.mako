@@ -66,7 +66,7 @@ links-as-notes: true
     def to_md(text):
         return _to_md(text, module)
 %>
-${title(1, 'Module `%s`' % module.name, module.refname)}
+${title(1, ('Namespace' if module.is_namespace else 'Module') + ' `%s`' % module.name, module.refname)}
 ${module.docstring | to_md}
 
 % if submodules:

@@ -88,10 +88,11 @@ ${function(m) | indent}
   classes = module.classes()
   functions = module.functions()
   submodules = module.submodules()
+  heading = 'Namespace' if module.is_namespace else 'Module'
 %>
 
-Module ${module.name}
-=======${'=' * len(module.name)}
+${heading} ${module.name}
+=${'=' * (len(module.name) + len(heading))}
 ${module.docstring}
 
 

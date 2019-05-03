@@ -8,14 +8,15 @@ hierarchical APIs.
 .. include:: ./documentation.md
 """
 import ast
+import importlib.machinery
 import importlib.util
 import inspect
 import os
 import os.path as path
-import pkgutil
 import re
 import sys
 import typing
+from contextlib import contextmanager
 from copy import copy
 from functools import lru_cache, reduce, partial
 from itertools import tee, groupby
@@ -36,6 +37,8 @@ except ImportError:
 _URL_MODULE_SUFFIX = '.html'
 _URL_INDEX_MODULE_SUFFIX = '.m.html'  # For modules named literal 'index'
 _URL_PACKAGE_SUFFIX = '/index.html'
+
+_SOURCE_SUFFIXES = tuple(importlib.machinery.SOURCE_SUFFIXES)
 
 T = TypeVar('T', bound='Doc')
 
@@ -120,7 +123,7 @@ def _render_template(template_name, **kwargs):
         raise
 
 
-def html(module_name, docfilter=None, **kwargs) -> str:
+def html(module_name, docfilter=None, reload=False, **kwargs) -> str:
     """
     Returns the documentation for the module `module_name` in HTML
     format. The module must be a module or an importable string.
@@ -130,12 +133,12 @@ def html(module_name, docfilter=None, **kwargs) -> str:
     that takes a single argument (a documentation object) and returns
     `True` or `False`. If `False`, that object will not be documented.
     """
-    mod = Module(import_module(module_name), docfilter=docfilter)
+    mod = Module(import_module(module_name, reload=reload), docfilter=docfilter)
     link_inheritance()
     return mod.html(**kwargs)
 
 
-def text(module_name, docfilter=None, **kwargs) -> str:
+def text(module_name, docfilter=None, reload=False, **kwargs) -> str:
     """
     Returns the documentation for the module `module_name` in plain
     text format suitable for viewing on a terminal.
@@ -146,73 +149,42 @@ def text(module_name, docfilter=None, **kwargs) -> str:
     that takes a single argument (a documentation object) and returns
     `True` or `False`. If `False`, that object will not be documented.
     """
-    mod = Module(import_module(module_name), docfilter=docfilter)
+    mod = Module(import_module(module_name, reload=reload), docfilter=docfilter)
     link_inheritance()
     return mod.text(**kwargs)
 
 
-def import_module(module) -> ModuleType:
+def import_module(module, *, reload: bool = False) -> ModuleType:
     """
     Return module object matching `module` specification (either a python
     module path or a filesystem path to file/directory).
     """
-    if isinstance(module, Module):
-        module = module.module
-    if isinstance(module, str):
+    @contextmanager
+    def _module_path(module):
+        from os.path import isfile, isdir, split, abspath, splitext
+        path, module = '_pdoc_dummy_nonexistent', module
+        if isdir(module) or isfile(module) and module.endswith(_SOURCE_SUFFIXES):
+            path, module = split(splitext(abspath(module))[0])
         try:
-            module = importlib.import_module(module)
-        except ImportError:
-            pass
-        except Exception as e:
-            raise ImportError('Error importing {!r}: {}'.format(module, e))
+            sys.path.insert(0, path)
+            yield module
+        finally:
+            sys.path.remove(path)
 
-    if inspect.ismodule(module):
-        if module.__name__.startswith(__name__):
-            # If this is pdoc itself, return without reloading.
-            # Otherwise most `isinstance(..., pdoc.Doc)` calls won't
-            # work correctly.
-            return module
-        return importlib.reload(module)
+    if isinstance(module, Module):
+        module = module.obj
+    if isinstance(module, str):
+        with _module_path(module) as module_path:
+            try:
+                module = importlib.import_module(module_path)
+            except Exception as e:
+                raise ImportError('Error importing {!r}: {}'.format(module, e))
 
-    # Try to load it as a filename
-    if path.exists(module) and module.endswith('.py'):
-        filename = module
-    elif path.exists(module + '.py'):
-        filename = module + '.py'
-    elif path.exists(path.join(module, '__init__.py')):
-        filename = path.join(module, '__init__.py')
-    else:
-        raise ValueError('File or module {!r} not found'.format(module))
-
-    # If the path is relative, the whole of it is a python module path.
-    # If the path is absolute, only the basename is.
-    module_name = path.splitext(module)[0]
-    if path.isabs(module):
-        module_name = path.basename(module_name)
-    else:
-        module_name = path.splitdrive(module_name)[1]
-    module_name = module_name.replace(path.sep, '.')
-
-    spec = importlib.util.spec_from_file_location(module_name, path.abspath(filename))
-    module = importlib.util.module_from_spec(spec)
-    try:
-        module.__loader__.exec_module(module)
-    except Exception as e:
-        raise ImportError('Error importing {!r}: {}'.format(filename, e))
-
-    # For some reason, `importlib.util.module_from_spec` doesn't add
-    # the module into `sys.modules`, and this later fails when
-    # `inspect.getsource` tries to retrieve the module in AST parsing
-    try:
-        if sys.modules[module_name].__file__ != module.__file__:
-            warn("Module {!r} in sys.modules loaded from {!r}. "
-                 "Now reloaded from {!r}.".format(module_name,
-                                                  sys.modules[module_name].__file__,
-                                                  module.__file__))
-    except KeyError:  # Module not yet in sys.modules
-        pass
-    sys.modules[module_name] = module
-
+    assert inspect.ismodule(module)
+    # If this is pdoc itself, return without reloading. Otherwise later
+    # `isinstance(..., pdoc.Doc)` calls won't work correctly.
+    if reload and not module.__name__.startswith(__name__):
+        module = importlib.reload(module)
     return module
 
 
@@ -238,6 +210,9 @@ def _var_docstrings(doc_obj: Union['Module', 'Class'], *,
     if _init_tree:
         tree = _init_tree  # type: Union[ast.Module, ast.FunctionDef]
     else:
+        # No variables in namespace packages
+        if isinstance(doc_obj, Module) and doc_obj.is_namespace:
+            return {}
         try:
             tree = ast.parse(inspect.getsource(doc_obj.obj))  # type: ignore
         except (OSError, TypeError, SyntaxError):
@@ -595,8 +570,22 @@ class Module(Doc):
 
         # If the module is a package, scan the directory for submodules
         if self.is_package:
-            loc = getattr(self.module, "__path__", [path.dirname(self.obj.__file__)])
-            for _, root, _ in pkgutil.iter_modules(loc):
+
+            def iter_modules(paths):
+                """
+                Custom implementation of `pkgutil.iter_modules()`
+                because that one doesn't play well with namespace packages.
+                See: https://github.com/pypa/setuptools/issues/83
+                """
+                from os.path import isdir, join, splitext
+                for pth in paths:
+                    for file in os.listdir(pth):
+                        if file.startswith(('.', '__pycache__', '__init__.py')):
+                            continue
+                        if file.endswith(_SOURCE_SUFFIXES) or isdir(join(pth, file)):
+                            yield splitext(file)[0]
+
+            for root in iter_modules(self.obj.__path__):
                 # Ignore if this module was already doc'd.
                 if root in self.doc:
                     continue
@@ -712,6 +701,13 @@ class Module(Doc):
         Works by checking whether the module has a `__path__` attribute.
         """
         return hasattr(self.obj, "__path__")
+
+    @property
+    def is_namespace(self):
+        """
+        `True` if this module is a namespace package.
+        """
+        return self.obj.__spec__.origin in (None, 'namespace')  # None in Py3.7+
 
     def find_class(self, cls: type):
         """
