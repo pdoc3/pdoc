@@ -420,9 +420,14 @@ class Doc:
         The raw python object.
         """
 
-        self.docstring = (docstring or inspect.getdoc(obj) or '').strip()
+        docstring = (docstring or inspect.getdoc(obj) or '').strip()
+        if '.. include::' in docstring:
+            from pdoc.html_helpers import _ToMarkdown
+            docstring = _ToMarkdown.admonitions(docstring, self.module, ('include',))
+        self.docstring = docstring
         """
-        The cleaned docstring for this object.
+        The cleaned docstring for this object with any `.. include::`
+        directives resolved (i.e. content included).
         """
 
         self.inherits = None  # type: Union[Class, Function, Variable]

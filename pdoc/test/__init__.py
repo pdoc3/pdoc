@@ -961,6 +961,11 @@ x =</p>'''
         html = to_html(text, module=mod)
         self.assertEqual(html, expected)
 
+        # Ensure includes are resolved within docstrings already,
+        # e.g. for `pdoc.html_helpers.extract_toc()` to work
+        self.assertIn('Command-line interface',
+                      pdoc.Module(pdoc.import_module(pdoc)).docstring)
+
     def test_urls(self):
         text = """Beautiful Soup
 http://www.foo.bar

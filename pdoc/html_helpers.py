@@ -187,8 +187,11 @@ class _ToMarkdown:
         return _googledoc_sections(text)
 
     @staticmethod
-    def _admonition(match, module=None):
+    def _admonition(match, module=None, limit_types=None):
         indent, type, value, text = match.groups()
+
+        if limit_types and type not in limit_types:
+            return match.group(0)
 
         if type == 'include' and module:
             try:
@@ -223,17 +226,20 @@ class _ToMarkdown:
         return '{}!!! {} "{}"\n{}\n'.format(indent, type, title, text)
 
     @staticmethod
-    def admonitions(text, module):
+    def admonitions(text, module, limit_types=None):
         """
         Process reStructuredText's block directives such as
         `.. warning::`, `.. deprecated::`, `.. versionadded::`, etc.
         and turn them into Python-M>arkdown admonitions.
 
+        `limit_types` is optionally a set of directives to limit processing to.
+
         See: https://python-markdown.github.io/extensions/admonition/
         """
         substitute = partial(re.compile(r'^(?P<indent> *)\.\. ?(\w+)::(?: *(.*))?'
                                         r'((?:\n(?:(?P=indent) +.*| *$))*)', re.MULTILINE).sub,
-                             partial(_ToMarkdown._admonition, module=module))
+                             partial(_ToMarkdown._admonition, module=module,
+                                     limit_types=limit_types))
         # Apply twice for nested (e.g. image inside warning)
         return substitute(substitute(text))
 
