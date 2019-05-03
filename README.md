@@ -38,12 +38,13 @@ Features
   special configuration.
 * Support for common docstrings formats (Markdown, numpydoc, Google-style docstrings)
   and some reST directives.
+* Support for PEP 484 type annotations.
 * pdoc respects `__all__` when present.
 * Inheritance used as applicable for inferring docstrings for class members.
 * Support for documenting module, class, and instance variables by traversing ASTs.
-* Automatic cross-linking of referenced identifiers in HTML.
+* Automatic cross-linking of referenced identifiers in HTML and PDF.
 * Overriding docstrings with special module-level `__pdoc__` dictionary.
-* Built-in development web server for near instant preview of rendered docstrings.
+* Built-in development web server for near-instant preview of rendered docstrings.
 
 The above features are explained in more detail in pdoc's [documentation]
 (which was generated with pdoc).
