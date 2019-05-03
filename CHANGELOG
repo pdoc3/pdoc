@@ -1,4 +1,4 @@
-0.5.4
+0.5.4  (2019-04-21)
 =====
   - Bugfixes:
     - Added support for metaclass subclasses.
@@ -7,7 +7,7 @@
     - Don't expand `os.environ` parameter default value as exposing it
       is a security issue.
 
-0.5.3
+0.5.3  (2019-03-05)
 =====
   - Only close standard input if `--close-stdin` is used. This flips
     the previous (hopefully rarely required) default.
@@ -24,7 +24,7 @@
     - New optional sorting of variables, functions, classes.
     - New configurable Highlight.js style.
 
-0.5.2
+0.5.2  (2019-02-04)
 =====
   - Add `__main__.py` so users can invoke `python -m pdoc`.
   - Fix: List builtin class method descriptors
@@ -38,11 +38,11 @@
     - Two-column TOC reference lists only when all names are short.
     - TOC links for some class no longer lead to its ancestor class.
 
-0.5.1
+0.5.1  (2019-01-11)
 =====
   - Markdown >= 3.0.0 requirement.
 
-0.5.0
+0.5.0  (2019-01-10)
 =====
   - Relicensed as AGPL-3.0.
   - Major refactoring, Python 3 compatibility.
@@ -71,7 +71,7 @@
   - To disable documenting an identifier with `__pdoc__`, prefer `False`
     to `None` (deprecated).
 
-0.3.1
+0.3.1  (2014-12-02)
 =====
   - Source code is extracted from __wrapped__ if it exists, and then
     falls back to inspect.getsourcelines. This reverses the behavior
