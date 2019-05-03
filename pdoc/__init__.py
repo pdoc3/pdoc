@@ -123,7 +123,7 @@ def _render_template(template_name, **kwargs):
         raise
 
 
-def html(module_name, docfilter=None, **kwargs) -> str:
+def html(module_name, docfilter=None, reload=False, **kwargs) -> str:
     """
     Returns the documentation for the module `module_name` in HTML
     format. The module must be a module or an importable string.
@@ -133,12 +133,12 @@ def html(module_name, docfilter=None, **kwargs) -> str:
     that takes a single argument (a documentation object) and returns
     `True` or `False`. If `False`, that object will not be documented.
     """
-    mod = Module(import_module(module_name), docfilter=docfilter)
+    mod = Module(import_module(module_name, reload=reload), docfilter=docfilter)
     link_inheritance()
     return mod.html(**kwargs)
 
 
-def text(module_name, docfilter=None, **kwargs) -> str:
+def text(module_name, docfilter=None, reload=False, **kwargs) -> str:
     """
     Returns the documentation for the module `module_name` in plain
     text format suitable for viewing on a terminal.
@@ -149,12 +149,12 @@ def text(module_name, docfilter=None, **kwargs) -> str:
     that takes a single argument (a documentation object) and returns
     `True` or `False`. If `False`, that object will not be documented.
     """
-    mod = Module(import_module(module_name), docfilter=docfilter)
+    mod = Module(import_module(module_name, reload=reload), docfilter=docfilter)
     link_inheritance()
     return mod.text(**kwargs)
 
 
-def import_module(module) -> ModuleType:
+def import_module(module, *, reload: bool = False) -> ModuleType:
     """
     Return module object matching `module` specification (either a python
     module path or a filesystem path to file/directory).
@@ -183,7 +183,7 @@ def import_module(module) -> ModuleType:
     assert inspect.ismodule(module)
     # If this is pdoc itself, return without reloading. Otherwise later
     # `isinstance(..., pdoc.Doc)` calls won't work correctly.
-    if not module.__name__.startswith(__name__):
+    if reload and not module.__name__.startswith(__name__):
         module = importlib.reload(module)
     return module
 
