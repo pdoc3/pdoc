@@ -178,9 +178,9 @@ class CliTest(unittest.TestCase):
                     self._check_files(include_patterns, exclude_patterns)
 
         filenames_files = {
-            ('module.py',): [EXAMPLE_MODULE, EXAMPLE_MODULE + '/module.html'],
-            ('module.py', 'subpkg2'): [f for f in self.PUBLIC_FILES
-                                       if 'module' in f or 'subpkg2' in f or f == EXAMPLE_MODULE],
+            ('module.py',): ['module.html'],
+            ('module.py', 'subpkg2'): ['module.html', 'subpkg2',
+                                       'subpkg2/index.html', 'subpkg2/module.html'],
         }
         with chdir(TESTS_BASEDIR):
             for filenames, expected_files in filenames_files.items():
@@ -193,8 +193,7 @@ class CliTest(unittest.TestCase):
         with chdir(TESTS_BASEDIR):
             with run_html(EXAMPLE_MODULE + '/module.py', EXAMPLE_MODULE + '/subpkg2'):
                 self._basic_html_assertions(
-                    [f for f in self.PUBLIC_FILES
-                     if 'module' in f or 'subpkg2' in f or f == EXAMPLE_MODULE])
+                    ['module.html', 'subpkg2', 'subpkg2/index.html', 'subpkg2/module.html'])
 
     def test_html_identifier(self):
         for package in ('', '._private'):
@@ -320,7 +319,7 @@ class CliTest(unittest.TestCase):
                         run(*(os.path.join(EXAMPLE_MODULE, f) for f in files))
                         out = stdout.getvalue()
                     for f in files:
-                        header = 'Module {}.{}'.format(EXAMPLE_MODULE, os.path.splitext(f)[0])
+                        header = 'Module {}\n'.format(os.path.splitext(f)[0])
                         self.assertIn(header, out)
 
     def test_text_identifier(self):
@@ -366,7 +365,7 @@ class ApiTest(unittest.TestCase):
     def test_module(self):
         modules = {
             EXAMPLE_MODULE: ('', ('index', 'module', 'subpkg', 'subpkg2')),
-            os.path.join(EXAMPLE_MODULE, 'subpkg2'): ('.subpkg2', ('subpkg2.module',)),
+            EXAMPLE_MODULE + '.subpkg2': ('.subpkg2', ('subpkg2.module',)),
         }
         with chdir(TESTS_BASEDIR):
             for module, (name_suffix, submodules) in modules.items():
@@ -378,11 +377,23 @@ class ApiTest(unittest.TestCase):
                                      [EXAMPLE_MODULE + '.' + m for m in submodules])
 
     def test_import_filename(self):
-        old_sys_path = sys.path.copy()
-        sys.path.clear()
-        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
+        with patch.object(sys, 'path', ['']), \
+             chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
             pdoc.import_module('index')
-        sys.path = old_sys_path
+
+    def test_imported_once(self):
+        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
+            pdoc.import_module('_imported_once.py')
+
+    def test_namespace(self):
+        # Test the three namespace types
+        # https://packaging.python.org/guides/packaging-namespace-packages/#creating-a-namespace-package
+        for i in range(1, 4):
+            path = os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_namespace', str(i))
+            with patch.object(sys, 'path', [os.path.join(path, 'a'),
+                                            os.path.join(path, 'b')]):
+                mod = pdoc.Module(pdoc.import_module('a.main'))
+                self.assertIn('D', mod.doc)
 
     def test_module_allsubmodules(self):
         m = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + '._private'))
