@@ -14,7 +14,6 @@ def _discover_tests():
 if __name__ == '__main__':
     setup(
         name="pdoc3",
-        author="Andrew Gallant",
         license="AGPL-3.0",
         description="Auto-generate API documentation for Python projects.",
         long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),

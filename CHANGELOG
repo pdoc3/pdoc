@@ -1,3 +1,7 @@
+0.6.1  (2019-05-05)
+=====
+  - Minor maintenance release.
+
 0.6.0  (2019-05-03)
 =====
   - New support for PEP 484 Python type annotations.
