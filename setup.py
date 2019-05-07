@@ -48,6 +48,7 @@ if __name__ == '__main__':
         install_requires=[
             "mako",
             "markdown >= 3.0",
+            "livereload",
         ],
         setup_requires=[
             'setuptools_git',

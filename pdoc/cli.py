@@ -9,7 +9,9 @@ import os.path as path
 import re
 import sys
 import warnings
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from livereload import Server, shell
+from http.server import BaseHTTPRequestHandler
+from tempfile import TemporaryDirectory
 from typing import Sequence
 from warnings import warn
 
@@ -385,29 +387,25 @@ def main(_args=None):
     sys.path.append(os.getcwd())
 
     if args.http:
-        template_config['link_prefix'] = "/"
-
-        # Run the HTTP server.
-        WebDoc.args = args  # Pass params to HTTPServer xP
-        WebDoc.template_config = template_config
-
         host, _, port = args.http.partition(':')
         host = host or DEFAULT_HOST
         port = int(port or DEFAULT_PORT)
 
-        print('Starting pdoc server on {}:{}'.format(host, port), file=sys.stderr)
-        httpd = HTTPServer((host, port), WebDoc)
-        print("pdoc server ready at http://%s:%d" % (host, port), file=sys.stderr)
-
-        # Allow tests to perform `pdoc.cli._httpd.shutdown()`
-        global _httpd
-        _httpd = httpd
-
+        print('Starting pdoc server', file=sys.stderr)
         try:
-            httpd.serve_forever()
-        finally:
-            httpd.server_close()
-            sys.exit(0)
+            with TemporaryDirectory() as td:
+                server = Server()
+                quoted_modules = ' '.join(args.modules)
+                shell_cmd = 'pdoc --html --force --output-dir {} {}'.format(td, quoted_modules)
+                for module in args.modules:
+                    server.watch(module, shell(shell_cmd, cwd='.'))
+                    msg = '{}:{}/{} for "{}" module'.format(host, port, module, module)
+                    print(msg, file=sys.stderr)
+                shell(shell_cmd, cwd='.')()
+                server.serve(root=td, host=host, port=port)()
+        except Exception as e:
+            sys.exit(e)
+        sys.exit(0)
 
     docfilter = None
     if args.filter and args.filter.strip():
