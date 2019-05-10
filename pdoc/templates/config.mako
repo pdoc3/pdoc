@@ -20,4 +20,8 @@
     #     Options: https://github.com/highlightjs/highlight.js/tree/master/src/styles
     #     Demo: https://highlightjs.org/static/demo/
     hljs_style = 'github'
+
+    # If set, insert Google Analytics tracking code. Value is GA
+    # tracking id (UA-XXXXXX-Y).
+    google_analytics = ''
 %>

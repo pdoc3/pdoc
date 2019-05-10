@@ -354,6 +354,13 @@ class CliTest(unittest.TestCase):
                 self._basic_html_assertions([file.replace('.html', '.md')
                                              for file in self.PUBLIC_FILES])
 
+    def test_google_analytics(self):
+        expected = ['google-analytics.com']
+        with run_html(EXAMPLE_MODULE):
+            self._check_files((), exclude_patterns=expected)
+        with run_html(EXAMPLE_MODULE, config='google_analytics="UA-xxxxxx-y"'):
+            self._check_files(expected)
+
 
 class ApiTest(unittest.TestCase):
     """

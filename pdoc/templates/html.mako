@@ -358,6 +358,13 @@
   <style media="screen and (min-width: 700px)">${css.desktop()}</style>
   <style media="print">${css.print()}</style>
 
+  % if google_analytics:
+    <script>
+    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+    ga('create', '${google_analytics}', 'auto'); ga('send', 'pageview');
+    </script><script async src='https://www.google-analytics.com/analytics.js'></script>
+  % endif
+
   <%include file="head.mako"/>
 </head>
 <body>
