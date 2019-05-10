@@ -17,7 +17,8 @@ from random import randint
 from tempfile import TemporaryDirectory
 from time import sleep
 from unittest.mock import patch
-from urllib.request import urlopen
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 import typing
 
@@ -1068,6 +1069,18 @@ class HttpTest(unittest.TestCase):
                 with urlopen(url, timeout=3) as resp:
                     html = resp.read()
                     self.assertIn(b'<a href="/_relative_import">', html)
+
+    def test_head(self):
+        with self._http(['pdoc']) as url:
+            with urlopen(Request(url + 'pdoc/',
+                                 method='HEAD',
+                                 headers={'If-None-Match': 'xxx'})) as resp:
+                self.assertEqual(resp.status, 205)
+            with self.assertRaises(HTTPError) as cm:
+                urlopen(Request(url + 'pdoc/',
+                                method='HEAD',
+                                headers={'If-None-Match': str(os.stat(pdoc.__file__).st_mtime)}))
+            self.assertEqual(cm.exception.code, 304)
 
 
 if __name__ == '__main__':

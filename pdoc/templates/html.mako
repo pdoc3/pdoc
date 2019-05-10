@@ -1,4 +1,6 @@
 <%
+  import os
+
   import pdoc
   from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html
 
@@ -389,6 +391,17 @@
 % if show_source_code:
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad()</script>
+% endif
+
+% if http_server and module:  ## Auto-reload on file change in dev mode
+    <script>
+    setInterval(() =>
+        fetch(window.location.href, {
+            method: "HEAD",
+            cache: "no-store",
+            headers: {"If-None-Match": "${os.stat(module.obj.__file__).st_mtime}"},
+        }).then(response => response.ok && window.location.reload()), 700);
+    </script>
 % endif
 </body>
 </html>
