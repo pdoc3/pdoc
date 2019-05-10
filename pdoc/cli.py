@@ -148,16 +148,28 @@ class WebDoc(BaseHTTPRequestHandler):
     template_config = None
 
     def do_HEAD(self):
+        status = 200
         if self.path != "/":
-            out = self.html()
-            if out is None:
-                self.send_response(404)
-                self.end_headers()
-                return
+            status = self.check_modified()
 
-        self.send_response(200)
+        self.send_response(status)
         self.send_header("Content-type", "text/html; charset=utf-8")
         self.end_headers()
+
+    def check_modified(self):
+        try:
+            module = pdoc.import_module(self.import_path_from_req_url)
+            new_etag = str(os.stat(module.__file__).st_mtime)
+        except ImportError:
+            return 404
+
+        old_etag = self.headers.get('If-None-Match', new_etag)
+        if old_etag == new_etag:
+            # Don't log repeating checks
+            self.log_request = lambda *args, **kwargs: None
+            return 304
+
+        return 205
 
     def do_GET(self):
         # Deny favicon shortcut early.
@@ -209,8 +221,9 @@ class WebDoc(BaseHTTPRequestHandler):
         elif self.path.endswith(pdoc._URL_PACKAGE_SUFFIX):
             return self.redirect(self.path[:-len(pdoc._URL_PACKAGE_SUFFIX)] + '/')
         else:
-            out = self.html()
-            if out is None:
+            try:
+                out = self.html()
+            except ImportError:
                 code = 404
                 out = "Module <code>%s</code> not found." % self.import_path_from_req_url
 
@@ -234,7 +247,6 @@ class WebDoc(BaseHTTPRequestHandler):
         generated and account for whether they are stale compared to
         the source code.
         """
-        # TODO: pass extra pdoc.html() params
         return pdoc.html(self.import_path_from_req_url,
                          reload=True, http_server=True, external_links=True,
                          **self.template_config)
