@@ -618,22 +618,22 @@ class ApiTest(unittest.TestCase):
         func = pdoc.Function('f', mod, f)
         self.assertEqual(func.params(), ['a', '*b', "c=[]"])
         self.assertEqual(func.params(annotate=True),
-                         ['a:\xA0int', '*b', "c:\xA0List[pdoc.Doc]\xA0=\xA0[]"])
+                         ['a:\N{NBSP}int', '*b', "c:\N{NBSP}List[pdoc.Doc]\N{NBSP}=\N{NBSP}[]"])
 
         # typed, linked
         def link(dobj):
             return '<a href="{}">{}</a>'.format(dobj.url(relative_to=mod), dobj.qualname)
 
         self.assertEqual(func.params(annotate=True, link=link),
-                         ['a:\xA0int', '*b',
-                          "c:\xa0List[<a href=\"#pdoc.Doc\">Doc</a>]\xa0=\xa0[]"])
+                         ['a:\N{NBSP}int', '*b',
+                          "c:\N{NBSP}List[<a href=\"#pdoc.Doc\">Doc</a>]\N{NBSP}=\N{NBSP}[]"])
 
     def test_Function_return_annotation(self):
         import typing
 
         def f() -> typing.List[typing.Union[str, pdoc.Doc]]: pass
         func = pdoc.Function('f', pdoc.Module(pdoc), f)
-        self.assertEqual(func.return_annotation(), 'List[Union[str,\xA0pdoc.Doc]]')
+        self.assertEqual(func.return_annotation(), 'List[Union[str,\N{NBSP}pdoc.Doc]]')
 
     @ignore_warnings
     def test_Class_docstring(self):

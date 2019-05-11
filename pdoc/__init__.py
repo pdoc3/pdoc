@@ -1062,7 +1062,7 @@ class Function(Doc):
                 annot = ''
         if not annot:
             return ''
-        s = inspect.formatannotation(annot).replace(' ', '\xA0')  # NBSP for better line breaks
+        s = inspect.formatannotation(annot).replace(' ', '\N{NBSP}')  # Better line breaks
         if link:
             from pdoc.html_helpers import _linkify
             s = re.sub(r'[\w\.]+', partial(_linkify, link=link, module=self.module), s)
@@ -1128,7 +1128,7 @@ class Function(Doc):
                     s = re.sub(r'(?<!\s)=(?!\s)', ' = ', re.sub(r':(?!\s)', ': ', s, 1), 1)
                 # "Eval" forward-declarations (typing string literals)
                 s = re.sub(r'(?<=: )[\'"]|[\'"](?= = )', '', s, 2)
-                s = s.replace(' ', '\xA0')  # Neater line breaking with NBSPs
+                s = s.replace(' ', '\N{NBSP}')  # prevent improper line breaking
 
                 if link:
                     s = re.sub(r'[\w\.]+', _linkify, s)
