@@ -596,10 +596,13 @@ class Module(Doc):
 
                 assert self.refname == self.name
                 fullname = "%s.%s" % (self.name, root)
-                m = import_module(fullname)
-
-                self.doc[root] = Module(
-                    m, docfilter=docfilter, supermodule=self, context=self._context)
+                self.doc[root] = m = Module(import_module(fullname),
+                                            docfilter=docfilter, supermodule=self,
+                                            context=self._context)
+                # Skip empty namespace packages because they may
+                # as well be other auxiliary directories
+                if m.is_namespace and not m.doc:
+                    del self.doc[root]
 
         # Apply docfilter
         if docfilter:
