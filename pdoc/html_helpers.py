@@ -114,28 +114,27 @@ class _ToMarkdown:
         type = _type_parts(type or '')
         desc = desc or '&nbsp;'
         assert _ToMarkdown._is_indented_4_spaces(desc)
-        if name and type:
-            return '**`{}`** :&ensp;{}\n:   {}\n\n'.format(name, type, desc)
-        elif name:
-            return '**`{}`**\n:   {}\n\n'.format(name, desc)
-        else:
-            assert(type)
-            return '{}\n:   {}\n\n'.format(type, desc)
+
+        ret = ""
+        if name:
+            ret += '**`{}`**'.format(name)
+        if type:
+            ret += ' :&ensp;{}'.format(type) if ret else type
+        if desc:
+            ret += '\n:   {}\n'.format(desc) if ret else desc
+        ret += '\n'
+
+        return ret
 
     @staticmethod
     def _numpy_params(match,
-                      name_to_type,
                       _name_parts=partial(re.compile(', ').sub, '`**, **`')):
         """ Converts NumpyDoc parameter (etc.) sections into Markdown. """
-        name, type, desc = match.groups()
+        name, type, desc = match.group("name", "type", "desc")
+        type = type or match.groupdict().get("single_type", None)
         desc = desc.strip()
-        if name and (type or desc):
-            if name_to_type and not type:
-                name, type = None, name
-            else:
-                name = _name_parts(name)
-            return _ToMarkdown._deflist(name, type, desc)
-        return match.group(0)
+        name = name and _name_parts(name)
+        return _ToMarkdown._deflist(name, type, desc)
 
     @staticmethod
     def _numpy_seealso(match):
@@ -151,9 +150,22 @@ class _ToMarkdown:
 
     @staticmethod
     def _numpy_sections(match,
-                        # All kinds of numpydoc Parameters (optionally with types; descriptions)
-                        _params=re.compile(r'^(\*{0,2}\w+(?:, \*{0,2}\w+)*)(?: ?: (.*)(?<!\.)$)?'
-                                           r'((?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
+                        # All kinds of numpydoc Parameters
+                        # (optionally with types; descriptions)
+                        _params=partial(
+                            re.compile(r'^(?P<name>\*{0,2}\w+(?:, \*{0,2}\w+)*)'
+                                       r'(?: ?: (?P<type>.*))?(?<!\.)$'
+                                       r'(?P<desc>(?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
+                            _numpy_params.__func__),
+                        # All kinds of numpydoc Returns
+                        # (similar to the above but lines without a colon are types here)
+                        _returns=partial(
+                            re.compile(r'^(?:(?P<name>\*{0,2}\w+(?:, \*{0,2}\w+)*)'
+                                       r'(?: ?: (?P<type>.*))|'
+                                       r'(?P<single_type>[^ ].*))'
+                                       r'(?<!\.)$'
+                                       r'(?P<desc>(?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
+                            _numpy_params.__func__),
                         _seealso=partial(
                             re.compile(r'^((?:\n?[\w.]* ?: .*)+)|(.*\w.*)').sub,
                             _numpy_seealso.__func__)):
@@ -165,9 +177,9 @@ class _ToMarkdown:
         # a newline is guaranteed from the match (and -1 works too)
         section = head[:head.find("\n")]
         if section in ('Parameters', 'Receives', 'Other Parameters'):
-            body = _params(lambda m: _ToMarkdown._numpy_params(m, False), body)
+            body = _params(body)
         elif section in ('Returns', 'Yields', 'Raises', 'Warns'):
-            body = _params(lambda m: _ToMarkdown._numpy_params(m, True), body)
+            body = _returns(body)
         else:
             assert(section == "See Also")
             body = _seealso(body)
