@@ -827,7 +827,7 @@ description of <code>x1</code>, <code>x2</code>.</p>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
-<dt><strong><code>TypeError</code></strong></dt>
+<dt><code>TypeError</code></dt>
 <dd>When something.</dd>
 </dl>
 <h2 id="see-also">See Also</h2>

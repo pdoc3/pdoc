@@ -114,18 +114,26 @@ class _ToMarkdown:
         type = _type_parts(type or '')
         desc = desc or '&nbsp;'
         assert _ToMarkdown._is_indented_4_spaces(desc)
-        if type:
+        if name and type:
             return '**`{}`** :&ensp;{}\n:   {}\n\n'.format(name, type, desc)
-        return '**`{}`**\n:   {}\n\n'.format(name, desc)
+        elif name:
+            return '**`{}`**\n:   {}\n\n'.format(name, desc)
+        else:
+            assert(type)
+            return '{}\n:   {}\n\n'.format(type, desc)
 
     @staticmethod
     def _numpy_params(match,
+                      name_to_type,
                       _name_parts=partial(re.compile(', ').sub, '`**, **`')):
         """ Converts NumpyDoc parameter (etc.) sections into Markdown. """
         name, type, desc = match.groups()
         desc = desc.strip()
         if name and (type or desc):
-            name = _name_parts(name)
+            if name_to_type and not type:
+                name, type = None, name
+            else:
+                name = _name_parts(name)
             return _ToMarkdown._deflist(name, type, desc)
         return match.group(0)
 
@@ -135,29 +143,49 @@ class _ToMarkdown:
         Converts NumpyDoc "See Also" section either into referenced code,
         optionally within a definition list.
         """
-        title, spec_with_desc, simple_list = match.groups()
+        spec_with_desc, simple_list = match.groups()
         if spec_with_desc:
-            return title + '\n\n'.join('`{}`\n:   {}'.format(*map(str.strip, line.split(':', 1)))
-                                       for line in filter(None, spec_with_desc.split('\n')))
-        return title + ', '.join('`{}`'.format(i) for i in simple_list.split(', '))
+            return '\n\n'.join('`{}`\n:   {}'.format(*map(str.strip, line.split(':', 1)))
+                               for line in filter(None, spec_with_desc.split('\n')))
+        return ', '.join('`{}`'.format(i) for i in simple_list.split(', '))
+
+    @staticmethod
+    def _numpy_sections(match,
+                        # All kinds of numpydoc Parameters (optionally with types; descriptions)
+                        _params=re.compile(r'^(\*{0,2}\w+(?:, \*{0,2}\w+)*)(?: ?: (.*)(?<!\.)$)?'
+                                           r'((?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
+                        _seealso=partial(
+                            re.compile(r'^((?:\n?[\w.]* ?: .*)+)|(.*\w.*)').sub,
+                            _numpy_seealso.__func__)):
+        """
+        Convert sections with parameter, return, and see also lists to Markdown
+        lists.
+        """
+        head, body = match.groups()
+        # a newline is guaranteed from the match (and -1 works too)
+        section = head[:head.find("\n")]
+        if section in ('Parameters', 'Receives', 'Other Parameters'):
+            body = _params(lambda m: _ToMarkdown._numpy_params(m, False), body)
+        elif section in ('Returns', 'Yields', 'Raises', 'Warns'):
+            body = _params(lambda m: _ToMarkdown._numpy_params(m, True), body)
+        else:
+            assert(section == "See Also")
+            body = _seealso(body)
+        return head + body
 
     @staticmethod
     def numpy(text,
-              # All kinds of numpydoc Parameters (optionally with types; descriptions)
-              _params=partial(
-                  re.compile(r'^(\*{0,2}\w+(?:, \*{0,2}\w+)*)(?: ?: (.*)(?<!\.)$)?'
-                             r'((?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
-                  _numpy_params.__func__),
-              _seealso=partial(
-                  re.compile(r'(See Also\n-{8}\n)(?:((?:\n?[\w.]* ?: .*)+)|(.*))').sub,
-                  _numpy_seealso.__func__)):
+              _sections=partial(re.compile(
+                  r'^(Returns\n-{7}\n|Yields\n-{6}\n|Raises\n-{6}\n|Warns\n-{5}\n|'
+                  r'Parameters\n-{10}\n|Receives\n-{8}\n|Other Parameters\n-{16}\n|'
+                  r'See Also\n-{8}\n)'
+                  r'((?:(?!.+\n-+).*$\n?)*)',
+                  re.MULTILINE).sub, _numpy_sections.__func__)):
         """
         Convert `text` in numpydoc docstring format to Markdown
         to be further converted later.
         """
-        text = _seealso(text)
-        text = _params(text)
-        return text
+        return _sections(text)
 
     @staticmethod
     def _is_indented_4_spaces(txt, _3_spaces_or_less=re.compile(r'\n\s{0,3}\S').search):
@@ -165,7 +193,7 @@ class _ToMarkdown:
 
     @staticmethod
     def _fix_indent(name, type, desc):
-        """Mazbe fix indent from 2 to 4 spaces."""
+        """Maybe fix indent from 2 to 4 spaces."""
         if not _ToMarkdown._is_indented_4_spaces(desc):
             desc = desc.replace('\n', '\n  ')
         return name, type, desc
