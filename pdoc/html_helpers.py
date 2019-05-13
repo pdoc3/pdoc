@@ -120,19 +120,19 @@ class _ToMarkdown:
             ret += '**`{}`**'.format(name)
         if type:
             ret += ' :&ensp;{}'.format(type) if ret else type
-        if desc:
-            ret += '\n:   {}\n'.format(desc) if ret else desc
-        ret += '\n'
-
+        assert name or type
+        ret += '\n:   {}\n\n'.format(desc)
         return ret
 
     @staticmethod
     def _numpy_params(match,
+                      section,
                       _name_parts=partial(re.compile(', ').sub, '`**, **`')):
         """ Converts NumpyDoc parameter (etc.) sections into Markdown. """
-        name, type, desc = match.group("name", "type", "desc")
-        type = type or match.groupdict().get("single_type", None)
+        name, type, desc = match.groups()
         desc = desc.strip()
+        if section.title() in ('Returns', 'Yields', 'Raises', 'Warns') and not type:
+            name, type = '', name
         name = name and _name_parts(name)
         return _ToMarkdown._deflist(name, type, desc)
 
@@ -150,22 +150,6 @@ class _ToMarkdown:
 
     @staticmethod
     def _numpy_sections(match,
-                        # All kinds of numpydoc Parameters
-                        # (optionally with types; descriptions)
-                        _params=partial(
-                            re.compile(r'^(?P<name>\*{0,2}\w+(?:, \*{0,2}\w+)*)'
-                                       r'(?: ?: (?P<type>.*))?(?<!\.)$'
-                                       r'(?P<desc>(?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
-                            _numpy_params.__func__),
-                        # All kinds of numpydoc Returns
-                        # (similar to the above but lines without a colon are types here)
-                        _returns=partial(
-                            re.compile(r'^(?:(?P<name>\*{0,2}\w+(?:, \*{0,2}\w+)*)'
-                                       r'(?: ?: (?P<type>.*))|'
-                                       r'(?P<single_type>[^ ].*))'
-                                       r'(?<!\.)$'
-                                       r'(?P<desc>(?:\n(?: {4}.*|$))*)', re.MULTILINE).sub,
-                            _numpy_params.__func__),
                         _seealso=partial(
                             re.compile(r'^((?:\n?[\w.]* ?: .*)+)|(.*\w.*)').sub,
                             _numpy_seealso.__func__)):
@@ -173,31 +157,27 @@ class _ToMarkdown:
         Convert sections with parameter, return, and see also lists to Markdown
         lists.
         """
-        head, body = match.groups()
-        # a newline is guaranteed from the match (and -1 works too)
-        section = head[:head.find("\n")]
-        if section in ('Parameters', 'Receives', 'Other Parameters'):
-            body = _params(body)
-        elif section in ('Returns', 'Yields', 'Raises', 'Warns'):
-            body = _returns(body)
-        else:
-            assert(section == "See Also")
+        section, body = match.groups()
+        if section.title() == 'See Also':
             body = _seealso(body)
-        return head + body
+        else:
+            body = re.sub(r'^(\*{0,2}\w+(?:, \*{0,2}\w+)*)'
+                          r'(?: ?: (.*)(?<!\.)$)?(?<!\.)$'
+                          r'((?:\n(?: {4}.*|$))*)',
+                          partial(_ToMarkdown._numpy_params, section=section),
+                          body,
+                          flags=re.MULTILINE)
+        return section + '\n-----\n' + body
 
     @staticmethod
-    def numpy(text,
-              _sections=partial(re.compile(
-                  r'^(Returns\n-{7}\n|Yields\n-{6}\n|Raises\n-{6}\n|Warns\n-{5}\n|'
-                  r'Parameters\n-{10}\n|Receives\n-{8}\n|Other Parameters\n-{16}\n|'
-                  r'See Also\n-{8}\n)'
-                  r'((?:(?!.+\n-+).*$\n?)*)',
-                  re.MULTILINE).sub, _numpy_sections.__func__)):
+    def numpy(text):
         """
         Convert `text` in numpydoc docstring format to Markdown
         to be further converted later.
         """
-        return _sections(text)
+        return re.sub(r'^(\w[\w ]+)\n-{3,}\n'
+                      r'((?:(?!.+\n-+).*$\n?)*)',
+                      _ToMarkdown._numpy_sections, text, flags=re.MULTILINE)
 
     @staticmethod
     def _is_indented_4_spaces(txt, _3_spaces_or_less=re.compile(r'\n\s{0,3}\S').search):
