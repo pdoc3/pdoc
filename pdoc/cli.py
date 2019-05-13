@@ -316,7 +316,7 @@ def write_files(m: pdoc.Module, ext: str, **kwargs):
             if ext == '.html':
                 w.write(m.html(**kwargs))
             elif ext == '.md':
-                w.write(m.html(**kwargs))
+                w.write(m.text(**kwargs))
     except Exception:
         try:
             os.unlink(f)
