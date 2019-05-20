@@ -1,3 +1,13 @@
+0.6.2  (2019-05-20)
+=====
+  - Fixes:
+    - Don't generate Modules for empty namespace packages (i.e. resource directories).
+    - Generate real markdown files when `--output-dir` is set but not `--html`.
+    - Fix formatting of numpydoc type-only parameters.
+  - Auto-reload modules upon changes when in `--http` mode.
+  - New config tunable: `google_analytics`.
+  - Warn on unknown config tunables passed on the CLI.
+
 0.6.1  (2019-05-05)
 =====
   - Minor maintenance release.
