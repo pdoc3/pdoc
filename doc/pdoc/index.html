@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.1" />
+<meta name="generator" content="pdoc 0.6.2" />
 <title>pdoc API documentation</title>
 <meta name="description" content="Python package `pdoc` provides types, functions, and a command-line
 interface for accessing public documentation of Python modules, and
@@ -387,6 +387,10 @@ def _render_template(template_name, **kwargs):
         config.update((var, getattr(config_module, var, None))
                       for var in config_module.__dict__
                       if var not in MAKO_INTERNALS)
+    known_keys = set(config) | {&#39;module&#39;, &#39;modules&#39;, &#39;http_server&#39;, &#39;external_links&#39;}  # deprecated
+    invalid_keys = {k: v for k, v in kwargs.items() if k not in known_keys}
+    if invalid_keys:
+        warn(&#39;Unknown configuration variables (not in config.mako): {}&#39;.format(invalid_keys))
     config.update(kwargs)
 
     try:
@@ -878,10 +882,13 @@ class Module(Doc):
 
                 assert self.refname == self.name
                 fullname = &#34;%s.%s&#34; % (self.name, root)
-                m = import_module(fullname)
-
-                self.doc[root] = Module(
-                    m, docfilter=docfilter, supermodule=self, context=self._context)
+                self.doc[root] = m = Module(import_module(fullname),
+                                            docfilter=docfilter, supermodule=self,
+                                            context=self._context)
+                # Skip empty namespace packages because they may
+                # as well be other auxiliary directories
+                if m.is_namespace and not m.doc:
+                    del self.doc[root]
 
         # Apply docfilter
         if docfilter:
@@ -1341,7 +1348,7 @@ class Function(Doc):
                 annot = &#39;&#39;
         if not annot:
             return &#39;&#39;
-        s = inspect.formatannotation(annot).replace(&#39; &#39;, &#39;\xA0&#39;)  # NBSP for better line breaks
+        s = inspect.formatannotation(annot).replace(&#39; &#39;, &#39;\N{NBSP}&#39;)  # Better line breaks
         if link:
             from pdoc.html_helpers import _linkify
             s = re.sub(r&#39;[\w\.]+&#39;, partial(_linkify, link=link, module=self.module), s)
@@ -1407,7 +1414,7 @@ class Function(Doc):
                     s = re.sub(r&#39;(?&lt;!\s)=(?!\s)&#39;, &#39; = &#39;, re.sub(r&#39;:(?!\s)&#39;, &#39;: &#39;, s, 1), 1)
                 # &#34;Eval&#34; forward-declarations (typing string literals)
                 s = re.sub(r&#39;(?&lt;=: )[\&#39;&#34;]|[\&#39;&#34;](?= = )&#39;, &#39;&#39;, s, 2)
-                s = s.replace(&#39; &#39;, &#39;\xA0&#39;)  # Neater line breaking with NBSPs
+                s = s.replace(&#39; &#39;, &#39;\N{NBSP}&#39;)  # prevent improper line breaking
 
                 if link:
                     s = re.sub(r&#39;[\w\.]+&#39;, _linkify, s)
@@ -1508,10 +1515,6 @@ class External(Doc):
 <dt><code class="name"><a title="pdoc.html_helpers" href="html_helpers.html">pdoc.html_helpers</a></code></dt>
 <dd>
 <section class="desc"><p>Helper functions for HTML output.</p></section>
-</dd>
-<dt><code class="name"><a title="pdoc.templates" href="templates/index.html">pdoc.templates</a></code></dt>
-<dd>
-<section class="desc"></section>
 </dd>
 <dt><code class="name"><a title="pdoc.test" href="test/index.html">pdoc.test</a></code></dt>
 <dd>
@@ -2614,7 +2617,7 @@ all other cases, it should be <code>False</code>.</p></section>
                 annot = &#39;&#39;
         if not annot:
             return &#39;&#39;
-        s = inspect.formatannotation(annot).replace(&#39; &#39;, &#39;\xA0&#39;)  # NBSP for better line breaks
+        s = inspect.formatannotation(annot).replace(&#39; &#39;, &#39;\N{NBSP}&#39;)  # Better line breaks
         if link:
             from pdoc.html_helpers import _linkify
             s = re.sub(r&#39;[\w\.]+&#39;, partial(_linkify, link=link, module=self.module), s)
@@ -2680,7 +2683,7 @@ all other cases, it should be <code>False</code>.</p></section>
                     s = re.sub(r&#39;(?&lt;!\s)=(?!\s)&#39;, &#39; = &#39;, re.sub(r&#39;:(?!\s)&#39;, &#39;: &#39;, s, 1), 1)
                 # &#34;Eval&#34; forward-declarations (typing string literals)
                 s = re.sub(r&#39;(?&lt;=: )[\&#39;&#34;]|[\&#39;&#34;](?= = )&#39;, &#39;&#39;, s, 2)
-                s = s.replace(&#39; &#39;, &#39;\xA0&#39;)  # Neater line breaking with NBSPs
+                s = s.replace(&#39; &#39;, &#39;\N{NBSP}&#39;)  # prevent improper line breaking
 
                 if link:
                     s = re.sub(r&#39;[\w\.]+&#39;, _linkify, s)
@@ -2773,7 +2776,7 @@ type hint annotations.</p></section>
             annot = &#39;&#39;
     if not annot:
         return &#39;&#39;
-    s = inspect.formatannotation(annot).replace(&#39; &#39;, &#39;\xA0&#39;)  # NBSP for better line breaks
+    s = inspect.formatannotation(annot).replace(&#39; &#39;, &#39;\N{NBSP}&#39;)  # Better line breaks
     if link:
         from pdoc.html_helpers import _linkify
         s = re.sub(r&#39;[\w\.]+&#39;, partial(_linkify, link=link, module=self.module), s)
@@ -2917,10 +2920,13 @@ global context object will be used.</p></section>
 
                 assert self.refname == self.name
                 fullname = &#34;%s.%s&#34; % (self.name, root)
-                m = import_module(fullname)
-
-                self.doc[root] = Module(
-                    m, docfilter=docfilter, supermodule=self, context=self._context)
+                self.doc[root] = m = Module(import_module(fullname),
+                                            docfilter=docfilter, supermodule=self,
+                                            context=self._context)
+                # Skip empty namespace packages because they may
+                # as well be other auxiliary directories
+                if m.is_namespace and not m.doc:
+                    del self.doc[root]
 
         # Apply docfilter
         if docfilter:
@@ -3445,7 +3451,6 @@ opposed to class variable).</p></section>
 <ul>
 <li><code><a title="pdoc.cli" href="cli.html">pdoc.cli</a></code></li>
 <li><code><a title="pdoc.html_helpers" href="html_helpers.html">pdoc.html_helpers</a></code></li>
-<li><code><a title="pdoc.templates" href="templates/index.html">pdoc.templates</a></code></li>
 <li><code><a title="pdoc.test" href="test/index.html">pdoc.test</a></code></li>
 </ul>
 </li>
@@ -3543,7 +3548,7 @@ opposed to class variable).</p></section>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.2</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

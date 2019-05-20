@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.1" />
+<meta name="generator" content="pdoc 0.6.2" />
 <title>pdoc.test API documentation</title>
 <meta name="description" content="Unit tests for pdoc package." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -45,7 +45,8 @@ from random import randint
 from tempfile import TemporaryDirectory
 from time import sleep
 from unittest.mock import patch
-from urllib.request import urlopen
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 import typing
 
@@ -382,6 +383,13 @@ class CliTest(unittest.TestCase):
                 self._basic_html_assertions([file.replace(&#39;.html&#39;, &#39;.md&#39;)
                                              for file in self.PUBLIC_FILES])
 
+    def test_google_analytics(self):
+        expected = [&#39;google-analytics.com&#39;]
+        with run_html(EXAMPLE_MODULE):
+            self._check_files((), exclude_patterns=expected)
+        with run_html(EXAMPLE_MODULE, config=&#39;google_analytics=&#34;UA-xxxxxx-y&#34;&#39;):
+            self._check_files(expected)
+
 
 class ApiTest(unittest.TestCase):
     &#34;&#34;&#34;
@@ -639,22 +647,22 @@ class ApiTest(unittest.TestCase):
         func = pdoc.Function(&#39;f&#39;, mod, f)
         self.assertEqual(func.params(), [&#39;a&#39;, &#39;*b&#39;, &#34;c=[]&#34;])
         self.assertEqual(func.params(annotate=True),
-                         [&#39;a:\xA0int&#39;, &#39;*b&#39;, &#34;c:\xA0List[pdoc.Doc]\xA0=\xA0[]&#34;])
+                         [&#39;a:\N{NBSP}int&#39;, &#39;*b&#39;, &#34;c:\N{NBSP}List[pdoc.Doc]\N{NBSP}=\N{NBSP}[]&#34;])
 
         # typed, linked
         def link(dobj):
             return &#39;&lt;a href=&#34;{}&#34;&gt;{}&lt;/a&gt;&#39;.format(dobj.url(relative_to=mod), dobj.qualname)
 
         self.assertEqual(func.params(annotate=True, link=link),
-                         [&#39;a:\xA0int&#39;, &#39;*b&#39;,
-                          &#34;c:\xa0List[&lt;a href=\&#34;#pdoc.Doc\&#34;&gt;Doc&lt;/a&gt;]\xa0=\xa0[]&#34;])
+                         [&#39;a:\N{NBSP}int&#39;, &#39;*b&#39;,
+                          &#34;c:\N{NBSP}List[&lt;a href=\&#34;#pdoc.Doc\&#34;&gt;Doc&lt;/a&gt;]\N{NBSP}=\N{NBSP}[]&#34;])
 
     def test_Function_return_annotation(self):
         import typing
 
         def f() -&gt; typing.List[typing.Union[str, pdoc.Doc]]: pass
         func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc), f)
-        self.assertEqual(func.return_annotation(), &#39;List[Union[str,\xA0pdoc.Doc]]&#39;)
+        self.assertEqual(func.return_annotation(), &#39;List[Union[str,\N{NBSP}pdoc.Doc]]&#39;)
 
     @ignore_warnings
     def test_Class_docstring(self):
@@ -844,12 +852,28 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;dl&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;output&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
 &lt;dd&gt;The output array&lt;/dd&gt;
+&lt;dt&gt;&lt;code&gt;foo&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;h2 id=&#34;returns_1&#34;&gt;Returns&lt;/h2&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dd&gt;The output array&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;raises&#34;&gt;Raises&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;TypeError&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;TypeError&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;When something.&lt;/dd&gt;
 &lt;/dl&gt;
+&lt;h2 id=&#34;raises_1&#34;&gt;Raises&lt;/h2&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;code&gt;TypeError&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;h2 id=&#34;returns_2&#34;&gt;Returns&lt;/h2&gt;
+&lt;p&gt;None.&lt;/p&gt;
+&lt;h2 id=&#34;invalid&#34;&gt;Invalid&lt;/h2&gt;
+&lt;p&gt;no match&lt;/p&gt;
 &lt;h2 id=&#34;see-also&#34;&gt;See Also&lt;/h2&gt;
 &lt;p&gt;&lt;code&gt;fromstring&lt;/code&gt;, &lt;code&gt;loadtxt&lt;/code&gt;&lt;/p&gt;
 &lt;h2 id=&#34;see-also_1&#34;&gt;See Also&lt;/h2&gt;
@@ -1089,6 +1113,18 @@ class HttpTest(unittest.TestCase):
                 with urlopen(url, timeout=3) as resp:
                     html = resp.read()
                     self.assertIn(b&#39;&lt;a href=&#34;/_relative_import&#34;&gt;&#39;, html)
+
+    def test_head(self):
+        with self._http([&#39;pdoc&#39;]) as url:
+            with urlopen(Request(url + &#39;pdoc/&#39;,
+                                 method=&#39;HEAD&#39;,
+                                 headers={&#39;If-None-Match&#39;: &#39;xxx&#39;})) as resp:
+                self.assertEqual(resp.status, 205)
+            with self.assertRaises(HTTPError) as cm:
+                urlopen(Request(url + &#39;pdoc/&#39;,
+                                method=&#39;HEAD&#39;,
+                                headers={&#39;If-None-Match&#39;: str(os.stat(pdoc.__file__).st_mtime)}))
+            self.assertEqual(cm.exception.code, 304)
 
 
 if __name__ == &#39;__main__&#39;:
@@ -1475,22 +1511,22 @@ not have a method with the specified name.</p></section>
         func = pdoc.Function(&#39;f&#39;, mod, f)
         self.assertEqual(func.params(), [&#39;a&#39;, &#39;*b&#39;, &#34;c=[]&#34;])
         self.assertEqual(func.params(annotate=True),
-                         [&#39;a:\xA0int&#39;, &#39;*b&#39;, &#34;c:\xA0List[pdoc.Doc]\xA0=\xA0[]&#34;])
+                         [&#39;a:\N{NBSP}int&#39;, &#39;*b&#39;, &#34;c:\N{NBSP}List[pdoc.Doc]\N{NBSP}=\N{NBSP}[]&#34;])
 
         # typed, linked
         def link(dobj):
             return &#39;&lt;a href=&#34;{}&#34;&gt;{}&lt;/a&gt;&#39;.format(dobj.url(relative_to=mod), dobj.qualname)
 
         self.assertEqual(func.params(annotate=True, link=link),
-                         [&#39;a:\xA0int&#39;, &#39;*b&#39;,
-                          &#34;c:\xa0List[&lt;a href=\&#34;#pdoc.Doc\&#34;&gt;Doc&lt;/a&gt;]\xa0=\xa0[]&#34;])
+                         [&#39;a:\N{NBSP}int&#39;, &#39;*b&#39;,
+                          &#34;c:\N{NBSP}List[&lt;a href=\&#34;#pdoc.Doc\&#34;&gt;Doc&lt;/a&gt;]\N{NBSP}=\N{NBSP}[]&#34;])
 
     def test_Function_return_annotation(self):
         import typing
 
         def f() -&gt; typing.List[typing.Union[str, pdoc.Doc]]: pass
         func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc), f)
-        self.assertEqual(func.return_annotation(), &#39;List[Union[str,\xA0pdoc.Doc]]&#39;)
+        self.assertEqual(func.return_annotation(), &#39;List[Union[str,\N{NBSP}pdoc.Doc]]&#39;)
 
     @ignore_warnings
     def test_Class_docstring(self):
@@ -1682,15 +1718,15 @@ def test_Class_params(self):
     func = pdoc.Function(&#39;f&#39;, mod, f)
     self.assertEqual(func.params(), [&#39;a&#39;, &#39;*b&#39;, &#34;c=[]&#34;])
     self.assertEqual(func.params(annotate=True),
-                     [&#39;a:\xA0int&#39;, &#39;*b&#39;, &#34;c:\xA0List[pdoc.Doc]\xA0=\xA0[]&#34;])
+                     [&#39;a:\N{NBSP}int&#39;, &#39;*b&#39;, &#34;c:\N{NBSP}List[pdoc.Doc]\N{NBSP}=\N{NBSP}[]&#34;])
 
     # typed, linked
     def link(dobj):
         return &#39;&lt;a href=&#34;{}&#34;&gt;{}&lt;/a&gt;&#39;.format(dobj.url(relative_to=mod), dobj.qualname)
 
     self.assertEqual(func.params(annotate=True, link=link),
-                     [&#39;a:\xA0int&#39;, &#39;*b&#39;,
-                      &#34;c:\xa0List[&lt;a href=\&#34;#pdoc.Doc\&#34;&gt;Doc&lt;/a&gt;]\xa0=\xa0[]&#34;])</code></pre>
+                     [&#39;a:\N{NBSP}int&#39;, &#39;*b&#39;,
+                      &#34;c:\N{NBSP}List[&lt;a href=\&#34;#pdoc.Doc\&#34;&gt;Doc&lt;/a&gt;]\N{NBSP}=\N{NBSP}[]&#34;])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_Function_return_annotation"><code class="name flex">
@@ -1705,7 +1741,7 @@ def test_Class_params(self):
 
     def f() -&gt; typing.List[typing.Union[str, pdoc.Doc]]: pass
     func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc), f)
-    self.assertEqual(func.return_annotation(), &#39;List[Union[str,\xA0pdoc.Doc]]&#39;)</code></pre>
+    self.assertEqual(func.return_annotation(), &#39;List[Union[str,\N{NBSP}pdoc.Doc]]&#39;)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test__all__"><code class="name flex">
@@ -2424,7 +2460,14 @@ not have a method with the specified name.</p></section>
             run(EXAMPLE_MODULE, output_dir=path)
             with chdir(path):
                 self._basic_html_assertions([file.replace(&#39;.html&#39;, &#39;.md&#39;)
-                                             for file in self.PUBLIC_FILES])</code></pre>
+                                             for file in self.PUBLIC_FILES])
+
+    def test_google_analytics(self):
+        expected = [&#39;google-analytics.com&#39;]
+        with run_html(EXAMPLE_MODULE):
+            self._check_files((), exclude_patterns=expected)
+        with run_html(EXAMPLE_MODULE, config=&#39;google_analytics=&#34;UA-xxxxxx-y&#34;&#39;):
+            self._check_files(expected)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -2503,6 +2546,21 @@ not have a method with the specified name.</p></section>
             returncode = run(EXAMPLE_MODULE, html=None, force=None, output_dir=os.getcwd())
             self.assertEqual(returncode, 0)
             self.assertEqual(stderr.getvalue(), &#39;&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.CliTest.test_google_analytics"><code class="name flex">
+<span>def <span class="ident">test_google_analytics</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def test_google_analytics(self):
+    expected = [&#39;google-analytics.com&#39;]
+    with run_html(EXAMPLE_MODULE):
+        self._check_files((), exclude_patterns=expected)
+    with run_html(EXAMPLE_MODULE, config=&#39;google_analytics=&#34;UA-xxxxxx-y&#34;&#39;):
+        self._check_files(expected)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_html"><code class="name flex">
@@ -2865,12 +2923,28 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;dl&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;output&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
 &lt;dd&gt;The output array&lt;/dd&gt;
+&lt;dt&gt;&lt;code&gt;foo&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;h2 id=&#34;returns_1&#34;&gt;Returns&lt;/h2&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dd&gt;The output array&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;raises&#34;&gt;Raises&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;TypeError&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;TypeError&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;When something.&lt;/dd&gt;
 &lt;/dl&gt;
+&lt;h2 id=&#34;raises_1&#34;&gt;Raises&lt;/h2&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;code&gt;TypeError&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;h2 id=&#34;returns_2&#34;&gt;Returns&lt;/h2&gt;
+&lt;p&gt;None.&lt;/p&gt;
+&lt;h2 id=&#34;invalid&#34;&gt;Invalid&lt;/h2&gt;
+&lt;p&gt;no match&lt;/p&gt;
 &lt;h2 id=&#34;see-also&#34;&gt;See Also&lt;/h2&gt;
 &lt;p&gt;&lt;code&gt;fromstring&lt;/code&gt;, &lt;code&gt;loadtxt&lt;/code&gt;&lt;/p&gt;
 &lt;h2 id=&#34;see-also_1&#34;&gt;See Also&lt;/h2&gt;
@@ -3194,12 +3268,28 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;dl&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;output&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
 &lt;dd&gt;The output array&lt;/dd&gt;
+&lt;dt&gt;&lt;code&gt;foo&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;h2 id=&#34;returns_1&#34;&gt;Returns&lt;/h2&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dd&gt;The output array&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;raises&#34;&gt;Raises&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;TypeError&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;TypeError&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;When something.&lt;/dd&gt;
 &lt;/dl&gt;
+&lt;h2 id=&#34;raises_1&#34;&gt;Raises&lt;/h2&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;code&gt;TypeError&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;h2 id=&#34;returns_2&#34;&gt;Returns&lt;/h2&gt;
+&lt;p&gt;None.&lt;/p&gt;
+&lt;h2 id=&#34;invalid&#34;&gt;Invalid&lt;/h2&gt;
+&lt;p&gt;no match&lt;/p&gt;
 &lt;h2 id=&#34;see-also&#34;&gt;See Also&lt;/h2&gt;
 &lt;p&gt;&lt;code&gt;fromstring&lt;/code&gt;, &lt;code&gt;loadtxt&lt;/code&gt;&lt;/p&gt;
 &lt;h2 id=&#34;see-also_1&#34;&gt;See Also&lt;/h2&gt;
@@ -3594,7 +3684,19 @@ not have a method with the specified name.</p></section>
             with self._http([&#39;_relative_import&#39;]) as url:
                 with urlopen(url, timeout=3) as resp:
                     html = resp.read()
-                    self.assertIn(b&#39;&lt;a href=&#34;/_relative_import&#34;&gt;&#39;, html)</code></pre>
+                    self.assertIn(b&#39;&lt;a href=&#34;/_relative_import&#34;&gt;&#39;, html)
+
+    def test_head(self):
+        with self._http([&#39;pdoc&#39;]) as url:
+            with urlopen(Request(url + &#39;pdoc/&#39;,
+                                 method=&#39;HEAD&#39;,
+                                 headers={&#39;If-None-Match&#39;: &#39;xxx&#39;})) as resp:
+                self.assertEqual(resp.status, 205)
+            with self.assertRaises(HTTPError) as cm:
+                urlopen(Request(url + &#39;pdoc/&#39;,
+                                method=&#39;HEAD&#39;,
+                                headers={&#39;If-None-Match&#39;: str(os.stat(pdoc.__file__).st_mtime)}))
+            self.assertEqual(cm.exception.code, 304)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -3615,6 +3717,26 @@ not have a method with the specified name.</p></section>
             with urlopen(url, timeout=3) as resp:
                 html = resp.read()
                 self.assertIn(b&#39;&lt;a href=&#34;/_relative_import&#34;&gt;&#39;, html)</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.HttpTest.test_head"><code class="name flex">
+<span>def <span class="ident">test_head</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def test_head(self):
+    with self._http([&#39;pdoc&#39;]) as url:
+        with urlopen(Request(url + &#39;pdoc/&#39;,
+                             method=&#39;HEAD&#39;,
+                             headers={&#39;If-None-Match&#39;: &#39;xxx&#39;})) as resp:
+            self.assertEqual(resp.status, 205)
+        with self.assertRaises(HTTPError) as cm:
+            urlopen(Request(url + &#39;pdoc/&#39;,
+                            method=&#39;HEAD&#39;,
+                            headers={&#39;If-None-Match&#39;: str(os.stat(pdoc.__file__).st_mtime)}))
+        self.assertEqual(cm.exception.code, 304)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.HttpTest.test_http"><code class="name flex">
@@ -3719,6 +3841,7 @@ not have a method with the specified name.</p></section>
 <li><code><a title="pdoc.test.CliTest.test_config" href="#pdoc.test.CliTest.test_config">test_config</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_external_links" href="#pdoc.test.CliTest.test_external_links">test_external_links</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_force" href="#pdoc.test.CliTest.test_force">test_force</a></code></li>
+<li><code><a title="pdoc.test.CliTest.test_google_analytics" href="#pdoc.test.CliTest.test_google_analytics">test_google_analytics</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html" href="#pdoc.test.CliTest.test_html">test_html</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html_identifier" href="#pdoc.test.CliTest.test_html_identifier">test_html_identifier</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html_multiple_files" href="#pdoc.test.CliTest.test_html_multiple_files">test_html_multiple_files</a></code></li>
@@ -3759,6 +3882,7 @@ not have a method with the specified name.</p></section>
 <h4><code><a title="pdoc.test.HttpTest" href="#pdoc.test.HttpTest">HttpTest</a></code></h4>
 <ul class="">
 <li><code><a title="pdoc.test.HttpTest.test_file" href="#pdoc.test.HttpTest.test_file">test_file</a></code></li>
+<li><code><a title="pdoc.test.HttpTest.test_head" href="#pdoc.test.HttpTest.test_head">test_head</a></code></li>
 <li><code><a title="pdoc.test.HttpTest.test_http" href="#pdoc.test.HttpTest.test_http">test_http</a></code></li>
 </ul>
 </li>
@@ -3769,7 +3893,7 @@ not have a method with the specified name.</p></section>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.2</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

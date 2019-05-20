@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.1" />
+<meta name="generator" content="pdoc 0.6.2" />
 <title>pdoc.cli API documentation</title>
 <meta name="description" content="pdoc&#39;s CLI interface and helper functions." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -176,16 +176,28 @@ class WebDoc(BaseHTTPRequestHandler):
     template_config = None
 
     def do_HEAD(self):
+        status = 200
         if self.path != &#34;/&#34;:
-            out = self.html()
-            if out is None:
-                self.send_response(404)
-                self.end_headers()
-                return
+            status = self.check_modified()
 
-        self.send_response(200)
+        self.send_response(status)
         self.send_header(&#34;Content-type&#34;, &#34;text/html; charset=utf-8&#34;)
         self.end_headers()
+
+    def check_modified(self):
+        try:
+            module = pdoc.import_module(self.import_path_from_req_url)
+            new_etag = str(os.stat(module.__file__).st_mtime)
+        except ImportError:
+            return 404
+
+        old_etag = self.headers.get(&#39;If-None-Match&#39;, new_etag)
+        if old_etag == new_etag:
+            # Don&#39;t log repeating checks
+            self.log_request = lambda *args, **kwargs: None
+            return 304
+
+        return 205
 
     def do_GET(self):
         # Deny favicon shortcut early.
@@ -237,8 +249,9 @@ class WebDoc(BaseHTTPRequestHandler):
         elif self.path.endswith(pdoc._URL_PACKAGE_SUFFIX):
             return self.redirect(self.path[:-len(pdoc._URL_PACKAGE_SUFFIX)] + &#39;/&#39;)
         else:
-            out = self.html()
-            if out is None:
+            try:
+                out = self.html()
+            except ImportError:
                 code = 404
                 out = &#34;Module &lt;code&gt;%s&lt;/code&gt; not found.&#34; % self.import_path_from_req_url
 
@@ -262,7 +275,6 @@ class WebDoc(BaseHTTPRequestHandler):
         generated and account for whether they are stale compared to
         the source code.
         &#34;&#34;&#34;
-        # TODO: pass extra pdoc.html() params
         return pdoc.html(self.import_path_from_req_url,
                          reload=True, http_server=True, external_links=True,
                          **self.template_config)
@@ -332,7 +344,7 @@ def write_files(m: pdoc.Module, ext: str, **kwargs):
             if ext == &#39;.html&#39;:
                 w.write(m.html(**kwargs))
             elif ext == &#39;.md&#39;:
-                w.write(m.html(**kwargs))
+                w.write(m.text(**kwargs))
     except Exception:
         try:
             os.unlink(f)
@@ -687,7 +699,7 @@ or similar, at your own discretion.&#34;&#34;&#34;,
             if ext == &#39;.html&#39;:
                 w.write(m.html(**kwargs))
             elif ext == &#39;.md&#39;:
-                w.write(m.html(**kwargs))
+                w.write(m.text(**kwargs))
     except Exception:
         try:
             os.unlink(f)
@@ -807,16 +819,28 @@ e.g. "text/html" or "text/plain".</p></section>
     template_config = None
 
     def do_HEAD(self):
+        status = 200
         if self.path != &#34;/&#34;:
-            out = self.html()
-            if out is None:
-                self.send_response(404)
-                self.end_headers()
-                return
+            status = self.check_modified()
 
-        self.send_response(200)
+        self.send_response(status)
         self.send_header(&#34;Content-type&#34;, &#34;text/html; charset=utf-8&#34;)
         self.end_headers()
+
+    def check_modified(self):
+        try:
+            module = pdoc.import_module(self.import_path_from_req_url)
+            new_etag = str(os.stat(module.__file__).st_mtime)
+        except ImportError:
+            return 404
+
+        old_etag = self.headers.get(&#39;If-None-Match&#39;, new_etag)
+        if old_etag == new_etag:
+            # Don&#39;t log repeating checks
+            self.log_request = lambda *args, **kwargs: None
+            return 304
+
+        return 205
 
     def do_GET(self):
         # Deny favicon shortcut early.
@@ -868,8 +892,9 @@ e.g. "text/html" or "text/plain".</p></section>
         elif self.path.endswith(pdoc._URL_PACKAGE_SUFFIX):
             return self.redirect(self.path[:-len(pdoc._URL_PACKAGE_SUFFIX)] + &#39;/&#39;)
         else:
-            out = self.html()
-            if out is None:
+            try:
+                out = self.html()
+            except ImportError:
                 code = 404
                 out = &#34;Module &lt;code&gt;%s&lt;/code&gt; not found.&#34; % self.import_path_from_req_url
 
@@ -893,7 +918,6 @@ e.g. "text/html" or "text/plain".</p></section>
         generated and account for whether they are stale compared to
         the source code.
         &#34;&#34;&#34;
-        # TODO: pass extra pdoc.html() params
         return pdoc.html(self.import_path_from_req_url,
                          reload=True, http_server=True, external_links=True,
                          **self.template_config)
@@ -970,6 +994,29 @@ def import_path_from_req_url(self):
 </dl>
 <h3>Methods</h3>
 <dl>
+<dt id="pdoc.cli.WebDoc.check_modified"><code class="name flex">
+<span>def <span class="ident">check_modified</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def check_modified(self):
+    try:
+        module = pdoc.import_module(self.import_path_from_req_url)
+        new_etag = str(os.stat(module.__file__).st_mtime)
+    except ImportError:
+        return 404
+
+    old_etag = self.headers.get(&#39;If-None-Match&#39;, new_etag)
+    if old_etag == new_etag:
+        # Don&#39;t log repeating checks
+        self.log_request = lambda *args, **kwargs: None
+        return 304
+
+    return 205</code></pre>
+</details>
+</dd>
 <dt id="pdoc.cli.WebDoc.do_GET"><code class="name flex">
 <span>def <span class="ident">do_GET</span></span>(<span>self)</span>
 </code></dt>
@@ -1027,8 +1074,9 @@ def import_path_from_req_url(self):
     elif self.path.endswith(pdoc._URL_PACKAGE_SUFFIX):
         return self.redirect(self.path[:-len(pdoc._URL_PACKAGE_SUFFIX)] + &#39;/&#39;)
     else:
-        out = self.html()
-        if out is None:
+        try:
+            out = self.html()
+        except ImportError:
             code = 404
             out = &#34;Module &lt;code&gt;%s&lt;/code&gt; not found.&#34; % self.import_path_from_req_url
 
@@ -1046,14 +1094,11 @@ def import_path_from_req_url(self):
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def do_HEAD(self):
+    status = 200
     if self.path != &#34;/&#34;:
-        out = self.html()
-        if out is None:
-            self.send_response(404)
-            self.end_headers()
-            return
+        status = self.check_modified()
 
-    self.send_response(200)
+    self.send_response(status)
     self.send_header(&#34;Content-type&#34;, &#34;text/html; charset=utf-8&#34;)
     self.end_headers()</code></pre>
 </details>
@@ -1086,7 +1131,6 @@ the source code.</p></section>
     generated and account for whether they are stale compared to
     the source code.
     &#34;&#34;&#34;
-    # TODO: pass extra pdoc.html() params
     return pdoc.html(self.import_path_from_req_url,
                      reload=True, http_server=True, external_links=True,
                      **self.template_config)</code></pre>
@@ -1168,6 +1212,7 @@ the source code.</p></section>
 <h4><code><a title="pdoc.cli.WebDoc" href="#pdoc.cli.WebDoc">WebDoc</a></code></h4>
 <ul class="">
 <li><code><a title="pdoc.cli.WebDoc.args" href="#pdoc.cli.WebDoc.args">args</a></code></li>
+<li><code><a title="pdoc.cli.WebDoc.check_modified" href="#pdoc.cli.WebDoc.check_modified">check_modified</a></code></li>
 <li><code><a title="pdoc.cli.WebDoc.do_GET" href="#pdoc.cli.WebDoc.do_GET">do_GET</a></code></li>
 <li><code><a title="pdoc.cli.WebDoc.do_HEAD" href="#pdoc.cli.WebDoc.do_HEAD">do_HEAD</a></code></li>
 <li><code><a title="pdoc.cli.WebDoc.echo" href="#pdoc.cli.WebDoc.echo">echo</a></code></li>
@@ -1185,7 +1230,7 @@ the source code.</p></section>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.2</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.1" />
+<meta name="generator" content="pdoc 0.6.2" />
 <title>pdoc.html_helpers API documentation</title>
 <meta name="description" content="Helper functions for HTML output." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -142,20 +142,24 @@ class _ToMarkdown:
         type = _type_parts(type or &#39;&#39;)
         desc = desc or &#39;&amp;nbsp;&#39;
         assert _ToMarkdown._is_indented_4_spaces(desc)
+        assert name or type
+        ret = &#34;&#34;
+        if name:
+            ret += &#39;**`{}`**&#39;.format(name)
         if type:
-            return &#39;**`{}`** :&amp;ensp;{}\n:   {}\n\n&#39;.format(name, type, desc)
-        return &#39;**`{}`**\n:   {}\n\n&#39;.format(name, desc)
+            ret += &#39; :&amp;ensp;{}&#39;.format(type) if ret else type
+        ret += &#39;\n:   {}\n\n&#39;.format(desc)
+        return ret
 
     @staticmethod
     def _numpy_params(match,
                       _name_parts=partial(re.compile(&#39;, &#39;).sub, &#39;`**, **`&#39;)):
         &#34;&#34;&#34; Converts NumpyDoc parameter (etc.) sections into Markdown. &#34;&#34;&#34;
-        name, type, desc = match.groups()
+        name, type, desc = match.group(&#34;name&#34;, &#34;type&#34;, &#34;desc&#34;)
+        type = type or match.groupdict().get(&#39;just_type&#39;, None)
         desc = desc.strip()
-        if name and (type or desc):
-            name = _name_parts(name)
-            return _ToMarkdown._deflist(name, type, desc)
-        return match.group(0)
+        name = name and _name_parts(name)
+        return _ToMarkdown._deflist(name, type, desc)
 
     @staticmethod
     def _numpy_seealso(match):
@@ -163,29 +167,44 @@ class _ToMarkdown:
         Converts NumpyDoc &#34;See Also&#34; section either into referenced code,
         optionally within a definition list.
         &#34;&#34;&#34;
-        title, spec_with_desc, simple_list = match.groups()
+        spec_with_desc, simple_list = match.groups()
         if spec_with_desc:
-            return title + &#39;\n\n&#39;.join(&#39;`{}`\n:   {}&#39;.format(*map(str.strip, line.split(&#39;:&#39;, 1)))
-                                       for line in filter(None, spec_with_desc.split(&#39;\n&#39;)))
-        return title + &#39;, &#39;.join(&#39;`{}`&#39;.format(i) for i in simple_list.split(&#39;, &#39;))
+            return &#39;\n\n&#39;.join(&#39;`{}`\n:   {}&#39;.format(*map(str.strip, line.split(&#39;:&#39;, 1)))
+                               for line in filter(None, spec_with_desc.split(&#39;\n&#39;)))
+        return &#39;, &#39;.join(&#39;`{}`&#39;.format(i) for i in simple_list.split(&#39;, &#39;))
 
     @staticmethod
-    def numpy(text,
-              # All kinds of numpydoc Parameters (optionally with types; descriptions)
-              _params=partial(
-                  re.compile(r&#39;^(\*{0,2}\w+(?:, \*{0,2}\w+)*)(?: ?: (.*)(?&lt;!\.)$)?&#39;
-                             r&#39;((?:\n(?: {4}.*|$))*)&#39;, re.MULTILINE).sub,
-                  _numpy_params.__func__),
-              _seealso=partial(
-                  re.compile(r&#39;(See Also\n-{8}\n)(?:((?:\n?[\w.]* ?: .*)+)|(.*))&#39;).sub,
-                  _numpy_seealso.__func__)):
+    def _numpy_sections(match):
+        &#34;&#34;&#34;
+        Convert sections with parameter, return, and see also lists to Markdown
+        lists.
+        &#34;&#34;&#34;
+        section, body = match.groups()
+        if section.title() == &#39;See Also&#39;:
+            body = re.sub(r&#39;^((?:\n?[\w.]* ?: .*)+)|(.*\w.*)&#39;,
+                          _ToMarkdown._numpy_seealso, body)
+        elif section.title() in (&#39;Returns&#39;, &#39;Yields&#39;, &#39;Raises&#39;, &#39;Warns&#39;):
+            body = re.sub(r&#39;^(?:(?P&lt;name&gt;\*{0,2}\w+(?:, \*{0,2}\w+)*)&#39;
+                          r&#39;(?: ?: (?P&lt;type&gt;.*))|&#39;
+                          r&#39;(?P&lt;just_type&gt;\w[^\n`*]*))(?&lt;!\.)$&#39;
+                          r&#39;(?P&lt;desc&gt;(?:\n(?: {4}.*|$))*)&#39;,
+                          _ToMarkdown._numpy_params, body, flags=re.MULTILINE)
+        else:
+            body = re.sub(r&#39;^(?P&lt;name&gt;\*{0,2}\w+(?:, \*{0,2}\w+)*)&#39;
+                          r&#39;(?: ?: (?P&lt;type&gt;.*))?(?&lt;!\.)$&#39;
+                          r&#39;(?P&lt;desc&gt;(?:\n(?: {4}.*|$))*)&#39;,
+                          _ToMarkdown._numpy_params, body, flags=re.MULTILINE)
+        return section + &#39;\n-----\n&#39; + body
+
+    @staticmethod
+    def numpy(text):
         &#34;&#34;&#34;
         Convert `text` in numpydoc docstring format to Markdown
         to be further converted later.
         &#34;&#34;&#34;
-        text = _seealso(text)
-        text = _params(text)
-        return text
+        return re.sub(r&#39;^(\w[\w ]+)\n-{3,}\n&#39;
+                      r&#39;((?:(?!.+\n-+).*$\n?)*)&#39;,
+                      _ToMarkdown._numpy_sections, text, flags=re.MULTILINE)
 
     @staticmethod
     def _is_indented_4_spaces(txt, _3_spaces_or_less=re.compile(r&#39;\n\s{0,3}\S&#39;).search):
@@ -193,7 +212,7 @@ class _ToMarkdown:
 
     @staticmethod
     def _fix_indent(name, type, desc):
-        &#34;&#34;&#34;Mazbe fix indent from 2 to 4 spaces.&#34;&#34;&#34;
+        &#34;&#34;&#34;Maybe fix indent from 2 to 4 spaces.&#34;&#34;&#34;
         if not _ToMarkdown._is_indented_4_spaces(desc):
             desc = desc.replace(&#39;\n&#39;, &#39;\n  &#39;)
         return name, type, desc
@@ -642,7 +661,7 @@ doesn't match any documented objects.</p>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.2</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
