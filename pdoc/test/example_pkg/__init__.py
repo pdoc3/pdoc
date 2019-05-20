@@ -130,11 +130,29 @@ class Docformats:
         -------
         output : pdoc.Doc
             The output array
+        foo
+
+        Returns
+        -------
+        pdoc.Doc
+            The output array
 
         Raises
         ------
         TypeError
             When something.
+
+        Raises
+        ------
+        TypeError
+
+        Returns
+        -------
+        None.
+
+        Invalid
+        -------
+        no match
 
         See Also
         --------
