@@ -824,12 +824,28 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <dl>
 <dt><strong><code>output</code></strong> :&ensp;<a><code>pdoc.Doc</code></a></dt>
 <dd>The output array</dd>
+<dt><code>foo</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns_1">Returns</h2>
+<dl>
+<dt><a><code>pdoc.Doc</code></a></dt>
+<dd>The output array</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
-<dt><strong><code>TypeError</code></strong></dt>
+<dt><code>TypeError</code></dt>
 <dd>When something.</dd>
 </dl>
+<h2 id="raises_1">Raises</h2>
+<dl>
+<dt><code>TypeError</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns_2">Returns</h2>
+<p>None.</p>
+<h2 id="invalid">Invalid</h2>
+<p>no match</p>
 <h2 id="see-also">See Also</h2>
 <p><code>fromstring</code>, <code>loadtxt</code></p>
 <h2 id="see-also_1">See Also</h2>
