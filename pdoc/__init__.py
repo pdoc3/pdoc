@@ -1060,7 +1060,7 @@ class Function(Doc):
         try:
             annot = typing.get_type_hints(self.obj).get('return', '')
         except NameError as e:
-            warn("Error handling return annotation for {}: {}", self.name, e.args[0])
+            warn("Error handling return annotation for {}: {}".format(self.name, e.args[0]))
             annot = inspect.signature(inspect.unwrap(self.obj)).return_annotation
             if annot == inspect.Parameter.empty:
                 annot = ''
