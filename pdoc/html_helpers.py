@@ -291,7 +291,7 @@ class _ToMarkdown:
                      re.compile(r'(?:^(?P<fence>```|~~~).*\n)?'
                                 r'(?:^>>>.*'
                                 r'(?:\n(?:(?:>>>|\.\.\.).*))*'
-                                r'(?:\n.*)?\n\n?)+'
+                                r'(?:\n.*)?\n?)+'
                                 r'(?P=fence)?', re.MULTILINE).sub,
                      lambda m: (m.group(0) if m.group('fence') else
                                 ('\n    ' + '\n    '.join(m.group(0).split('\n')) + '\n\n')))):
