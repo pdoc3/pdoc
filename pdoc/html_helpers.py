@@ -190,6 +190,12 @@ class _ToMarkdown:
         return name, type, desc
 
     @staticmethod
+    def indent(indent, text, *, clean_first=False):
+        if clean_first:
+            text = inspect.cleandoc(text)
+        return re.sub(r'\n', '\n' + indent, indent + text.rstrip())
+
+    @staticmethod
     def google(text,
                _googledoc_sections=partial(
                    re.compile(r'^([A-Z]\w+):$\n((?:\n?(?: {2,}.*|$))+)', re.MULTILINE).sub,
@@ -240,8 +246,7 @@ class _ToMarkdown:
             if value:
                 title += ':&ensp;' + value
 
-        text = '\n'.join(indent + '    ' + line
-                         for line in inspect.cleandoc(text).split('\n'))
+        text = _ToMarkdown.indent(indent + '    ', text, clean_first=True)
         return '{}!!! {} "{}"\n{}\n'.format(indent, type, title, text)
 
     @staticmethod
@@ -278,8 +283,7 @@ class _ToMarkdown:
         if end_before:
             text = text[:text.index(end_before)]
 
-        text = re.sub(r'\n', '\n' + indent, indent + text.rstrip())
-        return text
+        return _ToMarkdown.indent(indent, text)
 
     @staticmethod
     def _directive_opts(text: str) -> dict:
