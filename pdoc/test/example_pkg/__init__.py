@@ -284,3 +284,16 @@ doctests = Docformats.doctests
 
 
 reST_directives = Docformats.reST_directives
+
+
+def latex_math():
+    """
+    Inline equation: \\( v_t *\\frac{1}{2}* j_i + [a](#b) < 3 \\).
+
+    Block equation: \\[ v_t *\\frac{1}{2}* j_i + [a](#b) < 3 \\]
+
+    Block equation: $$ v_t *\\frac{1}{2}* j_i + [a](#b) < 3 $$
+
+    ..math::
+        v_t *\\frac{1}{2}* j_i + [a](#b) < 3
+    """

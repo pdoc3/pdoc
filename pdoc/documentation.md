@@ -177,12 +177,23 @@ Supported docstring formats
 ---------------------------
 Currently, pure Markdown (with [extensions]), [numpydoc],
 and [Google-style] docstrings formats are supported,
-along with some reST directives.
+along with some [reST directives].
+
+Additionally, if `latex_math` [template config] option is enabled,
+LaTeX math syntax is supported when placed between
+[recognized delimiters]: `\(...\)` for inline equations and
+`\[...\]` or `$$...$$` for block equations. Note, you need to escape
+your backslashes in Python docstrings (`\\(`, `\\frac{}{}`, ...)
+or, alternatively, use [raw string literals].
 
 *[reST]: reStructuredText
 [extensions]: https://python-markdown.github.io/extensions/#officially-supported-extensions
 [numpydoc]: https://numpydoc.readthedocs.io/
 [Google-style]: http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
+[reST directives]: #supported-rest-directives
+[template config]: #custom-templates
+[recognized delimiters]: http://docs.mathjax.org/en/latest/tex.html#tex-and-latex-math-delimiters
+[raw string literals]: https://www.journaldev.com/23598/python-raw-string
 
 
 ### Supported reST directives
@@ -193,6 +204,7 @@ The following reST directives should work:
 * [`.. image::`][image] or `.. figure::` (without options),
 * [`.. include::`][include], with support for the options:
   `:start-line:`, `:end-line:`, `:start-after:` and `:end-before:`.
+* [`.. math::`][math]
 * `.. versionadded::`
 * `.. versionchanged::`
 * `.. deprecated::`
@@ -201,6 +213,7 @@ The following reST directives should work:
 [admonitions]: http://docutils.sourceforge.net/docs/ref/rst/directives.html#admonitions
 [image]: http://docutils.sourceforge.net/docs/ref/rst/directives.html#images
 [include]: http://docutils.sourceforge.net/docs/ref/rst/directives.html#including-an-external-document-fragment
+[math]: http://docutils.sourceforge.net/docs/ref/rst/directives.html#math
 
 
 Linking to other identifiers

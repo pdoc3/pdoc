@@ -230,6 +230,11 @@ class _ToMarkdown:
                 indent, text.translate(str.maketrans({'\n': ' ',
                                                       '[': '\\[',
                                                       ']': '\\]'})).strip(), value)
+        if type == 'math':
+            return _ToMarkdown.indent(indent,
+                                      _ToMarkdown.math('\\[ ' + text.strip() + ' \\]'),
+                                      clean_first=True)
+
         if type == 'versionchanged':
             title = 'Changed in version:&ensp;' + value
         elif type == 'versionadded':
@@ -312,9 +317,17 @@ class _ToMarkdown:
         """Wrap URLs in Python-Markdown-compatible <angle brackets>."""
         return re.sub(r'(?<![<"\'])(\s*)((?:http|ftp)s?://[^>)\s]+)(\s*)', r'\1<\2>\3', text)
 
+    @staticmethod
+    def math(text, *, unwrap=False):
+        if unwrap:
+            return re.sub(r'<code>~mathjax~(.*?)</code>', r'\1', text, flags=re.DOTALL)
+        return re.sub(r'(?<!\S)(\\\(.*?\\\)|\\\[.*?\\\]|\$\$.*?\$\$)',
+                      r'`~mathjax~\1`', text, flags=re.DOTALL)
+
 
 def to_html(text: str, docformat: str = 'numpy,google', *,
-            module: pdoc.Module = None, link: Callable[..., str] = None):
+            module: pdoc.Module = None, link: Callable[..., str] = None,
+            latex_math: bool = False):
     """
     Returns HTML of `text` interpreted as `docformat`.
     By default, Numpydoc and Google-style docstrings are assumed,
@@ -324,8 +337,16 @@ def to_html(text: str, docformat: str = 'numpy,google', *,
     resolved) and `link` is the hyperlinking function like the one in the
     example template.
     """
+    if latex_math:
+        text = _ToMarkdown.math(text)
+
     md = to_markdown(text, docformat=docformat, module=module, link=link)
-    return _md.reset().convert(md)
+    html = _md.reset().convert(md)
+
+    if latex_math:
+        html = _ToMarkdown.math(html, unwrap=True)
+
+    return html
 
 
 def to_markdown(text: str, docformat: str = 'numpy,google', *,
