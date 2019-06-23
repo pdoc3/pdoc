@@ -218,7 +218,7 @@ def _var_docstrings(doc_obj: Union['Module', 'Class'], *,
         if isinstance(doc_obj, Module) and doc_obj.is_namespace:
             return {}
         try:
-            tree = ast.parse(inspect.getsource(doc_obj.obj))  # type: ignore
+            tree = ast.parse(inspect.getsource(doc_obj.obj))
         except (OSError, TypeError, SyntaxError):
             warn("Couldn't get/parse source of '{!r}'".format(doc_obj))
             return {}
