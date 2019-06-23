@@ -228,6 +228,12 @@ class Docformats:
         ```
         fenced code works
         ```
+
+        Examples:
+            >>> nbytes(100)
+            '100.0 bytes'
+
+            >>> asdf
         """
 
     def reST_directives(self):

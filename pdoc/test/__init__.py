@@ -934,6 +934,13 @@ that are relevant to the interface.</p>
 </code></pre>
 <p>Alternatively</p>
 <pre><code>fenced code works
+</code></pre>
+
+<h2 id="examples">Examples</h2>
+<pre><code>&gt;&gt;&gt; nbytes(100)
+'100.0 bytes'
+
+&gt;&gt;&gt; asdf
 </code></pre>'''
         text = inspect.getdoc(self._docmodule.doctests)
         html = to_html(text, module=self._module, link=self._link)

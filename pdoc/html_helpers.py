@@ -299,6 +299,8 @@ class _ToMarkdown:
         Indent non-fenced (`~~~`) top-level (0-indented)
         doctest blocks so they render as code.
         """
+        if not text.endswith('\n'):  # Needed for the r'(?:\n.*)?\n\n?)+' line (GH-72)
+            text += '\n'
         return _indent_doctests(text)
 
     @staticmethod
