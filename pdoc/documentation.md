@@ -220,10 +220,11 @@ Command-line interface
 [cmd]: #command-line-interface
 `pdoc` includes a feature-rich "binary" program for producing
 HTML and plain text documentation of your modules.
-To produce HTML documentation of your whole package in subdirectory
-'build' of the current directory, using the default HTML template, run:
+For example, to produce HTML documentation of your whole package
+in subdirectory 'build' of the current directory, using the default
+HTML template, run:
 
-    $ pdoc --html --html-dir build my_package
+    $ pdoc --html --output-dir build my_package
 
 To run a local HTTP server while developing your package or writing
 docstrings for it, run:
@@ -296,16 +297,24 @@ afterwards, pass the directory path as a parameter to the
     see if you can do so by overriding just some of the following, placeholder
     sub-templates:
 
-    * _config.mako_: Basic template configuration, affects the way templates are rendered.
+    * [_config.mako_]: Basic template configuration, affects the way templates
+      are rendered.
     * _head.mako_: Included just before `</head>`. Best for adding resources and styles.
     * _logo.mako_: Included at the very top of the navigation sidebar. Empty by default.
     * _credits.mako_: Included in the footer, right before pdoc version string.
 
-    See default template files for reference.
+    See [default template files] for reference.
+
+.. tip::
+   You can also alter individual [_config.mako_] preferences using the
+   `--config` command-line switch.
 
 If working with `pdoc` programmatically, _prepend_ the directory with
 modified templates into the `directories` list of the
 `pdoc.tpl_lookup` object.
+
+[_config.mako_]: https://github.com/pdoc3/pdoc/blob/master/pdoc/templates/config.mako
+[default template files]: https://github.com/pdoc3/pdoc/tree/master/pdoc/templates
 
 
 Compatibility
