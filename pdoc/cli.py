@@ -396,25 +396,14 @@ def main(_args=None):
     # Support loading modules specified as python paths relative to cwd
     sys.path.append(os.getcwd())
 
-    # Virtual Environment Handling for system pdoc cli
+    # Virtual environment handling for pdoc script run from system site
     try:
-        # this will raise a KeyError if not in a virtual envitonment.
-        venvPath = os.environ['VIRTUAL_ENV']
-        # pdoc is installed in the current v.e., it will find v.e. local modules.
-        if path.isdir(path.join(venvPath,
-                                'lib',
-                                'site-packages',
-                                'pdoc')):
-
-            pass
-        else:
-            # pdoc cli is running with system Python context despite being invoked in a v.e.
-            sys.path.append(path.join(venvPath,
-                                      'lib',
-                                      'site-packages'))
+        venv_dir = os.environ['VIRTUAL_ENV']
     except KeyError:
-        # pdoc cli was not invoked in a virtual environment
-        pass
+        pass  # pdoc was not invoked while in a virtual environment
+    else:
+        from distutils.sysconfig import get_python_lib
+        sys.path.append(get_python_lib(prefix=venv_dir))
 
     if args.http:
         template_config['link_prefix'] = "/"
