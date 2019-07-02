@@ -396,6 +396,15 @@ def main(_args=None):
     # Support loading modules specified as python paths relative to cwd
     sys.path.append(os.getcwd())
 
+    # Virtual environment handling for pdoc script run from system site
+    try:
+        venv_dir = os.environ['VIRTUAL_ENV']
+    except KeyError:
+        pass  # pdoc was not invoked while in a virtual environment
+    else:
+        from distutils.sysconfig import get_python_lib
+        sys.path.append(get_python_lib(prefix=venv_dir))
+
     if args.http:
         template_config['link_prefix'] = "/"
 
