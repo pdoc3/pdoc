@@ -15,7 +15,7 @@
 
 
   def to_html(text):
-    return _to_html(text, module=module, link=link)
+    return _to_html(text, module=module, link=link, latex_math=latex_math)
 %>
 
 <%def name="ident(name)"><span class="ident">${name}</span></%def>
@@ -365,6 +365,10 @@
     window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
     ga('create', '${google_analytics}', 'auto'); ga('send', 'pageview');
     </script><script async src='https://www.google-analytics.com/analytics.js'></script>
+  % endif
+
+  % if latex_math:
+    <script async src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS_CHTML'></script>
   % endif
 
   <%include file="head.mako"/>

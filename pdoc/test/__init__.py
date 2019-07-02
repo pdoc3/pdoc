@@ -1030,6 +1030,15 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"""
         html = to_html(text)
         self.assertEqual(html, expected)
 
+    def test_latex_math(self):
+        expected = r'''<p>Inline equation: <span><span class="MathJax_Preview"> v_t *\frac{1}{2}* j_i + [a] &lt; 3 </span><script type="math/tex"> v_t *\frac{1}{2}* j_i + [a] < 3 </script></span>.</p>
+<p>Block equation: <span><span class="MathJax_Preview"> v_t *\frac{1}{2}* j_i + [a] &lt; 3 </span><script type="math/tex; mode=display"> v_t *\frac{1}{2}* j_i + [a] < 3 </script></span></p>
+<p>Block equation: <span><span class="MathJax_Preview"> v_t *\frac{1}{2}* j_i + [a] &lt; 3 </span><script type="math/tex; mode=display"> v_t *\frac{1}{2}* j_i + [a] < 3 </script></span></p>
+<p><span><span class="MathJax_Preview"> v_t *\frac{1}{2}* j_i + [a] &lt; 3 </span><script type="math/tex; mode=display"> v_t *\frac{1}{2}* j_i + [a] < 3 </script></span></p>'''  # noqa: E501
+        text = inspect.getdoc(self._docmodule.latex_math)
+        html = to_html(text, module=self._module, link=self._link, latex_math=True)
+        self.assertEqual(html, expected)
+
 
 class HttpTest(unittest.TestCase):
     """

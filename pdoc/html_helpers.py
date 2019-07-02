@@ -9,6 +9,8 @@ from typing import Callable, Match
 from warnings import warn
 
 import markdown
+from markdown.inlinepatterns import InlineProcessor
+from markdown.util import AtomicString, etree
 
 import pdoc
 
@@ -230,6 +232,11 @@ class _ToMarkdown:
                 indent, text.translate(str.maketrans({'\n': ' ',
                                                       '[': '\\[',
                                                       ']': '\\]'})).strip(), value)
+        if type == 'math':
+            return _ToMarkdown.indent(indent,
+                                      '\\[ ' + text.strip() + ' \\]',
+                                      clean_first=True)
+
         if type == 'versionchanged':
             title = 'Changed in version:&ensp;' + value
         elif type == 'versionadded':
@@ -313,8 +320,26 @@ class _ToMarkdown:
         return re.sub(r'(?<![<"\'])(\s*)((?:http|ftp)s?://[^>)\s]+)(\s*)', r'\1<\2>\3', text)
 
 
+class _MathPattern(InlineProcessor):
+    NAME = 'pdoc-math'
+    PATTERN = r'(?<!\S|\\)(?:\\\((.+?)\\\)|\\\[(.+?)\\\]|\$\$(.+?)\$\$)'
+    PRIORITY = 181  # Larger than that of 'escape' pattern
+
+    def handleMatch(self, m, data):
+        for value, is_block in zip(m.groups(), (False, True, True)):
+            if value:
+                break
+        script = etree.Element('script', type='math/tex' + ('; mode=display' if is_block else ''))
+        preview = etree.Element('span', {'class': 'MathJax_Preview'})
+        preview.text = script.text = AtomicString(value)
+        wrapper = etree.Element('span')
+        wrapper.extend([preview, script])
+        return wrapper, m.start(0), m.end(0)
+
+
 def to_html(text: str, docformat: str = 'numpy,google', *,
-            module: pdoc.Module = None, link: Callable[..., str] = None):
+            module: pdoc.Module = None, link: Callable[..., str] = None,
+            latex_math: bool = False):
     """
     Returns HTML of `text` interpreted as `docformat`.
     By default, Numpydoc and Google-style docstrings are assumed,
@@ -324,6 +349,14 @@ def to_html(text: str, docformat: str = 'numpy,google', *,
     resolved) and `link` is the hyperlinking function like the one in the
     example template.
     """
+    # Optionally register our math syntax processor
+    if not latex_math and _MathPattern.NAME in _md.inlinePatterns:
+        _md.inlinePatterns.deregister(_MathPattern.NAME)
+    elif latex_math and _MathPattern.NAME not in _md.inlinePatterns:
+        _md.inlinePatterns.register(_MathPattern(_MathPattern.PATTERN),
+                                    _MathPattern.NAME,
+                                    _MathPattern.PRIORITY)
+
     md = to_markdown(text, docformat=docformat, module=module, link=link)
     return _md.reset().convert(md)
 

@@ -24,4 +24,11 @@
     # If set, insert Google Analytics tracking code. Value is GA
     # tracking id (UA-XXXXXX-Y).
     google_analytics = ''
+
+    # If set, render LaTeX math syntax within \(...\) (inline equations),
+    # or within \[...\] or $$...$$ or `.. math::` (block equations)
+    # as nicely-formatted math formulas using MathJax.
+    # Note: in Python docstrings, either all backslashes need to be escaped (\\)
+    # or you need to use raw r-strings.
+    latex_math = False
 %>
