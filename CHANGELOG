@@ -1,3 +1,9 @@
+0.6.3  (2019-07-03)
+=====
+  - New support for LaTeX math syntax (using new config tunable `latex_math=True`).
+  - Support for running system-site-installed pdoc within a virtual environment.
+  - Bugfixes.
+
 0.6.2  (2019-05-20)
 =====
   - Fixes:
