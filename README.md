@@ -36,8 +36,8 @@ Features
 --------
 * Simple usage. Generate sensible API (+ prose) documentation without any
   special configuration.
-* Support for common docstrings formats (Markdown, numpydoc, Google-style docstrings)
-  and some reST directives.
+* Support for common docstrings formats (Markdown, numpydoc, Google-style docstrings),
+  LaTeX math, and some reST directives.
 * Support for PEP 484 type annotations.
 * pdoc respects `__all__` when present.
 * Inheritance used as applicable for inferring docstrings for class members.
