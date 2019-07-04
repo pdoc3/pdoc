@@ -819,7 +819,7 @@ class Class(Doc):
         for name, obj in public_objs:
             if name in self.doc and self.doc[name].docstring:
                 continue
-            if inspect.isroutine(obj):
+            if inspect.isroutine(obj) and callable(obj):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self,
                     method=not self._method_type(self.obj, name))
