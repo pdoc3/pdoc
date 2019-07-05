@@ -826,10 +826,14 @@ class Class(Doc):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self,
                     method=not self._method_type(self.obj, name))
+            elif inspect.isroutine(obj):
+                self.doc[name] = Variable(
+                    name, self.module, inspect.getdoc(obj),
+                    obj=getattr(obj, '__get__', obj),
+                    cls=self, instance_var=True)
             elif (inspect.isdatadescriptor(obj) or
                   inspect.isgetsetdescriptor(obj) or
-                  inspect.ismemberdescriptor(obj) or
-                  inspect.isroutine(obj)):
+                  inspect.ismemberdescriptor(obj)):
                 self.doc[name] = Variable(
                     name, self.module, inspect.getdoc(obj),
                     obj=getattr(obj, 'fget', obj),
