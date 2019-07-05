@@ -818,6 +818,9 @@ class Class(Doc):
         # Convert the public Python objects to documentation objects.
         for name, obj in public_objs:
             if name in self.doc and self.doc[name].docstring:
+                if inspect.isroutine(obj) and not callable(obj):
+                    assert isinstance(self.doc[name], Variable)
+                    self.doc[name].instance_var = True
                 continue
             if inspect.isroutine(obj) and callable(obj):
                 self.doc[name] = Function(
@@ -825,7 +828,8 @@ class Class(Doc):
                     method=not self._method_type(self.obj, name))
             elif (inspect.isdatadescriptor(obj) or
                   inspect.isgetsetdescriptor(obj) or
-                  inspect.ismemberdescriptor(obj)):
+                  inspect.ismemberdescriptor(obj) or
+                  inspect.isroutine(obj)):
                 self.doc[name] = Variable(
                     name, self.module, inspect.getdoc(obj),
                     obj=getattr(obj, 'fget', obj),
