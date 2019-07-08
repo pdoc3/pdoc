@@ -417,19 +417,16 @@ class ApiTest(unittest.TestCase):
     def test_readonly_var_descriptors(self):
         pdoc.reset()
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
-        var = mod.doc['B'].doc['squere']
+        var = mod.doc['B'].doc['square']
         self.assertIsInstance(var, pdoc.Variable)
         self.assertTrue(var.instance_var)
-        self.assertEqual(var.docstring, """Squere of variable `var`""")
-
-    def test_readonly_var_descriptors_no_docstring(self):
-        pdoc.reset()
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        self.assertEqual(var.docstring, """Square of variable `var`""")
         var = mod.doc['B'].doc['squere_no_doc']
         self.assertIsInstance(var, pdoc.Variable)
         self.assertTrue(var.instance_var)
         self.assertEqual(var.docstring,
-                         """Read-only value descriptor, returns squere of variable `var`""")
+                         """Read-only value descriptor, returns square of variable `var`""")
+        self.assertTrue(var.source)
 
     def test_builtin_methoddescriptors(self):
         import parser

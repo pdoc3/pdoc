@@ -20,8 +20,8 @@ def foo(env=os.environ):
     pass
 
 
-class ReadOnlyValueDescrpitor:
-    """Read-only value descriptor, returns squere of variable `var`"""
+class ReadOnlyValueDescriptor:
+    """Read-only value descriptor, returns square of variable `var`"""
 
     def __get__(self, instance, instance_type=None):
         if instance is not None:
@@ -54,10 +54,10 @@ class B(A, int):
     var = 3
     """B.var docstring"""
 
-    squere = ReadOnlyValueDescrpitor()
-    """Squere of variable `var`"""
+    square = ReadOnlyValueDescriptor()
+    """Square of variable `var`"""
 
-    squere_no_doc = ReadOnlyValueDescrpitor()   # no doc-string
+    squere_no_doc = ReadOnlyValueDescriptor()   # no doc-string
 
     def __init__(self, x, y, z, w):
         """__init__ docstring"""
