@@ -302,11 +302,3 @@ def latex_math():
 
 class Location(namedtuple('Location', 'lat lon')):
     """Geo-location, GPS position."""
-
-
-class Location2:
-    pass
-
-
-class Location2(Location2):
-    pass
