@@ -871,6 +871,14 @@ class Class(Doc):
         classes = [self.module.find_class(c)
                    for c in inspect.getmro(self.obj)
                    if c not in (self.obj, object)]
+        if self in classes:
+            # This can contain self in case of a class inheriting from
+            # a class with (previously) the same name. E.g.
+            #
+            #     class Loc(namedtuple('Loc', 'lat lon')): ...
+            #
+            # We remove it from ancestors so that toposort doesn't break.
+            classes.remove(self)
         if only_documented:
             classes = _filter_type(Class, classes)
         return classes

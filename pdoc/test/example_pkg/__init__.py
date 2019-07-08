@@ -1,4 +1,5 @@
 """Module docstring"""
+from collections import namedtuple
 import subprocess
 import os
 
@@ -297,3 +298,15 @@ def latex_math():
     ..math::
         v_t *\\frac{1}{2}* j_i + [a] < 3
     """
+
+
+class Location(namedtuple('Location', 'lat lon')):
+    """Geo-location, GPS position."""
+
+
+class Location2:
+    pass
+
+
+class Location2(Location2):
+    pass
