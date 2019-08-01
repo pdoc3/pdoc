@@ -16,6 +16,9 @@
     # No prefix results in all links being relative.
     link_prefix = ''
 
+    # Enable syntax highlighting for code/source blocks by including Highlight.js
+    syntax_highlighting = True
+
     # Set the style keyword such as 'atom-one-light' or 'github-gist'
     #     Options: https://github.com/highlightjs/highlight.js/tree/master/src/styles
     #     Demo: https://highlightjs.org/static/demo/
