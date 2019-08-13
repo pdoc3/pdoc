@@ -502,7 +502,7 @@ class Module(Doc):
 
     __slots__ = ('supermodule', 'doc', '_context', '_is_inheritance_linked')
 
-    def __init__(self, module: ModuleType, *, docfilter: Callable[[Doc], bool] = None,
+    def __init__(self, module: Union[ModuleType, str], *, docfilter: Callable[[Doc], bool] = None,
                  supermodule: 'Module' = None, context: Context = None):
         """
         Creates a `Module` documentation object given the actual
@@ -517,6 +517,9 @@ class Module(Doc):
         `context` is an instance of `pdoc.Context`. If `None` a
         global context object will be used.
         """
+        if isinstance(module, str):
+            module = import_module(module)
+
         super().__init__(module.__name__, self, module)
         if self.name.endswith('.__init__') and not self.is_package:
             self.name = self.name[:-len('.__init__')]
