@@ -437,8 +437,7 @@ def main(_args=None):
                        isinstance(obj, pdoc.Class) and f in obj.doc
                        for f in _filters)
 
-    modules = [pdoc.Module(pdoc.import_module(module),
-                           docfilter=docfilter)
+    modules = [pdoc.Module(module, docfilter=docfilter)
                for module in args.modules]
     pdoc.link_inheritance()
 

@@ -379,7 +379,7 @@ class ApiTest(unittest.TestCase):
         with chdir(TESTS_BASEDIR):
             for module, (name_suffix, submodules) in modules.items():
                 with self.subTest(module=module):
-                    m = pdoc.Module(pdoc.import_module(module))
+                    m = pdoc.Module(module)
                     self.assertEqual(repr(m), "<Module '{}'>".format(m.obj.__name__))
                     self.assertEqual(m.name, EXAMPLE_MODULE + name_suffix)
                     self.assertEqual(sorted(m.name for m in m.submodules()),
@@ -401,17 +401,17 @@ class ApiTest(unittest.TestCase):
             path = os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_namespace', str(i))
             with patch.object(sys, 'path', [os.path.join(path, 'a'),
                                             os.path.join(path, 'b')]):
-                mod = pdoc.Module(pdoc.import_module('a.main'))
+                mod = pdoc.Module('a.main')
                 self.assertIn('D', mod.doc)
 
     def test_module_allsubmodules(self):
-        m = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + '._private'))
+        m = pdoc.Module(EXAMPLE_MODULE + '._private')
         self.assertEqual(sorted(m.name for m in m.submodules()),
                          [EXAMPLE_MODULE + '._private.module'])
 
     def test_instance_var(self):
         pdoc.reset()
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         var = mod.doc['B'].doc['instance_var']
         self.assertTrue(var.instance_var)
 
@@ -423,7 +423,7 @@ class ApiTest(unittest.TestCase):
 
     def test_refname(self):
         mod = EXAMPLE_MODULE + '.' + 'subpkg'
-        module = pdoc.Module(pdoc.import_module(mod))
+        module = pdoc.Module(mod)
         var = module.doc['var']
         cls = module.doc['B']
         nested_cls = cls.doc['C']
@@ -443,7 +443,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(cls.doc['inherited'].refname, mod + '.B.inherited')
 
     def test_qualname(self):
-        module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        module = pdoc.Module(EXAMPLE_MODULE)
         var = module.doc['var']
         cls = module.doc['B']
         nested_cls = cls.doc['C']
@@ -489,7 +489,7 @@ class ApiTest(unittest.TestCase):
             self.assertEqual(list(mod.doc.keys()), ['B'])
 
     def test_find_ident(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         self.assertIsInstance(mod.find_ident('subpkg'), pdoc.Module)
         mod = pdoc.Module(pdoc)
         self.assertIsInstance(mod.find_ident('subpkg'), pdoc.External)
@@ -506,7 +506,7 @@ class ApiTest(unittest.TestCase):
         self.assertIs(mod.find_ident('pdoc.Doc.__init__').obj, pdoc.Doc)
 
     def test_inherits(self):
-        module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        module = pdoc.Module(EXAMPLE_MODULE)
         pdoc.link_inheritance()
 
         a = module.doc['A']
@@ -524,7 +524,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(c.doc['overridden'].inherits, b.doc['overridden'])
 
     def test_inherited_members(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         pdoc.link_inheritance()
         a = mod.doc['A']
         b = mod.doc['B']
@@ -553,7 +553,7 @@ class ApiTest(unittest.TestCase):
                          [mod.find_class(D).refname])
 
     def test_link_inheritance(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         with warnings.catch_warnings(record=True) as w:
             pdoc.link_inheritance()
             pdoc.link_inheritance()
@@ -565,7 +565,7 @@ class ApiTest(unittest.TestCase):
 
         # Test inheritance across modules
         pdoc.reset()
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + '._test_linking'))
+        mod = pdoc.Module(EXAMPLE_MODULE + '._test_linking')
         pdoc.link_inheritance()
         a = mod.doc['a'].doc['A']
         b = mod.doc['b'].doc['B']
@@ -676,7 +676,7 @@ class ApiTest(unittest.TestCase):
             self.assertEqual(pdoc.Class('C', mod, C).params(), [])
 
     def test_url(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         pdoc.link_inheritance()
 
         c = mod.doc['D']
@@ -693,7 +693,7 @@ class ApiTest(unittest.TestCase):
 
     @unittest.skipIf(sys.version_info < (3, 6), reason="only deterministic on CPython 3.6+")
     def test_sorting(self):
-        module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        module = pdoc.Module(EXAMPLE_MODULE)
 
         sorted_variables = module.variables()
         unsorted_variables = module.variables(sort=False)
@@ -718,7 +718,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(sorted_methods, sorted(unsorted_methods))
 
     def test_module_init(self):
-        mod = pdoc.Module(pdoc.import_module('pdoc.__init__'))
+        mod = pdoc.Module('pdoc.__init__')
         self.assertEqual(mod.name, 'pdoc')
         self.assertIn('Module', mod.doc)
 
@@ -765,7 +765,7 @@ class HtmlHelpersTest(unittest.TestCase):
         self.assertIn('<code>foo.f()</code>', to_html('`foo.f()`', module=module, link=link))
 
     def test_to_html_refname_warning(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
 
         def f():
             """Reference to some `example_pkg.nonexisting` object"""
@@ -1007,7 +1007,7 @@ x =</p>'''
         # Ensure includes are resolved within docstrings already,
         # e.g. for `pdoc.html_helpers.extract_toc()` to work
         self.assertIn('Command-line interface',
-                      pdoc.Module(pdoc.import_module(pdoc)).docstring)
+                      pdoc.Module(pdoc).docstring)
 
     def test_urls(self):
         text = """Beautiful Soup
