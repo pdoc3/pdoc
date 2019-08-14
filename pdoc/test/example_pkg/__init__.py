@@ -1,4 +1,5 @@
 """Module docstring"""
+from collections import namedtuple
 import subprocess
 import os
 
@@ -60,7 +61,7 @@ class B(A, int):
     squere_no_doc = ReadOnlyValueDescriptor()   # no doc-string
 
     def __init__(self, x, y, z, w):
-        """__init__ docstring"""
+        """`__init__` docstring"""
         self.instance_var = None
         """instance var docstring"""
 
@@ -311,3 +312,7 @@ def latex_math():
     ..math::
         v_t *\\frac{1}{2}* j_i + [a] < 3
     """
+
+
+class Location(namedtuple('Location', 'lat lon')):
+    """Geo-location, GPS position."""

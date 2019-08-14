@@ -229,27 +229,20 @@ def _var_docstrings(doc_obj: Union['Module', 'Class'], *,
 
     cls = None
     module = doc_obj
-    module_all = getattr(module.obj, '__all__', None)
+    module_all = set(getattr(module.obj, '__all__', ()))
+    member_obj = dict(inspect.getmembers(doc_obj.obj)).get
 
     if isinstance(doc_obj, Class):
         cls = doc_obj
         module = doc_obj.module
-        module_all = None  # If documenting a class, we needn't look into __all__
 
         # For classes, first add instance variables defined in __init__
         if not _init_tree:
-            try:
-                # Recursive call with just the __init__ tree
-                vs = _var_docstrings(
-                    doc_obj, _init_tree=next(
-                        node for node in tree.body
-                        if (isinstance(node, ast.FunctionDef) and
-                            node.name == '__init__')))
-            except StopIteration:
-                pass
-
-    if module_all is not None:
-        module_all = set(module_all)
+            # Recursive call with just the __init__ tree
+            for node in tree.body:
+                if isinstance(node, ast.FunctionDef) and node.name == '__init__':
+                    vs.update(_var_docstrings(doc_obj, _init_tree=node))
+                    break
 
     try:
         ast_AnnAssign = ast.AnnAssign   # type: Type
@@ -285,7 +278,7 @@ def _var_docstrings(doc_obj: Union['Module', 'Class'], *,
         if not _is_public(name):
             continue
 
-        if module_all is not None and name not in module_all:
+        if module_all and name not in module_all:
             continue
 
         docstring = inspect.cleandoc(str_node.value.s).strip()
@@ -293,6 +286,7 @@ def _var_docstrings(doc_obj: Union['Module', 'Class'], *,
             continue
 
         vs[name] = Variable(name, module, docstring,
+                            obj=member_obj(name),
                             cls=cls, instance_var=bool(_init_tree))
     return vs
 
@@ -879,6 +873,14 @@ class Class(Doc):
         classes = [self.module.find_class(c)
                    for c in inspect.getmro(self.obj)
                    if c not in (self.obj, object)]
+        if self in classes:
+            # This can contain self in case of a class inheriting from
+            # a class with (previously) the same name. E.g.
+            #
+            #     class Loc(namedtuple('Loc', 'lat lon')): ...
+            #
+            # We remove it from ancestors so that toposort doesn't break.
+            classes.remove(self)
         if only_documented:
             classes = _filter_type(Class, classes)
         return classes
