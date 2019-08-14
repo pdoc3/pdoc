@@ -149,7 +149,6 @@ class CliTest(unittest.TestCase):
             '*args',
             '**kwargs',
             'x, y, z, w',
-            '__init__ docstring',
             'instance_var',
             'instance var docstring',
             'B.f docstring',
@@ -159,6 +158,7 @@ class CliTest(unittest.TestCase):
             'B.C docstring',
             'B.overridden docstring',
 
+            '<code>__init__</code> docstring',
             ' class="ident">static',
         ]
         exclude_patterns = [
@@ -174,7 +174,7 @@ class CliTest(unittest.TestCase):
         }
         for package, expected_files in package_files.items():
             with self.subTest(package=package):
-                with run_html(EXAMPLE_MODULE + package):
+                with run_html(EXAMPLE_MODULE + package, config='show_source_code=False'):
                     self._basic_html_assertions(expected_files)
                     self._check_files(include_patterns, exclude_patterns)
 
@@ -186,7 +186,8 @@ class CliTest(unittest.TestCase):
         with chdir(TESTS_BASEDIR):
             for filenames, expected_files in filenames_files.items():
                 with self.subTest(filename=','.join(filenames)):
-                    with run_html(*(os.path.join(EXAMPLE_MODULE, f) for f in filenames)):
+                    with run_html(*(os.path.join(EXAMPLE_MODULE, f) for f in filenames),
+                                  config='show_source_code=False'):
                         self._basic_html_assertions(expected_files)
                         self._check_files(include_patterns, exclude_patterns)
 
@@ -279,7 +280,7 @@ class CliTest(unittest.TestCase):
             'B.CONST docstring',
             'B.var docstring',
             'x, y, z, w',
-            '__init__ docstring',
+            '`__init__` docstring',
             'instance_var',
             'instance var docstring',
             'b=1',

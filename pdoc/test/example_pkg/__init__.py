@@ -47,7 +47,7 @@ class B(A, int):
     """B.var docstring"""
 
     def __init__(self, x, y, z, w):
-        """__init__ docstring"""
+        """`__init__` docstring"""
         self.instance_var = None
         """instance var docstring"""
 
