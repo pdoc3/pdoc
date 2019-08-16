@@ -13,7 +13,7 @@
 
 <%def name="function(func)" buffered="True">
     <%
-        returns = show_type_annotations and f.return_annotation() or ''
+        returns = show_type_annotations and func.return_annotation() or ''
         if returns:
             returns = ' -> ' + returns
     %>
