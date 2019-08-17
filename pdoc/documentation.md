@@ -253,9 +253,15 @@ variable [`PYTHONWARNINGS`][PYTHONWARNINGS] before running pdoc:
 
 [PYTHONWARNINGS]: https://docs.python.org/3/using/cmdline.html#envvar-PYTHONWARNINGS
 
+To build documentation that omits the source code in favor of [docstrings only][docstrings], run:
+
+    $ pdoc --html -c show_source_code=False my_package
+
 For brief usage instructions, type:
 
     $ pdoc --help
+
+[docstrings]: https://github.com/pdoc3/pdoc/issues/81
 
 
 Programmatic usage
