@@ -27,6 +27,7 @@
                 <a href="${get_online_source_link(online_source_link, d)}">Online source code</a>
             </summary>
         </div>
+    %endif
     % if show_source_code and d.source and d.obj is not getattr(d.inherits, 'obj', None):
         <details class="source">
             <summary>Expand source code</summary>
