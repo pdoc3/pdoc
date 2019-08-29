@@ -452,7 +452,7 @@ def get_online_source_link(template: str, dobj: pdoc.Doc):
     try:
         lines, start_line = inspect.getsourcelines(dobj.obj)
         end_line = start_line + len(lines)
-        abs_path = inspect.getmodule(dobj.obj).__file__
+        abs_path = inspect.getfile(dobj.obj)
         path = os.path.relpath(abs_path, os.getcwd())  # project-relative path
         commit = _get_head_commit()
         url = template.format(**locals())
