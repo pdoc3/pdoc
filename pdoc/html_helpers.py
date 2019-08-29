@@ -453,12 +453,12 @@ def get_online_source_link(template: str, dobj: pdoc.Doc):
         lines, start_line = inspect.getsourcelines(dobj.obj)
         end_line = start_line + len(lines)
         abs_path = inspect.getmodule(dobj.obj).__file__
-        file_path = os.path.relpath(abs_path, os.getcwd())  # project-relative path
+        path = os.path.relpath(abs_path, os.getcwd())  # project-relative path
         commit = _get_head_commit()
         url = template.format(**locals())
         return url
     except Exception:
         # TODO what sort of error handling do we want: logging / warnings?
         import logging
-        logging.exception('get_online_source_link for {} failed'.format(dobj))
+        logging.exception('get_online_source_link for {} failed.'.format(dobj))
         return None
