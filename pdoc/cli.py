@@ -83,6 +83,11 @@ aa(
          "(default: ./html for --html).",
 )
 aa(
+    "--html-index",
+    action="store_true",
+    help="Make a top-level index.html listing all the documented packages."
+)
+aa(
     "--html-no-source",
     action="store_true",
     help=argparse.SUPPRESS,
@@ -487,9 +492,9 @@ or similar, at your own discretion.""",
             # Two blank lines between two modules' texts
             sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
 
-    # Add the root index.html at the top level
-    if args.html:
-        # The template expects `modules` to be Tuples of (name, docstring)
+    if args.html and args.html_index:
+        # Add the root index.html at the top level.
+        # The template expects `modules` to be Tuples of (name, docstring).
         module_tuples = sorted((module.name, module.docstring)
                                for module in modules)
         index_text = pdoc._render_template('/html.mako',
