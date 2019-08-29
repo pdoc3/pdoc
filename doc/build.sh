@@ -21,6 +21,7 @@ rm -r "$BUILDROOT" 2>/dev/null || true
 pushd "$DOCROOT/.." >/dev/null
 pdoc3 --html \
      ${IS_RELEASE+--template-dir "$DOCROOT/pdoc_template"} \
+     --config "online_source_link=https://github.com/pdoc3/pdoc/blob/{commit}/{path}#L{start_line}-L{end_line}" \
      --output-dir "$BUILDROOT" \
      pdoc
 popd >/dev/null

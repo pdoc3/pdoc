@@ -17,7 +17,6 @@
     # called to template it for a given documentation object.
     # Supported keywords for interpolation are commit, path, start_line, and end_line.
     # online_source_link = 'https://github.com/ORG/PROJECT/blob/{commit}/{path}#L{start_line}-L{end_line}'
-    online_source_link = 'https://github.com/pdoc3/pdoc/blob/{commit}/{path}#L{start_line}-L{end_line}
 
     # A prefix to use for every HTML hyperlink in the generated documentation.
     # No prefix results in all links being relative.
