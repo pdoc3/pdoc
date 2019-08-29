@@ -2,6 +2,7 @@
 """pdoc's CLI interface and helper functions."""
 
 import argparse
+import ast
 import importlib
 import inspect
 import os
@@ -370,12 +371,17 @@ def main(_args=None):
         _warn_deprecated('--overwrite', '--force')
         args.force = args.overwrite
 
-    try:
-        template_config = {opt.split('=', 1)[0]: eval(opt.split('=', 1)[1], {})
-                           for opt in args.config}
-    except Exception as e:
-        raise RuntimeError('Error evaluating config values {}: {}\n'
-                           'Make sure string values are quoted?'.format(args.config, e))
+    template_config = {}
+    for opt in args.config:
+        try:
+            config_key, config_value = opt.split('=', 1)
+            config_value = ast.literal_eval(config_value)
+            template_config[config_key] = config_value
+        except Exception as e:
+            raise RuntimeError(
+                'Error evaluating config value {!r}\n'
+                'Make sure string values are quoted?'.format(opt, e)
+            )
     if args.html_no_source:
         _warn_deprecated('--html-no-source', '-c show_source_code=False', True)
         template_config['show_source_code'] = False
