@@ -2,7 +2,7 @@
   import os
 
   import pdoc
-  from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html
+  from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html, get_online_source_link
 
 
   def link(d, name=None, fmt='{}'):
@@ -22,8 +22,13 @@
 
 <%def name="show_source(d)">
     % if show_source_code and d.source and d.obj is not getattr(d.inherits, 'obj', None):
+        <div class="source">
+            <summary>
+                <a href="${get_online_source_link(d)}">Online source code</a>
+            </summary>
+        </div>
         <details class="source">
-            <summary>Source code</summary>
+            <summary>Expand source code</summary>
             <pre><code class="python">${d.source | h}</code></pre>
         </details>
     %endif

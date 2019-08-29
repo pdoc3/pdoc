@@ -2,8 +2,9 @@
 Helper functions for HTML output.
 """
 import inspect
-import os.path
+import os
 import re
+import subprocess
 from functools import partial, lru_cache
 from typing import Callable, Match
 from warnings import warn
@@ -430,3 +431,32 @@ def extract_toc(text: str):
     if toc.endswith('<p>'):  # CUT was put into its own paragraph
         toc = toc[:-3].rstrip()
     return toc
+
+
+@lru_cache()
+def _get_head_commit():
+    """
+    If the working directory is part of a git repository, return the
+    head git commit hash. Otherwise, raise a CalledProcessError.
+    """
+    process_args = ['git', 'rev-parse', 'HEAD']
+    commit = subprocess.check_output(process_args, universal_newlines=True)
+    return commit.strip()
+
+
+def get_online_source_link(template: str, dobj: pdoc.Doc):
+    """
+    Interpolate `template` as a formatted string literal using values extracted
+    from `dobj` and the working directory.
+    """
+    try:
+        lines, start_line = inspect.getsourcelines(dobj.obj)
+        end_line = start_line + len(lines)
+        abs_path = inspect.getmodule(dobj.obj).__file__
+        file_path = os.path.relpath(abs_path, os.getcwd())  # project-relative path
+        commit = _get_head_commit()
+        url = template.format(**locals())
+        return url
+    except Exception:
+        # TODO what sort of error handling do we want: logging / warnings?
+        return None
