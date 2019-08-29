@@ -92,6 +92,7 @@ class CliTest(unittest.TestCase):
     Command-line interface unit tests.
     """
     ALL_FILES = [
+        'index.html',
         'example_pkg',
         'example_pkg/index.html',
         'example_pkg/index.m.html',
@@ -121,6 +122,10 @@ class CliTest(unittest.TestCase):
         files = glob(file_pattern, recursive=True)
         assert files
         for file in files:
+            # EARLY CONTINUE
+            if file == 'index.html':
+                # The root index.html is a special snowflake. Skip it.
+                continue
             with open(file) as f:
                 contents = f.read()
                 for pattern in include_patterns:
@@ -168,9 +173,13 @@ class CliTest(unittest.TestCase):
         package_files = {
             '': self.PUBLIC_FILES,
             '.subpkg2': [f for f in self.PUBLIC_FILES
-                         if 'subpkg2' in f or f == EXAMPLE_MODULE],
+                         if ('subpkg2' in f
+                             or f == EXAMPLE_MODULE
+                             or f == 'index.html')],
             '._private': [f for f in self.ALL_FILES
-                          if EXAMPLE_MODULE + '/_private' in f or f == EXAMPLE_MODULE],
+                          if (EXAMPLE_MODULE + '/_private' in f
+                              or f == EXAMPLE_MODULE
+                              or f == 'index.html')],
         }
         for package, expected_files in package_files.items():
             with self.subTest(package=package):
@@ -179,8 +188,8 @@ class CliTest(unittest.TestCase):
                     self._check_files(include_patterns, exclude_patterns)
 
         filenames_files = {
-            ('module.py',): ['module.html'],
-            ('module.py', 'subpkg2'): ['module.html', 'subpkg2',
+            ('module.py',): ['index.html', 'module.html'],
+            ('module.py', 'subpkg2'): ['index.html', 'module.html', 'subpkg2',
                                        'subpkg2/index.html', 'subpkg2/module.html'],
         }
         with chdir(TESTS_BASEDIR):
@@ -195,7 +204,8 @@ class CliTest(unittest.TestCase):
         with chdir(TESTS_BASEDIR):
             with run_html(EXAMPLE_MODULE + '/module.py', EXAMPLE_MODULE + '/subpkg2'):
                 self._basic_html_assertions(
-                    ['module.html', 'subpkg2', 'subpkg2/index.html', 'subpkg2/module.html'])
+                    ['index.html', 'module.html', 'subpkg2',
+                     'subpkg2/index.html', 'subpkg2/module.html'])
 
     def test_html_identifier(self):
         for package in ('', '._private'):
@@ -354,7 +364,8 @@ class CliTest(unittest.TestCase):
             run(EXAMPLE_MODULE, output_dir=path)
             with chdir(path):
                 self._basic_html_assertions([file.replace('.html', '.md')
-                                             for file in self.PUBLIC_FILES])
+                                             for file in self.PUBLIC_FILES
+                                             if file != 'index.html'])
 
     def test_google_analytics(self):
         expected = ['google-analytics.com']

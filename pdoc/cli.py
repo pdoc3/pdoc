@@ -487,6 +487,25 @@ or similar, at your own discretion.""",
             # Two blank lines between two modules' texts
             sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
 
+    # Add the root index.html at the top level
+    if args.html:
+        # The template expects `modules` to be Tuples of (name, docstring)
+        module_tuples = sorted((module.name, module.docstring)
+                               for module in modules)
+        index_text = pdoc._render_template('/html.mako',
+                                           modules=module_tuples,
+                                           **template_config)
+        index_file = path.join(args.output_dir, 'index.html')
+        try:
+            with open(index_file, 'w+', encoding='utf-8') as w:
+                w.write(index_text)
+        except Exception:
+            try:
+                os.unlink(index_file)
+            except Exception:
+                pass
+            raise
+
 
 if __name__ == "__main__":
     main(parser.parse_args())
