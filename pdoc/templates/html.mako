@@ -21,12 +21,13 @@
 <%def name="ident(name)"><span class="ident">${name}</span></%def>
 
 <%def name="show_source(d)">
-    % if show_source_code and d.source and d.obj is not getattr(d.inherits, 'obj', None):
+    % if 'online_source_link' in locals() and online_source_link and d.source and d.obj is not getattr(d.inherits, 'obj', None):
         <div class="source">
             <summary>
-                <a href="${get_online_source_link(d)}">Online source code</a>
+                <a href="${get_online_source_link(online_source_link, d)}">Online source code</a>
             </summary>
         </div>
+    % if show_source_code and d.source and d.obj is not getattr(d.inherits, 'obj', None):
         <details class="source">
             <summary>Expand source code</summary>
             <pre><code class="python">${d.source | h}</code></pre>
