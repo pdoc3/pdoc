@@ -459,4 +459,6 @@ def get_online_source_link(template: str, dobj: pdoc.Doc):
         return url
     except Exception:
         # TODO what sort of error handling do we want: logging / warnings?
+        import logging
+        logging.exception('get_online_source_link for {} failed'.format(dobj))
         return None
