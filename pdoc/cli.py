@@ -486,7 +486,7 @@ or similar, at your own discretion.""",
     for module in modules:
         if args.html:
             _quit_if_module_exists(module, ext='.html')
-            write_files(module, ext='.html', **template_config)
+            write_files(module, ext='.html', html_index=args.html_index, **template_config)
         elif args.output_dir:  # Generate text files
             _quit_if_module_exists(module, ext='.md')
             write_files(module, ext='.md', **template_config)

@@ -105,7 +105,8 @@ def _render_template(template_name, **kwargs):
         config.update((var, getattr(config_module, var, None))
                       for var in config_module.__dict__
                       if var not in MAKO_INTERNALS)
-    known_keys = set(config) | {'module', 'modules', 'http_server', 'external_links'}  # deprecated
+    known_keys = set(config) | {'module', 'modules', 'http_server',
+                                'html_index', 'external_links'}  # deprecated
     invalid_keys = {k: v for k, v in kwargs.items() if k not in known_keys}
     if invalid_keys:
         warn('Unknown configuration variables (not in config.mako): {}'.format(invalid_keys))

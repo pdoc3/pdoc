@@ -226,10 +226,18 @@ class CliTest(unittest.TestCase):
                 self._basic_html_assertions(
                     ['index.html', 'module.html', 'subpkg2',
                      'subpkg2/index.html', 'subpkg2/module.html'])
-                # And 'index.html' should be the Python module list
+                # 'index.html' should be the Python module list
                 with open('index.html') as f:
                     contents = f.read()
                     self.assertIn('Python module list', contents)
+                # 'module.html' should have link to 'All packages'
+                with open('module.html') as f:
+                    contents = f.read()
+                    self.assertIn('All packages', contents)
+                # 'subpkg2/index.html' should have link to 'All packages'
+                with open('subpkg2/index.html') as f:
+                    contents = f.read()
+                    self.assertIn('All packages', contents)
 
     def test_html_no_source(self):
         with self.assertWarns(DeprecationWarning),\

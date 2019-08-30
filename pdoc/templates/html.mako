@@ -100,7 +100,7 @@
   </%def>
 
   <header>
-  % if http_server:
+  % if http_server or html_index:
     <nav class="http-server-breadcrumbs">
       <a href="/">All packages</a>
       <% parts = module.name.split('.')[:-1] %>
