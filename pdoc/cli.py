@@ -293,19 +293,22 @@ def module_path(m: pdoc.Module, ext: str):
     return path.join(args.output_dir, *re.sub(r'\.html$', ext, m.url()).split('/'))
 
 
-def _quit_if_exists(m: pdoc.Module, ext: str):
+def _quit_if_file_exists(pth):
     if args.force:
         return
+    if path.lexists(pth):
+        print("File '%s' already exists. Delete it, or run with --force" % pth,
+              file=sys.stderr)
+        sys.exit(1)
 
+
+def _quit_if_module_exists(m: pdoc.Module, ext: str):
     paths = [module_path(m, ext)]
     if m.is_package:  # If package, make sure the dir doesn't exist either
         paths.append(path.dirname(paths[0]))
 
     for pth in paths:
-        if path.lexists(pth):
-            print("File '%s' already exists. Delete it, or run with --force" % pth,
-                  file=sys.stderr)
-            sys.exit(1)
+        _quit_if_file_exists(pth)
 
 
 def write_files(m: pdoc.Module, ext: str, **kwargs):
@@ -482,10 +485,10 @@ or similar, at your own discretion.""",
 
     for module in modules:
         if args.html:
-            _quit_if_exists(module, ext='.html')
+            _quit_if_module_exists(module, ext='.html')
             write_files(module, ext='.html', **template_config)
         elif args.output_dir:  # Generate text files
-            _quit_if_exists(module, ext='.md')
+            _quit_if_module_exists(module, ext='.md')
             write_files(module, ext='.md', **template_config)
         else:
             sys.stdout.write(module.text(**template_config))
@@ -494,13 +497,14 @@ or similar, at your own discretion.""",
 
     if args.html and args.html_index:
         # Add the root index.html at the top level.
+        index_file = path.join(args.output_dir, 'index.html')
+        _quit_if_file_exists(index_file)
         # The template expects `modules` to be Tuples of (name, docstring).
         module_tuples = sorted((module.name, module.docstring)
                                for module in modules)
         index_text = pdoc._render_template('/html.mako',
                                            modules=module_tuples,
                                            **template_config)
-        index_file = path.join(args.output_dir, 'index.html')
         try:
             with open(index_file, 'w+', encoding='utf-8') as w:
                 w.write(index_text)

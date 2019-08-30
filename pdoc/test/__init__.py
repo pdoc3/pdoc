@@ -14,6 +14,7 @@ from glob import glob
 from io import StringIO
 from itertools import chain
 from random import randint
+from shutil import rmtree
 from tempfile import TemporaryDirectory
 from time import sleep
 from unittest.mock import patch
@@ -245,6 +246,22 @@ class CliTest(unittest.TestCase):
 
             with redirect_streams() as (stdout, stderr):
                 returncode = run(EXAMPLE_MODULE, html=None, force=None, output_dir=os.getcwd())
+                self.assertEqual(returncode, 0)
+                self.assertEqual(stderr.getvalue(), '')
+
+    def test_force_with_html_index(self):
+        with run_html('--html-index', EXAMPLE_MODULE):
+            # Remove everything but index.html ensure it's failing because of index.html
+            rmtree(EXAMPLE_MODULE)
+            with redirect_streams() as (stdout, stderr):
+                returncode = run('--html-index',
+                                 EXAMPLE_MODULE, _check=False, html=None, output_dir=os.getcwd())
+                self.assertNotEqual(returncode, 0)
+                self.assertNotEqual(stderr.getvalue(), '')
+
+            with redirect_streams() as (stdout, stderr):
+                returncode = run('--html-index',
+                                 EXAMPLE_MODULE, html=None, force=None, output_dir=os.getcwd())
                 self.assertEqual(returncode, 0)
                 self.assertEqual(stderr.getvalue(), '')
 
