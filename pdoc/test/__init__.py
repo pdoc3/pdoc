@@ -216,6 +216,20 @@ class CliTest(unittest.TestCase):
                 ],
             )
 
+    def test_html_index(self):
+        with chdir(TESTS_BASEDIR):
+            # Given the --html-index option
+            with run_html('--html-index',
+                          EXAMPLE_MODULE + '/module.py', EXAMPLE_MODULE + '/subpkg2'):
+                # Should have 'index.html' in addition to the normal output
+                self._basic_html_assertions(
+                    ['index.html', 'module.html', 'subpkg2',
+                     'subpkg2/index.html', 'subpkg2/module.html'])
+                # And 'index.html' should be the Python module list
+                with open('index.html') as f:
+                    contents = f.read()
+                    self.assertIn('Python module list', contents)
+
     def test_html_no_source(self):
         with self.assertWarns(DeprecationWarning),\
                 run_html(EXAMPLE_MODULE, html_no_source=None):
