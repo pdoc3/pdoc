@@ -440,8 +440,18 @@ def _get_head_commit():
     head git commit hash. Otherwise, raise a CalledProcessError.
     """
     process_args = ['git', 'rev-parse', 'HEAD']
-    commit = subprocess.check_output(process_args, universal_newlines=True)
-    return commit.strip()
+    try:
+        commit = subprocess.check_output(process_args, universal_newlines=True)
+        return commit.strip()
+    except FileNotFoundError as error:
+        warn("git executable not found on system:\n{}".format(error))
+    except subprocess.CalledProcessError as error:
+        warn(
+            "Ensure pdoc is run within a git repository.\n"
+            "`{}` failed with output:\n{}"
+            .format(' '.join(process_args), error.output)
+        )
+    return None
 
 
 def get_online_source_link(template: str, dobj: pdoc.Doc):

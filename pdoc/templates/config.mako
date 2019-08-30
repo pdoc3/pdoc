@@ -16,7 +16,7 @@
     # online_source_link is a string whose str.format method is
     # called to template it for a given documentation object.
     # Supported keywords for interpolation are commit, path, start_line, and end_line.
-    # online_source_link = 'https://github.com/ORG/PROJECT/blob/{commit}/{path}#L{start_line}-L{end_line}'
+    # online_source_link = 'https://github.com/USER/PROJECT/blob/{commit}/{path}#L{start_line}-L{end_line}'
     online_source_link = None
 
     # A prefix to use for every HTML hyperlink in the generated documentation.
