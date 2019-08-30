@@ -5,6 +5,7 @@ import inspect
 import os
 import re
 import subprocess
+import traceback
 from functools import partial, lru_cache
 from typing import Callable, Match
 from warnings import warn
@@ -468,7 +469,5 @@ def get_online_source_link(template: str, dobj: pdoc.Doc):
         url = template.format(**locals())
         return url
     except Exception:
-        # TODO what sort of error handling do we want: logging / warnings?
-        import logging
-        logging.exception('get_online_source_link for {} failed.'.format(dobj))
+        warn('get_online_source_link for {} failed:\n{}'.format(dobj, traceback.format_exc()))
         return None
