@@ -21,15 +21,6 @@ def foo(env=os.environ):
     pass
 
 
-class ReadOnlyValueDescriptor:
-    """Read-only value descriptor, returns square of variable `var`"""
-
-    def __get__(self, instance, instance_type=None):
-        if instance is not None:
-            return instance.var ** 2
-        return self
-
-
 class A:
     """`A` is base class for `example_pkg.B`."""  # Test refname link
     def overridden(self):
@@ -40,6 +31,18 @@ class A:
 
     def inherited(self):  # Inherited in B
         """A.inherited docstring"""
+
+
+non_callable_routine = staticmethod(lambda x: 2)  # Not interpreted as Function; skipped
+
+
+class ReadOnlyValueDescriptor:
+    """Read-only value descriptor"""
+
+    def __get__(self, instance, instance_type=None):
+        if instance is not None:
+            return instance.var ** 2
+        return self
 
 
 class B(A, int):
@@ -55,10 +58,10 @@ class B(A, int):
     var = 3
     """B.var docstring"""
 
-    square = ReadOnlyValueDescriptor()
-    """Square of variable `var`"""
+    ro_value_descriptor = ReadOnlyValueDescriptor()
+    """ro_value_descriptor docstring"""
 
-    squere_no_doc = ReadOnlyValueDescriptor()   # no doc-string
+    ro_value_descriptor_no_doc = ReadOnlyValueDescriptor()   # no doc-string
 
     def __init__(self, x, y, z, w):
         """`__init__` docstring"""

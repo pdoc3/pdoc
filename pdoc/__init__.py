@@ -199,56 +199,46 @@ def _pairwise(iterable):
     return zip(a, b)
 
 
-def _var_docstrings(doc_obj: Union['Module', 'Class'], *,
-                    _init_tree: ast.FunctionDef = None) -> Dict[str, 'Variable']:
+def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
+                       _init_tree=None) -> Tuple[Dict[str, str],
+                                                 Dict[str, str]]:
     """
-    Extracts docstrings for variables of `doc_obj`
+    Extracts PEP-224 docstrings for variables of `doc_obj`
     (either a `pdoc.Module` or `pdoc.Class`).
 
-    Returns a dict mapping variable names to `pdoc.Variable` objects.
-
-    For `pdoc.Class` objects, the dict contains class' instance
-    variables (defined as `self.something` in class' `__init__`),
-    recognized by `Variable.instance_var == True`.
+    Returns a tuple of two dicts mapping variable names to their docstrings.
+    The second dict contains instance variables and is non-empty only in case
+    `doc_obj` is a `pdoc.Class` which has `__init__` method.
     """
+    # No variables in namespace packages
+    if isinstance(doc_obj, Module) and doc_obj.is_namespace:
+        return {}, {}
+
+    vars = {}  # type: Dict[str, str]
+    instance_vars = {}  # type: Dict[str, str]
+
     if _init_tree:
-        tree = _init_tree  # type: Union[ast.Module, ast.FunctionDef]
+        tree = _init_tree
     else:
-        # No variables in namespace packages
-        if isinstance(doc_obj, Module) and doc_obj.is_namespace:
-            return {}
         try:
             tree = ast.parse(inspect.getsource(doc_obj.obj))
         except (OSError, TypeError, SyntaxError):
             warn("Couldn't get/parse source of '{!r}'".format(doc_obj))
-            return {}
+            return {}, {}
+
         if isinstance(doc_obj, Class):
             tree = tree.body[0]  # type: ignore  # ast.parse creates a dummy ast.Module wrapper
 
-    vs = {}  # type: Dict[str, Variable]
-
-    cls = None
-    module = doc_obj
-    module_all = set(getattr(module.obj, '__all__', ()))
-    member_obj = dict(inspect.getmembers(doc_obj.obj)).get
-
-    if isinstance(doc_obj, Class):
-        cls = doc_obj
-        module = doc_obj.module
-
-        # For classes, first add instance variables defined in __init__
-        if not _init_tree:
-            # Recursive call with just the __init__ tree
+            # For classes, maybe add instance variables defined in __init__
             for node in tree.body:
                 if isinstance(node, ast.FunctionDef) and node.name == '__init__':
-                    vs.update(_var_docstrings(doc_obj, _init_tree=node))
+                    instance_vars, _ = _pep224_docstrings(doc_obj, _init_tree=node)
                     break
 
     try:
         ast_AnnAssign = ast.AnnAssign   # type: Type
     except AttributeError:  # Python < 3.6
         ast_AnnAssign = type(None)
-
     ast_Assignments = (ast.Assign, ast_AnnAssign)
 
     for assign_node, str_node in _pairwise(ast.iter_child_nodes(tree)):
@@ -275,20 +265,13 @@ def _var_docstrings(doc_obj: Union['Module', 'Class'], *,
         else:
             continue
 
-        if not _is_public(name):
-            continue
-
-        if module_all and name not in module_all:
-            continue
-
         docstring = inspect.cleandoc(str_node.value.s).strip()
         if not docstring:
             continue
 
-        vs[name] = Variable(name, module, docstring,
-                            obj=member_obj(name),
-                            cls=cls, instance_var=bool(_init_tree))
-    return vs
+        vars[name] = docstring
+
+    return vars, instance_vars
 
 
 def _is_public(ident_name):
@@ -297,6 +280,10 @@ def _is_public(ident_name):
     identifier name.
     """
     return not ident_name.startswith("_")
+
+
+def _is_function(obj):
+    return inspect.isroutine(obj) and callable(obj)
 
 
 def _filter_type(type: Type[T],
@@ -538,6 +525,8 @@ class Module(Doc):
         self._is_inheritance_linked = False
         """Re-entry guard for `pdoc.Module._link_inheritance()`."""
 
+        var_docstrings, _ = _pep224_docstrings(self)
+
         # Populate self.doc with this module's public members
         if hasattr(self.obj, '__all__'):
             public_objs = []
@@ -555,16 +544,17 @@ class Module(Doc):
             public_objs = [(name, inspect.unwrap(obj))
                            for name, obj in inspect.getmembers(self.obj)
                            if (_is_public(name) and
-                               is_from_this_module(obj))]
+                               (is_from_this_module(obj) or name in var_docstrings))]
             index = list(self.obj.__dict__).index
             public_objs.sort(key=lambda i: index(i[0]))
+
         for name, obj in public_objs:
-            if inspect.isroutine(obj):
+            if _is_function(obj):
                 self.doc[name] = Function(name, self, obj)
             elif inspect.isclass(obj):
                 self.doc[name] = Class(name, self, obj)
-
-        self.doc.update(_var_docstrings(self))
+            elif name in var_docstrings:
+                self.doc[name] = Variable(name, self, var_docstrings[name], obj=obj)
 
         # If the module is a package, scan the directory for submodules
         if self.is_package:
@@ -799,8 +789,6 @@ class Class(Doc):
         self.doc = {}
         """A mapping from identifier name to a `pdoc.Doc` objects."""
 
-        self.doc.update(_var_docstrings(self))
-
         public_objs = [(name, inspect.unwrap(obj))
                        for name, obj in inspect.getmembers(self.obj)
                        # Filter only *own* members. The rest are inherited
@@ -809,35 +797,30 @@ class Class(Doc):
         index = list(self.obj.__dict__).index
         public_objs.sort(key=lambda i: index(i[0]))
 
+        var_docstrings, instance_var_docstrings = _pep224_docstrings(self)
+
         # Convert the public Python objects to documentation objects.
         for name, obj in public_objs:
-            if name in self.doc and self.doc[name].docstring:
-                if inspect.isroutine(obj) and not callable(obj):
-                    assert isinstance(self.doc[name], Variable)
-                    self.doc[name].instance_var = True
-                continue
-            if inspect.isroutine(obj) and callable(obj):
+            if _is_function(obj):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self,
                     method=not self._method_type(self.obj, name))
-            elif inspect.isroutine(obj):
-                self.doc[name] = Variable(
-                    name, self.module, inspect.getdoc(obj),
-                    obj=getattr(obj, '__get__', obj),
-                    cls=self, instance_var=True)
-            elif (inspect.isdatadescriptor(obj) or
-                  inspect.isgetsetdescriptor(obj) or
-                  inspect.ismemberdescriptor(obj)):
-                self.doc[name] = Variable(
-                    name, self.module, inspect.getdoc(obj),
-                    obj=getattr(obj, 'fget', obj),
-                    cls=self, instance_var=True)
             else:
                 self.doc[name] = Variable(
                     name, self.module,
-                    docstring=isinstance(obj, type) and inspect.getdoc(obj) or "",
-                    cls=self,
-                    instance_var=name in getattr(self.obj, "__slots__", ()))
+                    docstring=var_docstrings.get(name) or inspect.getdoc(obj), cls=self,
+                    obj=getattr(obj, 'fget', getattr(obj, '__get__', obj)),
+                    instance_var=(inspect.isdatadescriptor(obj) or
+                                  inspect.ismethoddescriptor(obj) or
+                                  inspect.isgetsetdescriptor(obj) or
+                                  inspect.ismemberdescriptor(obj) or
+                                  name in getattr(self.obj, '__slots__', ())))
+
+        for name, docstring in instance_var_docstrings.items():
+            self.doc[name] = Variable(
+                name, self.module, docstring, cls=self,
+                obj=getattr(self.obj, name, None),
+                instance_var=True)
 
     @staticmethod
     def _method_type(cls: type, name: str):
@@ -1027,7 +1010,7 @@ class Function(Doc):
         `method` should be `True` when the function is a method. In
         all other cases, it should be `False`.
         """
-        assert callable(obj)
+        assert callable(obj), (name, module, obj)
         super().__init__(name, module, obj)
 
         self.cls = cls

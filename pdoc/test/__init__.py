@@ -164,6 +164,7 @@ class CliTest(unittest.TestCase):
         exclude_patterns = [
             ' class="ident">_private',
             ' class="ident">_Private',
+            'non_callable_routine',
         ]
         package_files = {
             '': self.PUBLIC_FILES,
@@ -298,6 +299,7 @@ class CliTest(unittest.TestCase):
             '_Private',
             'subprocess',
             'Hidden',
+            'non_callable_routine',
         ]
 
         with self.subTest(package=EXAMPLE_MODULE):
@@ -415,18 +417,19 @@ class ApiTest(unittest.TestCase):
         var = mod.doc['B'].doc['instance_var']
         self.assertTrue(var.instance_var)
 
-    def test_readonly_var_descriptors(self):
+    def test_readonly_value_descriptors(self):
         pdoc.reset()
         mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
-        var = mod.doc['B'].doc['square']
+        var = mod.doc['B'].doc['ro_value_descriptor']
         self.assertIsInstance(var, pdoc.Variable)
         self.assertTrue(var.instance_var)
-        self.assertEqual(var.docstring, """Square of variable `var`""")
-        var = mod.doc['B'].doc['squere_no_doc']
+        self.assertEqual(var.docstring, """ro_value_descriptor docstring""")
+        self.assertTrue(var.source)
+
+        var = mod.doc['B'].doc['ro_value_descriptor_no_doc']
         self.assertIsInstance(var, pdoc.Variable)
         self.assertTrue(var.instance_var)
-        self.assertEqual(var.docstring,
-                         """Read-only value descriptor, returns square of variable `var`""")
+        self.assertEqual(var.docstring, """Read-only value descriptor""")
         self.assertTrue(var.source)
 
     def test_builtin_methoddescriptors(self):
