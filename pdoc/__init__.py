@@ -227,7 +227,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             return {}, {}
 
         if isinstance(doc_obj, Class):
-            tree = tree.body[0]  # type: ignore  # ast.parse creates a dummy ast.Module wrapper
+            tree = tree.body[0]  # ast.parse creates a dummy ast.Module wrapper
 
             # For classes, maybe add instance variables defined in __init__
             for node in tree.body:
