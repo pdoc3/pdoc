@@ -374,15 +374,16 @@ def main(_args=None):
     template_config = {}
     for config_str in args.config:
         try:
-            config_key, config_value = config_str.split('=', 1)
-            config_value = ast.literal_eval(config_value)
-            template_config[config_key] = config_value
-        except Exception as error:
-            raise RuntimeError(
-                '{} evaluating --config {}\n{}\n'
+            key, value = config_str.split('=', 1)
+            value = ast.literal_eval(value)
+            template_config[key] = value
+        except Exception:
+            raise ValueError(
+                'Error evaluating --config statement "{}". '
                 'Make sure string values are quoted?'
-                .format(error.__class__.__name__, config_str, error)
+                .format(config_str)
             )
+
     if args.html_no_source:
         _warn_deprecated('--html-no-source', '-c show_source_code=False', True)
         template_config['show_source_code'] = False
