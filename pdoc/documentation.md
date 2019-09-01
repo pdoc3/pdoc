@@ -239,6 +239,15 @@ HTML template, run:
 
     $ pdoc --html --output-dir build my_package
 
+If you want to omit the source code preview, run:
+
+    $ pdoc --html --config show_source_code=False my_package
+
+Find additional template configuration tunables in [Custom templates]
+section below.
+
+[Custom templates]: #custom-templates
+
 To run a local HTTP server while developing your package or writing
 docstrings for it, run:
 
@@ -253,15 +262,13 @@ variable [`PYTHONWARNINGS`][PYTHONWARNINGS] before running pdoc:
 
 [PYTHONWARNINGS]: https://docs.python.org/3/using/cmdline.html#envvar-PYTHONWARNINGS
 
-To build documentation that omits the source code in favor of [docstrings only][docstrings], run:
-
-    $ pdoc --html -c show_source_code=False my_package
-
 For brief usage instructions, type:
 
     $ pdoc --help
 
-[docstrings]: https://github.com/pdoc3/pdoc/issues/81
+Even more usage examples can be found in the [FAQ].
+
+[FAQ]: https://github.com/pdoc3/pdoc/issues?q=is%3Aissue+label%3Aquestion
 
 
 Programmatic usage
