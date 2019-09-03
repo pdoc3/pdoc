@@ -2,7 +2,7 @@
   import os
 
   import pdoc
-  from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html, get_repo_link_template
+  from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html, get_repo_link
 
 
   def link(d, name=None, fmt='{}'):
@@ -21,22 +21,26 @@
 <%def name="ident(name)"><span class="ident">${name}</span></%def>
 
 <%def name="show_source(d)">
-    % if repo_link_template and d.source and d.obj is not getattr(d.inherits, 'obj', None):
-        <% repo_link = get_repo_link_template(repo_link_template, d) %>
-        % if repo_link:
-          <div class="source">
-              <summary>
-                <a href="${repo_link}">Online source code</a>
-              </summary>
+  % if d.source and d.obj is not getattr(d.inherits, 'obj', None):
+    % if repo_link_template:
+      <% repo_link = get_repo_link(repo_link_template, d) %>
+    %endif
+    % if show_source_code:
+      <details class="source">
+        <summary>
+          <div>
+            <span>Expand source code</span>
+            % if repo_link_template and repo_link:
+              <a href="${repo_link}">View in Repo</a>
+            %endif
           </div>
-        %endif
+        </summary>
+        <pre><code class="python">${d.source | h}</code></pre>
+      </details>
+    % elif repo_link_template and repo_link:
+      <a href="${repo_link}" class="repo-link">View in Repo</a>
     %endif
-    % if show_source_code and d.source and d.obj is not getattr(d.inherits, 'obj', None):
-        <details class="source">
-            <summary>Expand source code</summary>
-            <pre><code class="python">${d.source | h}</code></pre>
-        </details>
-    %endif
+  %endif
 </%def>
 
 <%def name="show_desc(d, short=False)">

@@ -204,6 +204,20 @@
       text-transform: uppercase;
       cursor: pointer;
     }
+    .source summary div {
+      display: inline-flex;
+      align-items: center;
+      width: calc(100% - 20px);
+    }
+    .source summary div span:first-child {
+      flex-grow: 1;
+      text-align: left;
+    }
+    .repo-link {
+      display: block;
+      font-size: .8em;
+      text-transform: uppercase;
+    }
     .source pre {
       max-height: 500px;
       overflow: auto;

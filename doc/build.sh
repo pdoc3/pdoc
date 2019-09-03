@@ -22,6 +22,7 @@ pushd "$DOCROOT/.." >/dev/null
 pdoc3 --html \
      ${IS_RELEASE+--template-dir "$DOCROOT/pdoc_template"} \
      --config "repo_link_template='https://github.com/pdoc3/pdoc/blob/{commit}/{path}#L{start_line}-L{end_line}'" \
+     --config show_source_code=False \
      --output-dir "$BUILDROOT" \
      pdoc
 popd >/dev/null

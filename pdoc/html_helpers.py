@@ -455,7 +455,7 @@ def _get_head_commit():
     return None
 
 
-def get_repo_link_template(template: str, dobj: pdoc.Doc):
+def get_repo_link(template: str, dobj: pdoc.Doc):
     """
     Interpolate `template` as a formatted string literal using values extracted
     from `dobj` and the working directory.
@@ -471,7 +471,7 @@ def get_repo_link_template(template: str, dobj: pdoc.Doc):
         url = template.format(**locals())
         return url
     except Exception:
-        warn('get_repo_link_template for {} failed:\n{}'.format(dobj, traceback.format_exc()))
+        warn('get_repo_link_template for {} failed:\n{}'.format(dobj.obj, traceback.format_exc()))
         return None
 
 
