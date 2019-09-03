@@ -22,11 +22,14 @@
 
 <%def name="show_source(d)">
     % if repo_link_template and d.source and d.obj is not getattr(d.inherits, 'obj', None):
-        <div class="source">
-            <summary>
-                <a href="${get_repo_link_template(repo_link_template, d)}">Online source code</a>
-            </summary>
-        </div>
+        <% repo_link = get_repo_link_template(repo_link_template, d) %>
+        % if repo_link:
+          <div class="source">
+              <summary>
+                <a href="${repo_link}">Online source code</a>
+              </summary>
+          </div>
+        %endif
     %endif
     % if show_source_code and d.source and d.obj is not getattr(d.inherits, 'obj', None):
         <details class="source">
