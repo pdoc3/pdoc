@@ -460,14 +460,28 @@ def get_repo_link_template(template: str, dobj: pdoc.Doc):
     Interpolate `template` as a formatted string literal using values extracted
     from `dobj` and the working directory.
     """
+    fields = _get_str_template_fields(template)
     try:
-        lines, start_line = inspect.getsourcelines(dobj.obj)
-        end_line = start_line + len(lines)
+        if 'commit' in fields:
+            commit = _get_head_commit()
         abs_path = inspect.getfile(dobj.obj)
         path = os.path.relpath(abs_path, os.getcwd())  # project-relative path
-        commit = _get_head_commit()
+        lines, start_line = inspect.getsourcelines(dobj.obj)
+        end_line = start_line + len(lines)
         url = template.format(**locals())
         return url
     except Exception:
         warn('get_repo_link_template for {} failed:\n{}'.format(dobj, traceback.format_exc()))
         return None
+
+
+@lru_cache()
+def _get_str_template_fields(template):
+    """
+    Return a list of field names in a template string for str.format.
+    """
+    from string import Formatter
+    return [
+        field_name for _, field_name, _, _
+        in Formatter().parse(template) if field_name is not None
+    ]
