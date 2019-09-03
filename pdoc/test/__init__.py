@@ -658,11 +658,12 @@ class ApiTest(unittest.TestCase):
             def __init__(self):
                 """baz"""
 
-        self.assertEqual(pdoc.Class('A', pdoc.Module(pdoc), A).docstring, """foo""")
-        self.assertEqual(pdoc.Class('B', pdoc.Module(pdoc), B).docstring, """foo""")
-        self.assertEqual(pdoc.Class('C', pdoc.Module(pdoc), C).docstring, """foo\n\nbar""")
-        self.assertEqual(pdoc.Class('D', pdoc.Module(pdoc), D).docstring, """baz\n\nbar""")
-        self.assertEqual(pdoc.Class('E', pdoc.Module(pdoc), E).docstring, """foo\n\nbaz""")
+        mod = pdoc.Module(pdoc)
+        self.assertEqual(pdoc.Class('A', mod, A).docstring, """foo""")
+        self.assertEqual(pdoc.Class('B', mod, B).docstring, """foo""")
+        self.assertEqual(pdoc.Class('C', mod, C).docstring, """foo\n\nbar""")
+        self.assertEqual(pdoc.Class('D', mod, D).docstring, """baz\n\nbar""")
+        self.assertEqual(pdoc.Class('E', mod, E).docstring, """foo\n\nbaz""")
 
     @ignore_warnings
     def test_Class_params(self):
