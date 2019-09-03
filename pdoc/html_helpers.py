@@ -465,7 +465,7 @@ def get_repo_link_template(template: str, dobj: pdoc.Doc):
         if 'commit' in fields:
             commit = _get_head_commit()
         abs_path = inspect.getfile(dobj.obj)
-        path = os.path.relpath(abs_path, os.getcwd())  # project-relative path
+        path = _project_relative_path(abs_path)
         lines, start_line = inspect.getsourcelines(dobj.obj)
         end_line = start_line + len(lines)
         url = template.format(**locals())
@@ -473,6 +473,26 @@ def get_repo_link_template(template: str, dobj: pdoc.Doc):
     except Exception:
         warn('get_repo_link_template for {} failed:\n{}'.format(dobj, traceback.format_exc()))
         return None
+
+
+@lru_cache()
+def _project_relative_path(absolute_path):
+    """
+    Convert an absolute path of a python source file to a project-relative path.
+    Assumes the project's path is either the current working directory or
+    Python library installation.
+    """
+    from distutils.sysconfig import get_python_lib
+    for prefix_path in [os.getcwd(), get_python_lib()]:
+        common_path = os.path.commonpath([prefix_path, absolute_path])
+        if common_path == prefix_path:
+            # absolute_path is a descendant of prefix_path
+            return os.path.relpath(absolute_path, prefix_path)
+    raise RuntimeError(
+        "absolute path {!r} is not a descendant of the current working directory "
+        "or of the system's python library."
+        .format(absolute_path)
+    )
 
 
 @lru_cache()
