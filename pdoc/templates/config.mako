@@ -13,11 +13,11 @@
     show_source_code = True
 
     # Provide links to source code online.
-    # online_source_link is a string whose str.format method is
+    # repo_link_template is a string whose str.format method is
     # called to template it for a given documentation object.
     # Supported keywords for interpolation are commit, path, start_line, and end_line.
-    # online_source_link = 'https://github.com/USER/PROJECT/blob/{commit}/{path}#L{start_line}-L{end_line}'
-    online_source_link = None
+    # repo_link_template = 'https://github.com/USER/PROJECT/blob/{commit}/{path}#L{start_line}-L{end_line}'
+    repo_link_template = None
 
     # A prefix to use for every HTML hyperlink in the generated documentation.
     # No prefix results in all links being relative.

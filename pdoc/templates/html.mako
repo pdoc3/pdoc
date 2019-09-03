@@ -2,7 +2,7 @@
   import os
 
   import pdoc
-  from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html, get_online_source_link
+  from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html, get_repo_link_template
 
 
   def link(d, name=None, fmt='{}'):
@@ -21,10 +21,10 @@
 <%def name="ident(name)"><span class="ident">${name}</span></%def>
 
 <%def name="show_source(d)">
-    % if 'online_source_link' in locals() and online_source_link and d.source and d.obj is not getattr(d.inherits, 'obj', None):
+    % if repo_link_template and d.source and d.obj is not getattr(d.inherits, 'obj', None):
         <div class="source">
             <summary>
-                <a href="${get_online_source_link(online_source_link, d)}">Online source code</a>
+                <a href="${get_repo_link_template(repo_link_template, d)}">Online source code</a>
             </summary>
         </div>
     %endif

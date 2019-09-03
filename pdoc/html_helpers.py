@@ -444,7 +444,7 @@ def _get_head_commit():
     try:
         commit = subprocess.check_output(process_args, universal_newlines=True)
         return commit.strip()
-    except FileNotFoundError as error:
+    except OSError as error:
         warn("git executable not found on system:\n{}".format(error))
     except subprocess.CalledProcessError as error:
         warn(
@@ -455,7 +455,7 @@ def _get_head_commit():
     return None
 
 
-def get_online_source_link(template: str, dobj: pdoc.Doc):
+def get_repo_link_template(template: str, dobj: pdoc.Doc):
     """
     Interpolate `template` as a formatted string literal using values extracted
     from `dobj` and the working directory.
@@ -469,5 +469,5 @@ def get_online_source_link(template: str, dobj: pdoc.Doc):
         url = template.format(**locals())
         return url
     except Exception:
-        warn('get_online_source_link for {} failed:\n{}'.format(dobj, traceback.format_exc()))
+        warn('get_repo_link_template for {} failed:\n{}'.format(dobj, traceback.format_exc()))
         return None
