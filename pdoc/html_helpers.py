@@ -464,7 +464,7 @@ def get_repo_link(template: str, dobj: pdoc.Doc):
     try:
         if 'commit' in fields:
             commit = _get_head_commit()
-        abs_path = inspect.getfile(dobj.obj)
+        abs_path = inspect.getfile(inspect.unwrap(dobj.obj))
         path = _project_relative_path(abs_path)
         lines, start_line = inspect.getsourcelines(dobj.obj)
         end_line = start_line + len(lines)
