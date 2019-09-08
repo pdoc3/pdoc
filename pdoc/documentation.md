@@ -192,7 +192,7 @@ or, alternatively, use [raw string literals].
 [Google-style]: http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
 [reST directives]: #supported-rest-directives
 [template config]: #custom-templates
-[recognized delimiters]: http://docs.mathjax.org/en/latest/tex.html#tex-and-latex-math-delimiters
+[recognized delimiters]: https://docs.mathjax.org/en/latest/input/tex/delimiters.html
 [raw string literals]: https://www.journaldev.com/23598/python-raw-string
 
 
