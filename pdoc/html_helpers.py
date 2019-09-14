@@ -467,7 +467,7 @@ def get_repo_link(template: str, dobj: pdoc.Doc):
         abs_path = inspect.getfile(inspect.unwrap(dobj.obj))
         path = _project_relative_path(abs_path)
         lines, start_line = inspect.getsourcelines(dobj.obj)
-        end_line = start_line + len(lines)
+        end_line = start_line + len(lines) - 1
         url = template.format(**locals())
         return url
     except Exception:
