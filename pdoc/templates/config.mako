@@ -12,11 +12,13 @@
     # Disabling this can improve rendering speed of large modules.
     show_source_code = True
 
-    # Provide links to source code online.
-    # repo_link_template is a string whose str.format method is
-    # called to template it for a given documentation object.
-    # Supported keywords for interpolation are commit, path, start_line, and end_line.
-    # repo_link_template = 'https://github.com/USER/PROJECT/blob/{commit}/{path}#L{start_line}-L{end_line}'
+    # If set, format links to objects in online source code repository
+    # according to this template. Supported keywords for interpolation
+    # are: commit, path, start_line, end_line.
+    #repo_link_template = 'https://github.com/USER/PROJECT/blob/{commit}/{path}#L{start_line}-L{end_line}'
+    #repo_link_template = 'https://gitlab.com/USER/PROJECT/blob/{commit}/{path}#L{start_line}-L{end_line}'
+    #repo_link_template = 'https://bitbucket.org/USER/PROJECT/src/{commit}/{path}#lines-{start_line}:{end_line}'
+    #repo_link_template = 'https://CGIT_HOSTNAME/PROJECT/tree/{path}?id={commit}#n{start-line}'
     repo_link_template = None
 
     # A prefix to use for every HTML hyperlink in the generated documentation.
