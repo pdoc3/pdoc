@@ -21,24 +21,20 @@
 <%def name="ident(name)"><span class="ident">${name}</span></%def>
 
 <%def name="show_source(d)">
-  % if d.source and d.obj is not getattr(d.inherits, 'obj', None):
-    % if repo_link_template:
-      <% repo_link = get_repo_link(repo_link_template, d) %>
-    %endif
+  % if (show_source_code or repo_link_template) and d.source and d.obj is not getattr(d.inherits, 'obj', None):
+    <% repo_link = get_repo_link(repo_link_template, d) %>
     % if show_source_code:
       <details class="source">
         <summary>
-          <div>
             <span>Expand source code</span>
-            % if repo_link_template and repo_link:
-              <a href="${repo_link}">View in Repo</a>
+            % if repo_link:
+              <a href="${repo_link}" class="repo-link">Browse repo</a>
             %endif
-          </div>
         </summary>
         <pre><code class="python">${d.source | h}</code></pre>
       </details>
-    % elif repo_link_template and repo_link:
-      <a href="${repo_link}" class="repo-link">View in Repo</a>
+    % elif repo_link:
+      <div class="repo-link-div"><a href="${repo_link}" class="repo-link">Browse repo</a></div>
     %endif
   %endif
 </%def>

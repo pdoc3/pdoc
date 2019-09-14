@@ -439,6 +439,8 @@ def get_repo_link(template: str, dobj: pdoc.Doc):
     Interpolate `template` as a formatted string literal using values extracted
     from `dobj` and the working environment.
     """
+    if not template:
+        return None
     try:
         if 'commit' in _str_template_fields(template):
             commit = _git_head_commit()
