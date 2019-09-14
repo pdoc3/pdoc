@@ -434,16 +434,35 @@ def extract_toc(text: str):
     return toc
 
 
+def get_repo_link(template: str, dobj: pdoc.Doc):
+    """
+    Interpolate `template` as a formatted string literal using values extracted
+    from `dobj` and the working environment.
+    """
+    try:
+        if 'commit' in _str_template_fields(template):
+            commit = _git_head_commit()
+        abs_path = inspect.getfile(inspect.unwrap(dobj.obj))
+        path = _project_relative_path(abs_path)
+        lines, start_line = inspect.getsourcelines(dobj.obj)
+        end_line = start_line + len(lines) - 1
+        url = template.format(**locals())
+        return url
+    except Exception:
+        warn('get_repo_link for {} failed:\n{}'.format(dobj.obj, traceback.format_exc()))
+        return None
+
+
 @lru_cache()
-def _get_head_commit():
+def _git_head_commit():
     """
     If the working directory is part of a git repository, return the
     head git commit hash. Otherwise, raise a CalledProcessError.
     """
     process_args = ['git', 'rev-parse', 'HEAD']
     try:
-        commit = subprocess.check_output(process_args, universal_newlines=True)
-        return commit.strip()
+        commit = subprocess.check_output(process_args, universal_newlines=True).strip()
+        return commit
     except OSError as error:
         warn("git executable not found on system:\n{}".format(error))
     except subprocess.CalledProcessError as error:
@@ -453,26 +472,6 @@ def _get_head_commit():
             .format(' '.join(process_args), error.output)
         )
     return None
-
-
-def get_repo_link(template: str, dobj: pdoc.Doc):
-    """
-    Interpolate `template` as a formatted string literal using values extracted
-    from `dobj` and the working directory.
-    """
-    fields = _get_str_template_fields(template)
-    try:
-        if 'commit' in fields:
-            commit = _get_head_commit()
-        abs_path = inspect.getfile(inspect.unwrap(dobj.obj))
-        path = _project_relative_path(abs_path)
-        lines, start_line = inspect.getsourcelines(dobj.obj)
-        end_line = start_line + len(lines) - 1
-        url = template.format(**locals())
-        return url
-    except Exception:
-        warn('get_repo_link_template for {} failed:\n{}'.format(dobj.obj, traceback.format_exc()))
-        return None
 
 
 @lru_cache()
@@ -514,12 +513,13 @@ def _project_relative_path(absolute_path):
 
 
 @lru_cache()
-def _get_str_template_fields(template):
+def _str_template_fields(template):
     """
-    Return a list of field names in a template string for str.format.
+    Return a list of `str.format` field names in a template string.
     """
     from string import Formatter
     return [
-        field_name for _, field_name, _, _
-        in Formatter().parse(template) if field_name is not None
+        field_name
+        for _, field_name, _, _ in Formatter().parse(template)
+        if field_name is not None
     ]
