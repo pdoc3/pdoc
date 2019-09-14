@@ -476,6 +476,23 @@ def get_repo_link(template: str, dobj: pdoc.Doc):
 
 
 @lru_cache()
+def _git_project_root():
+    """
+    Return the path to project root directory or None if indeterminate.
+    """
+    path = None
+    for cmd in (['git', 'rev-parse', '--show-superproject-working-tree'],
+                ['git', 'rev-parse', '--show-toplevel']):
+        try:
+            path = subprocess.check_output(cmd, universal_newlines=True).rstrip('\r\n')
+            if path:
+                break
+        except (subprocess.CalledProcessError, OSError):
+            pass
+    return path
+
+
+@lru_cache()
 def _project_relative_path(absolute_path):
     """
     Convert an absolute path of a python source file to a project-relative path.
@@ -483,7 +500,8 @@ def _project_relative_path(absolute_path):
     Python library installation.
     """
     from distutils.sysconfig import get_python_lib
-    for prefix_path in [os.getcwd(), get_python_lib()]:
+    for prefix_path in (_git_project_root() or os.getcwd(),
+                        get_python_lib()):
         common_path = os.path.commonpath([prefix_path, absolute_path])
         if common_path == prefix_path:
             # absolute_path is a descendant of prefix_path
