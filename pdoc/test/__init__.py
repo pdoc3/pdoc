@@ -3,6 +3,7 @@ Unit tests for pdoc package.
 """
 import inspect
 import os
+import shutil
 import signal
 import sys
 import threading
@@ -26,7 +27,7 @@ import pdoc
 from pdoc.cli import main, parser
 from pdoc.html_helpers import (
     minify_css, minify_html, glimpse, to_html,
-    ReferenceWarning, extract_toc,
+    ReferenceWarning, extract_toc, get_repo_link,
 )
 
 TESTS_BASEDIR = os.path.abspath(os.path.dirname(__file__) or '.')
@@ -789,6 +790,16 @@ class HtmlHelpersTest(unittest.TestCase):
 </div>'''
         toc = extract_toc(text)
         self.assertEqual(toc, expected)
+
+    @unittest.skipIf(shutil.which("git") is None, reason="test assumes git installed on system")
+    def test_get_repo_link(self):
+        url = get_repo_link(
+            template='https://github.com/pdoc3/pdoc/blob/{commit}/{path}#L{start_line}-L{end_line}',
+            dobj=pdoc.Module(EXAMPLE_MODULE).find_ident('module.foo'),
+        )
+        self.assertIsNotNone(url)
+        expect_pattern = r"https://github.com/pdoc3/pdoc/blob/[0-9a-f]{40}/pdoc/test/example_pkg/module.py#L19-L21" # noqa E501
+        self.assertRegex(url, expect_pattern)
 
 
 class Docformats(unittest.TestCase):
