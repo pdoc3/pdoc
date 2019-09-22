@@ -1100,10 +1100,21 @@ class Function(Doc):
             return ["..."]
 
         def safe_default_value(p: inspect.Parameter):
+            if p.default is inspect.Parameter.empty:
+                return p
+
+            replacement = None
             if p.default is os.environ:
+                replacement = 'os.environ'
+            elif inspect.isclass(p.default):
+                replacement = p.default.__module__ + '.' + p.default.__qualname__
+            elif ' at 0x' in repr(p.default):
+                replacement = re.sub(r' at 0x\w+', '', repr(p.default))
+
+            if replacement:
                 class mock:
                     def __repr__(self):
-                        return 'os.environ'
+                        return replacement
                 return p.replace(default=mock())
             return p
 

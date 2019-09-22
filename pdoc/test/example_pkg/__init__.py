@@ -18,7 +18,10 @@ __pdoc__ = {}
 
 def foo(env=os.environ):
     """Doesn't leak environ"""
-    pass
+
+
+def object_as_arg_default(*args, a=object(), **kwargs):
+    """Html-encodes angle brackets in params"""
 
 
 class A:

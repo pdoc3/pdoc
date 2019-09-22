@@ -130,6 +130,7 @@ class CliTest(unittest.TestCase):
 
     def test_html(self):
         include_patterns = [
+            'a=&lt;object',
             'CONST docstring',
             'var docstring',
             'foreign_var',
@@ -162,6 +163,7 @@ class CliTest(unittest.TestCase):
             ' class="ident">static',
         ]
         exclude_patterns = [
+            '<object ',
             ' class="ident">_private',
             ' class="ident">_Private',
         ]
@@ -264,6 +266,7 @@ class CliTest(unittest.TestCase):
 
     def test_text(self):
         include_patterns = [
+            'object_as_arg_default(*args, a=<object ',
             'CONST docstring',
             'var docstring',
             'foreign_var',
@@ -614,6 +617,9 @@ class ApiTest(unittest.TestCase):
         func = pdoc.Function('f', mod,
                              lambda a=os.environ: None)
         self.assertEqual(func.params(), ['a=os.environ'])
+
+        func = pdoc.Function('f', mod, lambda a=object(): None)
+        self.assertEqual(func.params(), ['a=<object object>'])
 
         # typed
         def f(a: int, *b, c: typing.List[pdoc.Doc] = []): pass
