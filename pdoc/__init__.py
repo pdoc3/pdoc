@@ -583,8 +583,10 @@ class Module(Doc):
                     for file in os.listdir(pth):
                         if file.startswith(('.', '__pycache__', '__init__.py')):
                             continue
-                        if file.endswith(_SOURCE_SUFFIXES) or isdir(join(pth, file)):
+                        if file.endswith(_SOURCE_SUFFIXES):
                             yield splitext(file)[0]
+                        if isdir(join(pth, file)) and '.' not in file:
+                            yield file
 
             for root in iter_modules(self.obj.__path__):
                 # Ignore if this module was already doc'd.
