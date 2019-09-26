@@ -2,7 +2,7 @@
   import os
 
   import pdoc
-  from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html, get_repo_link
+  from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html, format_git_link
 
 
   def link(d, name=None, fmt='{}'):
@@ -21,20 +21,20 @@
 <%def name="ident(name)"><span class="ident">${name}</span></%def>
 
 <%def name="show_source(d)">
-  % if (show_source_code or repo_link_template) and d.source and d.obj is not getattr(d.inherits, 'obj', None):
-    <% repo_link = get_repo_link(repo_link_template, d) %>
+  % if (show_source_code or git_link_template) and d.source and d.obj is not getattr(d.inherits, 'obj', None):
+    <% git_link = format_git_link(git_link_template, d) %>
     % if show_source_code:
       <details class="source">
         <summary>
             <span>Expand source code</span>
-            % if repo_link:
-              <a href="${repo_link}" class="repo-link">Browse repo</a>
+            % if git_link:
+              <a href="${git_link}" class="git-link">Browse git</a>
             %endif
         </summary>
         <pre><code class="python">${d.source | h}</code></pre>
       </details>
-    % elif repo_link:
-      <div class="repo-link-div"><a href="${repo_link}" class="repo-link">Browse repo</a></div>
+    % elif git_link:
+      <div class="git-link-div"><a href="${git_link}" class="git-link">Browse git</a></div>
     %endif
   %endif
 </%def>

@@ -27,7 +27,7 @@ import pdoc
 from pdoc.cli import main, parser
 from pdoc.html_helpers import (
     minify_css, minify_html, glimpse, to_html,
-    ReferenceWarning, extract_toc, get_repo_link,
+    ReferenceWarning, extract_toc, format_git_link,
 )
 
 TESTS_BASEDIR = os.path.abspath(os.path.dirname(__file__) or '.')
@@ -792,8 +792,8 @@ class HtmlHelpersTest(unittest.TestCase):
         self.assertEqual(toc, expected)
 
     @unittest.skipIf(shutil.which("git") is None, reason="test assumes git installed on system")
-    def test_get_repo_link(self):
-        url = get_repo_link(
+    def test_format_git_link(self):
+        url = format_git_link(
             template='https://github.com/pdoc3/pdoc/blob/{commit}/{path}#L{start_line}-L{end_line}',
             dobj=pdoc.Module(EXAMPLE_MODULE).find_ident('module.foo'),
         )

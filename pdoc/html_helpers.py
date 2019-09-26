@@ -434,7 +434,7 @@ def extract_toc(text: str):
     return toc
 
 
-def get_repo_link(template: str, dobj: pdoc.Doc):
+def format_git_link(template: str, dobj: pdoc.Doc):
     """
     Interpolate `template` as a formatted string literal using values extracted
     from `dobj` and the working environment.
@@ -451,7 +451,7 @@ def get_repo_link(template: str, dobj: pdoc.Doc):
         url = template.format(**locals())
         return url
     except Exception:
-        warn('get_repo_link for {} failed:\n{}'.format(dobj.obj, traceback.format_exc()))
+        warn('format_git_link for {} failed:\n{}'.format(dobj.obj, traceback.format_exc()))
         return None
 
 

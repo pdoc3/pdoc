@@ -197,7 +197,7 @@
     }
 
     .source summary,
-    .repo-link-div {
+    .git-link-div {
       color: #666;
       text-align: right;
       font-weight: 400;
@@ -208,7 +208,7 @@
         white-space: nowrap;
         cursor: pointer;
       }
-      .repo-link {
+      .git-link {
         color: inherit;
         margin-left: 1em;
       }
