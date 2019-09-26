@@ -797,9 +797,8 @@ class HtmlHelpersTest(unittest.TestCase):
             template='https://github.com/pdoc3/pdoc/blob/{commit}/{path}#L{start_line}-L{end_line}',
             dobj=pdoc.Module(EXAMPLE_MODULE).find_ident('module.foo'),
         )
-        self.assertIsNotNone(url)
-        expect_pattern = r"https://github.com/pdoc3/pdoc/blob/[0-9a-f]{40}/pdoc/test/example_pkg/module.py#L19-L21" # noqa E501
-        self.assertRegex(url, expect_pattern)
+        self.assertRegex(url, r"https://github.com/pdoc3/pdoc/blob/[0-9a-f]{40}"
+                              r"/pdoc/test/example_pkg/module.py#L\d+-L\d+")
 
 
 class Docformats(unittest.TestCase):
