@@ -1084,7 +1084,7 @@ class HttpTest(unittest.TestCase):
                     sys.__stdout__.write(stdout.getvalue())
                     raise
                 finally:
-                    pdoc.cli._httpd.shutdown()
+                    pdoc.cli._httpd.shutdown()  # type: ignore
                     t.join()
 
     def test_http(self):
