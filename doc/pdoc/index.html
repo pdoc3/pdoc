@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.4" />
+<meta name="generator" content="pdoc 0.7.0" />
 <title>pdoc API documentation</title>
 <meta name="description" content="Python package `pdoc` provides types, functions, and a command-line
 interface for accessing public documentation of Python modules, and
@@ -11,7 +11,7 @@ for presenting …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 <style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em}</style>
@@ -299,7 +299,10 @@ an underscore is <a href="https://docs.python.org/3/tutorial/classes.html#privat
 </ol>
 </div>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L0-L1231" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">&#34;&#34;&#34;
 Python package `pdoc` provides types, functions, and a command-line
 interface for accessing public documentation of Python modules, and
@@ -501,56 +504,46 @@ def _pairwise(iterable):
     return zip(a, b)
 
 
-def _var_docstrings(doc_obj: Union[&#39;Module&#39;, &#39;Class&#39;], *,
-                    _init_tree: ast.FunctionDef = None) -&gt; Dict[str, &#39;Variable&#39;]:
+def _pep224_docstrings(doc_obj: Union[&#39;Module&#39;, &#39;Class&#39;], *,
+                       _init_tree=None) -&gt; Tuple[Dict[str, str],
+                                                 Dict[str, str]]:
     &#34;&#34;&#34;
-    Extracts docstrings for variables of `doc_obj`
+    Extracts PEP-224 docstrings for variables of `doc_obj`
     (either a `pdoc.Module` or `pdoc.Class`).
 
-    Returns a dict mapping variable names to `pdoc.Variable` objects.
-
-    For `pdoc.Class` objects, the dict contains class&#39; instance
-    variables (defined as `self.something` in class&#39; `__init__`),
-    recognized by `Variable.instance_var == True`.
+    Returns a tuple of two dicts mapping variable names to their docstrings.
+    The second dict contains instance variables and is non-empty only in case
+    `doc_obj` is a `pdoc.Class` which has `__init__` method.
     &#34;&#34;&#34;
+    # No variables in namespace packages
+    if isinstance(doc_obj, Module) and doc_obj.is_namespace:
+        return {}, {}
+
+    vars = {}  # type: Dict[str, str]
+    instance_vars = {}  # type: Dict[str, str]
+
     if _init_tree:
-        tree = _init_tree  # type: Union[ast.Module, ast.FunctionDef]
+        tree = _init_tree
     else:
-        # No variables in namespace packages
-        if isinstance(doc_obj, Module) and doc_obj.is_namespace:
-            return {}
         try:
             tree = ast.parse(inspect.getsource(doc_obj.obj))
         except (OSError, TypeError, SyntaxError):
             warn(&#34;Couldn&#39;t get/parse source of &#39;{!r}&#39;&#34;.format(doc_obj))
-            return {}
+            return {}, {}
+
         if isinstance(doc_obj, Class):
-            tree = tree.body[0]  # type: ignore  # ast.parse creates a dummy ast.Module wrapper
+            tree = tree.body[0]  # ast.parse creates a dummy ast.Module wrapper
 
-    vs = {}  # type: Dict[str, Variable]
-
-    cls = None
-    module = doc_obj
-    module_all = set(getattr(module.obj, &#39;__all__&#39;, ()))
-    member_obj = dict(inspect.getmembers(doc_obj.obj)).get
-
-    if isinstance(doc_obj, Class):
-        cls = doc_obj
-        module = doc_obj.module
-
-        # For classes, first add instance variables defined in __init__
-        if not _init_tree:
-            # Recursive call with just the __init__ tree
+            # For classes, maybe add instance variables defined in __init__
             for node in tree.body:
                 if isinstance(node, ast.FunctionDef) and node.name == &#39;__init__&#39;:
-                    vs.update(_var_docstrings(doc_obj, _init_tree=node))
+                    instance_vars, _ = _pep224_docstrings(doc_obj, _init_tree=node)
                     break
 
     try:
         ast_AnnAssign = ast.AnnAssign   # type: Type
     except AttributeError:  # Python &lt; 3.6
         ast_AnnAssign = type(None)
-
     ast_Assignments = (ast.Assign, ast_AnnAssign)
 
     for assign_node, str_node in _pairwise(ast.iter_child_nodes(tree)):
@@ -577,20 +570,13 @@ def _var_docstrings(doc_obj: Union[&#39;Module&#39;, &#39;Class&#39;], *,
         else:
             continue
 
-        if not _is_public(name):
-            continue
-
-        if module_all and name not in module_all:
-            continue
-
         docstring = inspect.cleandoc(str_node.value.s).strip()
         if not docstring:
             continue
 
-        vs[name] = Variable(name, module, docstring,
-                            obj=member_obj(name),
-                            cls=cls, instance_var=bool(_init_tree))
-    return vs
+        vars[name] = docstring
+
+    return vars, instance_vars
 
 
 def _is_public(ident_name):
@@ -599,6 +585,10 @@ def _is_public(ident_name):
     identifier name.
     &#34;&#34;&#34;
     return not ident_name.startswith(&#34;_&#34;)
+
+
+def _is_function(obj):
+    return inspect.isroutine(obj) and callable(obj)
 
 
 def _filter_type(type: Type[T],
@@ -843,6 +833,8 @@ class Module(Doc):
         self._is_inheritance_linked = False
         &#34;&#34;&#34;Re-entry guard for `pdoc.Module._link_inheritance()`.&#34;&#34;&#34;
 
+        var_docstrings, _ = _pep224_docstrings(self)
+
         # Populate self.doc with this module&#39;s public members
         if hasattr(self.obj, &#39;__all__&#39;):
             public_objs = []
@@ -860,16 +852,17 @@ class Module(Doc):
             public_objs = [(name, inspect.unwrap(obj))
                            for name, obj in inspect.getmembers(self.obj)
                            if (_is_public(name) and
-                               is_from_this_module(obj))]
+                               (is_from_this_module(obj) or name in var_docstrings))]
             index = list(self.obj.__dict__).index
             public_objs.sort(key=lambda i: index(i[0]))
+
         for name, obj in public_objs:
-            if inspect.isroutine(obj):
+            if _is_function(obj):
                 self.doc[name] = Function(name, self, obj)
             elif inspect.isclass(obj):
                 self.doc[name] = Class(name, self, obj)
-
-        self.doc.update(_var_docstrings(self))
+            elif name in var_docstrings:
+                self.doc[name] = Variable(name, self, var_docstrings[name], obj=obj)
 
         # If the module is a package, scan the directory for submodules
         if self.is_package:
@@ -1106,8 +1099,6 @@ class Class(Doc):
         self.doc = {}
         &#34;&#34;&#34;A mapping from identifier name to a `pdoc.Doc` objects.&#34;&#34;&#34;
 
-        self.doc.update(_var_docstrings(self))
-
         public_objs = [(name, inspect.unwrap(obj))
                        for name, obj in inspect.getmembers(self.obj)
                        # Filter only *own* members. The rest are inherited
@@ -1116,27 +1107,30 @@ class Class(Doc):
         index = list(self.obj.__dict__).index
         public_objs.sort(key=lambda i: index(i[0]))
 
+        var_docstrings, instance_var_docstrings = _pep224_docstrings(self)
+
         # Convert the public Python objects to documentation objects.
         for name, obj in public_objs:
-            if name in self.doc and self.doc[name].docstring:
-                continue
-            if inspect.isroutine(obj):
+            if _is_function(obj):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self,
                     method=not self._method_type(self.obj, name))
-            elif (inspect.isdatadescriptor(obj) or
-                  inspect.isgetsetdescriptor(obj) or
-                  inspect.ismemberdescriptor(obj)):
-                self.doc[name] = Variable(
-                    name, self.module, inspect.getdoc(obj),
-                    obj=getattr(obj, &#39;fget&#39;, obj),
-                    cls=self, instance_var=True)
             else:
                 self.doc[name] = Variable(
                     name, self.module,
-                    docstring=isinstance(obj, type) and inspect.getdoc(obj) or &#34;&#34;,
-                    cls=self,
-                    instance_var=name in getattr(self.obj, &#34;__slots__&#34;, ()))
+                    docstring=var_docstrings.get(name) or inspect.getdoc(obj), cls=self,
+                    obj=getattr(obj, &#39;fget&#39;, getattr(obj, &#39;__get__&#39;, obj)),
+                    instance_var=(inspect.isdatadescriptor(obj) or
+                                  inspect.ismethoddescriptor(obj) or
+                                  inspect.isgetsetdescriptor(obj) or
+                                  inspect.ismemberdescriptor(obj) or
+                                  name in getattr(self.obj, &#39;__slots__&#39;, ())))
+
+        for name, docstring in instance_var_docstrings.items():
+            self.doc[name] = Variable(
+                name, self.module, docstring, cls=self,
+                obj=getattr(self.obj, name, None),
+                instance_var=True)
 
     @staticmethod
     def _method_type(cls: type, name: str):
@@ -1326,7 +1320,7 @@ class Function(Doc):
         `method` should be `True` when the function is a method. In
         all other cases, it should be `False`.
         &#34;&#34;&#34;
-        assert callable(obj)
+        assert callable(obj), (name, module, obj)
         super().__init__(name, module, obj)
 
         self.cls = cls
@@ -1585,7 +1579,10 @@ documentation objects are shown in the output. It is a function
 that takes a single argument (a documentation object) and returns
 <code>True</code> or <code>False</code>. If <code>False</code>, that object will not be documented.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L130-L142" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def html(module_name, docfilter=None, reload=False, **kwargs) -&gt; str:
     &#34;&#34;&#34;
     Returns the documentation for the module `module_name` in HTML
@@ -1608,7 +1605,10 @@ that takes a single argument (a documentation object) and returns
 <section class="desc"><p>Return module object matching <code>module</code> specification (either a python
 module path or a filesystem path to file/directory).</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L161-L192" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def import_module(module, *, reload: bool = False) -&gt; ModuleType:
     &#34;&#34;&#34;
     Return module object matching `module` specification (either a python
@@ -1653,7 +1653,10 @@ share the provided <code>context</code> (<a title="pdoc.Context" href="#pdoc.Con
 <p>You need to call this if you expect <a title="pdoc.Doc.inherits" href="#pdoc.Doc.inherits"><code>Doc.inherits</code></a> and
 inherited <a title="pdoc.Doc.docstring" href="#pdoc.Doc.docstring"><code>Doc.docstring</code></a> to be set correctly.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L320-L339" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def link_inheritance(context: Context = None):
     &#34;&#34;&#34;
     Link inheritance relationsships between `pdoc.Class` objects
@@ -1682,7 +1685,10 @@ inherited <a title="pdoc.Doc.docstring" href="#pdoc.Doc.docstring"><code>Doc.doc
 <dd>
 <section class="desc"><p>Resets the global <a title="pdoc.Context" href="#pdoc.Context"><code>Context</code></a> to the initial (empty) state.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L80-L91" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def reset():
     &#34;&#34;&#34;Resets the global `pdoc.Context` to the initial (empty) state.&#34;&#34;&#34;
     global _global_context
@@ -1709,7 +1715,10 @@ documentation objects are shown in the output. It is a function
 that takes a single argument (a documentation object) and returns
 <code>True</code> or <code>False</code>. If <code>False</code>, that object will not be documented.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L145-L158" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def text(module_name, docfilter=None, reload=False, **kwargs) -&gt; str:
     &#34;&#34;&#34;
     Returns the documentation for the module `module_name` in plain
@@ -1743,7 +1752,10 @@ Python object <code>obj</code> is defined, and <code>docstring</code> is its
 documentation string. If <code>docstring</code> is left empty, it will be
 read with <code>inspect.getdoc()</code>.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L779-L998" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">class Class(Doc):
     &#34;&#34;&#34;
     Representation of a class&#39; documentation.
@@ -1762,8 +1774,6 @@ read with <code>inspect.getdoc()</code>.</p></section>
         self.doc = {}
         &#34;&#34;&#34;A mapping from identifier name to a `pdoc.Doc` objects.&#34;&#34;&#34;
 
-        self.doc.update(_var_docstrings(self))
-
         public_objs = [(name, inspect.unwrap(obj))
                        for name, obj in inspect.getmembers(self.obj)
                        # Filter only *own* members. The rest are inherited
@@ -1772,27 +1782,30 @@ read with <code>inspect.getdoc()</code>.</p></section>
         index = list(self.obj.__dict__).index
         public_objs.sort(key=lambda i: index(i[0]))
 
+        var_docstrings, instance_var_docstrings = _pep224_docstrings(self)
+
         # Convert the public Python objects to documentation objects.
         for name, obj in public_objs:
-            if name in self.doc and self.doc[name].docstring:
-                continue
-            if inspect.isroutine(obj):
+            if _is_function(obj):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self,
                     method=not self._method_type(self.obj, name))
-            elif (inspect.isdatadescriptor(obj) or
-                  inspect.isgetsetdescriptor(obj) or
-                  inspect.ismemberdescriptor(obj)):
-                self.doc[name] = Variable(
-                    name, self.module, inspect.getdoc(obj),
-                    obj=getattr(obj, &#39;fget&#39;, obj),
-                    cls=self, instance_var=True)
             else:
                 self.doc[name] = Variable(
                     name, self.module,
-                    docstring=isinstance(obj, type) and inspect.getdoc(obj) or &#34;&#34;,
-                    cls=self,
-                    instance_var=name in getattr(self.obj, &#34;__slots__&#34;, ()))
+                    docstring=var_docstrings.get(name) or inspect.getdoc(obj), cls=self,
+                    obj=getattr(obj, &#39;fget&#39;, getattr(obj, &#39;__get__&#39;, obj)),
+                    instance_var=(inspect.isdatadescriptor(obj) or
+                                  inspect.ismethoddescriptor(obj) or
+                                  inspect.isgetsetdescriptor(obj) or
+                                  inspect.ismemberdescriptor(obj) or
+                                  name in getattr(self.obj, &#39;__slots__&#39;, ())))
+
+        for name, docstring in instance_var_docstrings.items():
+            self.doc[name] = Variable(
+                name, self.module, docstring, cls=self,
+                obj=getattr(self.obj, name, None),
+                instance_var=True)
 
     @staticmethod
     def _method_type(cls: type, name: str):
@@ -1984,7 +1997,10 @@ read with <code>inspect.getdoc()</code>.</p></section>
 <section class="desc"><p>Returns an optionally-sorted list of <a title="pdoc.Variable" href="#pdoc.Variable"><code>Variable</code></a> objects that
 represent this class' class variables.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L911-L918" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def class_variables(self, include_inherited=True, sort=True):
     &#34;&#34;&#34;
     Returns an optionally-sorted list of `pdoc.Variable` objects that
@@ -2002,7 +2018,10 @@ represent this class' class variables.</p></section>
 <section class="desc"><p>Returns an optionally-sorted list of <a title="pdoc.Function" href="#pdoc.Function"><code>Function</code></a> objects that
 represent this class' static functions.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L939-L946" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def functions(self, include_inherited=True, sort=True) -&gt; List[&#39;Function&#39;]:
     &#34;&#34;&#34;
     Returns an optionally-sorted list of `pdoc.Function` objects that
@@ -2021,7 +2040,10 @@ represent this class' static functions.</p></section>
 (ancestor class, list of ancestor class' members sorted by name),
 sorted by MRO.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L948-L958" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def inherited_members(self) -&gt; List[Tuple[&#39;Class&#39;, List[Doc]]]:
     &#34;&#34;&#34;
     Returns all inherited members as a list of tuples
@@ -2043,7 +2065,10 @@ sorted by MRO.</p></section>
 represent this class' instance variables. Instance variables
 are those defined in a class's <code>__init__</code> as <code>self.variable = ...</code>.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L920-L928" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def instance_variables(self, include_inherited=True, sort=True):
     &#34;&#34;&#34;
     Returns an optionally-sorted list of `pdoc.Variable` objects that
@@ -2062,7 +2087,10 @@ are those defined in a class's <code>__init__</code> as <code>self.variable = ..
 <section class="desc"><p>Returns an optionally-sorted list of <a title="pdoc.Function" href="#pdoc.Function"><code>Function</code></a> objects that
 represent this class' methods.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L930-L937" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def methods(self, include_inherited=True, sort=True):
     &#34;&#34;&#34;
     Returns an optionally-sorted list of `pdoc.Function` objects that
@@ -2082,7 +2110,10 @@ in method resolution order.</p>
 <p>The list will contain objects of type <a title="pdoc.Class" href="#pdoc.Class"><code>Class</code></a>
 if the types are documented, and <a title="pdoc.External" href="#pdoc.External"><code>External</code></a> otherwise.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L853-L874" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def mro(self, only_documented=False) -&gt; List[&#39;Class&#39;]:
     &#34;&#34;&#34;
     Returns a list of ancestor (superclass) documentation objects
@@ -2114,7 +2145,10 @@ if the types are documented, and <a title="pdoc.External" href="#pdoc.External">
 <section class="desc"><p>Return a list of formatted parameters accepted by the
 class constructor (method <code>__init__</code>). See <a title="pdoc.Function.params" href="#pdoc.Function.params"><code>Function.params()</code></a>.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L887-L902" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def params(self, *, annotate=False, link=None) -&gt; List[&#39;str&#39;]:
     &#34;&#34;&#34;
     Return a list of formatted parameters accepted by the
@@ -2142,7 +2176,10 @@ Python interpreter (obtained from <code>type.__subclasses__()</code>).</p>
 <p>The objects in the list are of type <a title="pdoc.Class" href="#pdoc.Class"><code>Class</code></a> if available,
 and <a title="pdoc.External" href="#pdoc.External"><code>External</code></a> otherwise.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L876-L885" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def subclasses(self) -&gt; List[&#39;Class&#39;]:
     &#34;&#34;&#34;
     Returns a list of subclasses of this class that are visible to the
@@ -2185,7 +2222,10 @@ All <a title="pdoc.Module" href="#pdoc.Module"><code>Module</code></a> objects t
 <p>If you don't pass your own <a title="pdoc.Context" href="#pdoc.Context"><code>Context</code></a> instance to <a title="pdoc.Module" href="#pdoc.Module"><code>Module</code></a> constructor,
 a global context object will be used.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L62-L74" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">class Context(dict):
     &#34;&#34;&#34;
     The context object that maps all documented identifiers
@@ -2227,7 +2267,10 @@ Python object <code>obj</code> is defined, and <code>docstring</code> is its
 documentation string. If <code>docstring</code> is left empty, it will be
 read with <code>inspect.getdoc()</code>.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L342-L478" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">class Doc:
     &#34;&#34;&#34;
     A base class for all documentation objects.
@@ -2403,7 +2446,10 @@ if any.</p></section>
 <section class="desc"><p>Module-relative "qualified" name of this documentation
 object, used for show (e.g. <code>Doc.qualname</code>).</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L426-L432" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">@property
 def qualname(self):
     &#34;&#34;&#34;
@@ -2420,7 +2466,10 @@ object, usually its fully qualified path
 (e.g. <code>pdoc.Doc.refname</code>). Every
 documentation object provides this property.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L415-L424" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">@property
 def refname(self):
     &#34;&#34;&#34;
@@ -2438,7 +2487,10 @@ def refname(self):
 <section class="desc"><p>Cleaned (dedented) source code of the Python object. If not
 available, an empty string.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L402-L413" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">@property  # type: ignore
 @lru_cache()
 def source(self) -&gt; str:
@@ -2468,7 +2520,10 @@ relative URL.</p>
 <p>If <code>top_ancestor</code> is <code>True</code>, the returned URL instead points to
 the top ancestor in the object's <a title="pdoc.Doc.inherits" href="#pdoc.Doc.inherits"><code>Doc.inherits</code></a> chain.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L434-L463" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">@lru_cache()
 def url(self, relative_to: &#39;Module&#39; = None, *, link_prefix: str = &#39;&#39;,
         top_ancestor: bool = False):
@@ -2516,7 +2571,10 @@ the ancestor list of a class).</p>
 <p>Initializes an external identifier with <code>name</code>, where <code>name</code>
 should be a fully qualified name.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L1197-L1232" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">class External(Doc):
     &#34;&#34;&#34;
     A representation of an external identifier. The textual
@@ -2566,7 +2624,10 @@ should be a fully qualified name.</p></section>
 <dd>
 <section class="desc"><p><a title="pdoc.External" href="#pdoc.External"><code>External</code></a> objects return absolute urls matching <code>/{name}.ext</code>.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L1228-L1232" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def url(self, *args, **kwargs):
     &#34;&#34;&#34;
     `External` objects return absolute urls matching `/{name}.ext`.
@@ -2604,7 +2665,10 @@ beloing to a class. <code>cls</code> should be a <a title="pdoc.Class" href="#pd
 <p><code>method</code> should be <code>True</code> when the function is a method. In
 all other cases, it should be <code>False</code>.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L1001-L1155" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">class Function(Doc):
     &#34;&#34;&#34;
     Representation of documentation for a function or method.
@@ -2622,7 +2686,7 @@ all other cases, it should be <code>False</code>.</p></section>
         `method` should be `True` when the function is a method. In
         all other cases, it should be `False`.
         &#34;&#34;&#34;
-        assert callable(obj)
+        assert callable(obj), (name, module, obj)
         super().__init__(name, module, obj)
 
         self.cls = cls
@@ -2787,7 +2851,10 @@ If not, this is None.</p></section>
 <section class="desc"><p>Generates the string of keywords used to define the function,
 for example <code>def</code> or <code>async def</code>.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L1034-L1039" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def funcdef(self):
     &#34;&#34;&#34;
     Generates the string of keywords used to define the function,
@@ -2807,7 +2874,10 @@ optional arguments whose names begin with an underscore.</p>
 <p>If <code>annotate</code> is True, the parameter strings include <a href="https://www.python.org/dev/peps/pep-0484/">PEP 484</a>
 type hint annotations.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L1073-L1085" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def params(self, *, annotate: bool = False, link: Callable[[Doc], str] = None) -&gt; List[str]:
     &#34;&#34;&#34;
     Returns a list where each element is a nicely formatted
@@ -2829,7 +2899,10 @@ type hint annotations.</p></section>
 <dd>
 <section class="desc"><p>Formatted function return type annotation or empty string if none.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L1056-L1071" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def return_annotation(self, *, link=None):
     &#34;&#34;&#34;Formatted function return type annotation or empty string if none.&#34;&#34;&#34;
     try:
@@ -2881,7 +2954,10 @@ a submodule of.</p>
 <p><code>context</code> is an instance of <a title="pdoc.Context" href="#pdoc.Context"><code>Context</code></a>. If <code>None</code> a
 global context object will be used.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L481-L776" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">class Module(Doc):
     &#34;&#34;&#34;
     Representation of a module&#39;s documentation.
@@ -2932,6 +3008,8 @@ global context object will be used.</p></section>
         self._is_inheritance_linked = False
         &#34;&#34;&#34;Re-entry guard for `pdoc.Module._link_inheritance()`.&#34;&#34;&#34;
 
+        var_docstrings, _ = _pep224_docstrings(self)
+
         # Populate self.doc with this module&#39;s public members
         if hasattr(self.obj, &#39;__all__&#39;):
             public_objs = []
@@ -2949,16 +3027,17 @@ global context object will be used.</p></section>
             public_objs = [(name, inspect.unwrap(obj))
                            for name, obj in inspect.getmembers(self.obj)
                            if (_is_public(name) and
-                               is_from_this_module(obj))]
+                               (is_from_this_module(obj) or name in var_docstrings))]
             index = list(self.obj.__dict__).index
             public_objs.sort(key=lambda i: index(i[0]))
+
         for name, obj in public_objs:
-            if inspect.isroutine(obj):
+            if _is_function(obj):
                 self.doc[name] = Function(name, self, obj)
             elif inspect.isclass(obj):
                 self.doc[name] = Class(name, self, obj)
-
-        self.doc.update(_var_docstrings(self))
+            elif name in var_docstrings:
+                self.doc[name] = Variable(name, self, var_docstrings[name], obj=obj)
 
         # If the module is a package, scan the directory for submodules
         if self.is_package:
@@ -3182,6 +3261,15 @@ global context object will be used.</p></section>
 </ul>
 <h3>Instance variables</h3>
 <dl>
+<dt id="pdoc.Module._context"><code class="name">var <span class="ident">_context</span></code></dt>
+<dd>
+<section class="desc"><p>A lookup table for ALL doc objects of all modules that share this context,
+mainly used in <a title="pdoc.Module.find_ident" href="#pdoc.Module.find_ident"><code>Module.find_ident()</code></a>.</p></section>
+</dd>
+<dt id="pdoc.Module._is_inheritance_linked"><code class="name">var <span class="ident">_is_inheritance_linked</span></code></dt>
+<dd>
+<section class="desc"><p>Re-entry guard for <code>pdoc.Module._link_inheritance()</code>.</p></section>
+</dd>
 <dt id="pdoc.Module.doc"><code class="name">var <span class="ident">doc</span></code></dt>
 <dd>
 <section class="desc"><p>A mapping from identifier name to a documentation object.</p></section>
@@ -3190,7 +3278,10 @@ global context object will be used.</p></section>
 <dd>
 <section class="desc"><p><code>True</code> if this module is a namespace package.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L701-L706" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">@property
 def is_namespace(self):
     &#34;&#34;&#34;
@@ -3204,7 +3295,10 @@ def is_namespace(self):
 <section class="desc"><p><code>True</code> if this module is a package.</p>
 <p>Works by checking whether the module has a <code>__path__</code> attribute.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L692-L699" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">@property
 def is_package(self):
     &#34;&#34;&#34;
@@ -3229,7 +3323,10 @@ def is_package(self):
 <section class="desc"><p>Returns all documented module-level classes in the module,
 optionally sorted alphabetically, as a list of <a title="pdoc.Class" href="#pdoc.Class"><code>Class</code></a>.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L749-L754" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def classes(self, sort=True):
     &#34;&#34;&#34;
     Returns all documented module-level classes in the module,
@@ -3245,7 +3342,10 @@ optionally sorted alphabetically, as a list of <a title="pdoc.Class" href="#pdoc
 <section class="desc"><p>Given a Python <code>cls</code> object, try to find it in this module
 or in any of the exported identifiers of the submodules.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L708-L716" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def find_class(self, cls: type):
     &#34;&#34;&#34;
     Given a Python `cls` object, try to find it in this module
@@ -3268,7 +3368,10 @@ exported identifiers.</p>
 returned. If one cannot be found, then an instance of
 <a title="pdoc.External" href="#pdoc.External"><code>External</code></a> is returned populated with the given identifier.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L718-L736" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def find_ident(self, name: str) -&gt; Doc:
     &#34;&#34;&#34;
     Searches this module and **all** other public modules
@@ -3297,7 +3400,10 @@ returned. If one cannot be found, then an instance of
 <section class="desc"><p>Returns all documented module-level functions in the module,
 optionally sorted alphabetically, as a list of <a title="pdoc.Function" href="#pdoc.Function"><code>Function</code></a>.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L756-L761" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def functions(self, sort=True):
     &#34;&#34;&#34;
     Returns all documented module-level functions in the module,
@@ -3316,7 +3422,10 @@ self-contained HTML.</p>
 <p>For explanation of other arguments, see <a title="pdoc.html" href="#pdoc.html"><code>html()</code></a>.</p>
 <p><code>kwargs</code> is passed to the <code>mako</code> render function.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L675-L690" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def html(self, minify=True, **kwargs) -&gt; str:
     &#34;&#34;&#34;
     Returns the documentation for this module as
@@ -3342,7 +3451,10 @@ self-contained HTML.</p>
 <section class="desc"><p>Returns all documented sub-modules of the module sorted
 alphabetically as a list of <a title="pdoc.Module" href="#pdoc.Module"><code>Module</code></a>.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L763-L768" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def submodules(self):
     &#34;&#34;&#34;
     Returns all documented sub-modules of the module sorted
@@ -3357,7 +3469,10 @@ alphabetically as a list of <a title="pdoc.Module" href="#pdoc.Module"><code>Mod
 <dd>
 <section class="desc"><p>Returns the documentation for this module as plain text.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L668-L673" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def text(self, **kwargs) -&gt; str:
     &#34;&#34;&#34;
     Returns the documentation for this module as plain text.
@@ -3373,7 +3488,10 @@ alphabetically as a list of <a title="pdoc.Module" href="#pdoc.Module"><code>Mod
 <section class="desc"><p>Returns all documented module-level variables in the module,
 optionally sorted alphabetically, as a list of <a title="pdoc.Variable" href="#pdoc.Variable"><code>Variable</code></a>.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L742-L747" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">def variables(self, sort=True):
     &#34;&#34;&#34;
     Returns all documented module-level variables in the module,
@@ -3411,7 +3529,10 @@ module, class, and instance variables.</p>
 as a <a title="pdoc.Class" href="#pdoc.Class"><code>Class</code></a> object when this is a class or instance
 variable.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/a42d273b919d59845788aef7323eee7a6dfbd4d0/pdoc/__init__.py#L1158-L1194" class="git-link">Browse git</a>
+</summary>
 <pre><code class="python">class Variable(Doc):
     &#34;&#34;&#34;
     Representation of a variable&#39;s documentation. This includes
@@ -3589,7 +3710,9 @@ opposed to class variable).</p></section>
 </li>
 <li>
 <h4><code><a title="pdoc.Module" href="#pdoc.Module">Module</a></code></h4>
-<ul class="two-column">
+<ul class="">
+<li><code><a title="pdoc.Module._context" href="#pdoc.Module._context">_context</a></code></li>
+<li><code><a title="pdoc.Module._is_inheritance_linked" href="#pdoc.Module._is_inheritance_linked">_is_inheritance_linked</a></code></li>
 <li><code><a title="pdoc.Module.classes" href="#pdoc.Module.classes">classes</a></code></li>
 <li><code><a title="pdoc.Module.doc" href="#pdoc.Module.doc">doc</a></code></li>
 <li><code><a title="pdoc.Module.find_class" href="#pdoc.Module.find_class">find_class</a></code></li>
@@ -3618,7 +3741,7 @@ opposed to class variable).</p></section>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.4</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.0</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
