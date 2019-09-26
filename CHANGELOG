@@ -1,3 +1,13 @@
+0.6.4  (2019-09-26)
+=====
+  - New template tunable `syntax_highlighting=True` that controls whether
+    Highlight.js is included even if `show_source_code=False`.
+  - Fix `pdoc.Class.mro()` for types extending types with the same name.
+  - Support initializing `pdoc.Module` from module string.
+  - HTML-escape function parameter defaults so that objects' reprs don't
+    break HTML.
+  - Other small bug fixes.
+
 0.6.3  (2019-07-03)
 =====
   - New support for LaTeX math syntax (using new config tunable `latex_math=True`).
