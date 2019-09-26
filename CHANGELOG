@@ -1,3 +1,9 @@
+0.7.0  (2019-09-26)
+=====
+  - Better handling of descriptors.
+  - "Browse git" link pointing to e.g. GitHub added to documented identifiers
+    in HTML template. Controlled with new `git_link_template` config tunable.
+
 0.6.4  (2019-09-26)
 =====
   - New template tunable `syntax_highlighting=True` that controls whether
