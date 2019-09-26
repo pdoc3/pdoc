@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.3" />
+<meta name="generator" content="pdoc 0.6.4" />
 <title>pdoc API documentation</title>
 <meta name="description" content="Python package `pdoc` provides types, functions, and a command-line
 interface for accessing public documentation of Python modules, and
@@ -156,7 +156,7 @@ and <a href="http://google.github.io/styleguide/pyguide.html#38-comments-and-doc
 along with some <a href="#supported-rest-directives"><abbr title="reStructuredText">reST</abbr> directives</a>.</p>
 <p>Additionally, if <code>latex_math</code> <a href="#custom-templates">template config</a> option is enabled,
 LaTeX math syntax is supported when placed between
-<a href="http://docs.mathjax.org/en/latest/tex.html#tex-and-latex-math-delimiters">recognized delimiters</a>: <code>\(...\)</code> for inline equations and
+<a href="https://docs.mathjax.org/en/latest/input/tex/delimiters.html">recognized delimiters</a>: <code>\(...\)</code> for inline equations and
 <code>\[...\]</code> or <code>$$...$$</code> for block equations. Note, you need to escape
 your backslashes in Python docstrings (<code>\\(</code>, <code>\\frac{}{}</code>, &hellip;)
 or, alternatively, use <a href="https://www.journaldev.com/23598/python-raw-string">raw string literals</a>.</p>
@@ -188,6 +188,11 @@ in subdirectory 'build' of the current directory, using the default
 HTML template, run:</p>
 <pre><code>$ pdoc --html --output-dir build my_package
 </code></pre>
+<p>If you want to omit the source code preview, run:</p>
+<pre><code>$ pdoc --html --config show_source_code=False my_package
+</code></pre>
+<p>Find additional template configuration tunables in <a href="#custom-templates">Custom templates</a>
+section below.</p>
 <p>To run a local HTTP server while developing your package or writing
 docstrings for it, run:</p>
 <pre><code>$ pdoc --http : my_package
@@ -201,6 +206,7 @@ variable <a href="https://docs.python.org/3/using/cmdline.html#envvar-PYTHONWARN
 <p>For brief usage instructions, type:</p>
 <pre><code>$ pdoc --help
 </code></pre>
+<p>Even more usage examples can be found in the <a href="https://github.com/pdoc3/pdoc/issues?q=is%3Aissue+label%3Aquestion">FAQ</a>.</p>
 <h2 id="programmatic-usage">Programmatic usage</h2>
 <p>The main entry point is <a title="pdoc.Module" href="#pdoc.Module"><code>Module</code></a> which wraps a module object
 and recursively imports and wraps any submodules and their members.</p>
@@ -525,27 +531,20 @@ def _var_docstrings(doc_obj: Union[&#39;Module&#39;, &#39;Class&#39;], *,
 
     cls = None
     module = doc_obj
-    module_all = getattr(module.obj, &#39;__all__&#39;, None)
+    module_all = set(getattr(module.obj, &#39;__all__&#39;, ()))
+    member_obj = dict(inspect.getmembers(doc_obj.obj)).get
 
     if isinstance(doc_obj, Class):
         cls = doc_obj
         module = doc_obj.module
-        module_all = None  # If documenting a class, we needn&#39;t look into __all__
 
         # For classes, first add instance variables defined in __init__
         if not _init_tree:
-            try:
-                # Recursive call with just the __init__ tree
-                vs = _var_docstrings(
-                    doc_obj, _init_tree=next(
-                        node for node in tree.body
-                        if (isinstance(node, ast.FunctionDef) and
-                            node.name == &#39;__init__&#39;)))
-            except StopIteration:
-                pass
-
-    if module_all is not None:
-        module_all = set(module_all)
+            # Recursive call with just the __init__ tree
+            for node in tree.body:
+                if isinstance(node, ast.FunctionDef) and node.name == &#39;__init__&#39;:
+                    vs.update(_var_docstrings(doc_obj, _init_tree=node))
+                    break
 
     try:
         ast_AnnAssign = ast.AnnAssign   # type: Type
@@ -581,7 +580,7 @@ def _var_docstrings(doc_obj: Union[&#39;Module&#39;, &#39;Class&#39;], *,
         if not _is_public(name):
             continue
 
-        if module_all is not None and name not in module_all:
+        if module_all and name not in module_all:
             continue
 
         docstring = inspect.cleandoc(str_node.value.s).strip()
@@ -589,6 +588,7 @@ def _var_docstrings(doc_obj: Union[&#39;Module&#39;, &#39;Class&#39;], *,
             continue
 
         vs[name] = Variable(name, module, docstring,
+                            obj=member_obj(name),
                             cls=cls, instance_var=bool(_init_tree))
     return vs
 
@@ -804,7 +804,7 @@ class Module(Doc):
 
     __slots__ = (&#39;supermodule&#39;, &#39;doc&#39;, &#39;_context&#39;, &#39;_is_inheritance_linked&#39;)
 
-    def __init__(self, module: ModuleType, *, docfilter: Callable[[Doc], bool] = None,
+    def __init__(self, module: Union[ModuleType, str], *, docfilter: Callable[[Doc], bool] = None,
                  supermodule: &#39;Module&#39; = None, context: Context = None):
         &#34;&#34;&#34;
         Creates a `Module` documentation object given the actual
@@ -819,6 +819,9 @@ class Module(Doc):
         `context` is an instance of `pdoc.Context`. If `None` a
         global context object will be used.
         &#34;&#34;&#34;
+        if isinstance(module, str):
+            module = import_module(module)
+
         super().__init__(module.__name__, self, module)
         if self.name.endswith(&#39;.__init__&#39;) and not self.is_package:
             self.name = self.name[:-len(&#39;.__init__&#39;)]
@@ -882,8 +885,10 @@ class Module(Doc):
                     for file in os.listdir(pth):
                         if file.startswith((&#39;.&#39;, &#39;__pycache__&#39;, &#39;__init__.py&#39;)):
                             continue
-                        if file.endswith(_SOURCE_SUFFIXES) or isdir(join(pth, file)):
+                        if file.endswith(_SOURCE_SUFFIXES):
                             yield splitext(file)[0]
+                        if isdir(join(pth, file)) and &#39;.&#39; not in file:
+                            yield file
 
             for root in iter_modules(self.obj.__path__):
                 # Ignore if this module was already doc&#39;d.
@@ -1167,6 +1172,14 @@ class Class(Doc):
         classes = [self.module.find_class(c)
                    for c in inspect.getmro(self.obj)
                    if c not in (self.obj, object)]
+        if self in classes:
+            # This can contain self in case of a class inheriting from
+            # a class with (previously) the same name. E.g.
+            #
+            #     class Loc(namedtuple(&#39;Loc&#39;, &#39;lat lon&#39;)): ...
+            #
+            # We remove it from ancestors so that toposort doesn&#39;t break.
+            classes.remove(self)
         if only_documented:
             classes = _filter_type(Class, classes)
         return classes
@@ -1391,10 +1404,21 @@ class Function(Doc):
             return [&#34;...&#34;]
 
         def safe_default_value(p: inspect.Parameter):
+            if p.default is inspect.Parameter.empty:
+                return p
+
+            replacement = None
             if p.default is os.environ:
+                replacement = &#39;os.environ&#39;
+            elif inspect.isclass(p.default):
+                replacement = p.default.__module__ + &#39;.&#39; + p.default.__qualname__
+            elif &#39; at 0x&#39; in repr(p.default):
+                replacement = re.sub(r&#39; at 0x\w+&#39;, &#39;&#39;, repr(p.default))
+
+            if replacement:
                 class mock:
                     def __repr__(self):
-                        return &#39;os.environ&#39;
+                        return replacement
                 return p.replace(default=mock())
             return p
 
@@ -1804,6 +1828,14 @@ read with <code>inspect.getdoc()</code>.</p></section>
         classes = [self.module.find_class(c)
                    for c in inspect.getmro(self.obj)
                    if c not in (self.obj, object)]
+        if self in classes:
+            # This can contain self in case of a class inheriting from
+            # a class with (previously) the same name. E.g.
+            #
+            #     class Loc(namedtuple(&#39;Loc&#39;, &#39;lat lon&#39;)): ...
+            #
+            # We remove it from ancestors so that toposort doesn&#39;t break.
+            classes.remove(self)
         if only_documented:
             classes = _filter_type(Class, classes)
         return classes
@@ -2062,6 +2094,14 @@ if the types are documented, and <a title="pdoc.External" href="#pdoc.External">
     classes = [self.module.find_class(c)
                for c in inspect.getmro(self.obj)
                if c not in (self.obj, object)]
+    if self in classes:
+        # This can contain self in case of a class inheriting from
+        # a class with (previously) the same name. E.g.
+        #
+        #     class Loc(namedtuple(&#39;Loc&#39;, &#39;lat lon&#39;)): ...
+        #
+        # We remove it from ancestors so that toposort doesn&#39;t break.
+        classes.remove(self)
     if only_documented:
         classes = _filter_type(Class, classes)
     return classes</code></pre>
@@ -2417,7 +2457,7 @@ def source(self) -&gt; str:
 <h3>Methods</h3>
 <dl>
 <dt id="pdoc.Doc.url"><code class="name flex">
-<span>def <span class="ident">url</span></span>(<span>self, relative_to=None, *, link_prefix='', top_ancestor=False)</span>
+<span>def <span class="ident">url</span></span>(<span>self, relative_to=None, *, link_prefix=&#39;&#39;, top_ancestor=False)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Canonical relative URL (including page fragment) for this
@@ -2660,10 +2700,21 @@ all other cases, it should be <code>False</code>.</p></section>
             return [&#34;...&#34;]
 
         def safe_default_value(p: inspect.Parameter):
+            if p.default is inspect.Parameter.empty:
+                return p
+
+            replacement = None
             if p.default is os.environ:
+                replacement = &#39;os.environ&#39;
+            elif inspect.isclass(p.default):
+                replacement = p.default.__module__ + &#39;.&#39; + p.default.__qualname__
+            elif &#39; at 0x&#39; in repr(p.default):
+                replacement = re.sub(r&#39; at 0x\w+&#39;, &#39;&#39;, repr(p.default))
+
+            if replacement:
                 class mock:
                     def __repr__(self):
-                        return &#39;os.environ&#39;
+                        return replacement
                 return p.replace(default=mock())
             return p
 
@@ -2842,7 +2893,7 @@ global context object will be used.</p></section>
 
     __slots__ = (&#39;supermodule&#39;, &#39;doc&#39;, &#39;_context&#39;, &#39;_is_inheritance_linked&#39;)
 
-    def __init__(self, module: ModuleType, *, docfilter: Callable[[Doc], bool] = None,
+    def __init__(self, module: Union[ModuleType, str], *, docfilter: Callable[[Doc], bool] = None,
                  supermodule: &#39;Module&#39; = None, context: Context = None):
         &#34;&#34;&#34;
         Creates a `Module` documentation object given the actual
@@ -2857,6 +2908,9 @@ global context object will be used.</p></section>
         `context` is an instance of `pdoc.Context`. If `None` a
         global context object will be used.
         &#34;&#34;&#34;
+        if isinstance(module, str):
+            module = import_module(module)
+
         super().__init__(module.__name__, self, module)
         if self.name.endswith(&#39;.__init__&#39;) and not self.is_package:
             self.name = self.name[:-len(&#39;.__init__&#39;)]
@@ -2920,8 +2974,10 @@ global context object will be used.</p></section>
                     for file in os.listdir(pth):
                         if file.startswith((&#39;.&#39;, &#39;__pycache__&#39;, &#39;__init__.py&#39;)):
                             continue
-                        if file.endswith(_SOURCE_SUFFIXES) or isdir(join(pth, file)):
+                        if file.endswith(_SOURCE_SUFFIXES):
                             yield splitext(file)[0]
+                        if isdir(join(pth, file)) and &#39;.&#39; not in file:
+                            yield file
 
             for root in iter_modules(self.obj.__path__):
                 # Ignore if this module was already doc&#39;d.
@@ -3562,7 +3618,7 @@ opposed to class variable).</p></section>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.4</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

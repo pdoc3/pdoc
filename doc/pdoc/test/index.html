@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.3" />
+<meta name="generator" content="pdoc 0.6.4" />
 <title>pdoc.test API documentation</title>
 <meta name="description" content="Unit tests for pdoc package." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -158,6 +158,7 @@ class CliTest(unittest.TestCase):
 
     def test_html(self):
         include_patterns = [
+            &#39;a=&amp;lt;object&#39;,
             &#39;CONST docstring&#39;,
             &#39;var docstring&#39;,
             &#39;foreign_var&#39;,
@@ -177,7 +178,6 @@ class CliTest(unittest.TestCase):
             &#39;*args&#39;,
             &#39;**kwargs&#39;,
             &#39;x, y, z, w&#39;,
-            &#39;__init__ docstring&#39;,
             &#39;instance_var&#39;,
             &#39;instance var docstring&#39;,
             &#39;B.f docstring&#39;,
@@ -187,9 +187,11 @@ class CliTest(unittest.TestCase):
             &#39;B.C docstring&#39;,
             &#39;B.overridden docstring&#39;,
 
+            &#39;&lt;code&gt;__init__&lt;/code&gt; docstring&#39;,
             &#39; class=&#34;ident&#34;&gt;static&#39;,
         ]
         exclude_patterns = [
+            &#39;&lt;object &#39;,
             &#39; class=&#34;ident&#34;&gt;_private&#39;,
             &#39; class=&#34;ident&#34;&gt;_Private&#39;,
         ]
@@ -202,7 +204,7 @@ class CliTest(unittest.TestCase):
         }
         for package, expected_files in package_files.items():
             with self.subTest(package=package):
-                with run_html(EXAMPLE_MODULE + package):
+                with run_html(EXAMPLE_MODULE + package, config=&#39;show_source_code=False&#39;):
                     self._basic_html_assertions(expected_files)
                     self._check_files(include_patterns, exclude_patterns)
 
@@ -214,7 +216,8 @@ class CliTest(unittest.TestCase):
         with chdir(TESTS_BASEDIR):
             for filenames, expected_files in filenames_files.items():
                 with self.subTest(filename=&#39;,&#39;.join(filenames)):
-                    with run_html(*(os.path.join(EXAMPLE_MODULE, f) for f in filenames)):
+                    with run_html(*(os.path.join(EXAMPLE_MODULE, f) for f in filenames),
+                                  config=&#39;show_source_code=False&#39;):
                         self._basic_html_assertions(expected_files)
                         self._check_files(include_patterns, exclude_patterns)
 
@@ -291,6 +294,7 @@ class CliTest(unittest.TestCase):
 
     def test_text(self):
         include_patterns = [
+            &#39;object_as_arg_default(*args, a=&lt;object &#39;,
             &#39;CONST docstring&#39;,
             &#39;var docstring&#39;,
             &#39;foreign_var&#39;,
@@ -307,7 +311,7 @@ class CliTest(unittest.TestCase):
             &#39;B.CONST docstring&#39;,
             &#39;B.var docstring&#39;,
             &#39;x, y, z, w&#39;,
-            &#39;__init__ docstring&#39;,
+            &#39;`__init__` docstring&#39;,
             &#39;instance_var&#39;,
             &#39;instance var docstring&#39;,
             &#39;b=1&#39;,
@@ -406,7 +410,7 @@ class ApiTest(unittest.TestCase):
         with chdir(TESTS_BASEDIR):
             for module, (name_suffix, submodules) in modules.items():
                 with self.subTest(module=module):
-                    m = pdoc.Module(pdoc.import_module(module))
+                    m = pdoc.Module(module)
                     self.assertEqual(repr(m), &#34;&lt;Module &#39;{}&#39;&gt;&#34;.format(m.obj.__name__))
                     self.assertEqual(m.name, EXAMPLE_MODULE + name_suffix)
                     self.assertEqual(sorted(m.name for m in m.submodules()),
@@ -428,17 +432,17 @@ class ApiTest(unittest.TestCase):
             path = os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, &#39;_namespace&#39;, str(i))
             with patch.object(sys, &#39;path&#39;, [os.path.join(path, &#39;a&#39;),
                                             os.path.join(path, &#39;b&#39;)]):
-                mod = pdoc.Module(pdoc.import_module(&#39;a.main&#39;))
+                mod = pdoc.Module(&#39;a.main&#39;)
                 self.assertIn(&#39;D&#39;, mod.doc)
 
     def test_module_allsubmodules(self):
-        m = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + &#39;._private&#39;))
+        m = pdoc.Module(EXAMPLE_MODULE + &#39;._private&#39;)
         self.assertEqual(sorted(m.name for m in m.submodules()),
                          [EXAMPLE_MODULE + &#39;._private.module&#39;])
 
     def test_instance_var(self):
         pdoc.reset()
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         var = mod.doc[&#39;B&#39;].doc[&#39;instance_var&#39;]
         self.assertTrue(var.instance_var)
 
@@ -450,7 +454,7 @@ class ApiTest(unittest.TestCase):
 
     def test_refname(self):
         mod = EXAMPLE_MODULE + &#39;.&#39; + &#39;subpkg&#39;
-        module = pdoc.Module(pdoc.import_module(mod))
+        module = pdoc.Module(mod)
         var = module.doc[&#39;var&#39;]
         cls = module.doc[&#39;B&#39;]
         nested_cls = cls.doc[&#39;C&#39;]
@@ -470,7 +474,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(cls.doc[&#39;inherited&#39;].refname, mod + &#39;.B.inherited&#39;)
 
     def test_qualname(self):
-        module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        module = pdoc.Module(EXAMPLE_MODULE)
         var = module.doc[&#39;var&#39;]
         cls = module.doc[&#39;B&#39;]
         nested_cls = cls.doc[&#39;C&#39;]
@@ -516,7 +520,7 @@ class ApiTest(unittest.TestCase):
             self.assertEqual(list(mod.doc.keys()), [&#39;B&#39;])
 
     def test_find_ident(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         self.assertIsInstance(mod.find_ident(&#39;subpkg&#39;), pdoc.Module)
         mod = pdoc.Module(pdoc)
         self.assertIsInstance(mod.find_ident(&#39;subpkg&#39;), pdoc.External)
@@ -533,7 +537,7 @@ class ApiTest(unittest.TestCase):
         self.assertIs(mod.find_ident(&#39;pdoc.Doc.__init__&#39;).obj, pdoc.Doc)
 
     def test_inherits(self):
-        module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        module = pdoc.Module(EXAMPLE_MODULE)
         pdoc.link_inheritance()
 
         a = module.doc[&#39;A&#39;]
@@ -551,7 +555,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(c.doc[&#39;overridden&#39;].inherits, b.doc[&#39;overridden&#39;])
 
     def test_inherited_members(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         pdoc.link_inheritance()
         a = mod.doc[&#39;A&#39;]
         b = mod.doc[&#39;B&#39;]
@@ -580,7 +584,7 @@ class ApiTest(unittest.TestCase):
                          [mod.find_class(D).refname])
 
     def test_link_inheritance(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         with warnings.catch_warnings(record=True) as w:
             pdoc.link_inheritance()
             pdoc.link_inheritance()
@@ -592,7 +596,7 @@ class ApiTest(unittest.TestCase):
 
         # Test inheritance across modules
         pdoc.reset()
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + &#39;._test_linking&#39;))
+        mod = pdoc.Module(EXAMPLE_MODULE + &#39;._test_linking&#39;)
         pdoc.link_inheritance()
         a = mod.doc[&#39;a&#39;].doc[&#39;A&#39;]
         b = mod.doc[&#39;b&#39;].doc[&#39;B&#39;]
@@ -642,6 +646,9 @@ class ApiTest(unittest.TestCase):
                              lambda a=os.environ: None)
         self.assertEqual(func.params(), [&#39;a=os.environ&#39;])
 
+        func = pdoc.Function(&#39;f&#39;, mod, lambda a=object(): None)
+        self.assertEqual(func.params(), [&#39;a=&lt;object object&gt;&#39;])
+
         # typed
         def f(a: int, *b, c: typing.List[pdoc.Doc] = []): pass
         func = pdoc.Function(&#39;f&#39;, mod, f)
@@ -685,11 +692,12 @@ class ApiTest(unittest.TestCase):
             def __init__(self):
                 &#34;&#34;&#34;baz&#34;&#34;&#34;
 
-        self.assertEqual(pdoc.Class(&#39;A&#39;, pdoc.Module(pdoc), A).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
-        self.assertEqual(pdoc.Class(&#39;B&#39;, pdoc.Module(pdoc), B).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
-        self.assertEqual(pdoc.Class(&#39;C&#39;, pdoc.Module(pdoc), C).docstring, &#34;&#34;&#34;foo\n\nbar&#34;&#34;&#34;)
-        self.assertEqual(pdoc.Class(&#39;D&#39;, pdoc.Module(pdoc), D).docstring, &#34;&#34;&#34;baz\n\nbar&#34;&#34;&#34;)
-        self.assertEqual(pdoc.Class(&#39;E&#39;, pdoc.Module(pdoc), E).docstring, &#34;&#34;&#34;foo\n\nbaz&#34;&#34;&#34;)
+        mod = pdoc.Module(pdoc)
+        self.assertEqual(pdoc.Class(&#39;A&#39;, mod, A).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;B&#39;, mod, B).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).docstring, &#34;&#34;&#34;foo\n\nbar&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;D&#39;, mod, D).docstring, &#34;&#34;&#34;baz\n\nbar&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;E&#39;, mod, E).docstring, &#34;&#34;&#34;foo\n\nbaz&#34;&#34;&#34;)
 
     @ignore_warnings
     def test_Class_params(self):
@@ -703,7 +711,7 @@ class ApiTest(unittest.TestCase):
             self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).params(), [])
 
     def test_url(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         pdoc.link_inheritance()
 
         c = mod.doc[&#39;D&#39;]
@@ -720,7 +728,7 @@ class ApiTest(unittest.TestCase):
 
     @unittest.skipIf(sys.version_info &lt; (3, 6), reason=&#34;only deterministic on CPython 3.6+&#34;)
     def test_sorting(self):
-        module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        module = pdoc.Module(EXAMPLE_MODULE)
 
         sorted_variables = module.variables()
         unsorted_variables = module.variables(sort=False)
@@ -745,7 +753,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(sorted_methods, sorted(unsorted_methods))
 
     def test_module_init(self):
-        mod = pdoc.Module(pdoc.import_module(&#39;pdoc.__init__&#39;))
+        mod = pdoc.Module(&#39;pdoc.__init__&#39;)
         self.assertEqual(mod.name, &#39;pdoc&#39;)
         self.assertIn(&#39;Module&#39;, mod.doc)
 
@@ -792,7 +800,7 @@ class HtmlHelpersTest(unittest.TestCase):
         self.assertIn(&#39;&lt;code&gt;foo.f()&lt;/code&gt;&#39;, to_html(&#39;`foo.f()`&#39;, module=module, link=link))
 
     def test_to_html_refname_warning(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
 
         def f():
             &#34;&#34;&#34;Reference to some `example_pkg.nonexisting` object&#34;&#34;&#34;
@@ -1034,7 +1042,7 @@ x =&lt;/p&gt;&#39;&#39;&#39;
         # Ensure includes are resolved within docstrings already,
         # e.g. for `pdoc.html_helpers.extract_toc()` to work
         self.assertIn(&#39;Command-line interface&#39;,
-                      pdoc.Module(pdoc.import_module(pdoc)).docstring)
+                      pdoc.Module(pdoc).docstring)
 
     def test_urls(self):
         text = &#34;&#34;&#34;Beautiful Soup
@@ -1286,7 +1294,7 @@ not have a method with the specified name.</p></section>
         with chdir(TESTS_BASEDIR):
             for module, (name_suffix, submodules) in modules.items():
                 with self.subTest(module=module):
-                    m = pdoc.Module(pdoc.import_module(module))
+                    m = pdoc.Module(module)
                     self.assertEqual(repr(m), &#34;&lt;Module &#39;{}&#39;&gt;&#34;.format(m.obj.__name__))
                     self.assertEqual(m.name, EXAMPLE_MODULE + name_suffix)
                     self.assertEqual(sorted(m.name for m in m.submodules()),
@@ -1308,17 +1316,17 @@ not have a method with the specified name.</p></section>
             path = os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, &#39;_namespace&#39;, str(i))
             with patch.object(sys, &#39;path&#39;, [os.path.join(path, &#39;a&#39;),
                                             os.path.join(path, &#39;b&#39;)]):
-                mod = pdoc.Module(pdoc.import_module(&#39;a.main&#39;))
+                mod = pdoc.Module(&#39;a.main&#39;)
                 self.assertIn(&#39;D&#39;, mod.doc)
 
     def test_module_allsubmodules(self):
-        m = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + &#39;._private&#39;))
+        m = pdoc.Module(EXAMPLE_MODULE + &#39;._private&#39;)
         self.assertEqual(sorted(m.name for m in m.submodules()),
                          [EXAMPLE_MODULE + &#39;._private.module&#39;])
 
     def test_instance_var(self):
         pdoc.reset()
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         var = mod.doc[&#39;B&#39;].doc[&#39;instance_var&#39;]
         self.assertTrue(var.instance_var)
 
@@ -1330,7 +1338,7 @@ not have a method with the specified name.</p></section>
 
     def test_refname(self):
         mod = EXAMPLE_MODULE + &#39;.&#39; + &#39;subpkg&#39;
-        module = pdoc.Module(pdoc.import_module(mod))
+        module = pdoc.Module(mod)
         var = module.doc[&#39;var&#39;]
         cls = module.doc[&#39;B&#39;]
         nested_cls = cls.doc[&#39;C&#39;]
@@ -1350,7 +1358,7 @@ not have a method with the specified name.</p></section>
         self.assertEqual(cls.doc[&#39;inherited&#39;].refname, mod + &#39;.B.inherited&#39;)
 
     def test_qualname(self):
-        module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        module = pdoc.Module(EXAMPLE_MODULE)
         var = module.doc[&#39;var&#39;]
         cls = module.doc[&#39;B&#39;]
         nested_cls = cls.doc[&#39;C&#39;]
@@ -1396,7 +1404,7 @@ not have a method with the specified name.</p></section>
             self.assertEqual(list(mod.doc.keys()), [&#39;B&#39;])
 
     def test_find_ident(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         self.assertIsInstance(mod.find_ident(&#39;subpkg&#39;), pdoc.Module)
         mod = pdoc.Module(pdoc)
         self.assertIsInstance(mod.find_ident(&#39;subpkg&#39;), pdoc.External)
@@ -1413,7 +1421,7 @@ not have a method with the specified name.</p></section>
         self.assertIs(mod.find_ident(&#39;pdoc.Doc.__init__&#39;).obj, pdoc.Doc)
 
     def test_inherits(self):
-        module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        module = pdoc.Module(EXAMPLE_MODULE)
         pdoc.link_inheritance()
 
         a = module.doc[&#39;A&#39;]
@@ -1431,7 +1439,7 @@ not have a method with the specified name.</p></section>
         self.assertEqual(c.doc[&#39;overridden&#39;].inherits, b.doc[&#39;overridden&#39;])
 
     def test_inherited_members(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         pdoc.link_inheritance()
         a = mod.doc[&#39;A&#39;]
         b = mod.doc[&#39;B&#39;]
@@ -1460,7 +1468,7 @@ not have a method with the specified name.</p></section>
                          [mod.find_class(D).refname])
 
     def test_link_inheritance(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         with warnings.catch_warnings(record=True) as w:
             pdoc.link_inheritance()
             pdoc.link_inheritance()
@@ -1472,7 +1480,7 @@ not have a method with the specified name.</p></section>
 
         # Test inheritance across modules
         pdoc.reset()
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + &#39;._test_linking&#39;))
+        mod = pdoc.Module(EXAMPLE_MODULE + &#39;._test_linking&#39;)
         pdoc.link_inheritance()
         a = mod.doc[&#39;a&#39;].doc[&#39;A&#39;]
         b = mod.doc[&#39;b&#39;].doc[&#39;B&#39;]
@@ -1522,6 +1530,9 @@ not have a method with the specified name.</p></section>
                              lambda a=os.environ: None)
         self.assertEqual(func.params(), [&#39;a=os.environ&#39;])
 
+        func = pdoc.Function(&#39;f&#39;, mod, lambda a=object(): None)
+        self.assertEqual(func.params(), [&#39;a=&lt;object object&gt;&#39;])
+
         # typed
         def f(a: int, *b, c: typing.List[pdoc.Doc] = []): pass
         func = pdoc.Function(&#39;f&#39;, mod, f)
@@ -1565,11 +1576,12 @@ not have a method with the specified name.</p></section>
             def __init__(self):
                 &#34;&#34;&#34;baz&#34;&#34;&#34;
 
-        self.assertEqual(pdoc.Class(&#39;A&#39;, pdoc.Module(pdoc), A).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
-        self.assertEqual(pdoc.Class(&#39;B&#39;, pdoc.Module(pdoc), B).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
-        self.assertEqual(pdoc.Class(&#39;C&#39;, pdoc.Module(pdoc), C).docstring, &#34;&#34;&#34;foo\n\nbar&#34;&#34;&#34;)
-        self.assertEqual(pdoc.Class(&#39;D&#39;, pdoc.Module(pdoc), D).docstring, &#34;&#34;&#34;baz\n\nbar&#34;&#34;&#34;)
-        self.assertEqual(pdoc.Class(&#39;E&#39;, pdoc.Module(pdoc), E).docstring, &#34;&#34;&#34;foo\n\nbaz&#34;&#34;&#34;)
+        mod = pdoc.Module(pdoc)
+        self.assertEqual(pdoc.Class(&#39;A&#39;, mod, A).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;B&#39;, mod, B).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).docstring, &#34;&#34;&#34;foo\n\nbar&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;D&#39;, mod, D).docstring, &#34;&#34;&#34;baz\n\nbar&#34;&#34;&#34;)
+        self.assertEqual(pdoc.Class(&#39;E&#39;, mod, E).docstring, &#34;&#34;&#34;foo\n\nbaz&#34;&#34;&#34;)
 
     @ignore_warnings
     def test_Class_params(self):
@@ -1583,7 +1595,7 @@ not have a method with the specified name.</p></section>
             self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).params(), [])
 
     def test_url(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
         pdoc.link_inheritance()
 
         c = mod.doc[&#39;D&#39;]
@@ -1600,7 +1612,7 @@ not have a method with the specified name.</p></section>
 
     @unittest.skipIf(sys.version_info &lt; (3, 6), reason=&#34;only deterministic on CPython 3.6+&#34;)
     def test_sorting(self):
-        module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        module = pdoc.Module(EXAMPLE_MODULE)
 
         sorted_variables = module.variables()
         unsorted_variables = module.variables(sort=False)
@@ -1625,7 +1637,7 @@ not have a method with the specified name.</p></section>
         self.assertEqual(sorted_methods, sorted(unsorted_methods))
 
     def test_module_init(self):
-        mod = pdoc.Module(pdoc.import_module(&#39;pdoc.__init__&#39;))
+        mod = pdoc.Module(&#39;pdoc.__init__&#39;)
         self.assertEqual(mod.name, &#39;pdoc&#39;)
         self.assertIn(&#39;Module&#39;, mod.doc)</code></pre>
 </details>
@@ -1674,11 +1686,12 @@ def test_Class_docstring(self):
         def __init__(self):
             &#34;&#34;&#34;baz&#34;&#34;&#34;
 
-    self.assertEqual(pdoc.Class(&#39;A&#39;, pdoc.Module(pdoc), A).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
-    self.assertEqual(pdoc.Class(&#39;B&#39;, pdoc.Module(pdoc), B).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
-    self.assertEqual(pdoc.Class(&#39;C&#39;, pdoc.Module(pdoc), C).docstring, &#34;&#34;&#34;foo\n\nbar&#34;&#34;&#34;)
-    self.assertEqual(pdoc.Class(&#39;D&#39;, pdoc.Module(pdoc), D).docstring, &#34;&#34;&#34;baz\n\nbar&#34;&#34;&#34;)
-    self.assertEqual(pdoc.Class(&#39;E&#39;, pdoc.Module(pdoc), E).docstring, &#34;&#34;&#34;foo\n\nbaz&#34;&#34;&#34;)</code></pre>
+    mod = pdoc.Module(pdoc)
+    self.assertEqual(pdoc.Class(&#39;A&#39;, mod, A).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
+    self.assertEqual(pdoc.Class(&#39;B&#39;, mod, B).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
+    self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).docstring, &#34;&#34;&#34;foo\n\nbar&#34;&#34;&#34;)
+    self.assertEqual(pdoc.Class(&#39;D&#39;, mod, D).docstring, &#34;&#34;&#34;baz\n\nbar&#34;&#34;&#34;)
+    self.assertEqual(pdoc.Class(&#39;E&#39;, mod, E).docstring, &#34;&#34;&#34;foo\n\nbaz&#34;&#34;&#34;)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_Class_params"><code class="name flex">
@@ -1728,6 +1741,9 @@ def test_Class_params(self):
     func = pdoc.Function(&#39;f&#39;, mod,
                          lambda a=os.environ: None)
     self.assertEqual(func.params(), [&#39;a=os.environ&#39;])
+
+    func = pdoc.Function(&#39;f&#39;, mod, lambda a=object(): None)
+    self.assertEqual(func.params(), [&#39;a=&lt;object object&gt;&#39;])
 
     # typed
     def f(a: int, *b, c: typing.List[pdoc.Doc] = []): pass
@@ -1861,7 +1877,7 @@ def test_Class_params(self):
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def test_find_ident(self):
-    mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+    mod = pdoc.Module(EXAMPLE_MODULE)
     self.assertIsInstance(mod.find_ident(&#39;subpkg&#39;), pdoc.Module)
     mod = pdoc.Module(pdoc)
     self.assertIsInstance(mod.find_ident(&#39;subpkg&#39;), pdoc.External)
@@ -1911,7 +1927,7 @@ def test_Class_params(self):
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def test_inherited_members(self):
-    mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+    mod = pdoc.Module(EXAMPLE_MODULE)
     pdoc.link_inheritance()
     a = mod.doc[&#39;A&#39;]
     b = mod.doc[&#39;B&#39;]
@@ -1928,7 +1944,7 @@ def test_Class_params(self):
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def test_inherits(self):
-    module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+    module = pdoc.Module(EXAMPLE_MODULE)
     pdoc.link_inheritance()
 
     a = module.doc[&#39;A&#39;]
@@ -1955,7 +1971,7 @@ def test_Class_params(self):
 <summary>Source code</summary>
 <pre><code class="python">def test_instance_var(self):
     pdoc.reset()
-    mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+    mod = pdoc.Module(EXAMPLE_MODULE)
     var = mod.doc[&#39;B&#39;].doc[&#39;instance_var&#39;]
     self.assertTrue(var.instance_var)</code></pre>
 </details>
@@ -1968,7 +1984,7 @@ def test_Class_params(self):
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def test_link_inheritance(self):
-    mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+    mod = pdoc.Module(EXAMPLE_MODULE)
     with warnings.catch_warnings(record=True) as w:
         pdoc.link_inheritance()
         pdoc.link_inheritance()
@@ -1980,7 +1996,7 @@ def test_Class_params(self):
 
     # Test inheritance across modules
     pdoc.reset()
-    mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + &#39;._test_linking&#39;))
+    mod = pdoc.Module(EXAMPLE_MODULE + &#39;._test_linking&#39;)
     pdoc.link_inheritance()
     a = mod.doc[&#39;a&#39;].doc[&#39;A&#39;]
     b = mod.doc[&#39;b&#39;].doc[&#39;B&#39;]
@@ -2007,7 +2023,7 @@ def test_Class_params(self):
     with chdir(TESTS_BASEDIR):
         for module, (name_suffix, submodules) in modules.items():
             with self.subTest(module=module):
-                m = pdoc.Module(pdoc.import_module(module))
+                m = pdoc.Module(module)
                 self.assertEqual(repr(m), &#34;&lt;Module &#39;{}&#39;&gt;&#34;.format(m.obj.__name__))
                 self.assertEqual(m.name, EXAMPLE_MODULE + name_suffix)
                 self.assertEqual(sorted(m.name for m in m.submodules()),
@@ -2022,7 +2038,7 @@ def test_Class_params(self):
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def test_module_allsubmodules(self):
-    m = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE + &#39;._private&#39;))
+    m = pdoc.Module(EXAMPLE_MODULE + &#39;._private&#39;)
     self.assertEqual(sorted(m.name for m in m.submodules()),
                      [EXAMPLE_MODULE + &#39;._private.module&#39;])</code></pre>
 </details>
@@ -2035,7 +2051,7 @@ def test_Class_params(self):
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def test_module_init(self):
-    mod = pdoc.Module(pdoc.import_module(&#39;pdoc.__init__&#39;))
+    mod = pdoc.Module(&#39;pdoc.__init__&#39;)
     self.assertEqual(mod.name, &#39;pdoc&#39;)
     self.assertIn(&#39;Module&#39;, mod.doc)</code></pre>
 </details>
@@ -2054,7 +2070,7 @@ def test_Class_params(self):
         path = os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, &#39;_namespace&#39;, str(i))
         with patch.object(sys, &#39;path&#39;, [os.path.join(path, &#39;a&#39;),
                                         os.path.join(path, &#39;b&#39;)]):
-            mod = pdoc.Module(pdoc.import_module(&#39;a.main&#39;))
+            mod = pdoc.Module(&#39;a.main&#39;)
             self.assertIn(&#39;D&#39;, mod.doc)</code></pre>
 </details>
 </dd>
@@ -2066,7 +2082,7 @@ def test_Class_params(self):
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def test_qualname(self):
-    module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+    module = pdoc.Module(EXAMPLE_MODULE)
     var = module.doc[&#39;var&#39;]
     cls = module.doc[&#39;B&#39;]
     nested_cls = cls.doc[&#39;C&#39;]
@@ -2091,7 +2107,7 @@ def test_Class_params(self):
 <summary>Source code</summary>
 <pre><code class="python">def test_refname(self):
     mod = EXAMPLE_MODULE + &#39;.&#39; + &#39;subpkg&#39;
-    module = pdoc.Module(pdoc.import_module(mod))
+    module = pdoc.Module(mod)
     var = module.doc[&#39;var&#39;]
     cls = module.doc[&#39;B&#39;]
     nested_cls = cls.doc[&#39;C&#39;]
@@ -2120,7 +2136,7 @@ def test_Class_params(self):
 <summary>Source code</summary>
 <pre><code class="python">@unittest.skipIf(sys.version_info &lt; (3, 6), reason=&#34;only deterministic on CPython 3.6+&#34;)
 def test_sorting(self):
-    module = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+    module = pdoc.Module(EXAMPLE_MODULE)
 
     sorted_variables = module.variables()
     unsorted_variables = module.variables(sort=False)
@@ -2181,7 +2197,7 @@ def test_subclasses(self):
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def test_url(self):
-    mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+    mod = pdoc.Module(EXAMPLE_MODULE)
     pdoc.link_inheritance()
 
     c = mod.doc[&#39;D&#39;]
@@ -2253,6 +2269,7 @@ not have a method with the specified name.</p></section>
 
     def test_html(self):
         include_patterns = [
+            &#39;a=&amp;lt;object&#39;,
             &#39;CONST docstring&#39;,
             &#39;var docstring&#39;,
             &#39;foreign_var&#39;,
@@ -2272,7 +2289,6 @@ not have a method with the specified name.</p></section>
             &#39;*args&#39;,
             &#39;**kwargs&#39;,
             &#39;x, y, z, w&#39;,
-            &#39;__init__ docstring&#39;,
             &#39;instance_var&#39;,
             &#39;instance var docstring&#39;,
             &#39;B.f docstring&#39;,
@@ -2282,9 +2298,11 @@ not have a method with the specified name.</p></section>
             &#39;B.C docstring&#39;,
             &#39;B.overridden docstring&#39;,
 
+            &#39;&lt;code&gt;__init__&lt;/code&gt; docstring&#39;,
             &#39; class=&#34;ident&#34;&gt;static&#39;,
         ]
         exclude_patterns = [
+            &#39;&lt;object &#39;,
             &#39; class=&#34;ident&#34;&gt;_private&#39;,
             &#39; class=&#34;ident&#34;&gt;_Private&#39;,
         ]
@@ -2297,7 +2315,7 @@ not have a method with the specified name.</p></section>
         }
         for package, expected_files in package_files.items():
             with self.subTest(package=package):
-                with run_html(EXAMPLE_MODULE + package):
+                with run_html(EXAMPLE_MODULE + package, config=&#39;show_source_code=False&#39;):
                     self._basic_html_assertions(expected_files)
                     self._check_files(include_patterns, exclude_patterns)
 
@@ -2309,7 +2327,8 @@ not have a method with the specified name.</p></section>
         with chdir(TESTS_BASEDIR):
             for filenames, expected_files in filenames_files.items():
                 with self.subTest(filename=&#39;,&#39;.join(filenames)):
-                    with run_html(*(os.path.join(EXAMPLE_MODULE, f) for f in filenames)):
+                    with run_html(*(os.path.join(EXAMPLE_MODULE, f) for f in filenames),
+                                  config=&#39;show_source_code=False&#39;):
                         self._basic_html_assertions(expected_files)
                         self._check_files(include_patterns, exclude_patterns)
 
@@ -2386,6 +2405,7 @@ not have a method with the specified name.</p></section>
 
     def test_text(self):
         include_patterns = [
+            &#39;object_as_arg_default(*args, a=&lt;object &#39;,
             &#39;CONST docstring&#39;,
             &#39;var docstring&#39;,
             &#39;foreign_var&#39;,
@@ -2402,7 +2422,7 @@ not have a method with the specified name.</p></section>
             &#39;B.CONST docstring&#39;,
             &#39;B.var docstring&#39;,
             &#39;x, y, z, w&#39;,
-            &#39;__init__ docstring&#39;,
+            &#39;`__init__` docstring&#39;,
             &#39;instance_var&#39;,
             &#39;instance var docstring&#39;,
             &#39;b=1&#39;,
@@ -2588,6 +2608,7 @@ not have a method with the specified name.</p></section>
 <summary>Source code</summary>
 <pre><code class="python">def test_html(self):
     include_patterns = [
+        &#39;a=&amp;lt;object&#39;,
         &#39;CONST docstring&#39;,
         &#39;var docstring&#39;,
         &#39;foreign_var&#39;,
@@ -2607,7 +2628,6 @@ not have a method with the specified name.</p></section>
         &#39;*args&#39;,
         &#39;**kwargs&#39;,
         &#39;x, y, z, w&#39;,
-        &#39;__init__ docstring&#39;,
         &#39;instance_var&#39;,
         &#39;instance var docstring&#39;,
         &#39;B.f docstring&#39;,
@@ -2617,9 +2637,11 @@ not have a method with the specified name.</p></section>
         &#39;B.C docstring&#39;,
         &#39;B.overridden docstring&#39;,
 
+        &#39;&lt;code&gt;__init__&lt;/code&gt; docstring&#39;,
         &#39; class=&#34;ident&#34;&gt;static&#39;,
     ]
     exclude_patterns = [
+        &#39;&lt;object &#39;,
         &#39; class=&#34;ident&#34;&gt;_private&#39;,
         &#39; class=&#34;ident&#34;&gt;_Private&#39;,
     ]
@@ -2632,7 +2654,7 @@ not have a method with the specified name.</p></section>
     }
     for package, expected_files in package_files.items():
         with self.subTest(package=package):
-            with run_html(EXAMPLE_MODULE + package):
+            with run_html(EXAMPLE_MODULE + package, config=&#39;show_source_code=False&#39;):
                 self._basic_html_assertions(expected_files)
                 self._check_files(include_patterns, exclude_patterns)
 
@@ -2644,7 +2666,8 @@ not have a method with the specified name.</p></section>
     with chdir(TESTS_BASEDIR):
         for filenames, expected_files in filenames_files.items():
             with self.subTest(filename=&#39;,&#39;.join(filenames)):
-                with run_html(*(os.path.join(EXAMPLE_MODULE, f) for f in filenames)):
+                with run_html(*(os.path.join(EXAMPLE_MODULE, f) for f in filenames),
+                              config=&#39;show_source_code=False&#39;):
                     self._basic_html_assertions(expected_files)
                     self._check_files(include_patterns, exclude_patterns)</code></pre>
 </details>
@@ -2789,6 +2812,7 @@ not have a method with the specified name.</p></section>
 <summary>Source code</summary>
 <pre><code class="python">def test_text(self):
     include_patterns = [
+        &#39;object_as_arg_default(*args, a=&lt;object &#39;,
         &#39;CONST docstring&#39;,
         &#39;var docstring&#39;,
         &#39;foreign_var&#39;,
@@ -2805,7 +2829,7 @@ not have a method with the specified name.</p></section>
         &#39;B.CONST docstring&#39;,
         &#39;B.var docstring&#39;,
         &#39;x, y, z, w&#39;,
-        &#39;__init__ docstring&#39;,
+        &#39;`__init__` docstring&#39;,
         &#39;instance_var&#39;,
         &#39;instance var docstring&#39;,
         &#39;b=1&#39;,
@@ -3121,7 +3145,7 @@ x =&lt;/p&gt;&#39;&#39;&#39;
         # Ensure includes are resolved within docstrings already,
         # e.g. for `pdoc.html_helpers.extract_toc()` to work
         self.assertIn(&#39;Command-line interface&#39;,
-                      pdoc.Module(pdoc.import_module(pdoc)).docstring)
+                      pdoc.Module(pdoc).docstring)
 
     def test_urls(self):
         text = &#34;&#34;&#34;Beautiful Soup
@@ -3439,7 +3463,7 @@ x =&lt;/p&gt;&#39;&#39;&#39;
         # Ensure includes are resolved within docstrings already,
         # e.g. for `pdoc.html_helpers.extract_toc()` to work
         self.assertIn(&#39;Command-line interface&#39;,
-                      pdoc.Module(pdoc.import_module(pdoc)).docstring)</code></pre>
+                      pdoc.Module(pdoc).docstring)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.Docformats.test_urls"><code class="name flex">
@@ -3527,7 +3551,7 @@ not have a method with the specified name.</p></section>
         self.assertIn(&#39;&lt;code&gt;foo.f()&lt;/code&gt;&#39;, to_html(&#39;`foo.f()`&#39;, module=module, link=link))
 
     def test_to_html_refname_warning(self):
-        mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+        mod = pdoc.Module(EXAMPLE_MODULE)
 
         def f():
             &#34;&#34;&#34;Reference to some `example_pkg.nonexisting` object&#34;&#34;&#34;
@@ -3655,7 +3679,7 @@ not have a method with the specified name.</p></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def test_to_html_refname_warning(self):
-    mod = pdoc.Module(pdoc.import_module(EXAMPLE_MODULE))
+    mod = pdoc.Module(EXAMPLE_MODULE)
 
     def f():
         &#34;&#34;&#34;Reference to some `example_pkg.nonexisting` object&#34;&#34;&#34;
@@ -3950,7 +3974,7 @@ not have a method with the specified name.</p></section>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.4</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.3" />
+<meta name="generator" content="pdoc 0.6.4" />
 <title>pdoc.test.example_pkg.subpkg API documentation</title>
 <meta name="description" content="Module docstring" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -27,6 +27,7 @@
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">&#34;&#34;&#34;Module docstring&#34;&#34;&#34;
+from collections import namedtuple
 import subprocess
 import os
 
@@ -45,7 +46,10 @@ __pdoc__ = {}
 
 def foo(env=os.environ):
     &#34;&#34;&#34;Doesn&#39;t leak environ&#34;&#34;&#34;
-    pass
+
+
+def object_as_arg_default(*args, a=object(), **kwargs):
+    &#34;&#34;&#34;Html-encodes angle brackets in params&#34;&#34;&#34;
 
 
 class A:
@@ -74,7 +78,7 @@ class B(A, int):
     &#34;&#34;&#34;B.var docstring&#34;&#34;&#34;
 
     def __init__(self, x, y, z, w):
-        &#34;&#34;&#34;__init__ docstring&#34;&#34;&#34;
+        &#34;&#34;&#34;`__init__` docstring&#34;&#34;&#34;
         self.instance_var = None
         &#34;&#34;&#34;instance var docstring&#34;&#34;&#34;
 
@@ -324,7 +328,11 @@ def latex_math():
 
     ..math::
         v_t *\\frac{1}{2}* j_i + [a] &lt; 3
-    &#34;&#34;&#34;</code></pre>
+    &#34;&#34;&#34;
+
+
+class Location(namedtuple(&#39;Location&#39;, &#39;lat lon&#39;)):
+    &#34;&#34;&#34;Geo-location, GPS position.&#34;&#34;&#34;</code></pre>
 </details>
 </section>
 <section>
@@ -394,8 +402,7 @@ def latex_math():
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def foo(env=os.environ):
-    &#34;&#34;&#34;Doesn&#39;t leak environ&#34;&#34;&#34;
-    pass</code></pre>
+    &#34;&#34;&#34;Doesn&#39;t leak environ&#34;&#34;&#34;</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.example_pkg.subpkg.google"><code class="name flex">
@@ -665,6 +672,17 @@ description of <code>x1</code>, <code>x2</code>.</p>
     &#34;&#34;&#34;</code></pre>
 </details>
 </dd>
+<dt id="pdoc.test.example_pkg.subpkg.object_as_arg_default"><code class="name flex">
+<span>def <span class="ident">object_as_arg_default</span></span>(<span>*args, a=&lt;object object&gt;, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Html-encodes angle brackets in params</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def object_as_arg_default(*args, a=object(), **kwargs):
+    &#34;&#34;&#34;Html-encodes angle brackets in params&#34;&#34;&#34;</code></pre>
+</details>
+</dd>
 <dt id="pdoc.test.example_pkg.subpkg.reST_directives"><code class="name flex">
 <span>def <span class="ident">reST_directives</span></span>(<span>self)</span>
 </code></dt>
@@ -819,7 +837,7 @@ across multiple lines:</p>
 <dd>
 <section class="desc"><p>B docstring</p>
 <p>External refs: <code>sys.version</code>, <code>sys</code></p>
-<p><strong>init</strong> docstring</p></section>
+<p><code>__init__</code> docstring</p></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">class B(A, int):
@@ -836,7 +854,7 @@ across multiple lines:</p>
     &#34;&#34;&#34;B.var docstring&#34;&#34;&#34;
 
     def __init__(self, x, y, z, w):
-        &#34;&#34;&#34;__init__ docstring&#34;&#34;&#34;
+        &#34;&#34;&#34;`__init__` docstring&#34;&#34;&#34;
         self.instance_var = None
         &#34;&#34;&#34;instance var docstring&#34;&#34;&#34;
 
@@ -958,7 +976,7 @@ def p(self):
 <h3>Methods</h3>
 <dl>
 <dt id="pdoc.test.example_pkg.subpkg.B.f"><code class="name flex">
-<span>def <span class="ident">f</span></span>(<span>self, a, b=1, *args, c='c', **kwargs)</span>
+<span>def <span class="ident">f</span></span>(<span>self, a, b=1, *args, c=&#39;c&#39;, **kwargs)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>B.f docstring</p></section>
@@ -997,7 +1015,7 @@ def p(self):
 <dd>
 <section class="desc"><p>B docstring</p>
 <p>External refs: <code>sys.version</code>, <code>sys</code></p>
-<p><strong>init</strong> docstring</p></section>
+<p><code>__init__</code> docstring</p></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">class C(B): pass  # noqa: E701, E302</code></pre>
@@ -1038,7 +1056,7 @@ def p(self):
 <dd>
 <section class="desc"><p>B docstring</p>
 <p>External refs: <code>sys.version</code>, <code>sys</code></p>
-<p><strong>init</strong> docstring</p></section>
+<p><code>__init__</code> docstring</p></section>
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">class D(C): pass  # noqa: E701, E302</code></pre>
@@ -1612,6 +1630,22 @@ across multiple lines:</p>
 </dd>
 </dl>
 </dd>
+<dt id="pdoc.test.example_pkg.subpkg.Location"><code class="flex name class">
+<span>class <span class="ident">Location</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Geo-location, GPS position.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">class Location(namedtuple(&#39;Location&#39;, &#39;lat lon&#39;)):
+    &#34;&#34;&#34;Geo-location, GPS position.&#34;&#34;&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+</dd>
 </dl>
 </section>
 </article>
@@ -1639,12 +1673,13 @@ across multiple lines:</p>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="pdoc.test.example_pkg.subpkg.doctests" href="#pdoc.test.example_pkg.subpkg.doctests">doctests</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.subpkg.foo" href="#pdoc.test.example_pkg.subpkg.foo">foo</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.subpkg.google" href="#pdoc.test.example_pkg.subpkg.google">google</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.subpkg.latex_math" href="#pdoc.test.example_pkg.subpkg.latex_math">latex_math</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.subpkg.numpy" href="#pdoc.test.example_pkg.subpkg.numpy">numpy</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.subpkg.object_as_arg_default" href="#pdoc.test.example_pkg.subpkg.object_as_arg_default">object_as_arg_default</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.subpkg.reST_directives" href="#pdoc.test.example_pkg.subpkg.reST_directives">reST_directives</a></code></li>
 </ul>
 </li>
@@ -1687,6 +1722,9 @@ across multiple lines:</p>
 <li><code><a title="pdoc.test.example_pkg.subpkg.Docformats.reST_directives" href="#pdoc.test.example_pkg.subpkg.Docformats.reST_directives">reST_directives</a></code></li>
 </ul>
 </li>
+<li>
+<h4><code><a title="pdoc.test.example_pkg.subpkg.Location" href="#pdoc.test.example_pkg.subpkg.Location">Location</a></code></h4>
+</li>
 </ul>
 </li>
 </ul>
@@ -1694,7 +1732,7 @@ across multiple lines:</p>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.4</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
