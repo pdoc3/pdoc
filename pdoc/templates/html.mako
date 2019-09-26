@@ -2,7 +2,7 @@
   import os
 
   import pdoc
-  from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html
+  from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html, format_git_link
 
 
   def link(d, name=None, fmt='{}'):
@@ -21,12 +21,22 @@
 <%def name="ident(name)"><span class="ident">${name}</span></%def>
 
 <%def name="show_source(d)">
-    % if show_source_code and d.source and d.obj is not getattr(d.inherits, 'obj', None):
-        <details class="source">
-            <summary>Source code</summary>
-            <pre><code class="python">${d.source | h}</code></pre>
-        </details>
+  % if (show_source_code or git_link_template) and d.source and d.obj is not getattr(d.inherits, 'obj', None):
+    <% git_link = format_git_link(git_link_template, d) %>
+    % if show_source_code:
+      <details class="source">
+        <summary>
+            <span>Expand source code</span>
+            % if git_link:
+              <a href="${git_link}" class="git-link">Browse git</a>
+            %endif
+        </summary>
+        <pre><code class="python">${d.source | h}</code></pre>
+      </details>
+    % elif git_link:
+      <div class="git-link-div"><a href="${git_link}" class="git-link">Browse git</a></div>
     %endif
+  %endif
 </%def>
 
 <%def name="show_desc(d, short=False)">

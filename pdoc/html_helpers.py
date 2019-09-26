@@ -2,8 +2,10 @@
 Helper functions for HTML output.
 """
 import inspect
-import os.path
+import os
 import re
+import subprocess
+import traceback
 from functools import partial, lru_cache
 from typing import Callable, Match
 from warnings import warn
@@ -430,3 +432,96 @@ def extract_toc(text: str):
     if toc.endswith('<p>'):  # CUT was put into its own paragraph
         toc = toc[:-3].rstrip()
     return toc
+
+
+def format_git_link(template: str, dobj: pdoc.Doc):
+    """
+    Interpolate `template` as a formatted string literal using values extracted
+    from `dobj` and the working environment.
+    """
+    if not template:
+        return None
+    try:
+        if 'commit' in _str_template_fields(template):
+            commit = _git_head_commit()
+        abs_path = inspect.getfile(inspect.unwrap(dobj.obj))
+        path = _project_relative_path(abs_path)
+        lines, start_line = inspect.getsourcelines(dobj.obj)
+        end_line = start_line + len(lines) - 1
+        url = template.format(**locals())
+        return url
+    except Exception:
+        warn('format_git_link for {} failed:\n{}'.format(dobj.obj, traceback.format_exc()))
+        return None
+
+
+@lru_cache()
+def _git_head_commit():
+    """
+    If the working directory is part of a git repository, return the
+    head git commit hash. Otherwise, raise a CalledProcessError.
+    """
+    process_args = ['git', 'rev-parse', 'HEAD']
+    try:
+        commit = subprocess.check_output(process_args, universal_newlines=True).strip()
+        return commit
+    except OSError as error:
+        warn("git executable not found on system:\n{}".format(error))
+    except subprocess.CalledProcessError as error:
+        warn(
+            "Ensure pdoc is run within a git repository.\n"
+            "`{}` failed with output:\n{}"
+            .format(' '.join(process_args), error.output)
+        )
+    return None
+
+
+@lru_cache()
+def _git_project_root():
+    """
+    Return the path to project root directory or None if indeterminate.
+    """
+    path = None
+    for cmd in (['git', 'rev-parse', '--show-superproject-working-tree'],
+                ['git', 'rev-parse', '--show-toplevel']):
+        try:
+            path = subprocess.check_output(cmd, universal_newlines=True).rstrip('\r\n')
+            if path:
+                break
+        except (subprocess.CalledProcessError, OSError):
+            pass
+    return path
+
+
+@lru_cache()
+def _project_relative_path(absolute_path):
+    """
+    Convert an absolute path of a python source file to a project-relative path.
+    Assumes the project's path is either the current working directory or
+    Python library installation.
+    """
+    from distutils.sysconfig import get_python_lib
+    for prefix_path in (_git_project_root() or os.getcwd(),
+                        get_python_lib()):
+        common_path = os.path.commonpath([prefix_path, absolute_path])
+        if common_path == prefix_path:
+            # absolute_path is a descendant of prefix_path
+            return os.path.relpath(absolute_path, prefix_path)
+    raise RuntimeError(
+        "absolute path {!r} is not a descendant of the current working directory "
+        "or of the system's python library."
+        .format(absolute_path)
+    )
+
+
+@lru_cache()
+def _str_template_fields(template):
+    """
+    Return a list of `str.format` field names in a template string.
+    """
+    from string import Formatter
+    return [
+        field_name
+        for _, field_name, _, _ in Formatter().parse(template)
+        if field_name is not None
+    ]

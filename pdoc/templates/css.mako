@@ -196,14 +196,22 @@
       background: inherit;  /* Don't grey-back parameters */
     }
 
-    .source summary {
+    .source summary,
+    .git-link-div {
       color: #666;
       text-align: right;
       font-weight: 400;
       font-size: .8em;
       text-transform: uppercase;
-      cursor: pointer;
     }
+      .source summary > * {
+        white-space: nowrap;
+        cursor: pointer;
+      }
+      .git-link {
+        color: inherit;
+        margin-left: 1em;
+      }
     .source pre {
       max-height: 500px;
       overflow: auto;
