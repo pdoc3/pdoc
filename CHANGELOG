@@ -1,3 +1,8 @@
+0.7.1  (2019-10-03)
+=====
+  - Fix regression bug introduced with HTML-escaping function parameters
+    default values in v0.6.4.
+
 0.7.0  (2019-09-26)
 =====
   - Better handling of descriptors.
