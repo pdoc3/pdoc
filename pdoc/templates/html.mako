@@ -104,7 +104,7 @@
             if returns:
                 returns = ' ->\N{NBSP}' + returns
         %>
-        <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${params | h})${returns | h}</span>
+        <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${params})${returns}</span>
     </code></dt>
     <dd>${show_desc(f)}</dd>
   </%def>

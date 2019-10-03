@@ -639,6 +639,9 @@ class ApiTest(unittest.TestCase):
         func = pdoc.Function('f', mod, lambda a=object(): None)
         self.assertEqual(func.params(), ['a=<object object>'])
 
+        func = pdoc.Function('f', mod, lambda a=object(): None)
+        self.assertEqual(func.params(link=lambda x: ''), ['a=&lt;object object&gt;'])
+
         # typed
         def f(a: int, *b, c: typing.List[pdoc.Doc] = []): pass
         func = pdoc.Function('f', mod, f)

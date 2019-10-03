@@ -1104,6 +1104,11 @@ class Function(Doc):
             elif ' at 0x' in repr(p.default):
                 replacement = re.sub(r' at 0x\w+', '', repr(p.default))
 
+            nonlocal link
+            if link and ('<' in repr(p.default) or '>' in repr(p.default)):
+                import html
+                replacement = html.escape(replacement or p.default)
+
             if replacement:
                 class mock:
                     def __repr__(self):
