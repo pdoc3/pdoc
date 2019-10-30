@@ -237,7 +237,7 @@ For example, to produce HTML documentation of your whole package
 in subdirectory 'build' of the current directory, using the default
 HTML template, run:
 
-    $ pdoc --html --output-dir build my_package
+    $ pdoc --html --html-dir build my_package
 
 If you want to omit the source code preview, run:
 
