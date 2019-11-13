@@ -1081,6 +1081,11 @@ class Function(Doc):
         If `annotate` is True, the parameter strings include [PEP 484]
         type hint annotations.
 
+        .. todo::
+            Extract signature from the first lines of currently-unsupported builtin
+            functions' (such as `itertools.count()` or `numpy.array()`) docstrings.
+            See _TODO_ marker in the code for ideas.
+
         [PEP 484]: https://www.python.org/dev/peps/pep-0484/
         """
         return self._params(self.obj, annotate=annotate, link=link, module=self.module)
@@ -1091,6 +1096,8 @@ class Function(Doc):
             signature = inspect.signature(inspect.unwrap(func_obj))
         except ValueError:
             # I guess this is for C builtin functions?
+            # TODO: Extract signature from the first line of the docstring, i.e.
+            # https://github.com/mitmproxy/pdoc/commit/010d996003bc5b72fcf5fa515edbcc0142819919
             return ["..."]
 
         def safe_default_value(p: inspect.Parameter):
