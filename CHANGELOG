@@ -1,3 +1,7 @@
+0.7.2  (2019-11-13)
+=====
+  - Fix regression bug introduced in v0.7.1.
+
 0.7.1  (2019-10-03)
 =====
   - Fix regression bug introduced with HTML-escaping function parameters
