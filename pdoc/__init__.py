@@ -8,6 +8,7 @@ hierarchical APIs.
 .. include:: ./documentation.md
 """
 import ast
+import enum
 import importlib.machinery
 import importlib.util
 import inspect
@@ -1093,21 +1094,27 @@ class Function(Doc):
             return ["..."]
 
         def safe_default_value(p: inspect.Parameter):
-            if p.default is inspect.Parameter.empty:
+            value = p.default
+            if value is inspect.Parameter.empty:
                 return p
 
-            replacement = None
-            if p.default is os.environ:
-                replacement = 'os.environ'
-            elif inspect.isclass(p.default):
-                replacement = p.default.__module__ + '.' + p.default.__qualname__
-            elif ' at 0x' in repr(p.default):
-                replacement = re.sub(r' at 0x\w+', '', repr(p.default))
+            replacement = next((i for i in ('os.environ',
+                                            'sys.stdin',
+                                            'sys.stdout',
+                                            'sys.stderr',)
+                                if value is eval(i)), None)
+            if not replacement:
+                if isinstance(value, enum.Enum):
+                    replacement = str(value)
+                elif inspect.isclass(value):
+                    replacement = value.__module__ + '.' + value.__qualname__
+                elif ' at 0x' in repr(value):
+                    replacement = re.sub(r' at 0x\w+', '', repr(value))
 
-            nonlocal link
-            if link and ('<' in repr(p.default) or '>' in repr(p.default)):
-                import html
-                replacement = html.escape(replacement or p.default)
+                nonlocal link
+                if link and ('<' in repr(value) or '>' in repr(value)):
+                    import html
+                    replacement = html.escape(replacement or repr(value))
 
             if replacement:
                 class mock:

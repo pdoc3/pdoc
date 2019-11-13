@@ -1,6 +1,7 @@
 """
 Unit tests for pdoc package.
 """
+import enum
 import inspect
 import os
 import shutil
@@ -633,8 +634,13 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(func.params(), ['a', '*', 'b', 'c'])
 
         func = pdoc.Function('f', mod,
-                             lambda a=os.environ: None)
-        self.assertEqual(func.params(), ['a=os.environ'])
+                             lambda a=os.environ, b=sys.stdout: None)
+        self.assertEqual(func.params(), ['a=os.environ', 'b=sys.stdout'])
+
+        class Foo(enum.Enum):
+            a, b = 1, 2
+        func = pdoc.Function('f', mod, lambda a=Foo.a: None)
+        self.assertEqual(func.params(), ['a=Foo.a'])
 
         func = pdoc.Function('f', mod, lambda a=object(): None)
         self.assertEqual(func.params(), ['a=<object object>'])
