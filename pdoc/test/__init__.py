@@ -568,11 +568,22 @@ class ApiTest(unittest.TestCase):
         class D(B):
             pass
 
+        class G(C):
+            pass
+
+        class F(C):
+            pass
+
+        class E(C):
+            pass
+
         mod = pdoc.Module(pdoc)
         self.assertEqual([x.refname for x in pdoc.Class('A', mod, A).subclasses()],
                          [mod.find_class(C).refname])
         self.assertEqual([x.refname for x in pdoc.Class('B', mod, B).subclasses()],
                          [mod.find_class(D).refname])
+        self.assertEqual([x.refname for x in pdoc.Class('C', mod, C).subclasses()],
+                         [mod.find_class(x).refname for x in (E, F, G)])
 
     def test_link_inheritance(self):
         mod = pdoc.Module(EXAMPLE_MODULE)
