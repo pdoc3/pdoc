@@ -834,7 +834,8 @@ class HtmlHelpersTest(unittest.TestCase):
         toc = extract_toc(text)
         self.assertEqual(toc, expected)
 
-    @unittest.skipIf(shutil.which("git") is None, reason="test assumes git installed on system")
+    @unittest.skipIf(shutil.which("git") is None or not os.path.exists('.git'),
+                     "git not installed or we're not within git repo")
     def test_format_git_link(self):
         url = format_git_link(
             template='https://github.com/pdoc3/pdoc/blob/{commit}/{path}#L{start_line}-L{end_line}',
