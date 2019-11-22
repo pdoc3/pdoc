@@ -476,7 +476,7 @@ class Doc:
         return top
 
     def __lt__(self, other):
-        return self.name < other.name
+        return self.refname < other.refname
 
 
 class Module(Doc):
@@ -882,9 +882,8 @@ class Class(Doc):
         The objects in the list are of type `pdoc.Class` if available,
         and `pdoc.External` otherwise.
         """
-        return sorted((self.module.find_class(c)
-                       for c in type.__subclasses__(self.obj)),
-                      key=lambda x: x.refname)
+        return sorted(self.module.find_class(c)
+                      for c in type.__subclasses__(self.obj))
 
     def params(self, *, annotate=False, link=None) -> List['str']:
         """
