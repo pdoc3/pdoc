@@ -111,6 +111,10 @@ class CliTest(unittest.TestCase):
     ]
     PUBLIC_FILES = [f for f in ALL_FILES if '/_' not in f]
 
+    if os.name == 'nt':
+        ALL_FILES = [i.replace('/', '\\') for i in ALL_FILES]
+        PUBLIC_FILES = [i.replace('/', '\\') for i in PUBLIC_FILES]
+
     def setUp(self):
         pdoc.reset()
 
@@ -1102,6 +1106,7 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"""
         self.assertEqual(html, expected)
 
 
+@unittest.skipIf('win' in sys.platform, "signal.SIGALRM doesn't work on Windos")
 class HttpTest(unittest.TestCase):
     """
     Unit tests for the HTTP server functionality.
