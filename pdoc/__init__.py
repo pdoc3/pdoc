@@ -991,7 +991,13 @@ class Class(Doc):
             return
 
         for name, parent_dobj in self._super_members.items():
-            dobj = self.doc[name]
+            try:
+                dobj = self.doc[name]
+            except KeyError:
+                # There is a key in __pdoc__ blocking this member
+                assert any(i.endswith(self.qualname + '.' + name)
+                           for i in self.module.obj.__pdoc__)
+                continue
             if (dobj.obj is parent_dobj.obj or
                     (dobj.docstring or parent_dobj.docstring) == parent_dobj.docstring):
                 dobj.inherits = parent_dobj

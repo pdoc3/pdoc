@@ -495,6 +495,12 @@ class ApiTest(unittest.TestCase):
             self.assertNotIn('f', mod.doc['B'].doc)
             self.assertIsInstance(mod.find_ident('B.f'), pdoc.External)
 
+        # GH-125: https://github.com/pdoc3/pdoc/issues/125
+        with patch.object(module, '__pdoc__', {'B.inherited': False}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertNotIn('inherited', mod.doc['B'].doc)
+
     def test__pdoc__invalid_value(self):
         module = pdoc.import_module(EXAMPLE_MODULE)
         with patch.object(module, '__pdoc__', {'B': 1}), \
