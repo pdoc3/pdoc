@@ -897,10 +897,7 @@ class Class(Doc):
         if name in exclusions or qualname in exclusions or refname in exclusions:
             return []
 
-        params = Function._params(self.obj.__init__,
-                                  annotate=annotate, link=link, module=self.module)
-        params = params[1:] if params[0] == 'self' else params
-        return params
+        return Function._params(self.obj, annotate=annotate, link=link, module=self.module)
 
     def _filter_doc_objs(self, type: Type[T], include_inherited=True,
                          filter_func: Callable[[T], bool] = lambda x: True,
