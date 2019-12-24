@@ -930,6 +930,11 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <dt><a><code>scipy.random.norm</code></a></dt>
 <dd>Random variates, PDFs, etc.</dd>
 </dl>
+<h2 id="see-also_2">See Also</h2>
+<dl>
+<dt><a><code>pdoc.Doc</code></a></dt>
+<dd>A class description that spans several lines.</dd>
+</dl>
 <h2 id="notes">Notes</h2>
 <p>Foo bar.</p>
 <h3 id="h3-title">H3 Title</h3>
