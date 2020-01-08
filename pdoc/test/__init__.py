@@ -685,6 +685,12 @@ class ApiTest(unittest.TestCase):
                          ['a:\N{NBSP}int', '*b',
                           "c:\N{NBSP}List[<a href=\"#pdoc.Doc\">Doc</a>]\N{NBSP}=\N{NBSP}[]"])
 
+        def bug130_str_annotation(a: "str"):
+            return
+
+        self.assertEqual(pdoc.Function('bug130', mod, bug130_str_annotation).params(annotate=True),
+                         ['a:\N{NBSP}str'])
+
     def test_Function_return_annotation(self):
         import typing
 

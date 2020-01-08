@@ -1162,7 +1162,8 @@ class Function(Doc):
                     # PEP8-normalize whitespace
                     s = re.sub(r'(?<!\s)=(?!\s)', ' = ', re.sub(r':(?!\s)', ': ', s, 1), 1)
                 # "Eval" forward-declarations (typing string literals)
-                s = re.sub(r'(?<=: )[\'"]|[\'"](?= = )', '', s, 2)
+                if isinstance(p.annotation, str):
+                    s = s.replace("'%s'" % p.annotation, p.annotation, 1)
                 s = s.replace(' ', '\N{NBSP}')  # prevent improper line breaking
 
                 if link:
