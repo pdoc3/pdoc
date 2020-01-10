@@ -274,6 +274,15 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
 
     return vars, instance_vars
 
+def _is_whitelisted(ident_name, module):
+    """
+    Returns `True` if `ident_name` is contained in the module's __pdoc__ 
+    with a value of `True`.
+    """
+    if module:
+        pdoc = getattr(module, "__pdoc__", {})
+        if ident_name in pdoc and pdoc[ident_name] is True:
+            return True
 
 def _is_public(ident_name):
     """
@@ -547,10 +556,12 @@ class Module(Doc):
 
             public_objs = [(name, inspect.unwrap(obj))
                            for name, obj in inspect.getmembers(self.obj)
-                           if (_is_public(name) and
+                           if ((_is_public(name) or 
+                                _is_whitelisted(name, module)) and
                                (is_from_this_module(obj) or name in var_docstrings))]
             index = list(self.obj.__dict__).index
             public_objs.sort(key=lambda i: index(i[0]))
+
 
         for name, obj in public_objs:
             if _is_function(obj):
@@ -585,7 +596,7 @@ class Module(Doc):
                     continue
 
                 # Ignore if it isn't exported
-                if not _is_public(root):
+                if not _is_public(root) and not _is_whitelisted(root, module):
                     continue
 
                 assert self.refname == self.name
@@ -649,6 +660,8 @@ class Module(Doc):
                     if key.startswith(refname + '.'):
                         del self._context[key]
 
+                continue
+            if docstring is True:
                 continue
 
             dobj = self.find_ident(refname)
@@ -795,11 +808,13 @@ class Class(Doc):
         self.doc = {}
         """A mapping from identifier name to a `pdoc.Doc` objects."""
 
-        public_objs = [(name, inspect.unwrap(obj))
-                       for name, obj in inspect.getmembers(self.obj)
+        public_objs = [(_name, inspect.unwrap(obj))
+                       for _name, obj in inspect.getmembers(self.obj)
                        # Filter only *own* members. The rest are inherited
                        # in Class._fill_inheritance()
-                       if name in self.obj.__dict__ and _is_public(name)]
+                       if _name in self.obj.__dict__ and 
+                                (_is_public(_name) or 
+                                _is_whitelisted("{}.{}".format(name, _name), module.obj))]
         index = list(self.obj.__dict__).index
         public_objs.sort(key=lambda i: index(i[0]))
 

@@ -513,6 +513,28 @@ class ApiTest(unittest.TestCase):
             pdoc.Module(module)
             pdoc.link_inheritance()
 
+    def test__pdoc__whitelist(self):
+        module = pdoc.import_module(EXAMPLE_MODULE)
+
+        mod = pdoc.Module(module)
+        pdoc.link_inheritance()
+        self.assertIn('A', mod.doc)
+        self.assertNotIn('__call__', mod.doc['A'].doc)
+        self.assertNotIn('_private_function', mod.doc)
+
+        with patch.object(module, '__pdoc__', {'A.__call__': True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn('A', mod.doc)
+            self.assertIn('__call__', mod.doc['A'].doc)
+
+        with patch.object(module, '__pdoc__', {'_private_function': True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn('_private_function', mod.doc)
+
+
+
     def test__all__(self):
         module = pdoc.import_module(EXAMPLE_MODULE + '.index')
         with patch.object(module, '__all__', ['B'], create=True):
@@ -1199,3 +1221,4 @@ class HttpTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+    
