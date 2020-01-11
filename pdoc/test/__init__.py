@@ -817,10 +817,21 @@ class HtmlHelpersTest(unittest.TestCase):
         self.assertEqual(glimpse('Foo bar\n-------'), 'Foo bar')
 
     def test_to_html(self):
-        text = '# Title\n\n`pdoc.Module` is a `Doc`, not `dict`.'
-        expected = ('<h1 id="title">Title</h1>\n'
-                    '<p><a href="#pdoc.Module">Module</a> is a <a href="#pdoc.Doc">Doc</a>, '
-                    'not <code>dict</code>.</p>')
+        text = '''# Title
+
+`pdoc.Module` is a `Doc`, not `dict`.
+
+```
+code block
+```
+reference: `package.foo`
+'''
+        expected = '''<h1 id="title">Title</h1>
+<p><a href="#pdoc.Module">Module</a> is a <a href="#pdoc.Doc">Doc</a>, not <code>dict</code>.</p>
+<pre><code>code block
+</code></pre>
+
+<p>reference: <a href="/package.foo.ext">package.foo</a></p>'''
 
         module = pdoc.Module(pdoc)
 
