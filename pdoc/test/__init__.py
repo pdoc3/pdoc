@@ -929,9 +929,6 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <dd>Function a with its description.</dd>
 <dt><a><code>scipy.random.norm</code></a></dt>
 <dd>Random variates, PDFs, etc.</dd>
-</dl>
-<h2 id="see-also_2">See Also</h2>
-<dl>
 <dt><a><code>pdoc.Doc</code></a></dt>
 <dd>A class description that spans several lines.</dd>
 </dl>

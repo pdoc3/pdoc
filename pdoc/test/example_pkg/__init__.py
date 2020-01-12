@@ -183,9 +183,6 @@ class Docformats:
         --------
         pdoc.text : Function a with its description.
         scipy.random.norm : Random variates, PDFs, etc.
-
-        See Also
-        --------
         pdoc.Doc : A class description that
                    spans several lines.
 
