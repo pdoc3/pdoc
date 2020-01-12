@@ -166,8 +166,7 @@ class _ToMarkdown:
                           r'(?P<desc>(?:\n(?: {4}.*|$))*)',
                           _ToMarkdown._numpy_params, body, flags=re.MULTILINE)
         else:
-            name = r'(?:\w|\{\w+(?:,\w+)+\})+'
-
+            name = r'(?:\w|\{\w+(?:,\w+)+\})+'  # Support curly brace expansion
             body = re.sub(r'^(?P<name>\*{0,2}' + name + r'(?:, \*{0,2}' + name + r')*)'
                           r'(?: ?: (?P<type>.*))?(?<!\.)$'
                           r'(?P<desc>(?:\n(?: {4}.*|$))*)',

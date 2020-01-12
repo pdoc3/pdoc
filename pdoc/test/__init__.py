@@ -939,19 +939,17 @@ description of <code>x1</code>, <code>x2</code>.</p>
         self.assertEqual(html, expected)
 
     def test_numpy_curly_brace_expansion(self):
-        # see https://github.com/mwaskom/seaborn/blob/
-        # 66191d8a179f1bfa42f03749bc4a07e1c0c08156/seaborn/regression.py#L514
+        # See: https://github.com/mwaskom/seaborn/blob/66191d8a179f1bfa42f03749bc4a07e1c0c08156/seaborn/regression.py#L514  # noqa: 501
         text = '''Parameters
 ----------
-{x,y}_partial : str
-some description
+prefix_{x,y}_partial : str
+    some description
 '''
         expected = '''<h2 id="parameters">Parameters</h2>
 <dl>
-<dt><strong><code>{x,y}_partial</code></strong> :&ensp;<code>str</code></dt>
-<dd>&nbsp;</dd>
-</dl>
-<p>some description</p>'''
+<dt><strong><code>prefix_{x,y}_partial</code></strong> :&ensp;<code>str</code></dt>
+<dd>some description</dd>
+</dl>'''
         html = to_html(text, module=self._module, link=self._link)
         self.assertEqual(html, expected)
 
