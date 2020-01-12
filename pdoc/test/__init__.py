@@ -528,6 +528,12 @@ class ApiTest(unittest.TestCase):
             self.assertIn('A', mod.doc)
             self.assertIn('__call__', mod.doc['A'].doc)
 
+        with patch.object(module, '__pdoc__', {'example_pkg.A.__call__': True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn('A', mod.doc)
+            self.assertIn('__call__', mod.doc['A'].doc)
+
         with patch.object(module, '__pdoc__', {'_private_function': True}):
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
@@ -537,11 +543,17 @@ class ApiTest(unittest.TestCase):
         with patch.object(module, '__pdoc__', {'subpkg.A.__call__': True}):
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
-            self.assertIn('A', mod.doc)
-            self.assertIn('__call__', mod.doc['A'].doc)
+            self.assertIn('subpkg', mod.doc)
+            self.assertIn('A', mod.doc['subpkg'].doc)
+            self.assertIn('__call__', mod.doc['subpkg'].doc['A'].doc)
 
         # Using full refname
-        # with patch.object(module, '__pdoc__', {'example_pkg.subpkg.A.__call__': True}):
+        with patch.object(module, '__pdoc__', {'example_pkg.subpkg.A.__call__': True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn('subpkg', mod.doc)
+            self.assertIn('A', mod.doc['subpkg'].doc)
+            self.assertIn('__call__', mod.doc['subpkg'].doc['A'].doc)
 
 
     def test__all__(self):
