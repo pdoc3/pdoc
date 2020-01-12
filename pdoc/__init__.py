@@ -279,10 +279,9 @@ def _is_whitelisted(ident_name, module):
     Returns `True` if `ident_name` is contained in the module's __pdoc__ 
     with a value of `True`.
     """
-    if module:
-        pdoc = getattr(module, "__pdoc__", {})
-        if ident_name in pdoc and pdoc[ident_name] is True:
-            return True
+    pdoc = getattr(module, "__pdoc__", {})
+    if ident_name in pdoc and pdoc[ident_name]:
+        return True
 
 def _is_public(ident_name):
     """
@@ -661,6 +660,8 @@ class Module(Doc):
                         del self._context[key]
 
                 continue
+
+            # Prevent the ValueError below in case of whitelisting with "True"
             if docstring is True:
                 continue
 

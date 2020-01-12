@@ -28,7 +28,6 @@ def _private_function():
     """Private function, should only appear if whitelisted"""
 
 
-
 class A:
     """`A` is base class for `example_pkg.B`."""  # Test refname link
     def overridden(self):
