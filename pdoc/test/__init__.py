@@ -957,6 +957,21 @@ description of <code>x1</code>, <code>x2</code>.</p>
         html = to_html(text, module=self._module, link=self._link)
         self.assertEqual(html, expected)
 
+    def test_numpy_curly_brace_expansion(self):
+        # See: https://github.com/mwaskom/seaborn/blob/66191d8a179f1bfa42f03749bc4a07e1c0c08156/seaborn/regression.py#L514  # noqa: 501
+        text = '''Parameters
+----------
+prefix_{x,y}_partial : str
+    some description
+'''
+        expected = '''<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>prefix_{x,y}_partial</code></strong> :&ensp;<code>str</code></dt>
+<dd>some description</dd>
+</dl>'''
+        html = to_html(text, module=self._module, link=self._link)
+        self.assertEqual(html, expected)
+
     def test_google(self):
         expected = '''<p>Summary line.
 Nomatch:</p>
