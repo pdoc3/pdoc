@@ -946,6 +946,8 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <dd>Function a with its description.</dd>
 <dt><a><code>scipy.random.norm</code></a></dt>
 <dd>Random variates, PDFs, etc.</dd>
+<dt><a><code>pdoc.Doc</code></a></dt>
+<dd>A class description that spans several lines.</dd>
 </dl>
 <h2 id="notes">Notes</h2>
 <p>Foo bar.</p>

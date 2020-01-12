@@ -157,6 +157,7 @@ class _ToMarkdown:
         """
         section, body = match.groups()
         if section.title() == 'See Also':
+            body = re.sub(r'\n\s{4}\s*', ' ', body)  # Handle line continuation
             body = re.sub(r'^((?:\n?[\w.]* ?: .*)+)|(.*\w.*)',
                           _ToMarkdown._numpy_seealso, body)
         elif section.title() in ('Returns', 'Yields', 'Raises', 'Warns'):
