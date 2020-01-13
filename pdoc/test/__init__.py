@@ -555,6 +555,17 @@ class ApiTest(unittest.TestCase):
             self.assertIn('A', mod.doc['subpkg'].doc)
             self.assertIn('__call__', mod.doc['subpkg'].doc['A'].doc)
 
+        # Whitelist entire modules
+        with patch.object(module, '__pdoc__', {'example_pkg._private': True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn('_private', mod.doc)
+
+        with patch.object(module, '__pdoc__', {'_private': True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn('_private', mod.doc)
+
     def test__all__(self):
         module = pdoc.import_module(EXAMPLE_MODULE + '.index')
         with patch.object(module, '__all__', ['B'], create=True):
