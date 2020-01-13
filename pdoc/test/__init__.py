@@ -538,6 +538,8 @@ class ApiTest(unittest.TestCase):
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
             self.assertIn('_private_function', mod.doc)
+            self.assertIn('subpkg', mod.doc)
+            self.assertNotIn('_private_function', mod.doc["subpkg"].doc)
 
         # Defined in example_pkg, referring to a member of its submodule
         with patch.object(module, '__pdoc__', {'subpkg.A.__call__': True}):
