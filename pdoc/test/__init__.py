@@ -25,7 +25,7 @@ from urllib.request import Request, urlopen
 import typing
 
 import pdoc
-from pdoc.cli import main, parser
+from pdoc import cli
 from pdoc.html_helpers import (
     minify_css, minify_html, glimpse, to_html,
     ReferenceWarning, extract_toc, format_git_link,
@@ -57,9 +57,9 @@ def run(*args, _check=True, **kwargs) -> int:
     params = (('--' + key.replace('_', '-'), value)
               for key, value in kwargs.items())
     params = list(filter(None, chain.from_iterable(params)))  # type: ignore
-    _args = parser.parse_args([*params, *args])               # type: ignore
+    _args = cli.parser.parse_args([*params, *args])           # type: ignore
     try:
-        returncode = main(_args)
+        returncode = cli.main(_args)
         return returncode or 0
     except SystemExit as e:
         return e.code
@@ -1171,7 +1171,8 @@ class HttpTest(unittest.TestCase):
         with self._timeout(1000):
             with redirect_streams() as (stdout, stderr):
                 t = threading.Thread(
-                    target=main, args=(parser.parse_args(['--http', ':%d' % port] + modules),))
+                    target=cli.main,
+                    args=(cli.parser.parse_args(['--http', ':%d' % port] + modules),))
                 t.start()
                 sleep(.1)
 
