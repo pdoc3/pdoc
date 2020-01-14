@@ -479,6 +479,23 @@ class Doc:
         return self.refname < other.refname
 
 
+def _iter_modules(paths):
+    """
+    Custom implementation of `pkgutil.iter_modules()`
+    because that one doesn't play well with namespace packages.
+    See: https://github.com/pypa/setuptools/issues/83
+    """
+    from os.path import isdir, join, splitext
+    for pth in paths:
+        for file in os.listdir(pth):
+            if file.startswith(('.', '__pycache__', '__init__.py')):
+                continue
+            if file.endswith(_SOURCE_SUFFIXES):
+                yield splitext(file)[0]
+            if isdir(join(pth, file)) and '.' not in file:
+                yield file
+
+
 class Module(Doc):
     """
     Representation of a module's documentation.
@@ -491,13 +508,17 @@ class Module(Doc):
     __slots__ = ('supermodule', 'doc', '_context', '_is_inheritance_linked')
 
     def __init__(self, module: Union[ModuleType, str], *, docfilter: Callable[[Doc], bool] = None,
-                 supermodule: 'Module' = None, context: Context = None):
+                 scanfilter: Callable[[str], bool] = None, supermodule: 'Module' = None,
+                 context: Context = None):
         """
         Creates a `Module` documentation object given the actual
         module Python object.
 
         `docfilter` is an optional predicate that controls which
         sub-objects are documentated (see also: `pdoc.html()`).
+
+        `scanfilter` is an optional predicate that controls which
+        submodules are ignored during parsing.
 
         `supermodule` is the parent `pdoc.Module` this module is
         a submodule of.
@@ -563,23 +584,7 @@ class Module(Doc):
         # If the module is a package, scan the directory for submodules
         if self.is_package:
 
-            def iter_modules(paths):
-                """
-                Custom implementation of `pkgutil.iter_modules()`
-                because that one doesn't play well with namespace packages.
-                See: https://github.com/pypa/setuptools/issues/83
-                """
-                from os.path import isdir, join, splitext
-                for pth in paths:
-                    for file in os.listdir(pth):
-                        if file.startswith(('.', '__pycache__', '__init__.py')):
-                            continue
-                        if file.endswith(_SOURCE_SUFFIXES):
-                            yield splitext(file)[0]
-                        if isdir(join(pth, file)) and '.' not in file:
-                            yield file
-
-            for root in iter_modules(self.obj.__path__):
+            for root in _iter_modules(self.obj.__path__):
                 # Ignore if this module was already doc'd.
                 if root in self.doc:
                     continue
@@ -590,9 +595,13 @@ class Module(Doc):
 
                 assert self.refname == self.name
                 fullname = "%s.%s" % (self.name, root)
+
+                if scanfilter and not scanfilter(fullname):
+                    continue
+
                 self.doc[root] = m = Module(import_module(fullname),
-                                            docfilter=docfilter, supermodule=self,
-                                            context=self._context)
+                                            docfilter=docfilter, scanfilter=scanfilter,
+                                            supermodule=self, context=self._context)
                 # Skip empty namespace packages because they may
                 # as well be other auxiliary directories
                 if m.is_namespace and not m.doc:
