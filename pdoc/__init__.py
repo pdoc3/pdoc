@@ -224,8 +224,8 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
     else:
         try:
             tree = ast.parse(inspect.getsource(doc_obj.obj))
-        except (OSError, TypeError, SyntaxError):
-            warn("Couldn't get/parse source of '{!r}'".format(doc_obj))
+        except (OSError, TypeError, SyntaxError) as exc:
+            warn("Couldn't read PEP-224 variable docstrings from {!r}: {}".format(doc_obj, exc))
             return {}, {}
 
         if isinstance(doc_obj, Class):
