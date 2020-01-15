@@ -827,7 +827,8 @@ class Class(Doc):
                        # Filter only *own* members. The rest are inherited
                        # in Class._fill_inheritance()
                        if _name in self.obj.__dict__ and
-                       (_is_public(_name) or _is_whitelisted("{}.{}".format(name, _name), self.module))]
+                       (_is_public(_name) or _is_whitelisted("{}.{}".format(
+                           name, _name), self.module))]
         index = list(self.obj.__dict__).index
         public_objs.sort(key=lambda i: index(i[0]))
 
