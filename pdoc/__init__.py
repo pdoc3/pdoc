@@ -275,24 +275,24 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
     return vars, instance_vars
 
 
-def _is_whitelisted(ident_name, doc_obj):
+def _is_whitelisted(ident_name, doc_module):
     """
     Returns `True` if `ident_name` is contained in the module's __pdoc__
     with a value of `True`.
     """
     # Check this objects module's __pdoc__ for both the relative and
     # full canonical name
-    module_basename = doc_obj.module.name.split(".")[-1]
-    pdoc = getattr(doc_obj.module.obj, "__pdoc__", {})
+    module_basename = doc_module.name.split(".")[-1]
+    pdoc = getattr(doc_module.obj, "__pdoc__", {})
     if pdoc.get(ident_name, False) or \
             pdoc.get("{}.{}".format(module_basename, ident_name), False):
         return True
 
     # We also need to check all potential supermodules' __pdoc__s
     # due to full reference
-    if hasattr(doc_obj.module, "supermodule") and doc_obj.module.supermodule:
+    if doc_module.supermodule:
         new_ident = "{}.{}".format(module_basename, ident_name)
-        return _is_whitelisted(new_ident, doc_obj.module.supermodule)
+        return _is_whitelisted(new_ident, doc_module.supermodule)
 
     return False
 
@@ -570,7 +570,7 @@ class Module(Doc):
             public_objs = [(name, inspect.unwrap(obj))
                            for name, obj in inspect.getmembers(self.obj)
                            if ((_is_public(name) or
-                                _is_whitelisted(name, self)) and
+                                _is_whitelisted(name, self.module)) and
                                (is_from_this_module(obj) or name in var_docstrings))]
             index = list(self.obj.__dict__).index
             public_objs.sort(key=lambda i: index(i[0]))
@@ -608,7 +608,7 @@ class Module(Doc):
                     continue
 
                 # Ignore if it isn't exported
-                if not _is_public(root) and not _is_whitelisted(root, self):
+                if not _is_public(root) and not _is_whitelisted(root, self.module):
                     continue
 
                 assert self.refname == self.name
@@ -827,7 +827,7 @@ class Class(Doc):
                        # Filter only *own* members. The rest are inherited
                        # in Class._fill_inheritance()
                        if _name in self.obj.__dict__ and
-                       (_is_public(_name) or _is_whitelisted("{}.{}".format(name, _name), self))]
+                       (_is_public(_name) or _is_whitelisted("{}.{}".format(name, _name), self.module))]
         index = list(self.obj.__dict__).index
         public_objs.sort(key=lambda i: index(i[0]))
 

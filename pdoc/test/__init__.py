@@ -522,7 +522,7 @@ class ApiTest(unittest.TestCase):
         self.assertNotIn('__call__', mod.doc['A'].doc)
         self.assertNotIn('_private_function', mod.doc)
 
-        with patch.object(module, '__pdoc__', {'A.__call__': True}):
+        with patch.object(module, '__pdoc__', {'A.__call__': "Overwrite private function doc"}):
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
             self.assertIn('A', mod.doc)
