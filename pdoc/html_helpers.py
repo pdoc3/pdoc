@@ -404,7 +404,8 @@ def to_markdown(text: str, docformat: str = 'numpy,google', *,
                 # Matches markdown code spans not +directly+ within links.
                 # E.g. `code` and [foo is `bar`]() but not [`code`](...)
                 # Also skips \-escaped grave quotes.
-                _code_refs=re.compile(r'(?<![\[\\`])`(?!])(?:[^`]|(?<=\\)`)+`').sub):
+                _code_refs=re.compile(r'(?<![\\`])`(?:[^\]`]|(?<=\\)'
+                                      r'`(?!](.*)))+`(?!\](?:: )?\(.*\))').sub):
     """
     Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
 
