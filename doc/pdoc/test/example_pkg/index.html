@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.7.2" />
+<meta name="generator" content="pdoc 0.7.3" />
 <title>pdoc.test.example_pkg API documentation</title>
 <meta name="description" content="Module docstring" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -27,7 +27,7 @@
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L0-L323" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L0-L325" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Module docstring&#34;&#34;&#34;
 from collections import namedtuple
@@ -214,6 +214,8 @@ class Docformats:
         --------
         pdoc.text : Function a with its description.
         scipy.random.norm : Random variates, PDFs, etc.
+        pdoc.Doc : A class description that
+                   spans several lines.
 
         Notes
         -----
@@ -415,7 +417,7 @@ class Location(namedtuple(&#39;Location&#39;, &#39;lat lon&#39;)):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L242-L258" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L244-L260" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def doctests(self):
     &#34;&#34;&#34;
@@ -444,7 +446,7 @@ class Location(namedtuple(&#39;Location&#39;, &#39;lat lon&#39;)):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L19-L20" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L19-L20" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def foo(env=os.environ):
     &#34;&#34;&#34;Doesn&#39;t leak environ&#34;&#34;&#34;</code></pre>
@@ -502,7 +504,7 @@ that are relevant to the interface.</p>
 <p>Test a title without a blank line before it.</p>
 <h2 id="args_2">Args</h2>
 <dl>
-<dt><strong><code>A</code></strong></dt>
+<dt><strong><a title="pdoc.test.example_pkg.A" href="#pdoc.test.example_pkg.A"><code>A</code></a></strong></dt>
 <dd>a</dd>
 </dl>
 <h2 id="examples">Examples</h2>
@@ -516,7 +518,7 @@ that are relevant to the interface.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L196-L240" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L198-L242" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def google(self):
     &#34;&#34;&#34;
@@ -576,7 +578,7 @@ that are relevant to the interface.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L310-L320" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L312-L322" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def latex_math():
     &#34;&#34;&#34;
@@ -649,6 +651,8 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <dd>Function a with its description.</dd>
 <dt><code>scipy.random.norm</code></dt>
 <dd>Random variates, PDFs, etc.</dd>
+<dt><a title="pdoc.Doc" href="../../index.html#pdoc.Doc"><code>Doc</code></a></dt>
+<dd>A class description that spans several lines.</dd>
 </dl>
 <h2 id="notes">Notes</h2>
 <p>Foo bar.</p>
@@ -657,7 +661,7 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L130-L194" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L130-L196" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def numpy(self):
     &#34;&#34;&#34;
@@ -715,6 +719,8 @@ description of <code>x1</code>, <code>x2</code>.</p>
     --------
     pdoc.text : Function a with its description.
     scipy.random.norm : Random variates, PDFs, etc.
+    pdoc.Doc : A class description that
+               spans several lines.
 
     Notes
     -----
@@ -734,7 +740,7 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L23-L24" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L23-L24" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def object_as_arg_default(*args, a=object(), **kwargs):
     &#34;&#34;&#34;Html-encodes angle brackets in params&#34;&#34;&#34;</code></pre>
@@ -785,7 +791,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L260-L295" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L262-L297" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def reST_directives(self):
     &#34;&#34;&#34;
@@ -832,14 +838,13 @@ across multiple lines:</p>
 <dl>
 <dt id="pdoc.test.example_pkg.A"><code class="flex name class">
 <span>class <span class="ident">A</span></span>
-<span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
 <section class="desc"><p><a title="pdoc.test.example_pkg.A" href="#pdoc.test.example_pkg.A"><code>A</code></a> is base class for <code>example_pkg.B</code>.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L27-L36" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L27-L36" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class A:
     &#34;&#34;&#34;`A` is base class for `example_pkg.B`.&#34;&#34;&#34;  # Test refname link
@@ -866,7 +871,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L35-L36" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L35-L36" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def inherited(self):  # Inherited in B
     &#34;&#34;&#34;A.inherited docstring&#34;&#34;&#34;</code></pre>
@@ -880,7 +885,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L29-L30" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L29-L30" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def overridden(self):
     &#34;&#34;&#34;A.overridden docstring&#34;&#34;&#34;</code></pre>
@@ -894,7 +899,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L32-L33" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L32-L33" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def overridden_same_docstring(self):
     &#34;&#34;&#34;A.overridden_same_docstring docstring&#34;&#34;&#34;</code></pre>
@@ -913,7 +918,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L51-L118" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L51-L118" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class B(A, int):
     &#34;&#34;&#34;
@@ -1001,7 +1006,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L121-L121" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L121-L121" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class C(B): pass  # noqa: E701, E302</code></pre>
 </details>
@@ -1025,7 +1030,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L81-L83" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L81-L83" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@classmethod
 def cls(cls):
@@ -1040,7 +1045,7 @@ def cls(cls):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L77-L79" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L77-L79" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@staticmethod
 def static(x):
@@ -1060,7 +1065,7 @@ def static(x):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L96-L99" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L96-L99" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def p(self):
@@ -1074,7 +1079,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L45-L48" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L45-L48" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def __get__(self, instance, instance_type=None):
     if instance is not None:
@@ -1088,7 +1093,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L45-L48" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L45-L48" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def __get__(self, instance, instance_type=None):
     if instance is not None:
@@ -1107,7 +1112,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L74-L75" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L74-L75" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def f(self, a: int, b: int = 1, *args, c: str = &#39;c&#39;, **kwargs):
     &#34;&#34;&#34;B.f docstring&#34;&#34;&#34;</code></pre>
@@ -1121,7 +1126,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L111-L112" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L111-L112" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def overridden(self):
     pass</code></pre>
@@ -1149,7 +1154,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L121-L121" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L121-L121" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class C(B): pass  # noqa: E701, E302</code></pre>
 </details>
@@ -1195,7 +1200,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L122-L122" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L122-L122" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class D(C): pass  # noqa: E701, E302</code></pre>
 </details>
@@ -1229,14 +1234,13 @@ def p(self):
 </dd>
 <dt id="pdoc.test.example_pkg.Docformats"><code class="flex name class">
 <span>class <span class="ident">Docformats</span></span>
-<span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
 <section class="desc"></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L129-L295" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L129-L297" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Docformats:
     def numpy(self):
@@ -1295,6 +1299,8 @@ def p(self):
         --------
         pdoc.text : Function a with its description.
         scipy.random.norm : Random variates, PDFs, etc.
+        pdoc.Doc : A class description that
+                   spans several lines.
 
         Notes
         -----
@@ -1427,7 +1433,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L242-L258" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L244-L260" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def doctests(self):
     &#34;&#34;&#34;
@@ -1500,7 +1506,7 @@ that are relevant to the interface.</p>
 <p>Test a title without a blank line before it.</p>
 <h2 id="args_2">Args</h2>
 <dl>
-<dt><strong><code>A</code></strong></dt>
+<dt><strong><a title="pdoc.test.example_pkg.A" href="#pdoc.test.example_pkg.A"><code>A</code></a></strong></dt>
 <dd>a</dd>
 </dl>
 <h2 id="examples">Examples</h2>
@@ -1514,7 +1520,7 @@ that are relevant to the interface.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L196-L240" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L198-L242" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def google(self):
     &#34;&#34;&#34;
@@ -1621,6 +1627,8 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <dd>Function a with its description.</dd>
 <dt><code>scipy.random.norm</code></dt>
 <dd>Random variates, PDFs, etc.</dd>
+<dt><a title="pdoc.Doc" href="../../index.html#pdoc.Doc"><code>Doc</code></a></dt>
+<dd>A class description that spans several lines.</dd>
 </dl>
 <h2 id="notes">Notes</h2>
 <p>Foo bar.</p>
@@ -1629,7 +1637,7 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L130-L194" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L130-L196" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def numpy(self):
     &#34;&#34;&#34;
@@ -1687,6 +1695,8 @@ description of <code>x1</code>, <code>x2</code>.</p>
     --------
     pdoc.text : Function a with its description.
     scipy.random.norm : Random variates, PDFs, etc.
+    pdoc.Doc : A class description that
+               spans several lines.
 
     Notes
     -----
@@ -1743,7 +1753,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L260-L295" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L262-L297" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def reST_directives(self):
     &#34;&#34;&#34;
@@ -1787,14 +1797,14 @@ across multiple lines:</p>
 </dd>
 <dt id="pdoc.test.example_pkg.Location"><code class="flex name class">
 <span>class <span class="ident">Location</span></span>
-<span>(</span><span>*args, **kwargs)</span>
+<span>(</span><span>lat, lon)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Geo-location, GPS position.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L323-L324" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L325-L326" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Location(namedtuple(&#39;Location&#39;, &#39;lat lon&#39;)):
     &#34;&#34;&#34;Geo-location, GPS position.&#34;&#34;&#34;</code></pre>
@@ -1806,14 +1816,13 @@ across multiple lines:</p>
 </dd>
 <dt id="pdoc.test.example_pkg.ReadOnlyValueDescriptor"><code class="flex name class">
 <span>class <span class="ident">ReadOnlyValueDescriptor</span></span>
-<span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Read-only value descriptor</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/test/example_pkg/__init__.py#L42-L48" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/test/example_pkg/__init__.py#L42-L48" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class ReadOnlyValueDescriptor:
     &#34;&#34;&#34;Read-only value descriptor&#34;&#34;&#34;
@@ -1923,7 +1932,7 @@ across multiple lines:</p>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.3</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

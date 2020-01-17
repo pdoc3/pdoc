@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.7.2" />
+<meta name="generator" content="pdoc 0.7.3" />
 <title>pdoc.cli API documentation</title>
 <meta name="description" content="pdoc&#39;s CLI interface and helper functions." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -27,7 +27,7 @@
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/cli.py#L0-L499" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/cli.py#L0-L499" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">#!/usr/bin/env python3
 &#34;&#34;&#34;pdoc&#39;s CLI interface and helper functions.&#34;&#34;&#34;
@@ -546,7 +546,7 @@ if __name__ == &#34;__main__&#34;:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/cli.py#L354-L496" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/cli.py#L354-L496" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def main(_args=None):
     &#34;&#34;&#34; Command-line entry point &#34;&#34;&#34;
@@ -701,7 +701,7 @@ or similar, at your own discretion.&#34;&#34;&#34;,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/cli.py#L288-L289" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/cli.py#L288-L289" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def module_path(m: pdoc.Module, ext: str):
     return path.join(args.output_dir, *re.sub(r&#39;\.html$&#39;, ext, m.url()).split(&#39;/&#39;))</code></pre>
@@ -715,7 +715,7 @@ or similar, at your own discretion.&#34;&#34;&#34;,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/cli.py#L339-L341" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/cli.py#L339-L341" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def print_pdf(modules, **kwargs):
     modules = list(_flatten_submodules(modules))
@@ -730,7 +730,7 @@ or similar, at your own discretion.&#34;&#34;&#34;,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/cli.py#L307-L329" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/cli.py#L307-L329" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def write_files(m: pdoc.Module, ext: str, **kwargs):
     assert ext in (&#39;.html&#39;, &#39;.md&#39;)
@@ -861,7 +861,7 @@ e.g. "text/html" or "text/plain".</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/cli.py#L147-L285" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/cli.py#L147-L285" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class WebDoc(BaseHTTPRequestHandler):
     args = None  # Set before server instantiated
@@ -1028,7 +1028,7 @@ e.g. "text/html" or "text/plain".</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/cli.py#L275-L285" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/cli.py#L275-L285" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def import_path_from_req_url(self):
@@ -1054,7 +1054,7 @@ def import_path_from_req_url(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/cli.py#L160-L173" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/cli.py#L160-L173" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def check_modified(self):
     try:
@@ -1080,7 +1080,7 @@ def import_path_from_req_url(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/cli.py#L175-L234" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/cli.py#L175-L234" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def do_GET(self):
     # Deny favicon shortcut early.
@@ -1152,7 +1152,7 @@ def import_path_from_req_url(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/cli.py#L151-L158" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/cli.py#L151-L158" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def do_HEAD(self):
     status = 200
@@ -1172,7 +1172,7 @@ def import_path_from_req_url(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/cli.py#L241-L242" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/cli.py#L241-L242" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def echo(self, s):
     self.wfile.write(s.encode(&#34;utf-8&#34;))</code></pre>
@@ -1189,7 +1189,7 @@ the source code.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/cli.py#L244-L253" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/cli.py#L244-L253" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def html(self):
     &#34;&#34;&#34;
@@ -1211,7 +1211,7 @@ the source code.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/cli.py#L236-L239" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/cli.py#L236-L239" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def redirect(self, location):
     self.send_response(302)
@@ -1227,7 +1227,7 @@ the source code.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/cli.py#L255-L273" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/cli.py#L255-L273" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def resolve_ext(self, import_path):
     def exists(p):
@@ -1303,7 +1303,7 @@ the source code.</p></section>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.3</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

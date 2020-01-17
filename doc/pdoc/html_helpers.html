@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.7.2" />
+<meta name="generator" content="pdoc 0.7.3" />
 <title>pdoc.html_helpers API documentation</title>
 <meta name="description" content="Helper functions for HTML output." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -27,7 +27,7 @@
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/html_helpers.py#L0-L526" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/html_helpers.py#L0-L528" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 Helper functions for HTML output.
@@ -188,6 +188,7 @@ class _ToMarkdown:
         &#34;&#34;&#34;
         section, body = match.groups()
         if section.title() == &#39;See Also&#39;:
+            body = re.sub(r&#39;\n\s{4}\s*&#39;, &#39; &#39;, body)  # Handle line continuation
             body = re.sub(r&#39;^((?:\n?[\w.]* ?: .*)+)|(.*\w.*)&#39;,
                           _ToMarkdown._numpy_seealso, body)
         elif section.title() in (&#39;Returns&#39;, &#39;Yields&#39;, &#39;Raises&#39;, &#39;Warns&#39;):
@@ -197,7 +198,8 @@ class _ToMarkdown:
                           r&#39;(?P&lt;desc&gt;(?:\n(?: {4}.*|$))*)&#39;,
                           _ToMarkdown._numpy_params, body, flags=re.MULTILINE)
         else:
-            body = re.sub(r&#39;^(?P&lt;name&gt;\*{0,2}\w+(?:, \*{0,2}\w+)*)&#39;
+            name = r&#39;(?:\w|\{\w+(?:,\w+)+\})+&#39;  # Support curly brace expansion
+            body = re.sub(r&#39;^(?P&lt;name&gt;\*{0,2}&#39; + name + r&#39;(?:, \*{0,2}&#39; + name + r&#39;)*)&#39;
                           r&#39;(?: ?: (?P&lt;type&gt;.*))?(?&lt;!\.)$&#39;
                           r&#39;(?P&lt;desc&gt;(?:\n(?: {4}.*|$))*)&#39;,
                           _ToMarkdown._numpy_params, body, flags=re.MULTILINE)
@@ -399,7 +401,7 @@ def to_markdown(text: str, docformat: str = &#39;numpy,google&#39;, *,
                 # Matches markdown code spans not +directly+ within links.
                 # E.g. `code` and [foo is `bar`]() but not [`code`](...)
                 # Also skips \-escaped grave quotes.
-                _code_refs=re.compile(r&#39;(?&lt;![\[\\])`(?!])(?:[^`]|(?&lt;=\\)`)+`&#39;).sub):
+                _code_refs=re.compile(r&#39;(?&lt;![\[\\`])`(?!])(?:[^`]|(?&lt;=\\)`)+`&#39;).sub):
     &#34;&#34;&#34;
     Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
 
@@ -573,7 +575,7 @@ def _str_template_fields(template):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/html_helpers.py#L427-L434" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/html_helpers.py#L429-L436" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def extract_toc(text: str):
     &#34;&#34;&#34;
@@ -594,7 +596,7 @@ from <code>dobj</code> and the working environment.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/html_helpers.py#L437-L455" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/html_helpers.py#L439-L457" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def format_git_link(template: str, dobj: pdoc.Doc):
     &#34;&#34;&#34;
@@ -627,7 +629,7 @@ but never longer than <code>max_length</code> characters.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/html_helpers.py#L45-L66" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/html_helpers.py#L45-L66" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def glimpse(text: str, max_length=153, *, paragraph=True,
             _split_paragraph=partial(re.compile(r&#39;\s*\n\s*\n\s*&#39;).split, maxsplit=1),
@@ -661,7 +663,7 @@ but never longer than <code>max_length</code> characters.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/html_helpers.py#L20-L28" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/html_helpers.py#L20-L28" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@lru_cache()
 def minify_css(css: str,
@@ -683,7 +685,7 @@ def minify_css(css: str,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/html_helpers.py#L31-L42" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/html_helpers.py#L31-L42" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def minify_html(html: str,
                 _minify=partial(
@@ -712,7 +714,7 @@ example template.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/html_helpers.py#L342-L363" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/html_helpers.py#L344-L365" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def to_html(text: str, docformat: str = &#39;numpy,google&#39;, *,
             module: pdoc.Module = None, link: Callable[..., str] = None,
@@ -749,14 +751,14 @@ example template.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/html_helpers.py#L366-L397" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/html_helpers.py#L368-L399" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def to_markdown(text: str, docformat: str = &#39;numpy,google&#39;, *,
                 module: pdoc.Module = None, link: Callable[..., str] = None,
                 # Matches markdown code spans not +directly+ within links.
                 # E.g. `code` and [foo is `bar`]() but not [`code`](...)
                 # Also skips \-escaped grave quotes.
-                _code_refs=re.compile(r&#39;(?&lt;![\[\\])`(?!])(?:[^`]|(?&lt;=\\)`)+`&#39;).sub):
+                _code_refs=re.compile(r&#39;(?&lt;![\[\\`])`(?!])(?:[^`]|(?&lt;=\\)`)+`&#39;).sub):
     &#34;&#34;&#34;
     Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
 
@@ -792,7 +794,7 @@ example template.</p></section>
 <dl>
 <dt id="pdoc.html_helpers.ReferenceWarning"><code class="flex name class">
 <span>class <span class="ident">ReferenceWarning</span></span>
-<span>(</span><span>*args, **kwargs)</span>
+<span>(</span><span>...)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>This warning is raised in <a title="pdoc.html_helpers.to_html" href="#pdoc.html_helpers.to_html"><code>to_html()</code></a> when a object reference in markdown
@@ -801,7 +803,7 @@ doesn't match any documented objects.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/3a5e1d1241562691cb64584add3c8ed647ea2505/pdoc/html_helpers.py#L400-L406" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/html_helpers.py#L402-L408" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class ReferenceWarning(UserWarning):
     &#34;&#34;&#34;
@@ -861,7 +863,7 @@ doesn't match any documented objects.</p>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.3</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
