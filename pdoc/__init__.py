@@ -954,7 +954,7 @@ class Class(Doc):
         if name in exclusions or qualname in exclusions or refname in exclusions:
             return []
 
-        return Function._params(self.obj, annotate=annotate, link=link, module=self.module)
+        return Function._params(self, annotate=annotate, link=link, module=self.module)
 
     def _filter_doc_objs(self, type: Type[T], include_inherited=True,
                          filter_func: Callable[[T], bool] = lambda x: True,
@@ -1116,7 +1116,32 @@ class Function(Doc):
 
     def return_annotation(self, *, link=None):
         """Formatted function return type annotation or empty string if none."""
-        return _return_annotation(self.name, self.module, self.obj, link=link)
+        try:
+            annot = typing.get_type_hints(self.obj).get('return', '')
+        except NameError as e:
+            warn("Error handling return annotation for {}: {}".format(self.name, e.args[0]))
+            annot = inspect.signature(inspect.unwrap(self.obj)).return_annotation
+            if annot == inspect.Parameter.empty:
+                annot = ''
+        except TypeError:
+            # Extract annotation from the first line of the docstring for C builtin function
+            f_pattern = re.compile(r'^[a-zA-Z_]\w*\(.*\)'
+                                   r'(?: -> (?P<return_anno>.+))?$\n', re.MULTILINE)
+            f_match = f_pattern.match(self.obj.__doc__)
+            if f_match is None:
+                annot = ''
+            else:
+                annot = f_match.group("return_anno")
+                # Remove signature
+                self.docstring = f_pattern.sub('', self.obj.__doc__)
+
+        if not annot:
+            return ''
+        s = inspect.formatannotation(annot).replace(' ', '\N{NBSP}')  # Better line breaks
+        if link:
+            from pdoc.html_helpers import _linkify
+            s = re.sub(r'[\w\.]+', partial(_linkify, link=link, module=self.module), s)
+        return s
 
     def params(self, *, annotate: bool = False, link: Callable[[Doc], str] = None) -> List[str]:
         """
@@ -1128,24 +1153,55 @@ class Function(Doc):
         If `annotate` is True, the parameter strings include [PEP 484]
         type hint annotations.
 
-        .. todo::
-            Extract signature from the first lines of currently-unsupported builtin
-            functions' (such as `itertools.count()` or `numpy.array()`) docstrings.
-            See _TODO_ marker in the code for ideas.
-
         [PEP 484]: https://www.python.org/dev/peps/pep-0484/
         """
-        return self._params(self.obj, annotate=annotate, link=link, module=self.module)
+        return self._params(self, annotate=annotate, link=link, module=self.module)
 
     @staticmethod
-    def _params(func_obj, annotate=False, link=None, module=None):
+    def _params(doc_obj: Doc, annotate=False, link=None, module=None):
         try:
-            signature = inspect.signature(inspect.unwrap(func_obj))
+            signature = inspect.signature(inspect.unwrap(doc_obj.obj))
         except ValueError:
-            # I guess this is for C builtin functions?
-            # TODO: Extract signature from the first line of the docstring, i.e.
-            # https://github.com/mitmproxy/pdoc/commit/010d996003bc5b72fcf5fa515edbcc0142819919
-            return ["..."]
+            # Extract signature from the first line of the docstring for C builtin function
+            f_pattern = re.compile(r'^(?P<f_name>[a-zA-Z_]\w*)'
+                                   r'\((?P<params_all>.*)\)'
+                                   r'(?: -> (?P<return_anno>.+))?$\n', re.MULTILINE)
+            f_match = f_pattern.match(doc_obj.obj.__doc__)
+            if f_match is None:
+                return ["..."]
+
+            f_name, params_all, return_anno = f_match.group("f_name", "params_all", "return_anno")
+            params_obj = []
+            # TODO: This split condition is valid for `Dict[str, str]` but not for
+            #       something with nested brackets like `Dict[str, Dict[str, str]]`!
+            #       This split condition handles default values like `{1, 2, 3}` or
+            #       `('a', 'b', 'c')` correctly but not nested default values like
+            #       `[{1, 2}, {3, 4}]`
+            params_str = re.split(r', (?![^\[\({]*[\]\)}])', params_all)
+            for param_str in params_str:
+                p_match = re.match(r'^(?P<p_kind>\*{0,2})'
+                                   r'(?P<p_name>[a-zA-Z_]\w*)'
+                                   r'(?:: (?P<p_type>[\w\[\]\., ]+))?'
+                                   r'(?: = (?P<p_default>.+))?$', param_str)
+                if p_match is None:
+                    continue
+                p_kind, p_name, p_type, p_default = p_match.group(
+                    "p_kind", "p_name", "p_type", "p_default")
+                kind = inspect.Parameter.POSITIONAL_OR_KEYWORD
+                if len(p_kind) == 1:
+                    kind = inspect.Parameter.VAR_POSITIONAL
+                elif len(p_kind) == 2:
+                    kind = inspect.Parameter.VAR_KEYWORD
+                if p_type is None:
+                    p_type = inspect.Parameter.empty
+                if p_default is None:
+                    p_default = inspect.Parameter.empty
+                param = inspect.Parameter(p_name, kind, default=p_default, annotation=p_type)
+                params_obj.append(param)
+
+            # Remove signature from docstring
+            doc_obj.docstring = f_pattern.sub('', doc_obj.obj.__doc__)
+            signature = inspect.Signature(params_obj, return_annotation=return_anno)
 
         def safe_default_value(p: inspect.Parameter):
             value = p.default
