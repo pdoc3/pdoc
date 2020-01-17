@@ -809,6 +809,8 @@ class Class(Doc):
         self.doc = {}
         """A mapping from identifier name to a `pdoc.Doc` objects."""
 
+        pdoc = getattr(obj, '__pdoc__', {})
+
         public_objs = [(name, inspect.unwrap(obj))
                        for name, obj in inspect.getmembers(self.obj)
                        # Filter only *own* members. The rest are inherited
@@ -826,10 +828,25 @@ class Class(Doc):
                     name, self.module, obj, cls=self,
                     method=not self._method_type(self.obj, name))
             else:
+                pdoc_string = None
+
+                # Check for short refname
+                refname = self.qualname + '.' + name
+                if refname in pdoc.keys():
+                    pdoc_string = pdoc[refname]
+                    if pdoc_string is False:
+                        continue
+                # Check for full refname
+                refname = self.module.name + '.' + refname
+                if refname in pdoc.keys() and not pdoc_string:
+                    pdoc_string = pdoc[refname]
+                    if pdoc_string is False:
+                        continue
+
                 self.doc[name] = Variable(
                     name, self.module,
                     docstring=(
-                        var_docstrings.get(name) or
+                        pdoc_string or var_docstrings.get(name) or
                         (inspect.isclass(obj) or _is_descriptor(obj)) and inspect.getdoc(obj)),
                     cls=self,
                     obj=getattr(obj, 'fget', getattr(obj, '__get__', None)),
