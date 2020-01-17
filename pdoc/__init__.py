@@ -267,6 +267,9 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
         else:
             continue
 
+        if not _is_public(name):
+            continue
+
         docstring = inspect.cleandoc(str_node.value.s).strip()
         if not docstring:
             continue
