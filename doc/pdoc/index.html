@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.7.3" />
+<meta name="generator" content="pdoc 0.7.4" />
 <title>pdoc API documentation</title>
 <meta name="description" content="Python package `pdoc` provides types, functions, and a command-line
 interface for accessing public documentation of Python modules, and
@@ -301,7 +301,7 @@ an underscore is <a href="https://docs.python.org/3/tutorial/classes.html#privat
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L0-L1256" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L0-L1259" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 Python package `pdoc` provides types, functions, and a command-line
@@ -570,6 +570,9 @@ def _pep224_docstrings(doc_obj: Union[&#39;Module&#39;, &#39;Class&#39;], *,
               target.value.id == &#39;self&#39;):
             name = target.attr
         else:
+            continue
+
+        if not _is_public(name):
             continue
 
         docstring = inspect.cleandoc(str_node.value.s).strip()
@@ -1606,7 +1609,7 @@ that takes a single argument (a documentation object) and returns
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L129-L141" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L129-L141" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def html(module_name, docfilter=None, reload=False, **kwargs) -&gt; str:
     &#34;&#34;&#34;
@@ -1632,7 +1635,7 @@ module path or a filesystem path to file/directory).</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L160-L194" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L160-L194" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def import_module(module, *, reload: bool = False) -&gt; ModuleType:
     &#34;&#34;&#34;
@@ -1683,7 +1686,7 @@ inherited <a title="pdoc.Doc.docstring" href="#pdoc.Doc.docstring"><code>Doc.doc
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L322-L341" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L325-L344" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def link_inheritance(context: Context = None):
     &#34;&#34;&#34;
@@ -1715,7 +1718,7 @@ inherited <a title="pdoc.Doc.docstring" href="#pdoc.Doc.docstring"><code>Doc.doc
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L79-L90" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L79-L90" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def reset():
     &#34;&#34;&#34;Resets the global `pdoc.Context` to the initial (empty) state.&#34;&#34;&#34;
@@ -1745,7 +1748,7 @@ that takes a single argument (a documentation object) and returns
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L144-L157" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L144-L157" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def text(module_name, docfilter=None, reload=False, **kwargs) -&gt; str:
     &#34;&#34;&#34;
@@ -1782,7 +1785,7 @@ read with <code>inspect.getdoc()</code>.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L782-L1004" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L785-L1007" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Class(Doc):
     &#34;&#34;&#34;
@@ -2030,7 +2033,7 @@ represent this class' class variables.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L911-L918" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L914-L921" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def class_variables(self, include_inherited=True, sort=True):
     &#34;&#34;&#34;
@@ -2051,7 +2054,7 @@ represent this class' static functions.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L939-L946" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L942-L949" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def functions(self, include_inherited=True, sort=True) -&gt; List[&#39;Function&#39;]:
     &#34;&#34;&#34;
@@ -2073,7 +2076,7 @@ sorted by MRO.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L948-L958" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L951-L961" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def inherited_members(self) -&gt; List[Tuple[&#39;Class&#39;, List[Doc]]]:
     &#34;&#34;&#34;
@@ -2098,7 +2101,7 @@ are those defined in a class's <code>__init__</code> as <code>self.variable = ..
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L920-L928" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L923-L931" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def instance_variables(self, include_inherited=True, sort=True):
     &#34;&#34;&#34;
@@ -2120,7 +2123,7 @@ represent this class' methods.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L930-L937" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L933-L940" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def methods(self, include_inherited=True, sort=True):
     &#34;&#34;&#34;
@@ -2143,7 +2146,7 @@ if the types are documented, and <a title="pdoc.External" href="#pdoc.External">
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L856-L877" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L859-L880" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def mro(self, only_documented=False) -&gt; List[&#39;Class&#39;]:
     &#34;&#34;&#34;
@@ -2178,7 +2181,7 @@ class constructor (method <code>__init__</code>). See <a title="pdoc.Function.pa
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L890-L902" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L893-L905" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def params(self, *, annotate=False, link=None) -&gt; List[&#39;str&#39;]:
     &#34;&#34;&#34;
@@ -2206,7 +2209,7 @@ and <a title="pdoc.External" href="#pdoc.External"><code>External</code></a> oth
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L879-L888" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L882-L891" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def subclasses(self) -&gt; List[&#39;Class&#39;]:
     &#34;&#34;&#34;
@@ -2252,7 +2255,7 @@ a global context object will be used.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L61-L73" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L61-L73" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Context(dict):
     &#34;&#34;&#34;
@@ -2297,7 +2300,7 @@ read with <code>inspect.getdoc()</code>.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L344-L480" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L347-L483" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Doc:
     &#34;&#34;&#34;
@@ -2476,7 +2479,7 @@ object, used for show (e.g. <code>Doc.qualname</code>).</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L428-L434" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L431-L437" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def qualname(self):
@@ -2496,7 +2499,7 @@ documentation object provides this property.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L417-L426" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L420-L429" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def refname(self):
@@ -2517,7 +2520,7 @@ available, an empty string.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L404-L415" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L407-L418" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property  # type: ignore
 @lru_cache()
@@ -2550,7 +2553,7 @@ the top ancestor in the object's <a title="pdoc.Doc.inherits" href="#pdoc.Doc.in
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L436-L465" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L439-L468" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@lru_cache()
 def url(self, relative_to: &#39;Module&#39; = None, *, link_prefix: str = &#39;&#39;,
@@ -2601,7 +2604,7 @@ should be a fully qualified name.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L1222-L1257" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L1225-L1260" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class External(Doc):
     &#34;&#34;&#34;
@@ -2654,7 +2657,7 @@ should be a fully qualified name.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L1253-L1257" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L1256-L1260" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def url(self, *args, **kwargs):
     &#34;&#34;&#34;
@@ -2695,7 +2698,7 @@ all other cases, it should be <code>False</code>.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L1007-L1180" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L1010-L1183" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Function(Doc):
     &#34;&#34;&#34;
@@ -2900,7 +2903,7 @@ for example <code>def</code> or <code>async def</code>.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L1040-L1045" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L1043-L1048" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def funcdef(self):
     &#34;&#34;&#34;
@@ -2929,7 +2932,7 @@ See <em>TODO</em> marker in the code for ideas.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L1079-L1096" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L1082-L1099" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def params(self, *, annotate: bool = False, link: Callable[[Doc], str] = None) -&gt; List[str]:
     &#34;&#34;&#34;
@@ -2959,7 +2962,7 @@ See <em>TODO</em> marker in the code for ideas.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L1062-L1077" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L1065-L1080" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def return_annotation(self, *, link=None):
     &#34;&#34;&#34;Formatted function return type annotation or empty string if none.&#34;&#34;&#34;
@@ -3014,7 +3017,7 @@ global context object will be used.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L483-L779" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L486-L782" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Module(Doc):
     &#34;&#34;&#34;
@@ -3320,15 +3323,6 @@ global context object will be used.</p></section>
 </ul>
 <h3>Instance variables</h3>
 <dl>
-<dt id="pdoc.Module._context"><code class="name">var <span class="ident">_context</span></code></dt>
-<dd>
-<section class="desc"><p>A lookup table for ALL doc objects of all modules that share this context,
-mainly used in <a title="pdoc.Module.find_ident" href="#pdoc.Module.find_ident"><code>Module.find_ident()</code></a>.</p></section>
-</dd>
-<dt id="pdoc.Module._is_inheritance_linked"><code class="name">var <span class="ident">_is_inheritance_linked</span></code></dt>
-<dd>
-<section class="desc"><p>Re-entry guard for <code>pdoc.Module._link_inheritance()</code>.</p></section>
-</dd>
 <dt id="pdoc.Module.doc"><code class="name">var <span class="ident">doc</span></code></dt>
 <dd>
 <section class="desc"><p>A mapping from identifier name to a documentation object.</p></section>
@@ -3339,7 +3333,7 @@ mainly used in <a title="pdoc.Module.find_ident" href="#pdoc.Module.find_ident">
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L704-L709" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L707-L712" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def is_namespace(self):
@@ -3356,7 +3350,7 @@ def is_namespace(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L695-L702" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L698-L705" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def is_package(self):
@@ -3384,7 +3378,7 @@ optionally sorted alphabetically, as a list of <a title="pdoc.Class" href="#pdoc
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L752-L757" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L755-L760" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def classes(self, sort=True):
     &#34;&#34;&#34;
@@ -3403,7 +3397,7 @@ or in any of the exported identifiers of the submodules.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L711-L719" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L714-L722" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def find_class(self, cls: type):
     &#34;&#34;&#34;
@@ -3429,7 +3423,7 @@ returned. If one cannot be found, then an instance of
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L721-L739" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L724-L742" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def find_ident(self, name: str) -&gt; Doc:
     &#34;&#34;&#34;
@@ -3461,7 +3455,7 @@ optionally sorted alphabetically, as a list of <a title="pdoc.Function" href="#p
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L759-L764" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L762-L767" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def functions(self, sort=True):
     &#34;&#34;&#34;
@@ -3483,7 +3477,7 @@ self-contained HTML.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L678-L693" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L681-L696" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def html(self, minify=True, **kwargs) -&gt; str:
     &#34;&#34;&#34;
@@ -3512,7 +3506,7 @@ alphabetically as a list of <a title="pdoc.Module" href="#pdoc.Module"><code>Mod
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L766-L771" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L769-L774" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def submodules(self):
     &#34;&#34;&#34;
@@ -3530,7 +3524,7 @@ alphabetically as a list of <a title="pdoc.Module" href="#pdoc.Module"><code>Mod
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L671-L676" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L674-L679" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def text(self, **kwargs) -&gt; str:
     &#34;&#34;&#34;
@@ -3549,7 +3543,7 @@ optionally sorted alphabetically, as a list of <a title="pdoc.Variable" href="#p
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L745-L750" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L748-L753" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def variables(self, sort=True):
     &#34;&#34;&#34;
@@ -3590,7 +3584,7 @@ variable.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/ad61deebcfb19eb7e143f130ac890f96dec17afa/pdoc/__init__.py#L1183-L1219" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/__init__.py#L1186-L1222" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Variable(Doc):
     &#34;&#34;&#34;
@@ -3769,9 +3763,7 @@ opposed to class variable).</p></section>
 </li>
 <li>
 <h4><code><a title="pdoc.Module" href="#pdoc.Module">Module</a></code></h4>
-<ul class="">
-<li><code><a title="pdoc.Module._context" href="#pdoc.Module._context">_context</a></code></li>
-<li><code><a title="pdoc.Module._is_inheritance_linked" href="#pdoc.Module._is_inheritance_linked">_is_inheritance_linked</a></code></li>
+<ul class="two-column">
 <li><code><a title="pdoc.Module.classes" href="#pdoc.Module.classes">classes</a></code></li>
 <li><code><a title="pdoc.Module.doc" href="#pdoc.Module.doc">doc</a></code></li>
 <li><code><a title="pdoc.Module.find_class" href="#pdoc.Module.find_class">find_class</a></code></li>
@@ -3800,7 +3792,7 @@ opposed to class variable).</p></section>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.4</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
