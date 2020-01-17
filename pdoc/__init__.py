@@ -1132,8 +1132,8 @@ class Function(Doc):
                 annot = ''
             else:
                 annot = f_match.group("return_anno")
-                # Remove signature
-                self.docstring = f_pattern.sub('', self.obj.__doc__)
+                # Remove signature from docstring variable
+                self.docstring = f_pattern.sub('', self.docstring)
 
         if not annot:
             return ''
@@ -1199,8 +1199,8 @@ class Function(Doc):
                 param = inspect.Parameter(p_name, kind, default=p_default, annotation=p_type)
                 params_obj.append(param)
 
-            # Remove signature from docstring
-            doc_obj.docstring = f_pattern.sub('', doc_obj.obj.__doc__)
+            # Remove signature from docstring variable
+            doc_obj.docstring = f_pattern.sub('', doc_obj.docstring)
             signature = inspect.Signature(params_obj, return_annotation=return_anno)
 
         def safe_default_value(p: inspect.Parameter):
