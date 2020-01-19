@@ -1199,6 +1199,25 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"""
         html = to_html(text)
         self.assertEqual(html, expected)
 
+    def test_inline_code(self):
+        text = """`test`
+`test` test `test`
+Dict[`test`, `test`] test
+Tuple[`test`, `test`, `test`] test
+Tuple[`test`, Dict[`test`, `test`], `test`] test
+[`test`](https://pdoc3.github.io) test `test` test
+[`test`]: https://pdoc3.github.io test `test` test"""
+        expected = '''<p><a><code>pdoc.test</code></a>
+<a><code>pdoc.test</code></a> test <a><code>pdoc.test</code></a>
+Dict[<a><code>pdoc.test</code></a>, <a><code>pdoc.test</code></a>] test
+Tuple[<a><code>pdoc.test</code></a>, <a><code>pdoc.test</code></a>, <a><code>pdoc.test</code></a>] test
+Tuple[<a><code>pdoc.test</code></a>, Dict[<a><code>pdoc.test</code></a>, <a><code>pdoc.test</code></a>], <a><code>pdoc.test</code></a>] test
+<a href="https://pdoc3.github.io"><code>test</code></a> test <a><code>pdoc.test</code></a> test
+[<code>test</code>]: <a href="https://pdoc3.github.io">https://pdoc3.github.io</a> test <a><code>pdoc.test</code></a> test</p>'''  # noqa: E501
+        html = to_html(text, module=self._module, link=self._link)
+        self.assertEqual.__self__.maxDiff = None
+        self.assertEqual(html, expected)
+
     def test_latex_math(self):
         expected = r'''<p>Inline equation: <span><span class="MathJax_Preview"> v_t *\frac{1}{2}* j_i + [a] &lt; 3 </span><script type="math/tex"> v_t *\frac{1}{2}* j_i + [a] < 3 </script></span>.</p>
 <p>Block equation: <span><span class="MathJax_Preview"> v_t *\frac{1}{2}* j_i + [a] &lt; 3 </span><script type="math/tex; mode=display"> v_t *\frac{1}{2}* j_i + [a] < 3 </script></span></p>
