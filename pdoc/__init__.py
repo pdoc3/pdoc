@@ -1177,6 +1177,7 @@ class Function(Doc):
             #       This split condition handles default values like `{1, 2, 3}` or
             #       `('a', 'b', 'c')` correctly but not nested default values like
             #       `[{1, 2}, {3, 4}]`
+            # TEST: https://regex101.com/r/lfFY6O/1
             params_str = re.split(r', (?![^\[\({]*[\]\)}])', params_all)
             for param_str in params_str:
                 p_match = re.match(r'^(?P<p_kind>\*{0,2})'
