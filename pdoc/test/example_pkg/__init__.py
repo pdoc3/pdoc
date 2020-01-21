@@ -78,6 +78,9 @@ class B(A, int):
         self.instance_var = None
         """instance var docstring"""
 
+        self._private_instance_var = None
+        """This should be private (hidden) despite PEP 224 docstring"""
+
     def f(self, a: int, b: int = 1, *args, c: str = 'c', **kwargs):
         """B.f docstring"""
 
@@ -190,6 +193,8 @@ class Docformats:
         --------
         pdoc.text : Function a with its description.
         scipy.random.norm : Random variates, PDFs, etc.
+        pdoc.Doc : A class description that
+                   spans several lines.
 
         Notes
         -----

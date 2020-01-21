@@ -25,7 +25,7 @@ from urllib.request import Request, urlopen
 import typing
 
 import pdoc
-from pdoc.cli import main, parser
+from pdoc import cli
 from pdoc.html_helpers import (
     minify_css, minify_html, glimpse, to_html,
     ReferenceWarning, extract_toc, format_git_link,
@@ -57,9 +57,9 @@ def run(*args, _check=True, **kwargs) -> int:
     params = (('--' + key.replace('_', '-'), value)
               for key, value in kwargs.items())
     params = list(filter(None, chain.from_iterable(params)))  # type: ignore
-    _args = parser.parse_args([*params, *args])               # type: ignore
+    _args = cli.parser.parse_args([*params, *args])           # type: ignore
     try:
-        returncode = main(_args)
+        returncode = cli.main(_args)
         return returncode or 0
     except SystemExit as e:
         return e.code
@@ -874,10 +874,21 @@ class HtmlHelpersTest(unittest.TestCase):
         self.assertEqual(glimpse('Foo bar\n-------'), 'Foo bar')
 
     def test_to_html(self):
-        text = '# Title\n\n`pdoc.Module` is a `Doc`, not `dict`.'
-        expected = ('<h1 id="title">Title</h1>\n'
-                    '<p><a href="#pdoc.Module">Module</a> is a <a href="#pdoc.Doc">Doc</a>, '
-                    'not <code>dict</code>.</p>')
+        text = '''# Title
+
+`pdoc.Module` is a `Doc`, not `dict`.
+
+```
+code block
+```
+reference: `package.foo`
+'''
+        expected = '''<h1 id="title">Title</h1>
+<p><a href="#pdoc.Module">Module</a> is a <a href="#pdoc.Doc">Doc</a>, not <code>dict</code>.</p>
+<pre><code>code block
+</code></pre>
+
+<p>reference: <a href="/package.foo.ext">package.foo</a></p>'''
 
         module = pdoc.Module(pdoc)
 
@@ -992,12 +1003,29 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <dd>Function a with its description.</dd>
 <dt><a><code>scipy.random.norm</code></a></dt>
 <dd>Random variates, PDFs, etc.</dd>
+<dt><a><code>pdoc.Doc</code></a></dt>
+<dd>A class description that spans several lines.</dd>
 </dl>
 <h2 id="notes">Notes</h2>
 <p>Foo bar.</p>
 <h3 id="h3-title">H3 Title</h3>
 <p>Foo bar.</p>'''  # noqa: E501
         text = inspect.getdoc(self._docmodule.numpy)
+        html = to_html(text, module=self._module, link=self._link)
+        self.assertEqual(html, expected)
+
+    def test_numpy_curly_brace_expansion(self):
+        # See: https://github.com/mwaskom/seaborn/blob/66191d8a179f1bfa42f03749bc4a07e1c0c08156/seaborn/regression.py#L514  # noqa: 501
+        text = '''Parameters
+----------
+prefix_{x,y}_partial : str
+    some description
+'''
+        expected = '''<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>prefix_{x,y}_partial</code></strong> :&ensp;<code>str</code></dt>
+<dd>some description</dd>
+</dl>'''
         html = to_html(text, module=self._module, link=self._link)
         self.assertEqual(html, expected)
 
@@ -1200,7 +1228,8 @@ class HttpTest(unittest.TestCase):
         with self._timeout(1000):
             with redirect_streams() as (stdout, stderr):
                 t = threading.Thread(
-                    target=main, args=(parser.parse_args(['--http', ':%d' % port] + modules),))
+                    target=cli.main,
+                    args=(cli.parser.parse_args(['--http', ':%d' % port] + modules),))
                 t.start()
                 sleep(.1)
 

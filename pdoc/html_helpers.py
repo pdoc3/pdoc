@@ -157,6 +157,7 @@ class _ToMarkdown:
         """
         section, body = match.groups()
         if section.title() == 'See Also':
+            body = re.sub(r'\n\s{4}\s*', ' ', body)  # Handle line continuation
             body = re.sub(r'^((?:\n?[\w.]* ?: .*)+)|(.*\w.*)',
                           _ToMarkdown._numpy_seealso, body)
         elif section.title() in ('Returns', 'Yields', 'Raises', 'Warns'):
@@ -166,7 +167,8 @@ class _ToMarkdown:
                           r'(?P<desc>(?:\n(?: {4}.*|$))*)',
                           _ToMarkdown._numpy_params, body, flags=re.MULTILINE)
         else:
-            body = re.sub(r'^(?P<name>\*{0,2}\w+(?:, \*{0,2}\w+)*)'
+            name = r'(?:\w|\{\w+(?:,\w+)+\})+'  # Support curly brace expansion
+            body = re.sub(r'^(?P<name>\*{0,2}' + name + r'(?:, \*{0,2}' + name + r')*)'
                           r'(?: ?: (?P<type>.*))?(?<!\.)$'
                           r'(?P<desc>(?:\n(?: {4}.*|$))*)',
                           _ToMarkdown._numpy_params, body, flags=re.MULTILINE)
@@ -368,7 +370,7 @@ def to_markdown(text: str, docformat: str = 'numpy,google', *,
                 # Matches markdown code spans not +directly+ within links.
                 # E.g. `code` and [foo is `bar`]() but not [`code`](...)
                 # Also skips \-escaped grave quotes.
-                _code_refs=re.compile(r'(?<![\[\\])`(?!])(?:[^`]|(?<=\\)`)+`').sub):
+                _code_refs=re.compile(r'(?<![\[\\`])`(?!])(?:[^`]|(?<=\\)`)+`').sub):
     """
     Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
 

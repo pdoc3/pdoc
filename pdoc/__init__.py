@@ -39,8 +39,6 @@ _URL_MODULE_SUFFIX = '.html'
 _URL_INDEX_MODULE_SUFFIX = '.m.html'  # For modules named literal 'index'
 _URL_PACKAGE_SUFFIX = '/index.html'
 
-_SOURCE_SUFFIXES = tuple(importlib.machinery.SOURCE_SUFFIXES)
-
 T = TypeVar('T', bound='Doc')
 
 __pdoc__ = {}  # type: Dict[str, Union[bool, str]]
@@ -166,10 +164,13 @@ def import_module(module, *, reload: bool = False) -> ModuleType:
     """
     @contextmanager
     def _module_path(module):
-        from os.path import isfile, isdir, split, abspath, splitext
-        path, module = '_pdoc_dummy_nonexistent', module
-        if isdir(module) or isfile(module) and module.endswith(_SOURCE_SUFFIXES):
-            path, module = split(splitext(abspath(module))[0])
+        from os.path import abspath, basename, dirname, isfile, isdir
+        path = '_pdoc_dummy_nonexistent'
+        module_name = inspect.getmodulename(module)
+        if isdir(module):
+            path, module = dirname(abspath(module)), basename(module)
+        elif isfile(module) and module_name:
+            path, module = dirname(abspath(module)), module_name
         try:
             sys.path.insert(0, path)
             yield module
@@ -223,8 +224,8 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
     else:
         try:
             tree = ast.parse(inspect.getsource(doc_obj.obj))
-        except (OSError, TypeError, SyntaxError):
-            warn("Couldn't get/parse source of '{!r}'".format(doc_obj))
+        except (OSError, TypeError, SyntaxError) as exc:
+            warn("Couldn't read PEP-224 variable docstrings from {!r}: {}".format(doc_obj, exc))
             return {}, {}
 
         if isinstance(doc_obj, Class):
@@ -264,6 +265,9 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
               target.value.id == 'self'):
             name = target.attr
         else:
+            continue
+
+        if not _is_public(name):
             continue
 
         docstring = inspect.cleandoc(str_node.value.s).strip()
@@ -592,13 +596,14 @@ class Module(Doc):
                 because that one doesn't play well with namespace packages.
                 See: https://github.com/pypa/setuptools/issues/83
                 """
-                from os.path import isdir, join, splitext
+                from os.path import isdir, join
                 for pth in paths:
                     for file in os.listdir(pth):
                         if file.startswith(('.', '__pycache__', '__init__.py')):
                             continue
-                        if file.endswith(_SOURCE_SUFFIXES):
-                            yield splitext(file)[0]
+                        module_name = inspect.getmodulename(file)
+                        if module_name:
+                            yield module_name
                         if isdir(join(pth, file)) and '.' not in file:
                             yield file
 
