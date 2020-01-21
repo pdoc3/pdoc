@@ -570,6 +570,13 @@ class ApiTest(unittest.TestCase):
             pdoc.link_inheritance()
             self.assertIn('_private', mod.doc)
 
+        # Whitelist private instance variables
+        with patch.object(module, '__pdoc__', {'B._private_instance_var': True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn('B', mod.doc)
+            self.assertIn('_private_instance_var', mod.doc['B'].doc)
+
     def test__all__(self):
         module = pdoc.import_module(EXAMPLE_MODULE + '.index')
         with patch.object(module, '__all__', ['B'], create=True):
