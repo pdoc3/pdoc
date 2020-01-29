@@ -291,6 +291,13 @@ def _is_function(obj):
     return inspect.isroutine(obj) and callable(obj)
 
 
+def _is_descriptor(obj):
+    return (inspect.isdatadescriptor(obj) or
+            inspect.ismethoddescriptor(obj) or
+            inspect.isgetsetdescriptor(obj) or
+            inspect.ismemberdescriptor(obj))
+
+
 def _filter_type(type: Type[T],
                  values: Union[Iterable['Doc'], Dict[str, 'Doc']]) -> List[T]:
     """
@@ -789,12 +796,14 @@ class Class(Doc):
     __slots__ = ('doc', '_super_members')
 
     def __init__(self, name, module, obj, *, docstring=None):
-        assert isinstance(obj, type)
+        assert inspect.isclass(obj)
+
         if docstring is None:
             init_doc = inspect.getdoc(obj.__init__) or ''
             if init_doc == object.__init__.__doc__:
                 init_doc = ''
             docstring = ((inspect.getdoc(obj) or '') + '\n\n' + init_doc).strip()
+
         super().__init__(name, module, obj, docstring=docstring)
 
         self.doc = {}
@@ -819,12 +828,12 @@ class Class(Doc):
             else:
                 self.doc[name] = Variable(
                     name, self.module,
-                    docstring=var_docstrings.get(name) or inspect.getdoc(obj), cls=self,
-                    obj=getattr(obj, 'fget', getattr(obj, '__get__', obj)),
-                    instance_var=(inspect.isdatadescriptor(obj) or
-                                  inspect.ismethoddescriptor(obj) or
-                                  inspect.isgetsetdescriptor(obj) or
-                                  inspect.ismemberdescriptor(obj) or
+                    docstring=(
+                        var_docstrings.get(name) or
+                        (inspect.isclass(obj) or _is_descriptor(obj)) and inspect.getdoc(obj)),
+                    cls=self,
+                    obj=getattr(obj, 'fget', getattr(obj, '__get__', None)),
+                    instance_var=(_is_descriptor(obj) or
                                   name in getattr(self.obj, '__slots__', ())))
 
         for name, docstring in instance_var_docstrings.items():

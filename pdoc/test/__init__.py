@@ -442,6 +442,16 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(var.docstring, """Read-only value descriptor""")
         self.assertTrue(var.source)
 
+    def test_class_variables_docstring_not_from_obj(self):
+        class C:
+            vars_dont = 0
+            but_clss_have_doc = int
+
+        with self.assertWarns(UserWarning):
+            doc = pdoc.Class('C', pdoc.Module('pdoc'), C)
+        self.assertEqual(doc.doc['vars_dont'].docstring, '')
+        self.assertIn('integer', doc.doc['but_clss_have_doc'].docstring)
+
     def test_builtin_methoddescriptors(self):
         import parser
         with self.assertWarns(UserWarning):
