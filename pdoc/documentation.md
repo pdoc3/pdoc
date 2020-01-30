@@ -142,7 +142,7 @@ Class and instance variables can also [inherit docstrings].
 
 Overriding docstrings with `__pdoc__`
 -------------------------------------
-Docstrings for objects can be disabled or overridden with a special
+Docstrings for objects can be disabled, overridden or whitelisted with a special
 module-level dictionary `__pdoc__`. The _keys_
 should be string identifiers within the scope of the module or,
 alternatively, fully-qualified reference names. E.g. for instance
@@ -151,6 +151,12 @@ variable `self.variable` of class `C`, its module-level identifier is
 
 If `__pdoc__[key] = False`, then `key` (and its members) will be
 **excluded from the documentation** of the module.
+
+Conversely, if `__pdoc__[key] = True`, then `key` (and its members) will be
+**included in the documentation** of the module. This feature is useful for
+including the documentation of "private" definitions, i.e. classes/functions or
+variables starting with "_", including special functions such as "__call__", which
+are ignored by default.
 
 Alternatively, the _values_ of `__pdoc__` should be the overriding docstrings.
 This particular feature is useful when there's no feasible way of
