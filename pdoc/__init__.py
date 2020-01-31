@@ -1172,19 +1172,17 @@ class Function(Doc):
 
             s = str(p)
             if p.annotation is not EMPTY:
-                name, annotation = s.split(':', maxsplit=1)
-                name, annotation = name.strip(), annotation.strip()
                 if sys.version_info < (3, 7):
                     # PEP8-normalize whitespace
-                    annotation = re.sub(r'(?<!\s)=(?!\s)', ' = ', annotation, 1)
+                    s = re.sub(r'(?<!\s)=(?!\s)', ' = ', re.sub(r':(?!\s)', ': ', s, 1), 1)
                 # "Eval" forward-declarations (typing string literals)
                 if isinstance(p.annotation, str):
-                    annotation = p.annotation
-                annotation = annotation.replace(' ', '\N{NBSP}')  # prevent improper line breaking
+                    s = s.replace("'%s'" % p.annotation, p.annotation, 1)
+                s = s.replace(' ', '\N{NBSP}')  # prevent improper line breaking
 
                 if link:
-                    annotation = re.sub(r'[\w\.]+', _linkify, annotation)
-                s = ':\N{NBSP}'.join((name, annotation))
+                    annotation = inspect.formatannotation(p.annotation)
+                    s = s.replace(annotation, re.sub(r'[\w\.]+', _linkify, annotation))
 
             params.append(s)
 
