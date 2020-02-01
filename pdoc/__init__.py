@@ -1181,7 +1181,9 @@ class Function(Doc):
                 s = s.replace(' ', '\N{NBSP}')  # prevent improper line breaking
 
                 if link:
-                    s = re.sub(r'[\w\.]+', _linkify, s)
+                    annotation = inspect.formatannotation(p.annotation)
+                    linked_annotation = re.sub(r'[\w\.]+', _linkify, annotation)
+                    s = linked_annotation.join(s.rsplit(annotation, 1))  # "rreplace" once
 
             params.append(s)
 
