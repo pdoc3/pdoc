@@ -1182,7 +1182,8 @@ class Function(Doc):
 
                 if link:
                     annotation = inspect.formatannotation(p.annotation)
-                    s = s.replace(annotation, re.sub(r'[\w\.]+', _linkify, annotation))
+                    linked_annotation = re.sub(r'[\w\.]+', _linkify, annotation)
+                    s = linked_annotation.join(s.rsplit(annotation, 1))  # "rreplace" once
 
             params.append(s)
 
