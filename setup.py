@@ -4,7 +4,7 @@ import os.path as path
 
 cwd = path.dirname(__file__)
 longdesc = codecs.open(path.join(cwd, "longdesc.rst"), "r", "utf-8").read()
-version = "0.3.11"
+version = "0.3.12"
 with codecs.open(path.join(cwd, "pdoc", "__init__.py"), "r", "utf-8") as f:
     for line in f:
         if line.startswith("__version__"):
