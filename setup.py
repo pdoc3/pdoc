@@ -39,7 +39,7 @@ setup(
     data_files=[
         (
             "share/pdoc",
-            ["README.md", "longdesc.rst", "LICENSE", "INSTALL", "CHANGELOG"],
+            ["README.md", "longdesc.rst", "LICENSE", "CHANGELOG"],
         ),
         ("share/doc/pdoc", ["doc/pdoc/index.html"]),
     ],
