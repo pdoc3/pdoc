@@ -374,6 +374,11 @@ class CliTest(unittest.TestCase):
         with run_html(EXAMPLE_MODULE, config='google_analytics="UA-xxxxxx-y"'):
             self._check_files(expected)
 
+    def test_relative_dir_path(self):
+        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
+            with run_html('.'):
+                self._check_files(())
+
 
 class ApiTest(unittest.TestCase):
     """

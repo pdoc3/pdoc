@@ -164,11 +164,11 @@ def import_module(module, *, reload: bool = False) -> ModuleType:
     """
     @contextmanager
     def _module_path(module):
-        from os.path import abspath, basename, dirname, isfile, isdir
+        from os.path import abspath, dirname, isfile, isdir, split
         path = '_pdoc_dummy_nonexistent'
         module_name = inspect.getmodulename(module)
         if isdir(module):
-            path, module = dirname(abspath(module)), basename(module)
+            path, module = split(abspath(module))
         elif isfile(module) and module_name:
             path, module = dirname(abspath(module)), module_name
         try:
