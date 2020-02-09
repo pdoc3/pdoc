@@ -276,12 +276,16 @@
   @media screen and (min-width: 700px) {
     #sidebar {
       width: 30%;
+      height: 100vh;
+      overflow: auto;
     }
     #content {
       width: 70%;
+      height: 100vh;
       max-width: 100ch;
       padding: 3em 4em;
       border-left: 1px solid #ddd;
+      overflow: auto;
     }
     pre code {
       font-size: 1em;
