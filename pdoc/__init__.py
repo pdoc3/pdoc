@@ -1158,7 +1158,7 @@ class Function(Doc):
         return self._params(self, annotate=annotate, link=link, module=self.module)
 
     @staticmethod
-    def _params(doc_obj: Doc, annotate=False, link=None, module=None):
+    def _params(doc_obj, annotate=False, link=None, module=None):
         try:
             signature = inspect.signature(inspect.unwrap(doc_obj.obj))
         except ValueError:
