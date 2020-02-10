@@ -1162,6 +1162,9 @@ class Function(Doc):
         try:
             signature = inspect.signature(inspect.unwrap(doc_obj.obj))
         except ValueError:
+            if doc_obj.obj.__doc__ is None:
+                return ["..."]
+
             # Extract signature from the first line of the docstring for C builtin function
             f_pattern = re.compile(r'^(?P<f_name>[a-zA-Z_]\w*)'
                                    r'\((?P<params_all>.*)\)'
