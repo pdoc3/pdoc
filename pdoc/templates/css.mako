@@ -27,7 +27,7 @@
 
   #footer {
     font-size: .75em;
-    padding: 5px 30px;
+    margin-top: 3em;
     border-top: 1px solid #ddd;
     text-align: right;
   }
@@ -36,7 +36,15 @@
       display: inline-block;
     }
     #footer p:last-child {
-      margin-right: 30px;
+      margin-right: 0px;
+    }
+    .footer-desktop {
+      display: none;
+      padding: 5px 0px;
+    }
+    .footer-mobile {
+      display: block;
+      padding: 5px 30px;
     }
 
   h1, h2, h3, h4, h5 {
@@ -283,7 +291,7 @@
       width: 70%;
       height: 100vh;
       max-width: 100ch;
-      padding: 3em 4em;
+      padding: 3em 4em 0em 4em;
       border-left: 1px solid #ddd;
       overflow: auto;
     }
@@ -304,6 +312,12 @@
     }
     .toc > ul > li {
       margin-top: .5em;
+    }
+    .footer-desktop {
+      display: block;
+    }
+    .footer-mobile {
+      display: none;
     }
   }
 </%def>
