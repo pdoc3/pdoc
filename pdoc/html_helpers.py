@@ -9,10 +9,11 @@ import traceback
 from functools import partial, lru_cache
 from typing import Callable, Match
 from warnings import warn
+import xml.etree.ElementTree as etree
 
 import markdown
 from markdown.inlinepatterns import InlineProcessor
-from markdown.util import AtomicString, etree
+from markdown.util import AtomicString
 
 import pdoc
 
