@@ -458,7 +458,7 @@ Convert this file to PDF using e.g. Pandoc:
 
     pandoc --metadata=title:"MyProject Documentation"             \\
            --toc --toc-depth=4 --from=markdown+abbreviations      \\
-           --pdf-engine=xelatex --variable=mainfont:"DejaVu Sans" \\
+           --latex-engine=xelatex --variable=mainfont:"DejaVu Sans" \\
            --output=pdf.pdf pdf.md
 
 or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
