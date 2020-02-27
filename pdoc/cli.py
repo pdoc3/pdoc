@@ -224,9 +224,13 @@ class WebDoc(BaseHTTPRequestHandler):
         else:
             try:
                 out = self.html()
-            except ImportError:
+            except Exception:
+                import traceback
+                from html import escape
                 code = 404
-                out = "Module <code>%s</code> not found." % self.import_path_from_req_url
+                out = "Error importing module <code>{}</code>:\n\n<pre>{}</pre>".format(
+                    self.import_path_from_req_url, escape(traceback.format_exc()))
+                out = out.replace('\n', '<br>')
 
         self.send_response(code)
         self.send_header("Content-type", "text/html; charset=utf-8")
