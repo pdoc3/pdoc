@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.7.4" />
+<meta name="generator" content="pdoc 0.7.5" />
 <title>pdoc.html_helpers API documentation</title>
 <meta name="description" content="Helper functions for HTML output." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -27,7 +27,7 @@
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/html_helpers.py#L0-L528" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/html_helpers.py#L0-L529" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 Helper functions for HTML output.
@@ -40,10 +40,11 @@ import traceback
 from functools import partial, lru_cache
 from typing import Callable, Match
 from warnings import warn
+import xml.etree.ElementTree as etree
 
 import markdown
 from markdown.inlinepatterns import InlineProcessor
-from markdown.util import AtomicString, etree
+from markdown.util import AtomicString
 
 import pdoc
 
@@ -575,7 +576,7 @@ def _str_template_fields(template):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/html_helpers.py#L429-L436" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/html_helpers.py#L430-L437" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def extract_toc(text: str):
     &#34;&#34;&#34;
@@ -596,7 +597,7 @@ from <code>dobj</code> and the working environment.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/html_helpers.py#L439-L457" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/html_helpers.py#L440-L458" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def format_git_link(template: str, dobj: pdoc.Doc):
     &#34;&#34;&#34;
@@ -629,7 +630,7 @@ but never longer than <code>max_length</code> characters.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/html_helpers.py#L45-L66" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/html_helpers.py#L46-L67" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def glimpse(text: str, max_length=153, *, paragraph=True,
             _split_paragraph=partial(re.compile(r&#39;\s*\n\s*\n\s*&#39;).split, maxsplit=1),
@@ -663,7 +664,7 @@ but never longer than <code>max_length</code> characters.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/html_helpers.py#L20-L28" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/html_helpers.py#L21-L29" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@lru_cache()
 def minify_css(css: str,
@@ -685,7 +686,7 @@ def minify_css(css: str,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/html_helpers.py#L31-L42" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/html_helpers.py#L32-L43" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def minify_html(html: str,
                 _minify=partial(
@@ -714,7 +715,7 @@ example template.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/html_helpers.py#L344-L365" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/html_helpers.py#L345-L366" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def to_html(text: str, docformat: str = &#39;numpy,google&#39;, *,
             module: pdoc.Module = None, link: Callable[..., str] = None,
@@ -751,7 +752,7 @@ example template.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/html_helpers.py#L368-L399" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/html_helpers.py#L369-L400" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def to_markdown(text: str, docformat: str = &#39;numpy,google&#39;, *,
                 module: pdoc.Module = None, link: Callable[..., str] = None,
@@ -803,7 +804,7 @@ doesn't match any documented objects.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/c9d9118e1a2df4debc485e2d5b2118cd79f60994/pdoc/html_helpers.py#L402-L408" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/html_helpers.py#L403-L409" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class ReferenceWarning(UserWarning):
     &#34;&#34;&#34;
@@ -863,7 +864,7 @@ doesn't match any documented objects.</p>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.4</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
