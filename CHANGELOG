@@ -1,3 +1,10 @@
+0.7.5  (2020-02-27)
+=====
+  - Fix docstrings for class variables inherited from object/builtins values.
+  - Fix: In HTML output, never link function parameter names to
+    outer-scope identifiers.
+  - Fix regression with relative directory paths introduced in 0.7.3.
+
 0.7.4  (2020-01-17)
 =====
   - Fix regression introduced in 0.7.0: Hide private instance variables even
