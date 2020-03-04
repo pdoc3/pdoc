@@ -603,6 +603,10 @@ class ApiTest(unittest.TestCase):
         class E(C):
             pass
 
+        # H should not show up as a subclass of A, because it has anon-str __module__
+        # attribute
+        H = type("H", (A,), {"__module__": None})  # noqa: F841
+
         mod = pdoc.Module(pdoc)
         self.assertEqual([x.refname for x in pdoc.Class('A', mod, A).subclasses()],
                          [mod.find_class(C).refname])

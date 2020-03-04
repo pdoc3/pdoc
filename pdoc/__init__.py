@@ -897,7 +897,8 @@ class Class(Doc):
         and `pdoc.External` otherwise.
         """
         return sorted(self.module.find_class(c)
-                      for c in type.__subclasses__(self.obj))
+                      for c in type.__subclasses__(self.obj)
+                      if isinstance(c.__module__, str))
 
     def params(self, *, annotate=False, link=None) -> List['str']:
         """
