@@ -224,7 +224,12 @@
           <h3>Instance variables</h3>
           <dl>
           % for v in inst_vars:
-              <dt id="${v.refname}"><code class="name">var ${ident(v.name)}</code></dt>
+              <%
+                  var_type = show_type_annotations and v.type_annotation(link=link) or ''
+                  if var_type:
+                      var_type = ' ->\N{NBSP}' + var_type
+              %>
+              <dt id="${v.refname}"><code class="name">var ${ident(v.name)}${var_type}</code></dt>
               <dd>${show_desc(v)}</dd>
           % endfor
           </dl>

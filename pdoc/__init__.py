@@ -329,6 +329,23 @@ def _toposort(graph: Dict[T, Set[T]]) -> Generator[T, None, None]:
     assert not graph, "A cyclic dependency exists amongst %r" % graph
 
 
+def _return_annotation(name, module, obj, link=None):
+    try:
+        annot = typing.get_type_hints(obj).get('return', '')
+    except NameError as e:
+        warn("Error handling return annotation for {}: {}".format(name, e.args[0]))
+        annot = inspect.signature(inspect.unwrap(obj)).return_annotation
+        if annot == inspect.Parameter.empty:
+            annot = ''
+    if not annot:
+        return ''
+    s = inspect.formatannotation(annot).replace(' ', '\N{NBSP}')  # Better line breaks
+    if link:
+        from pdoc.html_helpers import _linkify
+        s = re.sub(r'[\w\.]+', partial(_linkify, link=link, module=module), s)
+    return s
+
+
 def link_inheritance(context: Context = None):
     """
     Link inheritance relationsships between `pdoc.Class` objects
@@ -1073,20 +1090,7 @@ class Function(Doc):
 
     def return_annotation(self, *, link=None):
         """Formatted function return type annotation or empty string if none."""
-        try:
-            annot = typing.get_type_hints(self.obj).get('return', '')
-        except NameError as e:
-            warn("Error handling return annotation for {}: {}".format(self.name, e.args[0]))
-            annot = inspect.signature(inspect.unwrap(self.obj)).return_annotation
-            if annot == inspect.Parameter.empty:
-                annot = ''
-        if not annot:
-            return ''
-        s = inspect.formatannotation(annot).replace(' ', '\N{NBSP}')  # Better line breaks
-        if link:
-            from pdoc.html_helpers import _linkify
-            s = re.sub(r'[\w\.]+', partial(_linkify, link=link, module=self.module), s)
-        return s
+        return _return_annotation(self.name, self.module, self.obj, link=link)
 
     def params(self, *, annotate: bool = False, link: Callable[[Doc], str] = None) -> List[str]:
         """
@@ -1231,6 +1235,10 @@ class Variable(Doc):
     @property
     def refname(self):
         return (self.cls.refname if self.cls else self.module.refname) + '.' + self.name
+
+    def type_annotation(self, *, link=None):
+        """Formatted variable type annotation or empty string if none."""
+        return _return_annotation(self.name, self.module, self.obj, link=link)
 
 
 class External(Doc):
