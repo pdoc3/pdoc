@@ -402,6 +402,15 @@ class ApiTest(unittest.TestCase):
                     self.assertEqual(sorted(m.name for m in m.submodules()),
                                      [EXAMPLE_MODULE + '.' + m for m in submodules])
 
+    def test_Module_find_class(self):
+        class A:
+            __module__ = None
+
+        assert A.__module__ is None
+        mod = pdoc.Module(pdoc)
+        self.assertIsInstance(mod.find_class(pdoc.Doc), pdoc.Class)
+        self.assertIsInstance(mod.find_class(A), pdoc.External)
+
     def test_import_filename(self):
         with patch.object(sys, 'path', ['']), \
                 chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):

@@ -39,6 +39,9 @@ _URL_MODULE_SUFFIX = '.html'
 _URL_INDEX_MODULE_SUFFIX = '.m.html'  # For modules named literal 'index'
 _URL_PACKAGE_SUFFIX = '/index.html'
 
+# type.__module__ can be None by the Python spec. In those cases, use this value
+_UNKNOWN_MODULE = '?'
+
 T = TypeVar('T', bound='Doc')
 
 __pdoc__ = {}  # type: Dict[str, Union[bool, str]]
@@ -726,7 +729,7 @@ class Module(Doc):
         # XXX: Is this corrent? Does it always match
         # `Class.module.name + Class.qualname`?. Especially now?
         # If not, see what was here before.
-        return self.find_ident(cls.__module__ + '.' + cls.__qualname__)
+        return self.find_ident((cls.__module__ or _UNKNOWN_MODULE) + '.' + cls.__qualname__)
 
     def find_ident(self, name: str) -> Doc:
         """
@@ -1131,7 +1134,7 @@ class Function(Doc):
                 if isinstance(value, enum.Enum):
                     replacement = str(value)
                 elif inspect.isclass(value):
-                    replacement = value.__module__ + '.' + value.__qualname__
+                    replacement = (value.__module__ or _UNKNOWN_MODULE) + '.' + value.__qualname__
                 elif ' at 0x' in repr(value):
                     replacement = re.sub(r' at 0x\w+', '', repr(value))
 
