@@ -1,6 +1,11 @@
 <%!
     # Template configuration. Copy over in your template directory
-    # (used with --template-dir) and adapt as required.
+    # (used with `--template-dir`) and adapt as necessary.
+    # Note, defaults are loaded from this distribution file, so your
+    # config.mako only needs to contain values you want overridden.
+    # You can also run pdoc with `--config KEY=VALUE` to override
+    # individual values.
+
     html_lang = 'en'
     show_inherited_members = False
     extract_module_toc_into_sidebar = True
