@@ -249,17 +249,34 @@ class Docformats:
         Need an intro paragrapgh.
 
             >>> Then code is indented one level
+            line1
+            line2
 
         Alternatively
         ```
+        >>> doctest
         fenced code works
+        always
         ```
 
         Examples:
             >>> nbytes(100)
             '100.0 bytes'
+            line2
 
-            >>> asdf
+            some text
+
+        some text
+
+        >>> another doctest
+        line1
+        line2
+
+        Example:
+            >>> f()
+            Traceback (most recent call last):
+                ...
+            Exception: something went wrong
         """
 
     def reST_directives(self):

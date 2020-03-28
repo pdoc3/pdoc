@@ -5,7 +5,9 @@ import inspect
 import os
 import re
 import subprocess
+import textwrap
 import traceback
+from contextlib import contextmanager
 from functools import partial, lru_cache
 from typing import Callable, Match
 from warnings import warn
@@ -91,6 +93,32 @@ _md = markdown.Markdown(
 )
 
 
+@contextmanager
+def _fenced_code_blocks_hidden(text):
+    def hide(text):
+        def replace(match):
+            orig = match.group()
+            new = '@' + str(hash(orig)) + '@'
+            hidden[new] = orig
+            return new
+
+        text = re.compile(r'^(?P<fence>```|~~~).*\n'
+                          r'(?:.*\n)*?'
+                          r'^(?P=fence)(?!.)', re.MULTILINE).sub(replace, text)
+        return text
+
+    def unhide(text):
+        for k, v in hidden.items():
+            text = text.replace(k, v)
+        return text
+
+    hidden = {}
+    # Via a manager object (a list) so modifications can pass back and forth as result[0]
+    result = [hide(text)]
+    yield result
+    result[0] = unhide(result[0])
+
+
 class _ToMarkdown:
     """
     This class serves as a namespace for methods converting common
@@ -157,17 +185,19 @@ class _ToMarkdown:
         lists.
         """
         section, body = match.groups()
-        if section.title() == 'See Also':
+        section = section.title()
+        if section == 'See Also':
             body = re.sub(r'\n\s{4}\s*', ' ', body)  # Handle line continuation
             body = re.sub(r'^((?:\n?[\w.]* ?: .*)+)|(.*\w.*)',
                           _ToMarkdown._numpy_seealso, body)
-        elif section.title() in ('Returns', 'Yields', 'Raises', 'Warns'):
+        elif section in ('Returns', 'Yields', 'Raises', 'Warns'):
             body = re.sub(r'^(?:(?P<name>\*{0,2}\w+(?:, \*{0,2}\w+)*)'
                           r'(?: ?: (?P<type>.*))|'
                           r'(?P<just_type>\w[^\n`*]*))(?<!\.)$'
                           r'(?P<desc>(?:\n(?: {4}.*|$))*)',
                           _ToMarkdown._numpy_params, body, flags=re.MULTILINE)
-        else:
+        elif section in ('Parameters', 'Receives', 'Other Parameters',
+                         'Arguments', 'Args', 'Attributes'):
             name = r'(?:\w|\{\w+(?:,\w+)+\})+'  # Support curly brace expansion
             body = re.sub(r'^(?P<name>\*{0,2}' + name + r'(?:, \*{0,2}' + name + r')*)'
                           r'(?: ?: (?P<type>.*))?(?<!\.)$'
@@ -203,20 +233,29 @@ class _ToMarkdown:
         return re.sub(r'\n', '\n' + indent, indent + text.rstrip())
 
     @staticmethod
-    def google(text,
-               _googledoc_sections=partial(
-                   re.compile(r'^([A-Z]\w+):$\n((?:\n?(?: {2,}.*|$))+)', re.MULTILINE).sub,
-                   lambda m, _params=partial(
-                           re.compile(r'^([\w*]+)(?: \(([\w.,=\[\] ]+)\))?: '
-                                      r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub,
-                           lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups()))): (
-                       m.group() if not m.group(2) else '\n{}\n-----\n{}'.format(
-                           m.group(1), _params(inspect.cleandoc('\n' + m.group(2))))))):
+    def google(text):
         """
         Convert `text` in Google-style docstring format to Markdown
         to be further converted later.
         """
-        return _googledoc_sections(text)
+        def googledoc_sections(match):
+            section, body = match.groups('')
+            if not body:
+                return match.group()
+            body = textwrap.dedent(body)
+            section = section.title()
+            if section in ('Args', 'Attributes', 'Returns', 'Yields', 'Raises', 'Warns'):
+                body = re.compile(
+                    r'^([\w*]+)(?: \(([\w.,=\[\] ]+)\))?: '
+                    r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub(
+                    lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups())),
+                    inspect.cleandoc('\n' + body)
+                )
+            return '\n{}\n-----\n{}'.format(section, body)
+
+        text = re.compile(r'^([A-Z]\w+):$\n'
+                          r'((?:\n?(?: {2,}.*|$))+)', re.MULTILINE).sub(googledoc_sections, text)
+        return text
 
     @staticmethod
     def _admonition(match, module=None, limit_types=None):
@@ -302,22 +341,16 @@ class _ToMarkdown:
         return dict(re.findall(r'^ *:([^:]+): *(.*)', text, re.MULTILINE))
 
     @staticmethod
-    def doctests(text,
-                 _indent_doctests=partial(
-                     re.compile(r'(?:^(?P<fence>```|~~~).*\n)?'
-                                r'(?:^>>>.*'
-                                r'(?:\n(?:(?:>>>|\.\.\.).*))*'
-                                r'(?:\n.*)?\n\n?)+'
-                                r'(?P=fence)?', re.MULTILINE).sub,
-                     lambda m: (m.group(0) if m.group('fence') else
-                                ('\n    ' + '\n    '.join(m.group(0).split('\n')) + '\n\n')))):
+    def doctests(text):
         """
-        Indent non-fenced (`~~~`) top-level (0-indented)
-        doctest blocks so they render as code.
+        Fence non-fenced (`~~~`) top-level (0-indented)
+        doctest blocks so they render as Python code.
         """
-        if not text.endswith('\n'):  # Needed for the r'(?:\n.*)?\n\n?)+' line (GH-72)
-            text += '\n'
-        return _indent_doctests(text)
+        with _fenced_code_blocks_hidden(text) as result:
+            result[0] = re.compile(r'^(?:>>> .*)(?:\n.+)*', re.MULTILINE).sub(
+                lambda match: '```python\n' + match.group() + '\n```\n', result[0])
+        text = result[0]
+        return text
 
     @staticmethod
     def raw_urls(text):
@@ -387,12 +420,12 @@ def to_markdown(text: str, docformat: str = 'numpy,google', *,
     if 'google' in docformat:
         text = _ToMarkdown.google(text)
 
+    text = _ToMarkdown.doctests(text)
+
     # If doing both, do numpy after google, otherwise google-style's
     # headings are incorrectly interpreted as numpy params
     if 'numpy' in docformat:
         text = _ToMarkdown.numpy(text)
-
-    text = _ToMarkdown.doctests(text)
 
     if module and link:
         text = _code_refs(partial(_linkify, link=link, module=module, fmt='`{}`'), text)

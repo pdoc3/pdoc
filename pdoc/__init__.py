@@ -556,7 +556,7 @@ class Module(Doc):
                          "exported in `__all__`".format(self.module, name))
         else:
             def is_from_this_module(obj):
-                mod = inspect.getmodule(obj)
+                mod = inspect.getmodule(inspect.unwrap(obj))
                 return mod is None or mod.__name__ == self.obj.__name__
 
             public_objs = [(name, inspect.unwrap(obj))
