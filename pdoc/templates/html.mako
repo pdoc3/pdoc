@@ -91,7 +91,7 @@
 <%def name="show_module(module)">
   <%
   variables = module.variables(sort=sort_identifiers)
-  classes = module.classes(sort=sort_identifiers)
+  classes = module.all_classes(sort=sort_identifiers)
   functions = module.functions(sort=sort_identifiers)
   submodules = module.submodules()
   %>
@@ -274,7 +274,7 @@
 <%def name="module_index(module)">
   <%
   variables = module.variables(sort=sort_identifiers)
-  classes = module.classes(sort=sort_identifiers)
+  classes = module.all_classes(sort=sort_identifiers)
   functions = module.functions(sort=sort_identifiers)
   submodules = module.submodules()
   supermodule = module.supermodule
