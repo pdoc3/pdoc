@@ -719,14 +719,13 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(func.return_annotation(), 'List[Union[str,\N{NBSP}pdoc.Doc]]')
 
     @ignore_warnings
-    def test_property_type_annotation(self):
+    def test_Variable_type_annotation(self):
         import typing
 
         class Foobar:
-            """foobar"""
             @property
-            def prop() -> typing.Optional[int]:
-                """prop"""
+            def prop(self) -> typing.Optional[int]:
+                pass
 
         cls = pdoc.Class('Foobar', pdoc.Module(pdoc), Foobar)
         prop = cls.instance_variables()[0]
