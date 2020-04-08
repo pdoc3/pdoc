@@ -27,7 +27,7 @@
 
   #footer {
     font-size: .75em;
-    margin-top: 3em;
+    padding: 5px 30px;
     border-top: 1px solid #ddd;
     text-align: right;
   }
@@ -36,15 +36,7 @@
       display: inline-block;
     }
     #footer p:last-child {
-      margin-right: 0px;
-    }
-    .footer-desktop {
-      display: none;
-      padding: 5px 0px;
-    }
-    .footer-mobile {
-      display: block;
-      padding: 5px 30px;
+      margin-right: 30px;
     }
 
   h1, h2, h3, h4, h5 {
@@ -286,14 +278,14 @@
       width: 30%;
       height: 100vh;
       overflow: auto;
+      position: sticky;
+      top: 0;
     }
     #content {
       width: 70%;
-      height: 100vh;
       max-width: 100ch;
-      padding: 3em 4em 0em 4em;
+      padding: 3em 4em;
       border-left: 1px solid #ddd;
-      overflow: auto;
     }
     pre code {
       font-size: 1em;
@@ -312,12 +304,6 @@
     }
     .toc > ul > li {
       margin-top: .5em;
-    }
-    .footer-desktop {
-      display: block;
-    }
-    .footer-mobile {
-      display: none;
     }
   }
 </%def>
