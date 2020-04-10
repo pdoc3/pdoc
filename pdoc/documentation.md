@@ -12,9 +12,11 @@ variables is found by examining objects' abstract syntax trees.
 [docstrings]: https://docs.python.org/3/glossary.html#term-docstring
 
 [^execution]:
-    Documented modules are executed in order to provide `__doc__`
-    attributes. Any non-fenced global code in imported modules will
+    Documented modules are _executed_ in order to provide `__doc__`
+    attributes. Any [non-fenced] global code in imported modules will
     affect the current environment.
+
+[non-fenced]: https://stackoverflow.com/questions/19578308/what-is-the-benefit-of-using-main-method-in-python/19578335#19578335
 
 
 What objects are documented?
