@@ -267,13 +267,8 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
         else:
             continue
 
-        if not _is_public(name):
-            if isinstance(doc_obj, Class):
-                w_name = ".".join((doc_obj.name, name))
-            else:
-                w_name = name
-            if not _is_whitelisted(w_name, doc_obj.module):
-                continue
+        if not _is_public(name) and not _is_whitelisted(name, doc_obj):
+            continue
 
         docstring = inspect.cleandoc(str_node.value.s).strip()
         if not docstring:
@@ -284,25 +279,18 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
     return vars, instance_vars
 
 
-def _is_whitelisted(ident_name, doc_module):
+def _is_whitelisted(name: str, doc_obj: Union['Module', 'Class']):
     """
-    Returns `True` if `ident_name` is contained in the module's __pdoc__
-    with a value of `True`.
+    Returns `True` if `name` (relative or absolute refname) is
+    contained in some module's __pdoc__ with a truish value.
     """
-    # Check this objects module's __pdoc__ for both the relative and
-    # full canonical name
-    module_basename = doc_module.name.split(".")[-1]
-    pdoc = getattr(doc_module.obj, "__pdoc__", {})
-    if pdoc.get(ident_name, False) or \
-            pdoc.get("{}.{}".format(module_basename, ident_name), False):
-        return True
-
-    # We also need to check all potential supermodules' __pdoc__s
-    # due to full reference
-    if doc_module.supermodule:
-        new_ident = "{}.{}".format(module_basename, ident_name)
-        return _is_whitelisted(new_ident, doc_module.supermodule)
-
+    refname = doc_obj.refname + '.' + name
+    module = doc_obj.module
+    while module:
+        qualname = refname[len(module.refname) + 1:]
+        if module.__pdoc__.get(qualname) or module.__pdoc__.get(refname):
+            return True
+        module = module.supermodule
     return False
 
 
@@ -578,8 +566,7 @@ class Module(Doc):
 
             public_objs = [(name, inspect.unwrap(obj))
                            for name, obj in inspect.getmembers(self.obj)
-                           if ((_is_public(name) or
-                                _is_whitelisted(name, self.module)) and
+                           if ((_is_public(name) or _is_whitelisted(name, self)) and
                                (is_from_this_module(obj) or name in var_docstrings))]
             index = list(self.obj.__dict__).index
             public_objs.sort(key=lambda i: index(i[0]))
@@ -618,7 +605,7 @@ class Module(Doc):
                     continue
 
                 # Ignore if it isn't exported
-                if not _is_public(root) and not _is_whitelisted(root, self.module):
+                if not _is_public(root) and not _is_whitelisted(root, self):
                     continue
 
                 assert self.refname == self.name
@@ -645,6 +632,11 @@ class Module(Doc):
                 self._context.update((obj.refname, obj)
                                      for obj in docobj.doc.values())
 
+    @property
+    def __pdoc__(self):
+        """This module's __pdoc__ dict, or an empty dict if none."""
+        return getattr(self.obj, '__pdoc__', {})
+
     def _link_inheritance(self):
         # Inherited members are already in place since
         # `Class._fill_inheritance()` has been called from
@@ -657,7 +649,12 @@ class Module(Doc):
             # errors if `pdoc.link_inheritance()` is called multiple times.
             return
 
-        for name, docstring in getattr(self.obj, "__pdoc__", {}).items():
+        # Apply __pdoc__ overrides
+        for name, docstring in self.__pdoc__.items():
+            # In case of whitelisting with "True", there's nothing to do
+            if docstring is True:
+                continue
+
             refname = "%s.%s" % (self.refname, name)
             if docstring in (False, None):
                 if docstring is None:
@@ -682,10 +679,6 @@ class Module(Doc):
                     if key.startswith(refname + '.'):
                         del self._context[key]
 
-                continue
-
-            # Prevent the ValueError below in case of whitelisting with "True"
-            if docstring is True:
                 continue
 
             dobj = self.find_ident(refname)
@@ -836,9 +829,8 @@ class Class(Doc):
                        for _name, obj in inspect.getmembers(self.obj)
                        # Filter only *own* members. The rest are inherited
                        # in Class._fill_inheritance()
-                       if _name in self.obj.__dict__ and
-                       (_is_public(_name) or _is_whitelisted("{}.{}".format(
-                           name, _name), self.module))]
+                       if _name in self.obj.__dict__
+                       and (_is_public(_name) or _is_whitelisted(_name, self))]
         index = list(self.obj.__dict__).index
         public_objs.sort(key=lambda i: index(i[0]))
 
@@ -932,7 +924,7 @@ class Class(Doc):
         name = self.name + '.__init__'
         qualname = self.qualname + '.__init__'
         refname = self.refname + '.__init__'
-        exclusions = getattr(self.module.obj, "__pdoc__", {})
+        exclusions = self.module.__pdoc__
         if name in exclusions or qualname in exclusions or refname in exclusions:
             return []
 
@@ -1030,9 +1022,7 @@ class Class(Doc):
             try:
                 dobj = self.doc[name]
             except KeyError:
-                # There is a key in __pdoc__ blocking this member
-                assert any(i.endswith(self.qualname + '.' + name)
-                           for i in self.module.obj.__pdoc__)
+                # There is a key in some __pdoc__ dict blocking this member
                 continue
             if (dobj.obj is parent_dobj.obj or
                     (dobj.docstring or parent_dobj.docstring) == parent_dobj.docstring):

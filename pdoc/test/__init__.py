@@ -515,67 +515,58 @@ class ApiTest(unittest.TestCase):
 
     def test__pdoc__whitelist(self):
         module = pdoc.import_module(EXAMPLE_MODULE)
-
         mod = pdoc.Module(module)
         pdoc.link_inheritance()
-        self.assertIn('A', mod.doc)
         self.assertNotIn('__call__', mod.doc['A'].doc)
         self.assertNotIn('_private_function', mod.doc)
 
+        # Override docstring string
         docstring = "Overwrite private function doc"
         with patch.object(module, '__pdoc__', {'A.__call__': docstring}):
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
-            self.assertIn('A', mod.doc)
-            self.assertIn('__call__', mod.doc['A'].doc)
             self.assertEqual(mod.doc['A'].doc['__call__'].docstring, docstring)
 
-        with patch.object(module, '__pdoc__', {'example_pkg.A.__call__': True}):
-            mod = pdoc.Module(module)
-            pdoc.link_inheritance()
-            self.assertIn('A', mod.doc)
-            self.assertIn('__call__', mod.doc['A'].doc)
-
+        # Module-relative
         with patch.object(module, '__pdoc__', {'_private_function': True}):
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
-            self.assertIn('_private_function', mod.doc)
-            self.assertIn('subpkg', mod.doc)
+            self.assertIn('Private function', mod.doc['_private_function'].docstring)
             self.assertNotIn('_private_function', mod.doc["subpkg"].doc)
 
         # Defined in example_pkg, referring to a member of its submodule
         with patch.object(module, '__pdoc__', {'subpkg.A.__call__': True}):
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
-            self.assertIn('subpkg', mod.doc)
-            self.assertIn('A', mod.doc['subpkg'].doc)
-            self.assertIn('__call__', mod.doc['subpkg'].doc['A'].doc)
+            self.assertIn('A.__call__', mod.doc['subpkg'].doc['A'].doc['__call__'].docstring)
 
         # Using full refname
         with patch.object(module, '__pdoc__', {'example_pkg.subpkg.A.__call__': True}):
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
-            self.assertIn('subpkg', mod.doc)
-            self.assertIn('A', mod.doc['subpkg'].doc)
-            self.assertIn('__call__', mod.doc['subpkg'].doc['A'].doc)
+            self.assertIn('A.__call__', mod.doc['subpkg'].doc['A'].doc['__call__'].docstring)
 
-        # Whitelist entire modules
+        # Entire module, absolute refname
         with patch.object(module, '__pdoc__', {'example_pkg._private': True}):
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
-            self.assertIn('_private', mod.doc)
+            self.assertIn('module', mod.doc['_private'].doc)
+            self.assertNotIn('_private', mod.doc['_private'].doc)
+            self.assertNotIn('__call__', mod.doc['_private'].doc['module'].doc)
 
+        # Entire module, relative
         with patch.object(module, '__pdoc__', {'_private': True}):
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
             self.assertIn('_private', mod.doc)
+            self.assertNotIn('_private', mod.doc['_private'].doc)
+            self.assertNotIn('__call__', mod.doc['_private'].doc['module'].doc)
 
-        # Whitelist private instance variables
+        # Private instance variables
         with patch.object(module, '__pdoc__', {'B._private_instance_var': True}):
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
-            self.assertIn('B', mod.doc)
-            self.assertIn('_private_instance_var', mod.doc['B'].doc)
+            self.assertIn('should be private', mod.doc['B'].doc['_private_instance_var'].docstring)
 
     def test__all__(self):
         module = pdoc.import_module(EXAMPLE_MODULE + '.index')
