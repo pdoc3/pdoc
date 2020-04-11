@@ -276,6 +276,10 @@
   @media screen and (min-width: 700px) {
     #sidebar {
       width: 30%;
+      height: 100vh;
+      overflow: auto;
+      position: sticky;
+      top: 0;
     }
     #content {
       width: 70%;
