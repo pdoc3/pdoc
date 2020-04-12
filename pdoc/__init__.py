@@ -1214,12 +1214,21 @@ class Function(Doc):
                                             self.docstring, re.MULTILINE),
                                  key=len, reverse=True)
                 if strings:
-                    my_locals, my_globals = {}, self.module.obj.__dict__
+                    string = filter(strings[0])
+                    _locals, _globals = {}, {}
+                    _globals.update(typing.__dict__)
+                    _globals.update(self.module.obj.__dict__)
+                    # Trim binding module basename from type annotations
+                    # See: https://github.com/pdoc3/pdoc/pull/148#discussion_r407114141
+                    module_basename = self.module.name.rsplit('.', maxsplit=1)[-1]
+                    if module_basename in string and module_basename not in _globals:
+                        string = re.sub(r'(?<!\.)\b{}\.\b'.format(module_basename), '', string)
+
                     try:
-                        exec('def {}: pass'.format(filter(strings[0])), my_globals, my_locals)
+                        exec('def {}: pass'.format(string), _globals, _locals)
                     except SyntaxError:
                         continue
-                    signature = inspect.signature(my_locals[self.name])
+                    signature = inspect.signature(_locals[self.name])
                     if cleanup_docstring and len(strings) == 1:
                         # Remove signature from docstring variable
                         self.docstring = self.docstring.replace(strings[0], '')
