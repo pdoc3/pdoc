@@ -1216,6 +1216,7 @@ class Function(Doc):
                 if strings:
                     string = filter(strings[0])
                     _locals, _globals = {}, {}
+                    _globals.update({'capsule': None})  # pybind11 capsule data type
                     _globals.update(typing.__dict__)
                     _globals.update(self.module.obj.__dict__)
                     # Trim binding module basename from type annotations
