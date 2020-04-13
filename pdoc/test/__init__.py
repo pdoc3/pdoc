@@ -869,11 +869,12 @@ code block
 reference: `package.foo`
 '''
         expected = '''<h1 id="title">Title</h1>
-<p><a href="#pdoc.Module">Module</a> is a <a href="#pdoc.Doc">Doc</a>, not <code>dict</code>.</p>
+<p><code><a href="#pdoc.Module">Module</a></code> is a <code><a href="#pdoc.Doc">Doc</a></code>,\
+ not <code>dict</code>.</p>
 <pre><code>code block
 </code></pre>
 
-<p>reference: <a href="/package.foo.ext">package.foo</a></p>'''
+<p>reference: <code>package.foo</code></p>'''
 
         module = pdoc.Module(pdoc)
 
@@ -931,7 +932,7 @@ class Docformats(unittest.TestCase):
 
     @staticmethod
     def _link(dobj, *args, **kwargs):
-        return '<a>`{}`</a>'.format(dobj.refname)
+        return '<a>{}</a>'.format(dobj.refname)
 
     def test_numpy(self):
         expected = '''<p>Summary line.</p>
@@ -947,24 +948,23 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <p class="admonition-title">Added in version:&ensp;1.5.0</p>
 </div>
 </dd>
-<dt><strong><code>x</code></strong> :&ensp;{ <code>NoneType</code>, <code>'B'</code>, <code>'C'</code> }, optional</dt>
+<dt><strong><code>x</code></strong> :&ensp;<code>{ NoneType, 'B', 'C' }</code>, optional</dt>
 <dd>&nbsp;</dd>
 <dt><strong><code>n</code></strong> :&ensp;<code>int</code> or <code>list</code> of <code>int</code></dt>
 <dd>Description of num</dd>
 <dt><strong><code>*args</code></strong>, <strong><code>**kwargs</code></strong></dt>
 <dd>Passed on.</dd>
+<dt><strong><code>complex</code></strong> :&ensp;<code>Union[Set[<a>pdoc.Doc</a>, <a>pdoc.Function</a>], <a>pdoc</a>]</code></dt>
+<dd>The <code>List[<a>pdoc.Doc</a>]</code>s of the new signal.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>output</code></strong> :&ensp;<a><code>pdoc.Doc</code></a></dt>
+<dt><strong><code>output</code></strong> :&ensp;<code><a>pdoc.Doc</a></code></dt>
+<dd>The output array</dd>
+<dt><code>List[<a>pdoc.Doc</a>]</code></dt>
 <dd>The output array</dd>
 <dt><code>foo</code></dt>
 <dd>&nbsp;</dd>
-</dl>
-<h2 id="returns_1">Returns</h2>
-<dl>
-<dt><a><code>pdoc.Doc</code></a></dt>
-<dd>The output array</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
@@ -976,7 +976,7 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <dt><code>TypeError</code></dt>
 <dd>&nbsp;</dd>
 </dl>
-<h2 id="returns_2">Returns</h2>
+<h2 id="returns_1">Returns</h2>
 <p>None.</p>
 <h2 id="invalid">Invalid</h2>
 <p>no match</p>
@@ -984,11 +984,11 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <p><code>fromstring</code>, <code>loadtxt</code></p>
 <h2 id="see-also_1">See Also</h2>
 <dl>
-<dt><a><code>pdoc.text</code></a></dt>
+<dt><code><a>pdoc.text</a></code></dt>
 <dd>Function a with its description.</dd>
-<dt><a><code>scipy.random.norm</code></a></dt>
+<dt><code>scipy.random.norm</code></dt>
 <dd>Random variates, PDFs, etc.</dd>
-<dt><a><code>pdoc.Doc</code></a></dt>
+<dt><code><a>pdoc.Doc</a></code></dt>
 <dd>A class description that spans several lines.</dd>
 </dl>
 <h2 id="notes">Notes</h2>
@@ -1021,7 +1021,7 @@ Nomatch:</p>
 <dl>
 <dt><strong><code>arg1</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>Text1</dd>
-<dt><strong><code>arg2</code></strong> :&ensp;<code>List</code>[<code>str</code>], optional,\
+<dt><strong><code>arg2</code></strong> :&ensp;<code>List[str]</code>, optional,\
  default=<code>10</code></dt>
 <dd>Text2</dd>
 </dl>
