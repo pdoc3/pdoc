@@ -7,14 +7,15 @@
 
   def link(dobj: pdoc.Doc, name=None):
     name = name or dobj.qualname + ('()' if isinstance(dobj, pdoc.Function) else '')
+    if isinstance(dobj, pdoc.External) and not external_links:
+        return name
     url = dobj.url(relative_to=module, link_prefix=link_prefix,
                    top_ancestor=not show_inherited_members)
     return '<a title="{}" href="{}">{}</a>'.format(dobj.refname, url, name)
 
 
   def to_html(text):
-    return _to_html(text, module=module, link=link, latex_math=latex_math,
-                    link_external=external_links)
+    return _to_html(text, module=module, link=link, latex_math=latex_math)
 %>
 
 <%def name="ident(name)"><span class="ident">${name}</span></%def>

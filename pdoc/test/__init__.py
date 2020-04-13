@@ -874,7 +874,7 @@ reference: `package.foo`
 <pre><code>code block
 </code></pre>
 
-<p>reference: <code>package.foo</code></p>'''
+<p>reference: <code><a href="/package.foo.ext">package.foo</a></code></p>'''
 
         module = pdoc.Module(pdoc)
 
@@ -884,9 +884,11 @@ reference: `package.foo`
         html = to_html(text, module=module, link=link)
         self.assertEqual(html, expected)
 
-        self.assertIn('<a href=', to_html('`pdoc.Doc.url()`', module=module, link=link))
+        self.assertEqual(to_html('`pdoc.Doc.url()`', module=module, link=link),
+                         '<p><code><a href="#pdoc.Doc.url">Doc.url</a></code></p>')
 
-        self.assertIn('<code>foo.f()</code>', to_html('`foo.f()`', module=module, link=link))
+        self.assertEqual(to_html('`foo.f()`', module=module, link=link),
+                         '<p><code><a href="/foo.f().ext">foo.f()</a></code></p>')
 
     def test_to_html_refname_warning(self):
         mod = pdoc.Module(EXAMPLE_MODULE)
@@ -986,7 +988,7 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <dl>
 <dt><code><a>pdoc.text</a></code></dt>
 <dd>Function a with its description.</dd>
-<dt><code>scipy.random.norm</code></dt>
+<dt><code><a>scipy.random.norm</a></code></dt>
 <dd>Random variates, PDFs, etc.</dd>
 <dt><code><a>pdoc.Doc</a></code></dt>
 <dd>A class description that spans several lines.</dd>
@@ -1047,7 +1049,7 @@ code
 <dl>
 <dt><strong><code>issue_10</code></strong></dt>
 <dd>description didn't work across multiple lines
-if only a single item was listed. <code>inspect.cleandoc()</code>
+if only a single item was listed. <code><a>inspect.cleandoc()</a></code>
 somehow stripped the required extra indentation.</dd>
 </dl>
 <h2 id="raises">Raises</h2>

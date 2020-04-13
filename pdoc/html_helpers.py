@@ -375,7 +375,7 @@ class _MathPattern(InlineProcessor):
 
 def to_html(text: str, docformat: str = 'numpy,google', *,
             module: pdoc.Module = None, link: Callable[..., str] = None,
-            latex_math: bool = False, link_external: bool = False):
+            latex_math: bool = False):
     """
     Returns HTML of `text` interpreted as `docformat`.
     By default, Numpydoc and Google-style docstrings are assumed,
@@ -393,14 +393,12 @@ def to_html(text: str, docformat: str = 'numpy,google', *,
                                     _MathPattern.NAME,
                                     _MathPattern.PRIORITY)
 
-    md = to_markdown(text, docformat=docformat, module=module, link=link,
-                     link_external=link_external)
+    md = to_markdown(text, docformat=docformat, module=module, link=link)
     return _md.reset().convert(md)
 
 
 def to_markdown(text: str, docformat: str = 'numpy,google', *,
                 module: pdoc.Module = None, link: Callable[..., str] = None,
-                link_external: bool = False,
                 # Matches markdown code spans not +directly+ within links.
                 # E.g. `code` and [foo is `bar`]() but not [`code`](...)
                 # Also skips \-escaped grave quotes.
@@ -428,8 +426,7 @@ def to_markdown(text: str, docformat: str = 'numpy,google', *,
         text = _ToMarkdown.numpy(text)
 
     if module and link:
-        text = _code_refs(partial(_linkify, link=link, module=module,
-                                  link_external=link_external, wrap_code=True), text)
+        text = _code_refs(partial(_linkify, link=link, module=module, wrap_code=True), text)
     return text
 
 
@@ -442,13 +439,16 @@ class ReferenceWarning(UserWarning):
     """
 
 
-def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module,
-             link_external=False, wrap_code=False):
+def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module, wrap_code=False):
 
     def handle_refname(match):
         refname = match.group()
         dobj = module.find_ident(refname)
         if isinstance(dobj, pdoc.External):
+            # If this is a single-word reference,
+            # most likely an argument name. Skip linking External.
+            if '.' not in refname:
+                return refname
             # If refname in documentation has a typo or is obsolete, warn.
             # XXX: Assume at least the first part of refname, i.e. the package, is correct.
             module_part = module.find_ident(refname.split('.')[0])
@@ -456,18 +456,19 @@ def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module,
                 warn('Code reference `{}` in module "{}" does not match any '
                      'documented object.'.format(refname, module.refname),
                      ReferenceWarning, stacklevel=3)
-            if not link_external:
-                return refname
         return link(dobj)
 
-    linked = re.sub(r'[a-zA-Z_]\w*(\.[a-zA-Z_]\w*)*', handle_refname, match.group())
+    code_span = match.group()
+    if not re.match(r'^[`\w\s.,()\][\'"]+$', code_span):
+        return code_span
+
+    linked = re.sub(r'[a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)*(?:\(\))?', handle_refname, code_span)
     if wrap_code:
         assert linked[0] == linked[-1] == '`'
-        # Escape markdown *,_ markers.
-        # Wrapping in HTML <code> as opposed to backticks evaluates them.
-        # Backticks cannot be used because html returned from `link()` is then
-        # escaped.
-        cleaned = re.sub(r'(?<!\\)(\*|_)', r'\\\1', linked[1:-1])
+        # Wrapping in HTML <code> as opposed to backticks evaluates markdown */_ markers,
+        # so let's escape them. Backticks cannot be used because html returned from `link()`
+        # would then become escaped.
+        cleaned = re.sub(r'(?<!\\)([-*_])', r'\\\1', linked[1:-1])
         return '<code>{}</code>'.format(cleaned)
     return linked
 
