@@ -336,23 +336,6 @@ def _toposort(graph: Mapping[T, Set[T]]) -> Generator[T, None, None]:
     assert not graph, "A cyclic dependency exists amongst %r" % graph
 
 
-def _return_annotation(name, module, obj, link=None):
-    try:
-        annot = typing.get_type_hints(obj).get('return', '')
-    except NameError as e:
-        warn("Error handling return annotation for {}: {}".format(name, e.args[0]))
-        annot = inspect.signature(inspect.unwrap(obj)).return_annotation
-        if annot == inspect.Parameter.empty:
-            annot = ''
-    if not annot:
-        return ''
-    s = inspect.formatannotation(annot).replace(' ', '\N{NBSP}')  # Better line breaks
-    if link:
-        from pdoc.html_helpers import _linkify
-        s = re.sub(r'[\w\.]+', partial(_linkify, link=link, module=module), s)
-    return s
-
-
 def link_inheritance(context: Context = None):
     """
     Link inheritance relationsships between `pdoc.Class` objects
@@ -937,7 +920,7 @@ class Class(Doc):
         if name in exclusions or qualname in exclusions or refname in exclusions:
             return []
 
-        return Function._params(self.obj, annotate=annotate, link=link, module=self.module)
+        return Function._params(self, annotate=annotate, link=link, module=self.module)
 
     def _filter_doc_objs(self, type: Type[T], include_inherited=True,
                          filter_func: Callable[[T], bool] = lambda x: True,
@@ -1099,7 +1082,25 @@ class Function(Doc):
 
     def return_annotation(self, *, link=None):
         """Formatted function return type annotation or empty string if none."""
-        return _return_annotation(self.name, self.module, self.obj, link=link)
+        try:
+            annot = typing.get_type_hints(self.obj)['return']
+        except NameError as e:
+            warn("Error handling return annotation for {}: {}".format(self.refname, e.args[0]))
+            annot = inspect.signature(self.obj).return_annotation
+        except (KeyError, TypeError):
+            try:
+                # Extract annotation from the docstring for C builtin function
+                annot = Function._signature_from_string(self).return_annotation
+            except AttributeError:
+                annot = ''
+
+        if annot is inspect.Parameter.empty or not annot:
+            return ''
+        s = inspect.formatannotation(annot).replace(' ', '\N{NBSP}')  # Better line breaks
+        if link:
+            from pdoc.html_helpers import _linkify
+            s = re.sub(r'[\w\.]+', partial(_linkify, link=link, module=self.module), s)
+        return s
 
     def params(self, *, annotate: bool = False, link: Callable[[Doc], str] = None) -> List[str]:
         """
@@ -1111,24 +1112,18 @@ class Function(Doc):
         If `annotate` is True, the parameter strings include [PEP 484]
         type hint annotations.
 
-        .. todo::
-            Extract signature from the first lines of currently-unsupported builtin
-            functions' (such as `itertools.count()` or `numpy.array()`) docstrings.
-            See _TODO_ marker in the code for ideas.
-
         [PEP 484]: https://www.python.org/dev/peps/pep-0484/
         """
-        return self._params(self.obj, annotate=annotate, link=link, module=self.module)
+        return self._params(self, annotate=annotate, link=link, module=self.module)
 
     @staticmethod
-    def _params(func_obj, annotate=False, link=None, module=None):
+    def _params(doc_obj, annotate=False, link=None, module=None):
         try:
-            signature = inspect.signature(inspect.unwrap(func_obj))
+            signature = inspect.signature(doc_obj.obj)
         except ValueError:
-            # I guess this is for C builtin functions?
-            # TODO: Extract signature from the first line of the docstring, i.e.
-            # https://github.com/mitmproxy/pdoc/commit/010d996003bc5b72fcf5fa515edbcc0142819919
-            return ["..."]
+            signature = Function._signature_from_string(doc_obj)
+            if not signature:
+                return ['...']
 
         def safe_default_value(p: inspect.Parameter):
             value = p.default
@@ -1202,6 +1197,43 @@ class Function(Doc):
 
         return params
 
+    @staticmethod
+    @lru_cache()
+    def _signature_from_string(self):
+        signature = None
+        for expr, cleanup_docstring, filter in (
+                # Full proper typed signature, such as one from pybind11
+                (r'^{}\(.*\)(?: -> .*)?$', True, lambda s: s),
+                # Human-readable, usage-like signature from some Python builtins
+                # (e.g. `range` or `slice` or `itertools.repeat` or `numpy.arange`)
+                (r'^{}\(.*\)(?= -|$)', False, lambda s: s.replace('[', '').replace(']', '')),
+        ):
+            strings = sorted(re.findall(expr.format(self.name),
+                                        self.docstring, re.MULTILINE),
+                             key=len, reverse=True)
+            if strings:
+                string = filter(strings[0])
+                _locals, _globals = {}, {}
+                _globals.update({'capsule': None})  # pybind11 capsule data type
+                _globals.update(typing.__dict__)
+                _globals.update(self.module.obj.__dict__)
+                # Trim binding module basename from type annotations
+                # See: https://github.com/pdoc3/pdoc/pull/148#discussion_r407114141
+                module_basename = self.module.name.rsplit('.', maxsplit=1)[-1]
+                if module_basename in string and module_basename not in _globals:
+                    string = re.sub(r'(?<!\.)\b{}\.\b'.format(module_basename), '', string)
+
+                try:
+                    exec('def {}: pass'.format(string), _globals, _locals)
+                except SyntaxError:
+                    continue
+                signature = inspect.signature(_locals[self.name])
+                if cleanup_docstring and len(strings) == 1:
+                    # Remove signature from docstring variable
+                    self.docstring = self.docstring.replace(strings[0], '')
+                break
+        return signature
+
     @property
     def refname(self):
         return (self.cls.refname if self.cls else self.module.refname) + '.' + self.name
@@ -1247,7 +1279,7 @@ class Variable(Doc):
 
     def type_annotation(self, *, link=None):
         """Formatted variable type annotation or empty string if none."""
-        return _return_annotation(self.name, self.module, self.obj, link=link)
+        return Function.return_annotation(cast(Function, self), link=link)
 
 
 class External(Doc):

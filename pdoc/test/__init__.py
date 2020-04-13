@@ -720,6 +720,18 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(pdoc.Function('bug130', mod, bug130_str_annotation).params(annotate=True),
                          ['a:\N{NBSP}str'])
 
+        # builtin callables with signatures in docstrings
+        from itertools import repeat
+        self.assertEqual(pdoc.Function('repeat', mod, repeat).params(), ['object', 'times'])
+        self.assertEqual(pdoc.Function('slice', mod, slice).params(), ['start', 'stop', 'step'])
+
+        class get_sample(repeat):
+            """ get_sample(self: pdoc.int, pos: int) -> Tuple[int, float] """
+        self.assertEqual(pdoc.Function('get_sample', mod, get_sample).params(annotate=True),
+                         ['self:\xa0int', 'pos:\xa0int'])
+        self.assertEqual(pdoc.Function('get_sample', mod, get_sample).return_annotation(),
+                         'Tuple[int,\xa0float]')
+
     def test_Function_return_annotation(self):
         import typing
 
