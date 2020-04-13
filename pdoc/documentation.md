@@ -350,7 +350,7 @@ Compatibility
 `pdoc` requires Python 3.5+.
 The last version to support Python 2.x is [pdoc3 0.3.x].
 
-[pdoc3 0.3.x]: https://pypi.org/project/pdoc3/0.3.11/
+[pdoc3 0.3.x]: https://pypi.org/project/pdoc3/0.3.13/
 
 
 Contributing
