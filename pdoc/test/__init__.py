@@ -729,6 +729,8 @@ class ApiTest(unittest.TestCase):
             """ get_sample(self: pdoc.int, pos: int) -> Tuple[int, float] """
         self.assertEqual(pdoc.Function('get_sample', mod, get_sample).params(annotate=True),
                          ['self:\xa0int', 'pos:\xa0int'])
+        self.assertEqual(pdoc.Function('get_sample', mod, get_sample).return_annotation(),
+                         'Tuple[int,\xa0float]')
 
     def test_Function_return_annotation(self):
         import typing

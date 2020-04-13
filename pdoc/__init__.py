@@ -802,7 +802,7 @@ class Class(Doc):
     """
     Representation of a class' documentation.
     """
-    __slots__ = ('doc', '_super_members', '_cached_docstring_signature')
+    __slots__ = ('doc', '_super_members')
 
     def __init__(self, name, module, obj, *, docstring=None):
         assert inspect.isclass(obj)
@@ -1029,7 +1029,7 @@ class Function(Doc):
     """
     Representation of documentation for a function or method.
     """
-    __slots__ = ('cls', 'method', '_cached_docstring_signature')
+    __slots__ = ('cls', 'method')
 
     def __init__(self, name, module, obj, *, cls: Class = None, method=False):
         """
@@ -1198,44 +1198,41 @@ class Function(Doc):
         return params
 
     @staticmethod
+    @lru_cache()
     def _signature_from_string(self):
-        try:
-            return self._cached_docstring_signature
-        except AttributeError:
-            signature = None
-            for expr, cleanup_docstring, filter in (
-                    # Full proper typed signature, such as one from pybind11
-                    (r'^{}\(.*\)(?: -> .*)?$', True, lambda s: s),
-                    # Human-readable, usage-like signature from some Python builtins
-                    # (e.g. `range` or `slice` or `itertools.repeat` or `numpy.arange`)
-                    (r'^{}\(.*\)(?= -|$)', False, lambda s: s.replace('[', '').replace(']', '')),
-            ):
-                strings = sorted(re.findall(expr.format(self.name),
-                                            self.docstring, re.MULTILINE),
-                                 key=len, reverse=True)
-                if strings:
-                    string = filter(strings[0])
-                    _locals, _globals = {}, {}
-                    _globals.update({'capsule': None})  # pybind11 capsule data type
-                    _globals.update(typing.__dict__)
-                    _globals.update(self.module.obj.__dict__)
-                    # Trim binding module basename from type annotations
-                    # See: https://github.com/pdoc3/pdoc/pull/148#discussion_r407114141
-                    module_basename = self.module.name.rsplit('.', maxsplit=1)[-1]
-                    if module_basename in string and module_basename not in _globals:
-                        string = re.sub(r'(?<!\.)\b{}\.\b'.format(module_basename), '', string)
+        signature = None
+        for expr, cleanup_docstring, filter in (
+                # Full proper typed signature, such as one from pybind11
+                (r'^{}\(.*\)(?: -> .*)?$', True, lambda s: s),
+                # Human-readable, usage-like signature from some Python builtins
+                # (e.g. `range` or `slice` or `itertools.repeat` or `numpy.arange`)
+                (r'^{}\(.*\)(?= -|$)', False, lambda s: s.replace('[', '').replace(']', '')),
+        ):
+            strings = sorted(re.findall(expr.format(self.name),
+                                        self.docstring, re.MULTILINE),
+                             key=len, reverse=True)
+            if strings:
+                string = filter(strings[0])
+                _locals, _globals = {}, {}
+                _globals.update({'capsule': None})  # pybind11 capsule data type
+                _globals.update(typing.__dict__)
+                _globals.update(self.module.obj.__dict__)
+                # Trim binding module basename from type annotations
+                # See: https://github.com/pdoc3/pdoc/pull/148#discussion_r407114141
+                module_basename = self.module.name.rsplit('.', maxsplit=1)[-1]
+                if module_basename in string and module_basename not in _globals:
+                    string = re.sub(r'(?<!\.)\b{}\.\b'.format(module_basename), '', string)
 
-                    try:
-                        exec('def {}: pass'.format(string), _globals, _locals)
-                    except SyntaxError:
-                        continue
-                    signature = inspect.signature(_locals[self.name])
-                    if cleanup_docstring and len(strings) == 1:
-                        # Remove signature from docstring variable
-                        self.docstring = self.docstring.replace(strings[0], '')
-                    break
-            self._cached_docstring_signature = signature
-            return signature
+                try:
+                    exec('def {}: pass'.format(string), _globals, _locals)
+                except SyntaxError:
+                    continue
+                signature = inspect.signature(_locals[self.name])
+                if cleanup_docstring and len(strings) == 1:
+                    # Remove signature from docstring variable
+                    self.docstring = self.docstring.replace(strings[0], '')
+                break
+        return signature
 
     @property
     def refname(self):
