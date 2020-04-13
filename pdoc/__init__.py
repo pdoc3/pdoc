@@ -22,7 +22,10 @@ from copy import copy
 from functools import lru_cache, reduce, partial
 from itertools import tee, groupby
 from types import ModuleType
-from typing import Dict, Iterable, List, Set, Type, TypeVar, Union, Tuple, Generator, Callable
+from typing import (
+    cast, Callable, Dict, Generator, Iterable, List, Mapping, Optional, Set, Tuple,
+    Type, TypeVar, Union,
+)
 from warnings import warn
 
 from mako.lookup import TemplateLookup
@@ -42,7 +45,7 @@ _URL_PACKAGE_SUFFIX = '/index.html'
 # type.__module__ can be None by the Python spec. In those cases, use this value
 _UNKNOWN_MODULE = '?'
 
-T = TypeVar('T', bound='Doc')
+T = TypeVar('T', 'Module', 'Class', 'Function', 'Variable')
 
 __pdoc__ = {}  # type: Dict[str, Union[bool, str]]
 
@@ -160,7 +163,8 @@ def text(module_name, docfilter=None, reload=False, **kwargs) -> str:
     return mod.text(**kwargs)
 
 
-def import_module(module, *, reload: bool = False) -> ModuleType:
+def import_module(module: Union[str, ModuleType],
+                  *, reload: bool = False) -> ModuleType:
     """
     Return module object matching `module` specification (either a python
     module path or a filesystem path to file/directory).
@@ -302,7 +306,7 @@ def _is_descriptor(obj):
 
 
 def _filter_type(type: Type[T],
-                 values: Union[Iterable['Doc'], Dict[str, 'Doc']]) -> List[T]:
+                 values: Union[Iterable['Doc'], Mapping[str, 'Doc']]) -> List[T]:
     """
     Return a list of values from `values` of type `type`.
     """
@@ -311,7 +315,7 @@ def _filter_type(type: Type[T],
     return [i for i in values if isinstance(i, type)]
 
 
-def _toposort(graph: Dict[T, Set[T]]) -> Generator[T, None, None]:
+def _toposort(graph: Mapping[T, Set[T]]) -> Generator[T, None, None]:
     """
     Return items of `graph` sorted in topological order.
     Source: https://rosettacode.org/wiki/Topological_sort#Python
@@ -422,7 +426,7 @@ class Doc:
         directives resolved (i.e. content included).
         """
 
-        self.inherits = None  # type: Union[Class, Function, Variable]
+        self.inherits = None  # type: Optional[Union[Class, Function, Variable]]
         """
         The Doc object (Class, Function, or Variable) this object inherits from,
         if any.
@@ -554,7 +558,7 @@ class Module(Doc):
         The parent `pdoc.Module` this module is a submodule of, or `None`.
         """
 
-        self.doc = {}  # type: Dict[str, Doc]
+        self.doc = {}  # type: Dict[str, Union[Module, Class, Function, Variable]]
         """A mapping from identifier name to a documentation object."""
 
         self._is_inheritance_linked = False
@@ -828,7 +832,7 @@ class Class(Doc):
 
         super().__init__(name, module, obj, docstring=docstring)
 
-        self.doc = {}
+        self.doc = {}  # type: Dict[str, Union[Function, Variable]]
         """A mapping from identifier name to a `pdoc.Doc` objects."""
 
         public_objs = [(name, inspect.unwrap(obj))
@@ -921,7 +925,7 @@ class Class(Doc):
         return sorted(self.module.find_class(c)
                       for c in type.__subclasses__(self.obj))
 
-    def params(self, *, annotate=False, link=None) -> List['str']:
+    def params(self, *, annotate=False, link=None) -> List[str]:
         """
         Return a list of formatted parameters accepted by the
         class constructor (method `__init__`). See `pdoc.Function.params`.
@@ -985,10 +989,10 @@ class Class(Doc):
         (ancestor class, list of ancestor class' members sorted by name),
         sorted by MRO.
         """
-        return sorted(((k, sorted(g))
+        return sorted(((cast(Class, k), sorted(g))
                        for k, g in groupby((i.inherits
                                             for i in self.doc.values() if i.inherits),
-                                           key=lambda i: i.cls)),
+                                           key=lambda i: i.cls)),                   # type: ignore
                       key=lambda x, _mro_index=self.mro().index: _mro_index(x[0]))  # type: ignore
 
     def _fill_inheritance(self):

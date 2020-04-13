@@ -144,7 +144,7 @@ aa(
 args = argparse.Namespace()
 
 
-class WebDoc(BaseHTTPRequestHandler):
+class _WebDoc(BaseHTTPRequestHandler):
     args = None  # Set before server instantiated
     template_config = None
 
@@ -308,7 +308,7 @@ def _quit_if_exists(m: pdoc.Module, ext: str):
             sys.exit(1)
 
 
-def write_files(m: pdoc.Module, ext: str, **kwargs):
+def recursive_write_files(m: pdoc.Module, ext: str, **kwargs):
     assert ext in ('.html', '.md')
     f = module_path(m, ext=ext)
 
@@ -330,7 +330,7 @@ def write_files(m: pdoc.Module, ext: str, **kwargs):
         raise
 
     for submodule in m.submodules():
-        write_files(submodule, ext=ext, **kwargs)
+        recursive_write_files(submodule, ext=ext, **kwargs)
 
 
 def _flatten_submodules(modules: Sequence[pdoc.Module]):
@@ -340,7 +340,7 @@ def _flatten_submodules(modules: Sequence[pdoc.Module]):
             yield from _flatten_submodules((submodule,))
 
 
-def print_pdf(modules, **kwargs):
+def _print_pdf(modules, **kwargs):
     modules = list(_flatten_submodules(modules))
     print(pdoc._render_template('/pdf.mako', modules=modules, **kwargs))
 
@@ -421,15 +421,15 @@ def main(_args=None):
         template_config['link_prefix'] = "/"
 
         # Run the HTTP server.
-        WebDoc.args = args  # Pass params to HTTPServer xP
-        WebDoc.template_config = template_config
+        _WebDoc.args = args  # Pass params to HTTPServer xP
+        _WebDoc.template_config = template_config
 
         host, _, port = args.http.partition(':')
         host = host or DEFAULT_HOST
         port = int(port or DEFAULT_PORT)
 
         print('Starting pdoc server on {}:{}'.format(host, port), file=sys.stderr)
-        httpd = HTTPServer((host, port), WebDoc)
+        httpd = HTTPServer((host, port), _WebDoc)
         print("pdoc server ready at http://%s:%d" % (host, port), file=sys.stderr)
 
         # Allow tests to perform `pdoc.cli._httpd.shutdown()`
@@ -454,7 +454,7 @@ def main(_args=None):
     pdoc.link_inheritance()
 
     if args.pdf:
-        print_pdf(modules, **template_config)
+        _print_pdf(modules, **template_config)
         print("""
 PDF-ready markdown written to standard output.
                               ^^^^^^^^^^^^^^^
@@ -490,10 +490,10 @@ or similar, at your own discretion.""",
     for module in modules:
         if args.html:
             _quit_if_exists(module, ext='.html')
-            write_files(module, ext='.html', **template_config)
+            recursive_write_files(module, ext='.html', **template_config)
         elif args.output_dir:  # Generate text files
             _quit_if_exists(module, ext='.md')
-            write_files(module, ext='.md', **template_config)
+            recursive_write_files(module, ext='.md', **template_config)
         else:
             sys.stdout.write(module.text(**template_config))
             # Two blank lines between two modules' texts
