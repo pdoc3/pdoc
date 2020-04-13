@@ -629,12 +629,14 @@ class Module(Doc):
                 # as well be other auxiliary directories
                 if m.is_namespace and not m.doc:
                     del self.doc[root]
+                    self._context.pop(m.refname)
 
         # Apply docfilter
         if docfilter:
             for name, dobj in self.doc.copy().items():
                 if not docfilter(dobj):
                     self.doc.pop(name)
+                    self._context.pop(dobj.refname, None)
 
         # Build the reference name dictionary of the module
         self._context[self.refname] = self
