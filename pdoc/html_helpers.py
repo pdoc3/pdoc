@@ -150,7 +150,8 @@ class _ToMarkdown:
         assert name or type
         ret = ""
         if name:
-            ret += '**`{}`**'.format(name.replace(', ', '`**, **`'))
+            # NOTE: Double-backtick argument names so we skip linkifying them
+            ret += '**``{}``**'.format(name.replace(', ', '``**, **``'))
         if type:
             ret += ' :&ensp;{}'.format(type) if ret else type
         ret += '\n:   {}\n\n'.format(desc)
@@ -427,6 +428,7 @@ def to_markdown(text: str, docformat: str = 'numpy,google', *,
 
     if module and link:
         text = _code_refs(partial(_linkify, link=link, module=module, wrap_code=True), text)
+
     return text
 
 
@@ -440,6 +442,10 @@ class ReferenceWarning(UserWarning):
 
 
 def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module, wrap_code=False):
+    code_span = match.group()
+    is_type_annotation = re.match(r'^[`\w\s.,\[\]()]+$', code_span)
+    if not is_type_annotation:
+        return code_span
 
     def handle_refname(match):
         refname = match.group()
@@ -458,17 +464,15 @@ def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module, wra
                      ReferenceWarning, stacklevel=3)
         return link(dobj)
 
-    code_span = match.group()
-    if not re.match(r'^[`\w\s.,()\][\'"]+$', code_span):
-        return code_span
-
+    if wrap_code:
+        code_span = code_span.replace('[', '\\[')
     linked = re.sub(r'[a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)*(?:\(\))?', handle_refname, code_span)
     if wrap_code:
         assert linked[0] == linked[-1] == '`'
         # Wrapping in HTML <code> as opposed to backticks evaluates markdown */_ markers,
         # so let's escape them. Backticks cannot be used because html returned from `link()`
         # would then become escaped.
-        cleaned = re.sub(r'(?<!\\)([-*_])', r'\\\1', linked[1:-1])
+        cleaned = re.sub(r'(?<!\\)(_)', r'\\\1', linked[1:-1])
         return '<code>{}</code>'.format(cleaned)
     return linked
 
