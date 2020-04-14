@@ -744,8 +744,6 @@ class ApiTest(unittest.TestCase):
         import typing
 
         class Foobar:
-            var: int = 3
-            """var"""
             @property
             def prop(self) -> typing.Optional[int]:
                 pass
@@ -753,6 +751,16 @@ class ApiTest(unittest.TestCase):
         mod = pdoc.Module(pdoc)
         cls = pdoc.Class('Foobar', mod, Foobar)
         self.assertEqual(cls.doc['prop'].type_annotation(), 'Union[int,\N{NBSP}NoneType]')
+
+    @ignore_warnings
+    @unittest.skipIf(sys.version_info < (3, 6), 'variable annotation unsupported in <Py3.6')
+    def test_Variable_type_annotation_py35plus(self):
+        exec('''class Foo:
+                    var: int = 3
+                    """var"""
+        ''')
+        mod = pdoc.Module(pdoc)
+        cls = pdoc.Class('Foobar', mod, locals()['Foo'])
         self.assertEqual(cls.doc['var'].type_annotation(), 'int')
 
     @ignore_warnings
