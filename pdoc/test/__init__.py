@@ -1271,14 +1271,20 @@ Work [like this](http://foo/) and [like that].
 
 [like that]: ftp://bar
 
-data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"""
+data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D
+
+```
+http://url.com
+```"""
         expected = """<p>Beautiful Soup
 <a href="http://www.foo.bar">http://www.foo.bar</a>
 <a href="http://www.foo.bar?q=&quot;foo&quot;">http://www.foo.bar?q="foo"</a>
 <a href="https://travis-ci.org/cs01/pygdbmi"><img src="https://foo" /></a>
 <a href="https://foo.bar">https://foo.bar</a></p>
 <p>Work <a href="http://foo/">like this</a> and <a href="ftp://bar">like that</a>.</p>
-<p>data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D</p>"""
+<p>data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D</p>
+<pre><code>http://url.com
+</code></pre>"""
         html = to_html(text)
         self.assertEqual(html, expected)
 

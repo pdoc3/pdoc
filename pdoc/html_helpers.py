@@ -354,7 +354,11 @@ class _ToMarkdown:
     @staticmethod
     def raw_urls(text):
         """Wrap URLs in Python-Markdown-compatible <angle brackets>."""
-        return re.sub(r'(?<![<"\'])(\s*)((?:http|ftp)s?://[^>)\s]+)(\s*)', r'\1<\2>\3', text)
+        with _fenced_code_blocks_hidden(text) as result:
+            result[0] = re.sub(r'(?<![<"\'])(\s*)((?:http|ftp)s?://[^>)\s]+)(\s*)',
+                               r'\1<\2>\3', result[0])
+        text = result[0]
+        return text
 
 
 class _MathPattern(InlineProcessor):
@@ -414,12 +418,12 @@ def to_markdown(text: str, docformat: str = 'numpy,google', *,
     assert all(i in (None, '', 'numpy', 'google') for i in docformat.split(',')), docformat
 
     text = _ToMarkdown.admonitions(text, module)
-    text = _ToMarkdown.raw_urls(text)
 
     if 'google' in docformat:
         text = _ToMarkdown.google(text)
 
     text = _ToMarkdown.doctests(text)
+    text = _ToMarkdown.raw_urls(text)
 
     # If doing both, do numpy after google, otherwise google-style's
     # headings are incorrectly interpreted as numpy params
