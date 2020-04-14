@@ -19,6 +19,9 @@
     padding: 30px;
     overflow: hidden;
   }
+    #sidebar > *:last-child {
+      margin-bottom: 2cm;
+    }
 
   .http-server-breadcrumbs {
     font-size: 130%;
