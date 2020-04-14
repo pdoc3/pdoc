@@ -183,7 +183,9 @@ class CliTest(unittest.TestCase):
         }
         for package, expected_files in package_files.items():
             with self.subTest(package=package):
-                with run_html(EXAMPLE_MODULE + package, config='show_source_code=False'):
+                with run_html(EXAMPLE_MODULE + package,
+                              '--config', 'show_type_annotations=False',
+                              config='show_source_code=False'):
                     self._basic_html_assertions(expected_files)
                     self._check_files(include_patterns, exclude_patterns)
 
@@ -196,6 +198,7 @@ class CliTest(unittest.TestCase):
             for filenames, expected_files in filenames_files.items():
                 with self.subTest(filename=','.join(filenames)):
                     with run_html(*(os.path.join(EXAMPLE_MODULE, f) for f in filenames),
+                                  '--config', 'show_type_annotations=False',
                                   config='show_source_code=False'):
                         self._basic_html_assertions(expected_files)
                         self._check_files(include_patterns, exclude_patterns)
@@ -313,7 +316,7 @@ class CliTest(unittest.TestCase):
 
         with self.subTest(package=EXAMPLE_MODULE):
             with redirect_streams() as (stdout, _):
-                run(EXAMPLE_MODULE)
+                run(EXAMPLE_MODULE, config='show_type_annotations=False')
                 out = stdout.getvalue()
 
             header = 'Module {}\n{:=<{}}'.format(EXAMPLE_MODULE, '',
