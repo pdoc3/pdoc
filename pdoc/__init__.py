@@ -836,8 +836,7 @@ class Class(Doc):
         for name, obj in public_objs:
             if _is_function(obj):
                 self.doc[name] = Function(
-                    name, self.module, obj, cls=self,
-                    method=not self._method_type(self.obj, name))
+                    name, self.module, obj, cls=self)
             else:
                 self.doc[name] = Variable(
                     name, self.module,
@@ -958,7 +957,7 @@ class Class(Doc):
         represent this class' methods.
         """
         return self._filter_doc_objs(
-            Function, include_inherited, lambda dobj: dobj.method,
+            Function, include_inherited, lambda dobj: dobj.is_method,
             sort)
 
     def functions(self, include_inherited=True, sort=True) -> List['Function']:
@@ -967,7 +966,7 @@ class Class(Doc):
         represent this class' static functions.
         """
         return self._filter_doc_objs(
-            Function, include_inherited, lambda dobj: not dobj.method,
+            Function, include_inherited, lambda dobj: not dobj.is_method,
             sort)
 
     def inherited_members(self) -> List[Tuple['Class', List[Doc]]]:
@@ -1033,9 +1032,9 @@ class Function(Doc):
     """
     Representation of documentation for a function or method.
     """
-    __slots__ = ('cls', 'method')
+    __slots__ = ('cls',)
 
-    def __init__(self, name, module, obj, *, cls: Class = None, method=False):
+    def __init__(self, name, module, obj, *, cls: Class = None):
         """
         Same as `pdoc.Doc`, except `obj` must be a
         Python function object. The docstring is gathered automatically.
@@ -1055,12 +1054,23 @@ class Function(Doc):
         If not, this is None.
         """
 
-        self.method = method
+    @property
+    def is_method(self) -> bool:
         """
         Whether this function is a normal bound method.
 
         In particular, static and class methods have this set to False.
         """
+        assert self.cls
+        return not Class._method_type(self.cls.obj, self.name)
+
+    @property
+    def method(self):
+        warn('`Function.method` is deprecated. Use: `Function.is_method`', DeprecationWarning,
+             stacklevel=2)
+        return self.is_method
+
+    __pdoc__['Function.method'] = False
 
     def funcdef(self):
         """
