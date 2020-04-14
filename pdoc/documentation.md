@@ -21,10 +21,16 @@ variables is found by examining objects' abstract syntax trees.
 
 What objects are documented?
 ----------------------------
+[public-private]: #what-objects-are-documented
 `pdoc` only extracts _public API_ documentation.[^public]
-All objects (modules, functions, classes, variables) are only
-considered public if their _identifiers don't begin with an
-underscore_ ( \_ ).[^private]
+If a module defines [`__all__`][__all__], then only
+the identifiers contained in this list are considered public.
+More generally, objects (modules, variables, functions, classes, methods)
+are only considered public in the module where they are defined
+(vs. imported from somewhere else) and only if their
+_identifiers don't begin with an underscore_ ( \_ ).[^private]
+
+This can be fine-tuned through [`__pdoc__` dict][__pdoc__].
 
 [^public]:
     Here, public API refers to the API that is made available
@@ -38,17 +44,7 @@ underscore_ ( \_ ).[^private]
 
 [a common convention]: https://docs.python.org/3/tutorial/classes.html#private-variables
 
-In addition, if a module defines [`__all__`][__all__], then only
-the identifiers contained in this list will be considered public.
-Otherwise, a module's global identifiers are considered public
-only if they don't begin with an underscore and are defined
-in this exact module (i.e. not imported from somewhere else).
-
 [__all__]: https://docs.python.org/3/tutorial/modules.html#importing-from-a-package
-
-By transitivity, sub-objects of non-public objects
-(e.g. submodules of non-public modules, methods of non-public classes etc.)
-are not public and thus not documented.
 
 
 Where does `pdoc` get documentation from?
@@ -144,19 +140,25 @@ Class and instance variables can also [inherit docstrings].
 
 Overriding docstrings with `__pdoc__`
 -------------------------------------
-Docstrings for objects can be disabled or overridden with a special
+[__pdoc__]: #overriding-docstrings-with-__pdoc__
+Docstrings for objects can be disabled, overridden, or whitelisted with a special
 module-level dictionary `__pdoc__`. The _keys_
 should be string identifiers within the scope of the module or,
 alternatively, fully-qualified reference names. E.g. for instance
 variable `self.variable` of class `C`, its module-level identifier is
-`'C.variable'`.
+`'C.variable'`, and `some_package.module.C.variable` its refname.
 
 If `__pdoc__[key] = False`, then `key` (and its members) will be
 **excluded from the documentation** of the module.
 
-Alternatively, the _values_ of `__pdoc__` should be the overriding docstrings.
-This particular feature is useful when there's no feasible way of
-attaching a docstring to something. A good example of this is a
+Conversely, if `__pdoc__[key] = True`, then `key` (and its public members) will be
+**included in the documentation** of the module. This can be used to
+include documentation of [private objects][public-private],
+including special functions such as `__call__`, which are ignored by default.
+
+Alternatively, the _values_ of `__pdoc__` can be the **overriding docstrings**.
+This feature is useful when there's no feasible way of
+attaching a docstring to something. A good example is a
 [namedtuple](https://docs.python.org/3/library/collections.html#collections.namedtuple):
 
     __pdoc__ = {}

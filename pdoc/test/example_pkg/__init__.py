@@ -24,6 +24,10 @@ def object_as_arg_default(*args, a=object(), **kwargs):
     """Html-encodes angle brackets in params"""
 
 
+def _private_function():
+    """Private function, should only appear if whitelisted"""
+
+
 class A:
     """`A` is base class for `example_pkg.B`."""  # Test refname link
     def overridden(self):
@@ -34,6 +38,9 @@ class A:
 
     def inherited(self):  # Inherited in B
         """A.inherited docstring"""
+
+    def __call__(self):
+        """A.__call__ docstring. Only shown when whitelisted"""
 
 
 non_callable_routine = staticmethod(lambda x: 2)  # Not interpreted as Function; skipped
