@@ -436,7 +436,7 @@ class Doc:
         return inspect.cleandoc(''.join(['\n'] + lines))
 
     @property
-    def refname(self):
+    def refname(self) -> str:
         """
         Reference name of this documentation
         object, usually its fully qualified path
@@ -447,7 +447,7 @@ class Doc:
         return self.name
 
     @property
-    def qualname(self):
+    def qualname(self) -> str:
         """
         Module-relative "qualified" name of this documentation
         object, used for show (e.g. <code>Doc.qualname</code>).
@@ -456,7 +456,7 @@ class Doc:
 
     @lru_cache()
     def url(self, relative_to: 'Module' = None, *, link_prefix: str = '',
-            top_ancestor: bool = False):
+            top_ancestor: bool = False) -> str:
         """
         Canonical relative URL (including page fragment) for this
         documentation object.
@@ -716,7 +716,7 @@ class Module(Doc):
         return html
 
     @property
-    def is_package(self):
+    def is_package(self) -> bool:
         """
         `True` if this module is a package.
 
@@ -725,13 +725,13 @@ class Module(Doc):
         return hasattr(self.obj, "__path__")
 
     @property
-    def is_namespace(self):
+    def is_namespace(self) -> bool:
         """
         `True` if this module is a namespace package.
         """
         return self.obj.__spec__.origin in (None, 'namespace')  # None in Py3.7+
 
-    def find_class(self, cls: type):
+    def find_class(self, cls: type) -> Doc:
         """
         Given a Python `cls` object, try to find it in this module
         or in any of the exported identifiers of the submodules.
@@ -765,28 +765,28 @@ class Module(Doc):
         result = _filter_type(type, self.doc)
         return sorted(result) if sort else result
 
-    def variables(self, sort=True):
+    def variables(self, sort=True) -> List['Variable']:
         """
         Returns all documented module-level variables in the module,
         optionally sorted alphabetically, as a list of `pdoc.Variable`.
         """
         return self._filter_doc_objs(Variable, sort)
 
-    def classes(self, sort=True):
+    def classes(self, sort=True) -> List['Class']:
         """
         Returns all documented module-level classes in the module,
         optionally sorted alphabetically, as a list of `pdoc.Class`.
         """
         return self._filter_doc_objs(Class, sort)
 
-    def functions(self, sort=True):
+    def functions(self, sort=True) -> List['Function']:
         """
         Returns all documented module-level functions in the module,
         optionally sorted alphabetically, as a list of `pdoc.Function`.
         """
         return self._filter_doc_objs(Function, sort)
 
-    def submodules(self):
+    def submodules(self) -> List['Module']:
         """
         Returns all documented sub-modules of the module sorted
         alphabetically as a list of `pdoc.Module`.
@@ -874,7 +874,7 @@ class Class(Doc):
         raise RuntimeError("{}.{} not found".format(cls, name))
 
     @property
-    def refname(self):
+    def refname(self) -> str:
         return self.module.name + '.' + self.qualname
 
     def mro(self, only_documented=False) -> List['Class']:
@@ -932,7 +932,7 @@ class Class(Doc):
                   if (include_inherited or not obj.inherits) and filter_func(obj)]
         return sorted(result) if sort else result
 
-    def class_variables(self, include_inherited=True, sort=True):
+    def class_variables(self, include_inherited=True, sort=True) -> List['Variable']:
         """
         Returns an optionally-sorted list of `pdoc.Variable` objects that
         represent this class' class variables.
@@ -941,7 +941,7 @@ class Class(Doc):
             Variable, include_inherited, lambda dobj: not dobj.instance_var,
             sort)
 
-    def instance_variables(self, include_inherited=True, sort=True):
+    def instance_variables(self, include_inherited=True, sort=True) -> List['Variable']:
         """
         Returns an optionally-sorted list of `pdoc.Variable` objects that
         represent this class' instance variables. Instance variables
@@ -951,7 +951,7 @@ class Class(Doc):
             Variable, include_inherited, lambda dobj: dobj.instance_var,
             sort)
 
-    def methods(self, include_inherited=True, sort=True):
+    def methods(self, include_inherited=True, sort=True) -> List['Function']:
         """
         Returns an optionally-sorted list of `pdoc.Function` objects that
         represent this class' methods.
@@ -1072,7 +1072,7 @@ class Function(Doc):
 
     __pdoc__['Function.method'] = False
 
-    def funcdef(self):
+    def funcdef(self) -> str:
         """
         Generates the string of keywords used to define the function,
         for example `def` or `async def`.
@@ -1094,7 +1094,7 @@ class Function(Doc):
         except AttributeError:
             return False
 
-    def return_annotation(self, *, link=None):
+    def return_annotation(self, *, link=None) -> str:
         """Formatted function return type annotation or empty string if none."""
         annot = ''
         try:
@@ -1273,7 +1273,7 @@ class Function(Doc):
         return signature
 
     @property
-    def refname(self):
+    def refname(self) -> str:
         return (self.cls.refname if self.cls else self.module.refname) + '.' + self.name
 
 
@@ -1296,7 +1296,7 @@ class Variable(Doc):
         self.cls = cls
         """
         The `pdoc.Class` object if this is a class or instance
-        variable. If not, this is None.
+        variable. If not (i.e. it is a global variable), this is None.
         """
 
         self.instance_var = instance_var
@@ -1306,16 +1306,16 @@ class Variable(Doc):
         """
 
     @property
-    def qualname(self):
+    def qualname(self) -> str:
         if self.cls:
             return self.cls.qualname + '.' + self.name
         return self.name
 
     @property
-    def refname(self):
+    def refname(self) -> str:
         return (self.cls.refname if self.cls else self.module.refname) + '.' + self.name
 
-    def type_annotation(self, *, link=None):
+    def type_annotation(self, *, link=None) -> str:
         """Formatted variable type annotation or empty string if none."""
         return Function.return_annotation(cast(Function, self), link=link)
 
