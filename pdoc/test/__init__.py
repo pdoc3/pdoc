@@ -744,13 +744,16 @@ class ApiTest(unittest.TestCase):
         import typing
 
         class Foobar:
+            var: int = 3
+            """var"""
             @property
             def prop(self) -> typing.Optional[int]:
                 pass
 
-        cls = pdoc.Class('Foobar', pdoc.Module(pdoc), Foobar)
-        prop = cls.instance_variables()[0]
-        self.assertEqual(prop.type_annotation(), 'Union[int,\N{NBSP}NoneType]')
+        mod = pdoc.Module(pdoc)
+        cls = pdoc.Class('Foobar', mod, Foobar)
+        self.assertEqual(cls.doc['prop'].type_annotation(), 'Union[int,\N{NBSP}NoneType]')
+        self.assertEqual(cls.doc['var'].type_annotation(), 'int')
 
     @ignore_warnings
     def test_Class_docstring(self):

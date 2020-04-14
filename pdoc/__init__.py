@@ -38,6 +38,8 @@ except ImportError:
     __version__ = '???'  # Package not installed
 
 
+_get_type_hints = lru_cache()(typing.get_type_hints)
+
 _URL_MODULE_SUFFIX = '.html'
 _URL_INDEX_MODULE_SUFFIX = '.m.html'  # For modules named literal 'index'
 _URL_PACKAGE_SUFFIX = '/index.html'
@@ -261,6 +263,8 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
         elif isinstance(assign_node, ast_AnnAssign):
             target = assign_node.target
             # TODO: use annotation
+            # Note, need only for instance variables. Class variables are already
+            # handled by `typing.get_type_hints()` elsewhere.
         else:
             continue
 
@@ -1082,17 +1086,41 @@ class Function(Doc):
 
     def return_annotation(self, *, link=None):
         """Formatted function return type annotation or empty string if none."""
+        annot = ''
         try:
-            annot = typing.get_type_hints(self.obj)['return']
-        except NameError as e:
-            warn("Error handling return annotation for {}: {}".format(self.refname, e.args[0]))
-            annot = inspect.signature(self.obj).return_annotation
-        except (KeyError, TypeError):
+            try:
+                annot = _get_type_hints(self.obj)['return']
+            except Exception:
+                pass
+            else:
+                raise
+            try:
+                # This works mainly for non-property variables, and the rest are passed through
+                annot = _get_type_hints(cast(Class, self.cls).obj)[self.name]
+            except Exception:
+                pass
+            else:
+                raise
+            try:
+                annot = inspect.signature(self.obj).return_annotation
+            except Exception:
+                pass
+            else:
+                raise
             try:
                 # Extract annotation from the docstring for C builtin function
                 annot = Function._signature_from_string(self).return_annotation
-            except AttributeError:
-                annot = ''
+            except Exception:
+                pass
+            else:
+                raise
+        except RuntimeError:  # Success.
+            pass
+        else:
+            # Don't warn on instance variables. Their annotations remain TODO
+            # to be found when parsing _pep224_docstrings()
+            if not getattr(self, 'instance_var', False):
+                warn("Error handling return annotation for {!r}".format(self), stacklevel=3)
 
         if annot is inspect.Parameter.empty or not annot:
             return ''
