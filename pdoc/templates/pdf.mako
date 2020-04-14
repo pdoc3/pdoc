@@ -3,11 +3,11 @@
     import pdoc
     from pdoc.html_helpers import to_markdown
 
-    def link(d, fmt='{}'):
-        name = fmt.format(d.qualname + ('()' if isinstance(d, pdoc.Function) else ''))
-        if isinstance(d, pdoc.External):
+    def link(dobj: pdoc.Doc):
+        name = dobj.qualname + ('()' if isinstance(dobj, pdoc.Function) else '')
+        if isinstance(dobj, pdoc.External):
             return name
-        return '[{}](#{})'.format(name, d.refname)
+        return '[{0}](#{1} "{1}")'.format(name, dobj.refname)
 
     def _to_md(text, module):
         text = to_markdown(text, module=module, link=link)

@@ -130,40 +130,39 @@ class _ToMarkdown:
     will come in handy.
     """
     @staticmethod
-    def _deflist(name, type, desc,
-                 # Wraps any identifiers and string literals in parameter type spec
-                 # in backticks while skipping common "stopwords" such as 'or', 'of',
-                 # 'optional' ... See §4 Parameters:
-                 # https://numpydoc.readthedocs.io/en/latest/format.html#sections
-                 _type_parts=partial(
-                     re.compile(r'[\w.\'"]+').sub,
-                     lambda m: ('{}' if m.group(0) in ('of', 'or', 'default', 'optional') else
-                                '`{}`').format(m.group(0)))):
+    def _deflist(name, type, desc):
         """
         Returns `name`, `type`, and `desc` formatted as a
         Python-Markdown definition list entry. See also:
         https://python-markdown.github.io/extensions/definition_lists/
         """
-        type = _type_parts(type or '')
+        # Wrap any identifiers and string literals in parameter type spec
+        # in backticks while skipping common "stopwords" such as 'or', 'of',
+        # 'optional' ... See §4 Parameters:
+        # https://numpydoc.readthedocs.io/en/latest/format.html#sections
+        type_parts = re.split(r'( *(?: of | or |, *default(?:=|\b)|, *optional\b) *)', type or '')
+        type_parts[::2] = ['`{}`'.format(s) if s else s
+                           for s in type_parts[::2]]
+        type = ''.join(type_parts)
+
         desc = desc or '&nbsp;'
         assert _ToMarkdown._is_indented_4_spaces(desc)
         assert name or type
         ret = ""
         if name:
-            ret += '**`{}`**'.format(name)
+            # NOTE: Double-backtick argument names so we skip linkifying them
+            ret += '**``{}``**'.format(name.replace(', ', '``**, **``'))
         if type:
             ret += ' :&ensp;{}'.format(type) if ret else type
         ret += '\n:   {}\n\n'.format(desc)
         return ret
 
     @staticmethod
-    def _numpy_params(match,
-                      _name_parts=partial(re.compile(', ').sub, '`**, **`')):
+    def _numpy_params(match):
         """ Converts NumpyDoc parameter (etc.) sections into Markdown. """
         name, type, desc = match.group("name", "type", "desc")
         type = type or match.groupdict().get('just_type', None)
         desc = desc.strip()
-        name = name and _name_parts(name)
         return _ToMarkdown._deflist(name, type, desc)
 
     @staticmethod
@@ -428,7 +427,7 @@ def to_markdown(text: str, docformat: str = 'numpy,google', *,
         text = _ToMarkdown.numpy(text)
 
     if module and link:
-        text = _code_refs(partial(_linkify, link=link, module=module, fmt='`{}`'), text)
+        text = _code_refs(partial(_linkify, link=link, module=module, wrap_code=True), text)
 
     return text
 
@@ -442,22 +441,40 @@ class ReferenceWarning(UserWarning):
     """
 
 
-def _linkify(match: Match, link: Callable[..., str], module: pdoc.Module,
-             _is_pyident=re.compile(r'^[a-zA-Z_]\w*(\.\w+)+$').match, **kwargs):
-    matched = match.group(0)
-    refname = matched.strip('`')
-    dobj = module.find_ident(refname)
-    if isinstance(dobj, pdoc.External):
-        if not _is_pyident(refname):
-            return matched
-        # If refname in documentation has a typo or is obsolete, warn.
-        # XXX: Assume at least the first part of refname, i.e. the package, is correct.
-        module_part = module.find_ident(refname.split('.')[0])
-        if not isinstance(module_part, pdoc.External):
-            warn('Code reference `{}` in module "{}" does not match any '
-                 'documented object.'.format(refname, module.refname),
-                 ReferenceWarning, stacklevel=3)
-    return link(dobj, **kwargs)
+def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module, wrap_code=False):
+    code_span = match.group()
+    is_type_annotation = re.match(r'^[`\w\s.,\[\]()]+$', code_span)
+    if not is_type_annotation:
+        return code_span
+
+    def handle_refname(match):
+        refname = match.group()
+        dobj = module.find_ident(refname)
+        if isinstance(dobj, pdoc.External):
+            # If this is a single-word reference,
+            # most likely an argument name. Skip linking External.
+            if '.' not in refname:
+                return refname
+            # If refname in documentation has a typo or is obsolete, warn.
+            # XXX: Assume at least the first part of refname, i.e. the package, is correct.
+            module_part = module.find_ident(refname.split('.')[0])
+            if not isinstance(module_part, pdoc.External):
+                warn('Code reference `{}` in module "{}" does not match any '
+                     'documented object.'.format(refname, module.refname),
+                     ReferenceWarning, stacklevel=3)
+        return link(dobj)
+
+    if wrap_code:
+        code_span = code_span.replace('[', '\\[')
+    linked = re.sub(r'[a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)*(?:\(\))?', handle_refname, code_span)
+    if wrap_code:
+        assert linked[0] == linked[-1] == '`'
+        # Wrapping in HTML <code> as opposed to backticks evaluates markdown */_ markers,
+        # so let's escape them. Backticks cannot be used because html returned from `link()`
+        # would then become escaped.
+        cleaned = re.sub(r'(?<!\\)(_)', r'\\\1', linked[1:-1])
+        return '<code>{}</code>'.format(cleaned)
+    return linked
 
 
 def extract_toc(text: str):

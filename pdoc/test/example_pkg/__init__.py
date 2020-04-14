@@ -149,17 +149,16 @@ class Docformats:
             Description of num
         *args, **kwargs
             Passed on.
+        complex : Union[Set[pdoc.Doc, Function], pdoc]
+            The `List[Doc]`s of the new signal.
 
         Returns
         -------
         output : pdoc.Doc
             The output array
-        foo
-
-        Returns
-        -------
-        pdoc.Doc
+        List[pdoc.Doc]
             The output array
+        foo
 
         Raises
         ------

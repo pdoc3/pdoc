@@ -5,13 +5,13 @@
   from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html, format_git_link
 
 
-  def link(d, name=None, fmt='{}'):
-    name = fmt.format(name or d.qualname + ('()' if isinstance(d, pdoc.Function) else ''))
-    if not isinstance(d, pdoc.Doc) or isinstance(d, pdoc.External) and not external_links:
+  def link(dobj: pdoc.Doc, name=None):
+    name = name or dobj.qualname + ('()' if isinstance(dobj, pdoc.Function) else '')
+    if isinstance(dobj, pdoc.External) and not external_links:
         return name
-    url = d.url(relative_to=module, link_prefix=link_prefix,
-                top_ancestor=not show_inherited_members)
-    return '<a title="{}" href="{}">{}</a>'.format(d.refname, url, name)
+    url = dobj.url(relative_to=module, link_prefix=link_prefix,
+                   top_ancestor=not show_inherited_members)
+    return '<a title="{}" href="{}">{}</a>'.format(dobj.refname, url, name)
 
 
   def to_html(text):
