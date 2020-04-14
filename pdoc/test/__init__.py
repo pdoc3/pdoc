@@ -533,6 +533,12 @@ class ApiTest(unittest.TestCase):
             pdoc.link_inheritance()
             self.assertNotIn('inherited', mod.doc['B'].doc)
 
+        # GH-99: https://github.com/pdoc3/pdoc/issues/99
+        module = pdoc.import_module(EXAMPLE_MODULE + '._exclude_dir')
+        with patch.object(module, '__pdoc__', {'downloaded_modules': False}, create=True):
+            mod = pdoc.Module(module)
+            self.assertNotIn('downloaded_modules', mod.doc)
+
     def test__pdoc__invalid_value(self):
         module = pdoc.import_module(EXAMPLE_MODULE)
         with patch.object(module, '__pdoc__', {'B': 1}), \

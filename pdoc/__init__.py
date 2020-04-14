@@ -305,6 +305,21 @@ def _is_whitelisted(name: str, doc_obj: Union['Module', 'Class']):
     return False
 
 
+def _is_blacklisted(name: str, doc_obj: Union['Module', 'Class']):
+    """
+    Returns `True` if `name` (relative or absolute refname) is
+    contained in some module's __pdoc__ with value False.
+    """
+    refname = doc_obj.refname + '.' + name
+    module = doc_obj.module
+    while module:
+        qualname = refname[len(module.refname) + 1:]
+        if module.__pdoc__.get(qualname) is False or module.__pdoc__.get(refname) is False:
+            return True
+        module = module.supermodule
+    return False
+
+
 def _is_public(ident_name):
     """
     Returns `True` if `ident_name` matches the export criteria for an
@@ -624,6 +639,8 @@ class Module(Doc):
 
                 # Ignore if it isn't exported
                 if not _is_public(root) and not _is_whitelisted(root, self):
+                    continue
+                if _is_blacklisted(root, self):
                     continue
 
                 assert self.refname == self.name
