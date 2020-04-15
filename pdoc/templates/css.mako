@@ -132,10 +132,8 @@
       padding: 0;
     }
     #index h4 {
+      margin-top: .6em;
       font-weight: bold;
-    }
-    #index h4 + ul {
-      margin-bottom:.6em;
     }
     /* Make TOC lists have 2+ columns when viewport is wide enough.
        Assuming ~20-character identifiers and ~30% wide sidebar. */
