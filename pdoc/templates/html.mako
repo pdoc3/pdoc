@@ -285,6 +285,13 @@
 
     <%include file="logo.mako"/>
 
+    % if search_query:
+        <div class="gcse-search" style="height: 70px"
+             data-as_oq="${' '.join(search_query.strip().split()) | h }"
+             data-gaCategoryParameter="${module.refname | h}">
+        </div>
+    % endif
+
     <h1>Index</h1>
     ${extract_toc(module.docstring) if extract_module_toc_into_sidebar else ''}
     <ul id="index">
@@ -382,6 +389,11 @@
     window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
     ga('create', '${google_analytics}', 'auto'); ga('send', 'pageview');
     </script><script async src='https://www.google-analytics.com/analytics.js'></script>
+  % endif
+
+  % if search_query:
+    <script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
+    <style>.gsc-control-cse {padding:0 !important;margin-top:1em}</style>
   % endif
 
   % if latex_math:

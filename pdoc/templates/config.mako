@@ -42,6 +42,12 @@
     # tracking id (UA-XXXXXX-Y).
     google_analytics = ''
 
+    # If set, insert Google Custom Search search bar widget above the sidebar index.
+    # The whitespace-separated tokens represent arbitrary extra queries (at least one
+    # must match) passed to regular Google search. Example:
+    #search_query = 'inurl:github.com/USER/PROJECT  site:PROJECT.github.io  site:PROJECT.website'
+    search_query = ''
+
     # If set, render LaTeX math syntax within \(...\) (inline equations),
     # or within \[...\] or $$...$$ or `.. math::` (block equations)
     # as nicely-formatted math formulas using MathJax.
