@@ -950,6 +950,8 @@ class HtmlHelpersTest(unittest.TestCase):
 
 `pdoc.Module` is a `Doc`, not `dict`.
 
+ref with underscore: `_x_x_`
+
 ```
 code block
 ```
@@ -958,14 +960,16 @@ reference: `package.foo`
         expected = '''<h1 id="title">Title</h1>
 <p><code><a href="#pdoc.Module">Module</a></code> is a <code><a href="#pdoc.Doc">Doc</a></code>,\
  not <code>dict</code>.</p>
+<p>ref with underscore: <code><a href="#pdoc._x_x_">_x_x_</a></code></p>
 <pre><code>code block
 </code></pre>
 
 <p>reference: <code><a href="/package.foo.ext">package.foo</a></code></p>'''
 
         module = pdoc.Module(pdoc)
+        module.doc['_x_x_'] = pdoc.Variable('_x_x_', module, '')
 
-        def link(dobj, *args, **kwargs):
+        def link(dobj):
             return '<a href="{}">{}</a>'.format(dobj.url(relative_to=module), dobj.qualname)
 
         html = to_html(text, module=module, link=link)
@@ -976,6 +980,40 @@ reference: `package.foo`
 
         self.assertEqual(to_html('`foo.f()`', module=module, link=link),
                          '<p><code><a href="/foo.f().ext">foo.f()</a></code></p>')
+
+    def test_to_html_refname(self):
+        text = '''
+[`pdoc` x][pdoc] `pdoc`
+[x `pdoc`][pdoc] `[pdoc]()`
+
+`__x__`
+
+[`pdoc`](#)
+[``pdoc` ``](#)
+[```pdoc```](#)
+
+```
+pdoc
+```
+
+[pdoc]: #pdoc
+'''
+        expected = '''\
+<p><a href="#pdoc"><code>pdoc</code> x</a> <code><a>pdoc</a></code>
+<a href="#pdoc">x <code>pdoc</code></a> <code>[<a>pdoc</a>]()</code></p>
+<p><code>__x__</code></p>
+<p><a href="#"><code>pdoc</code></a>
+<a href="#"><code>pdoc`</code></a>
+<a href="#"><code>pdoc</code></a></p>
+<pre><code>pdoc
+</code></pre>\
+'''
+
+        def link(dobj):
+            return '<a>{}</a>'.format(dobj.qualname)
+
+        html = to_html(text, module=pdoc.Module(pdoc), link=link)
+        self.assertEqual(html, expected)
 
     def test_to_html_refname_warning(self):
         mod = pdoc.Module(EXAMPLE_MODULE)

@@ -150,8 +150,8 @@ class _ToMarkdown:
         assert name or type
         ret = ""
         if name:
-            # NOTE: Double-backtick argument names so we skip linkifying them
-            ret += '**``{}``**'.format(name.replace(', ', '``**, **``'))
+            # NOTE: Triple-backtick argument names so we skip linkifying them
+            ret += '**```{}```**'.format(name.replace(', ', '```**, **```'))
         if type:
             ret += ' :&ensp;{}'.format(type) if ret else type
         ret += '\n:   {}\n\n'.format(desc)
@@ -403,11 +403,7 @@ def to_html(text: str, docformat: str = 'numpy,google', *,
 
 
 def to_markdown(text: str, docformat: str = 'numpy,google', *,
-                module: pdoc.Module = None, link: Callable[..., str] = None,
-                # Matches markdown code spans not +directly+ within links.
-                # E.g. `code` and [foo is `bar`]() but not [`code`](...)
-                # Also skips \-escaped grave quotes.
-                _code_refs=re.compile(r'(?<![\[\\`])`(?!])(?:[^`]|(?<=\\)`)+`').sub):
+                module: pdoc.Module = None, link: Callable[..., str] = None):
     """
     Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
 
@@ -431,8 +427,18 @@ def to_markdown(text: str, docformat: str = 'numpy,google', *,
         text = _ToMarkdown.numpy(text)
 
     if module and link:
-        text = _code_refs(partial(_linkify, link=link, module=module, wrap_code=True), text)
-
+        # Hyperlink markdown code spans not within markdown hyperlinks.
+        # E.g. `code` yes, but not [`code`](...). RE adapted from:
+        # https://github.com/Python-Markdown/markdown/blob/ada40c66/markdown/inlinepatterns.py#L106
+        # Also avoid linking triple-backticked arg names in deflists.
+        linkify = partial(_linkify, link=link, module=module, wrap_code=True)
+        text = re.sub(r'(?P<inside_link>\[[^\]]*?)?'
+                      r'(?:(?<!\\)(?:\\{2})+(?=`)|(?<!\\)(?P<fence>`+)'
+                      r'(?P<code>.+?)(?<!`)'
+                      r'(?P=fence)(?!`))',
+                      lambda m: (m.group()
+                                 if m.group('inside_link') or len(m.group('fence')) > 2
+                                 else linkify(m)), text)
     return text
 
 
@@ -446,12 +452,17 @@ class ReferenceWarning(UserWarning):
 
 
 def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module, wrap_code=False):
-    code_span = match.group()
+    try:
+        code_span = match.group('code')
+    except IndexError:
+        code_span = match.group()
+
     is_type_annotation = re.match(r'^[`\w\s.,\[\]()]+$', code_span)
     if not is_type_annotation:
-        return code_span
+        return match.group()
 
     def handle_refname(match):
+        nonlocal link, module
         refname = match.group()
         dobj = module.find_ident(refname)
         if isinstance(dobj, pdoc.External):
@@ -472,11 +483,12 @@ def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module, wra
         code_span = code_span.replace('[', '\\[')
     linked = re.sub(r'[a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)*(?:\(\))?', handle_refname, code_span)
     if wrap_code:
-        assert linked[0] == linked[-1] == '`'
         # Wrapping in HTML <code> as opposed to backticks evaluates markdown */_ markers,
-        # so let's escape them. Backticks cannot be used because html returned from `link()`
+        # so let's escape them in text (but not in HTML tag attributes).
+        # Backticks also cannot be used because html returned from `link()`
         # would then become escaped.
-        cleaned = re.sub(r'(?<!\\)(_)', r'\\\1', linked[1:-1])
+        # This finds overlapping matches, https://stackoverflow.com/a/5616910/1090455
+        cleaned = re.sub(r'(_(?=[^>]*?(?:<|$)))', r'\\\1', linked)
         return '<code>{}</code>'.format(cleaned)
     return linked
 
