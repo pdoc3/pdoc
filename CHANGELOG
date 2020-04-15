@@ -1,3 +1,20 @@
+0.8.0  (2020-04-15)
+=====
+  - New features:
+    - Whitelisting `_private` members with `__pdoc__[key] = True`.
+    - Support function signatures (and annotations) for Python built-in/C extension types.
+    - Show type annotations also for variables (some; no instance variables).
+    - Consult `__docformat__` variable in the documented module (PEP 258).
+    - Skip traversal of `__pdoc__`-ignored package/directory.
+    - HTML sidebar (index) now has a separate scrollbar.
+  - Changes:
+    - Improved reference linking in more complex type expressions.
+    - `show_type_annotations` config tunable is now set by default.
+  - Fixes:
+    - Fix crash when some `class.__module__` is None.
+    - Avoid URL manipulation inside code blocks.
+    - Improved doctests and googledoc docformat.
+
 0.7.5  (2020-02-27)
 =====
   - Fix docstrings for class variables inherited from object/builtins values.
