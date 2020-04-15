@@ -243,9 +243,16 @@ class _ToMarkdown:
                 return match.group()
             body = textwrap.dedent(body)
             section = section.title()
-            if section in ('Args', 'Attributes', 'Returns', 'Yields', 'Raises', 'Warns'):
+            if section in ('Args', 'Attributes'):
                 body = re.compile(
                     r'^([\w*]+)(?: \(([\w.,=\[\] ]+)\))?: '
+                    r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub(
+                    lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups())),
+                    inspect.cleandoc('\n' + body)
+                )
+            elif section in ('Returns', 'Yields', 'Raises', 'Warns'):
+                body = re.compile(
+                    r'^()([\w.,\[\] ]+): '
                     r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub(
                     lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups())),
                     inspect.cleandoc('\n' + body)

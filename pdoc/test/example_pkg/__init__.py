@@ -230,6 +230,9 @@ class Docformats:
                 if only a single item was listed. `inspect.cleandoc()`
                 somehow stripped the required extra indentation.
 
+        Returns:
+            Dict[int, pdoc.Doc]: Description.
+
         Raises:
             AttributeError: The ``Raises`` section is a list of all exceptions
                 that are relevant to the interface.

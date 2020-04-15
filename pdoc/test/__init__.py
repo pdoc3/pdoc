@@ -1172,20 +1172,25 @@ code
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>issue_10</code></strong></dt>
+<dt><code>issue_10</code></dt>
 <dd>description didn't work across multiple lines
 if only a single item was listed. <code><a>inspect.cleandoc()</a></code>
 somehow stripped the required extra indentation.</dd>
 </dl>
+<h2 id="returns_1">Returns</h2>
+<dl>
+<dt><code>Dict[int, <a>pdoc.Doc</a>]</code></dt>
+<dd>Description.</dd>
+</dl>
 <h2 id="raises">Raises</h2>
 <dl>
-<dt><strong><code>AttributeError</code></strong></dt>
+<dt><code>AttributeError</code></dt>
 <dd>
 <p>The <code>Raises</code> section is a list of all exceptions
 that are relevant to the interface.</p>
 <p>and a third line.</p>
 </dd>
-<dt><strong><code>ValueError</code></strong></dt>
+<dt><code>ValueError</code></dt>
 <dd>If <code>arg2</code> is equal to <code>arg1</code>.</dd>
 </dl>
 <p>Test a title without a blank line before it.</p>
