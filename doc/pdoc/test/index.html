@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.7.5" />
+<meta name="generator" content="pdoc 0.8.0" />
 <title>pdoc.test API documentation</title>
 <meta name="description" content="Unit tests for pdoc package." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 <style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em}</style>
 <link rel="canonical" href="https://pdoc3.github.io/pdoc/doc/pdoc/test/">
 <link rel="icon" href="https://pdoc.github.io/pdoc/logo.png">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><script>(adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:"ca-pub-2900001379782823",enable_page_level_ads:true});</script></head>
+<script data-ad-client="ca-pub-2900001379782823" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script></head>
 <body>
 <main>
 <article id="content">
@@ -27,7 +27,7 @@
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L0-L1249" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L0-L1427" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 Unit tests for pdoc package.
@@ -214,7 +214,9 @@ class CliTest(unittest.TestCase):
         }
         for package, expected_files in package_files.items():
             with self.subTest(package=package):
-                with run_html(EXAMPLE_MODULE + package, config=&#39;show_source_code=False&#39;):
+                with run_html(EXAMPLE_MODULE + package,
+                              &#39;--config&#39;, &#39;show_type_annotations=False&#39;,
+                              config=&#39;show_source_code=False&#39;):
                     self._basic_html_assertions(expected_files)
                     self._check_files(include_patterns, exclude_patterns)
 
@@ -227,6 +229,7 @@ class CliTest(unittest.TestCase):
             for filenames, expected_files in filenames_files.items():
                 with self.subTest(filename=&#39;,&#39;.join(filenames)):
                     with run_html(*(os.path.join(EXAMPLE_MODULE, f) for f in filenames),
+                                  &#39;--config&#39;, &#39;show_type_annotations=False&#39;,
                                   config=&#39;show_source_code=False&#39;):
                         self._basic_html_assertions(expected_files)
                         self._check_files(include_patterns, exclude_patterns)
@@ -344,7 +347,7 @@ class CliTest(unittest.TestCase):
 
         with self.subTest(package=EXAMPLE_MODULE):
             with redirect_streams() as (stdout, _):
-                run(EXAMPLE_MODULE)
+                run(EXAMPLE_MODULE, config=&#39;show_type_annotations=False&#39;)
                 out = stdout.getvalue()
 
             header = &#39;Module {}\n{:=&lt;{}}&#39;.format(EXAMPLE_MODULE, &#39;&#39;,
@@ -432,6 +435,15 @@ class ApiTest(unittest.TestCase):
                     self.assertEqual(m.name, EXAMPLE_MODULE + name_suffix)
                     self.assertEqual(sorted(m.name for m in m.submodules()),
                                      [EXAMPLE_MODULE + &#39;.&#39; + m for m in submodules])
+
+    def test_Module_find_class(self):
+        class A:
+            __module__ = None
+
+        assert A.__module__ is None
+        mod = pdoc.Module(pdoc)
+        self.assertIsInstance(mod.find_class(pdoc.Doc), pdoc.Class)
+        self.assertIsInstance(mod.find_class(A), pdoc.External)
 
     def test_import_filename(self):
         with patch.object(sys, &#39;path&#39;, [&#39;&#39;]), \
@@ -552,12 +564,73 @@ class ApiTest(unittest.TestCase):
             pdoc.link_inheritance()
             self.assertNotIn(&#39;inherited&#39;, mod.doc[&#39;B&#39;].doc)
 
+        # GH-99: https://github.com/pdoc3/pdoc/issues/99
+        module = pdoc.import_module(EXAMPLE_MODULE + &#39;._exclude_dir&#39;)
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;downloaded_modules&#39;: False}, create=True):
+            mod = pdoc.Module(module)
+            self.assertNotIn(&#39;downloaded_modules&#39;, mod.doc)
+
     def test__pdoc__invalid_value(self):
         module = pdoc.import_module(EXAMPLE_MODULE)
         with patch.object(module, &#39;__pdoc__&#39;, {&#39;B&#39;: 1}), \
                 self.assertRaises(ValueError):
             pdoc.Module(module)
             pdoc.link_inheritance()
+
+    def test__pdoc__whitelist(self):
+        module = pdoc.import_module(EXAMPLE_MODULE)
+        mod = pdoc.Module(module)
+        pdoc.link_inheritance()
+        self.assertNotIn(&#39;__call__&#39;, mod.doc[&#39;A&#39;].doc)
+        self.assertNotIn(&#39;_private_function&#39;, mod.doc)
+
+        # Override docstring string
+        docstring = &#34;Overwrite private function doc&#34;
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;A.__call__&#39;: docstring}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertEqual(mod.doc[&#39;A&#39;].doc[&#39;__call__&#39;].docstring, docstring)
+
+        # Module-relative
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;_private_function&#39;: True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn(&#39;Private function&#39;, mod.doc[&#39;_private_function&#39;].docstring)
+            self.assertNotIn(&#39;_private_function&#39;, mod.doc[&#34;subpkg&#34;].doc)
+
+        # Defined in example_pkg, referring to a member of its submodule
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;subpkg.A.__call__&#39;: True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn(&#39;A.__call__&#39;, mod.doc[&#39;subpkg&#39;].doc[&#39;A&#39;].doc[&#39;__call__&#39;].docstring)
+
+        # Using full refname
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;example_pkg.subpkg.A.__call__&#39;: True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn(&#39;A.__call__&#39;, mod.doc[&#39;subpkg&#39;].doc[&#39;A&#39;].doc[&#39;__call__&#39;].docstring)
+
+        # Entire module, absolute refname
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;example_pkg._private&#39;: True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn(&#39;module&#39;, mod.doc[&#39;_private&#39;].doc)
+            self.assertNotIn(&#39;_private&#39;, mod.doc[&#39;_private&#39;].doc)
+            self.assertNotIn(&#39;__call__&#39;, mod.doc[&#39;_private&#39;].doc[&#39;module&#39;].doc)
+
+        # Entire module, relative
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;_private&#39;: True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn(&#39;_private&#39;, mod.doc)
+            self.assertNotIn(&#39;_private&#39;, mod.doc[&#39;_private&#39;].doc)
+            self.assertNotIn(&#39;__call__&#39;, mod.doc[&#39;_private&#39;].doc[&#39;module&#39;].doc)
+
+        # Private instance variables
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;B._private_instance_var&#39;: True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn(&#39;should be private&#39;, mod.doc[&#39;B&#39;].doc[&#39;_private_instance_var&#39;].docstring)
 
     def test__all__(self):
         module = pdoc.import_module(EXAMPLE_MODULE + &#39;.index&#39;)
@@ -742,12 +815,48 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(pdoc.Function(&#39;bug130&#39;, mod, bug130_str_annotation).params(annotate=True),
                          [&#39;a:\N{NBSP}str&#39;])
 
+        # builtin callables with signatures in docstrings
+        from itertools import repeat
+        self.assertEqual(pdoc.Function(&#39;repeat&#39;, mod, repeat).params(), [&#39;object&#39;, &#39;times&#39;])
+        self.assertEqual(pdoc.Function(&#39;slice&#39;, mod, slice).params(), [&#39;start&#39;, &#39;stop&#39;, &#39;step&#39;])
+
+        class get_sample(repeat):
+            &#34;&#34;&#34; get_sample(self: pdoc.int, pos: int) -&gt; Tuple[int, float] &#34;&#34;&#34;
+        self.assertEqual(pdoc.Function(&#39;get_sample&#39;, mod, get_sample).params(annotate=True),
+                         [&#39;self:\xa0int&#39;, &#39;pos:\xa0int&#39;])
+        self.assertEqual(pdoc.Function(&#39;get_sample&#39;, mod, get_sample).return_annotation(),
+                         &#39;Tuple[int,\xa0float]&#39;)
+
     def test_Function_return_annotation(self):
         import typing
 
         def f() -&gt; typing.List[typing.Union[str, pdoc.Doc]]: pass
         func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc), f)
         self.assertEqual(func.return_annotation(), &#39;List[Union[str,\N{NBSP}pdoc.Doc]]&#39;)
+
+    @ignore_warnings
+    def test_Variable_type_annotation(self):
+        import typing
+
+        class Foobar:
+            @property
+            def prop(self) -&gt; typing.Optional[int]:
+                pass
+
+        mod = pdoc.Module(pdoc)
+        cls = pdoc.Class(&#39;Foobar&#39;, mod, Foobar)
+        self.assertEqual(cls.doc[&#39;prop&#39;].type_annotation(), &#39;Union[int,\N{NBSP}NoneType]&#39;)
+
+    @ignore_warnings
+    @unittest.skipIf(sys.version_info &lt; (3, 6), &#39;variable annotation unsupported in &lt;Py3.6&#39;)
+    def test_Variable_type_annotation_py35plus(self):
+        exec(&#39;&#39;&#39;class Foo:
+                    var: int = 3
+                    &#34;&#34;&#34;var&#34;&#34;&#34;
+        &#39;&#39;&#39;)
+        mod = pdoc.Module(pdoc)
+        cls = pdoc.Class(&#39;Foobar&#39;, mod, locals()[&#39;Foo&#39;])
+        self.assertEqual(cls.doc[&#39;var&#39;].type_annotation(), &#39;int&#39;)
 
     @ignore_warnings
     def test_Class_docstring(self):
@@ -872,29 +981,70 @@ class HtmlHelpersTest(unittest.TestCase):
 
 `pdoc.Module` is a `Doc`, not `dict`.
 
+ref with underscore: `_x_x_`
+
 ```
 code block
 ```
 reference: `package.foo`
 &#39;&#39;&#39;
         expected = &#39;&#39;&#39;&lt;h1 id=&#34;title&#34;&gt;Title&lt;/h1&gt;
-&lt;p&gt;&lt;a href=&#34;#pdoc.Module&#34;&gt;Module&lt;/a&gt; is a &lt;a href=&#34;#pdoc.Doc&#34;&gt;Doc&lt;/a&gt;, not &lt;code&gt;dict&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;&lt;a href=&#34;#pdoc.Module&#34;&gt;Module&lt;/a&gt;&lt;/code&gt; is a &lt;code&gt;&lt;a href=&#34;#pdoc.Doc&#34;&gt;Doc&lt;/a&gt;&lt;/code&gt;,\
+ not &lt;code&gt;dict&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;ref with underscore: &lt;code&gt;&lt;a href=&#34;#pdoc._x_x_&#34;&gt;_x_x_&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;code block
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;reference: &lt;a href=&#34;/package.foo.ext&#34;&gt;package.foo&lt;/a&gt;&lt;/p&gt;&#39;&#39;&#39;
+&lt;p&gt;reference: &lt;code&gt;&lt;a href=&#34;/package.foo.ext&#34;&gt;package.foo&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;&#39;&#39;&#39;
 
         module = pdoc.Module(pdoc)
+        module.doc[&#39;_x_x_&#39;] = pdoc.Variable(&#39;_x_x_&#39;, module, &#39;&#39;)
 
-        def link(dobj, *args, **kwargs):
+        def link(dobj):
             return &#39;&lt;a href=&#34;{}&#34;&gt;{}&lt;/a&gt;&#39;.format(dobj.url(relative_to=module), dobj.qualname)
 
         html = to_html(text, module=module, link=link)
         self.assertEqual(html, expected)
 
-        self.assertIn(&#39;&lt;a href=&#39;, to_html(&#39;`pdoc.Doc.url()`&#39;, module=module, link=link))
+        self.assertEqual(to_html(&#39;`pdoc.Doc.url()`&#39;, module=module, link=link),
+                         &#39;&lt;p&gt;&lt;code&gt;&lt;a href=&#34;#pdoc.Doc.url&#34;&gt;Doc.url&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;&#39;)
 
-        self.assertIn(&#39;&lt;code&gt;foo.f()&lt;/code&gt;&#39;, to_html(&#39;`foo.f()`&#39;, module=module, link=link))
+        self.assertEqual(to_html(&#39;`foo.f()`&#39;, module=module, link=link),
+                         &#39;&lt;p&gt;&lt;code&gt;&lt;a href=&#34;/foo.f().ext&#34;&gt;foo.f()&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;&#39;)
+
+    def test_to_html_refname(self):
+        text = &#39;&#39;&#39;
+[`pdoc` x][pdoc] `pdoc`
+[x `pdoc`][pdoc] `[pdoc]()`
+
+`__x__`
+
+[`pdoc`](#)
+[``pdoc` ``](#)
+[```pdoc```](#)
+
+```
+pdoc
+```
+
+[pdoc]: #pdoc
+&#39;&#39;&#39;
+        expected = &#39;&#39;&#39;\
+&lt;p&gt;&lt;a href=&#34;#pdoc&#34;&gt;&lt;code&gt;pdoc&lt;/code&gt; x&lt;/a&gt; &lt;code&gt;&lt;a&gt;pdoc&lt;/a&gt;&lt;/code&gt;
+&lt;a href=&#34;#pdoc&#34;&gt;x &lt;code&gt;pdoc&lt;/code&gt;&lt;/a&gt; &lt;code&gt;[&lt;a&gt;pdoc&lt;/a&gt;]()&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;__x__&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;#&#34;&gt;&lt;code&gt;pdoc&lt;/code&gt;&lt;/a&gt;
+&lt;a href=&#34;#&#34;&gt;&lt;code&gt;pdoc`&lt;/code&gt;&lt;/a&gt;
+&lt;a href=&#34;#&#34;&gt;&lt;code&gt;pdoc&lt;/code&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;pdoc
+&lt;/code&gt;&lt;/pre&gt;\
+&#39;&#39;&#39;
+
+        def link(dobj):
+            return &#39;&lt;a&gt;{}&lt;/a&gt;&#39;.format(dobj.qualname)
+
+        html = to_html(text, module=pdoc.Module(pdoc), link=link)
+        self.assertEqual(html, expected)
 
     def test_to_html_refname_warning(self):
         mod = pdoc.Module(EXAMPLE_MODULE)
@@ -940,7 +1090,7 @@ class Docformats(unittest.TestCase):
 
     @staticmethod
     def _link(dobj, *args, **kwargs):
-        return &#39;&lt;a&gt;`{}`&lt;/a&gt;&#39;.format(dobj.refname)
+        return &#39;&lt;a&gt;{}&lt;/a&gt;&#39;.format(dobj.refname)
 
     def test_numpy(self):
         expected = &#39;&#39;&#39;&lt;p&gt;Summary line.&lt;/p&gt;
@@ -956,24 +1106,23 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;p class=&#34;admonition-title&#34;&gt;Added in version:&amp;ensp;1.5.0&lt;/p&gt;
 &lt;/div&gt;
 &lt;/dd&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;x&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;{ &lt;code&gt;NoneType&lt;/code&gt;, &lt;code&gt;&#39;B&#39;&lt;/code&gt;, &lt;code&gt;&#39;C&#39;&lt;/code&gt; }, optional&lt;/dt&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;x&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;{ NoneType, &#39;B&#39;, &#39;C&#39; }&lt;/code&gt;, optional&lt;/dt&gt;
 &lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;n&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;int&lt;/code&gt; or &lt;code&gt;list&lt;/code&gt; of &lt;code&gt;int&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Description of num&lt;/dd&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;*args&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;**kwargs&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
 &lt;dd&gt;Passed on.&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;complex&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;Union[Set[&lt;a&gt;pdoc.Doc&lt;/a&gt;, &lt;a&gt;pdoc.Function&lt;/a&gt;], &lt;a&gt;pdoc&lt;/a&gt;]&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;The &lt;code&gt;List[&lt;a&gt;pdoc.Doc&lt;/a&gt;]&lt;/code&gt;s of the new signal.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;returns&#34;&gt;Returns&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;output&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;output&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;&lt;a&gt;pdoc.Doc&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;The output array&lt;/dd&gt;
+&lt;dt&gt;&lt;code&gt;List[&lt;a&gt;pdoc.Doc&lt;/a&gt;]&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;The output array&lt;/dd&gt;
 &lt;dt&gt;&lt;code&gt;foo&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
-&lt;/dl&gt;
-&lt;h2 id=&#34;returns_1&#34;&gt;Returns&lt;/h2&gt;
-&lt;dl&gt;
-&lt;dt&gt;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
-&lt;dd&gt;The output array&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;raises&#34;&gt;Raises&lt;/h2&gt;
 &lt;dl&gt;
@@ -985,7 +1134,7 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;dt&gt;&lt;code&gt;TypeError&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
 &lt;/dl&gt;
-&lt;h2 id=&#34;returns_2&#34;&gt;Returns&lt;/h2&gt;
+&lt;h2 id=&#34;returns_1&#34;&gt;Returns&lt;/h2&gt;
 &lt;p&gt;None.&lt;/p&gt;
 &lt;h2 id=&#34;invalid&#34;&gt;Invalid&lt;/h2&gt;
 &lt;p&gt;no match&lt;/p&gt;
@@ -993,11 +1142,11 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;p&gt;&lt;code&gt;fromstring&lt;/code&gt;, &lt;code&gt;loadtxt&lt;/code&gt;&lt;/p&gt;
 &lt;h2 id=&#34;see-also_1&#34;&gt;See Also&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;a&gt;&lt;code&gt;pdoc.text&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;&lt;a&gt;pdoc.text&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Function a with its description.&lt;/dd&gt;
-&lt;dt&gt;&lt;a&gt;&lt;code&gt;scipy.random.norm&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;&lt;a&gt;scipy.random.norm&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Random variates, PDFs, etc.&lt;/dd&gt;
-&lt;dt&gt;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;&lt;a&gt;pdoc.Doc&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;A class description that spans several lines.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;notes&#34;&gt;Notes&lt;/h2&gt;
@@ -1030,7 +1179,7 @@ Nomatch:&lt;/p&gt;
 &lt;dl&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg1&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;str&lt;/code&gt;, optional&lt;/dt&gt;
 &lt;dd&gt;Text1&lt;/dd&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;List&lt;/code&gt;[&lt;code&gt;str&lt;/code&gt;], optional,\
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;List[str]&lt;/code&gt;, optional,\
  default=&lt;code&gt;10&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Text2&lt;/dd&gt;
 &lt;/dl&gt;
@@ -1054,20 +1203,25 @@ code
 &lt;/dl&gt;
 &lt;h2 id=&#34;returns&#34;&gt;Returns&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;issue_10&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;issue_10&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;description didn&#39;t work across multiple lines
-if only a single item was listed. &lt;code&gt;inspect.cleandoc()&lt;/code&gt;
+if only a single item was listed. &lt;code&gt;&lt;a&gt;inspect.cleandoc()&lt;/a&gt;&lt;/code&gt;
 somehow stripped the required extra indentation.&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;h2 id=&#34;returns_1&#34;&gt;Returns&lt;/h2&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;code&gt;Dict[int, &lt;a&gt;pdoc.Doc&lt;/a&gt;]&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;Description.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;raises&#34;&gt;Raises&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;AttributeError&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;AttributeError&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;
 &lt;p&gt;The &lt;code&gt;Raises&lt;/code&gt; section is a list of all exceptions
 that are relevant to the interface.&lt;/p&gt;
 &lt;p&gt;and a third line.&lt;/p&gt;
 &lt;/dd&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;ValueError&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;ValueError&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;If &lt;code&gt;arg2&lt;/code&gt; is equal to &lt;code&gt;arg1&lt;/code&gt;.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;p&gt;Test a title without a blank line before it.&lt;/p&gt;
@@ -1078,8 +1232,9 @@ that are relevant to the interface.&lt;/p&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
 &lt;p&gt;Examples in doctest format.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; a = [1,2,3]
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; a = [1,2,3]
 &lt;/code&gt;&lt;/pre&gt;
+
 &lt;h2 id=&#34;todos&#34;&gt;Todos&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;For module TODOs&lt;/li&gt;
@@ -1091,16 +1246,33 @@ that are relevant to the interface.&lt;/p&gt;
     def test_doctests(self):
         expected = &#39;&#39;&#39;&lt;p&gt;Need an intro paragrapgh.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; Then code is indented one level
+line1
+line2
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Alternatively&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;fenced code works
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; doctest
+fenced code works
+always
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; nbytes(100)
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; nbytes(100)
 &#39;100.0 bytes&#39;
+line2
+&lt;/code&gt;&lt;/pre&gt;
 
-&amp;gt;&amp;gt;&amp;gt; asdf
+&lt;p&gt;some text&lt;/p&gt;
+&lt;p&gt;some text&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; another doctest
+line1
+line2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;example&#34;&gt;Example&lt;/h2&gt;
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; f()
+Traceback (most recent call last):
+    ...
+Exception: something went wrong
 &lt;/code&gt;&lt;/pre&gt;&#39;&#39;&#39;
         text = inspect.getdoc(self._docmodule.doctests)
         html = to_html(text, module=self._module, link=self._link)
@@ -1179,14 +1351,20 @@ Work [like this](http://foo/) and [like that].
 
 [like that]: ftp://bar
 
-data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
+data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D
+
+```
+http://url.com
+```&#34;&#34;&#34;
         expected = &#34;&#34;&#34;&lt;p&gt;Beautiful Soup
 &lt;a href=&#34;http://www.foo.bar&#34;&gt;http://www.foo.bar&lt;/a&gt;
 &lt;a href=&#34;http://www.foo.bar?q=&amp;quot;foo&amp;quot;&#34;&gt;http://www.foo.bar?q=&#34;foo&#34;&lt;/a&gt;
 &lt;a href=&#34;https://travis-ci.org/cs01/pygdbmi&#34;&gt;&lt;img src=&#34;https://foo&#34; /&gt;&lt;/a&gt;
 &lt;a href=&#34;https://foo.bar&#34;&gt;https://foo.bar&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Work &lt;a href=&#34;http://foo/&#34;&gt;like this&lt;/a&gt; and &lt;a href=&#34;ftp://bar&#34;&gt;like that&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&lt;/p&gt;&#34;&#34;&#34;
+&lt;p&gt;data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;http://url.com
+&lt;/code&gt;&lt;/pre&gt;&#34;&#34;&#34;
         html = to_html(text)
         self.assertEqual(html, expected)
 
@@ -1286,7 +1464,7 @@ if __name__ == &#39;__main__&#39;:
 <dl>
 <dt><code class="name"><a title="pdoc.test.example_pkg" href="example_pkg/index.html">pdoc.test.example_pkg</a></code></dt>
 <dd>
-<section class="desc"><p>Module docstring</p></section>
+<div class="desc"><p>Module docstring</p></div>
 </dd>
 </dl>
 </section>
@@ -1299,11 +1477,11 @@ if __name__ == &#39;__main__&#39;:
 <span>def <span class="ident">chdir</span></span>(<span>path)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L46-L53" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L46-L53" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@contextmanager
 def chdir(path):
@@ -1319,11 +1497,11 @@ def chdir(path):
 <span>def <span class="ident">ignore_warnings</span></span>(<span>func)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L83-L89" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L83-L89" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def ignore_warnings(func):
     @wraps(func)
@@ -1338,11 +1516,11 @@ def chdir(path):
 <span>def <span class="ident">redirect_streams</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L76-L80" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L76-L80" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@contextmanager
 def redirect_streams():
@@ -1352,14 +1530,14 @@ def redirect_streams():
 </details>
 </dd>
 <dt id="pdoc.test.run"><code class="name flex">
-<span>def <span class="ident">run</span></span>(<span>*args, **kwargs)</span>
+<span>def <span class="ident">run</span></span>(<span>*args, **kwargs) -> int</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L56-L65" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L56-L65" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def run(*args, _check=True, **kwargs) -&gt; int:
     params = ((&#39;--&#39; + key.replace(&#39;_&#39;, &#39;-&#39;), value)
@@ -1377,11 +1555,11 @@ def redirect_streams():
 <span>def <span class="ident">run_html</span></span>(<span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L68-L73" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L68-L73" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@contextmanager
 def run_html(*args, **kwargs):
@@ -1395,11 +1573,11 @@ def run_html(*args, **kwargs):
 <span>def <span class="ident">temp_dir</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L40-L43" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L40-L43" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@contextmanager
 def temp_dir():
@@ -1417,14 +1595,14 @@ def temp_dir():
 <span>(</span><span>methodName='runTest')</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Programmatic/API unit tests.</p>
+<div class="desc"><p>Programmatic/API unit tests.</p>
 <p>Create an instance of the class that will use the named test
 method when executed. Raises a ValueError if the instance does
-not have a method with the specified name.</p></section>
+not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L383-L812" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L386-L921" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class ApiTest(unittest.TestCase):
     &#34;&#34;&#34;
@@ -1447,6 +1625,15 @@ not have a method with the specified name.</p></section>
                     self.assertEqual(m.name, EXAMPLE_MODULE + name_suffix)
                     self.assertEqual(sorted(m.name for m in m.submodules()),
                                      [EXAMPLE_MODULE + &#39;.&#39; + m for m in submodules])
+
+    def test_Module_find_class(self):
+        class A:
+            __module__ = None
+
+        assert A.__module__ is None
+        mod = pdoc.Module(pdoc)
+        self.assertIsInstance(mod.find_class(pdoc.Doc), pdoc.Class)
+        self.assertIsInstance(mod.find_class(A), pdoc.External)
 
     def test_import_filename(self):
         with patch.object(sys, &#39;path&#39;, [&#39;&#39;]), \
@@ -1567,12 +1754,73 @@ not have a method with the specified name.</p></section>
             pdoc.link_inheritance()
             self.assertNotIn(&#39;inherited&#39;, mod.doc[&#39;B&#39;].doc)
 
+        # GH-99: https://github.com/pdoc3/pdoc/issues/99
+        module = pdoc.import_module(EXAMPLE_MODULE + &#39;._exclude_dir&#39;)
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;downloaded_modules&#39;: False}, create=True):
+            mod = pdoc.Module(module)
+            self.assertNotIn(&#39;downloaded_modules&#39;, mod.doc)
+
     def test__pdoc__invalid_value(self):
         module = pdoc.import_module(EXAMPLE_MODULE)
         with patch.object(module, &#39;__pdoc__&#39;, {&#39;B&#39;: 1}), \
                 self.assertRaises(ValueError):
             pdoc.Module(module)
             pdoc.link_inheritance()
+
+    def test__pdoc__whitelist(self):
+        module = pdoc.import_module(EXAMPLE_MODULE)
+        mod = pdoc.Module(module)
+        pdoc.link_inheritance()
+        self.assertNotIn(&#39;__call__&#39;, mod.doc[&#39;A&#39;].doc)
+        self.assertNotIn(&#39;_private_function&#39;, mod.doc)
+
+        # Override docstring string
+        docstring = &#34;Overwrite private function doc&#34;
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;A.__call__&#39;: docstring}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertEqual(mod.doc[&#39;A&#39;].doc[&#39;__call__&#39;].docstring, docstring)
+
+        # Module-relative
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;_private_function&#39;: True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn(&#39;Private function&#39;, mod.doc[&#39;_private_function&#39;].docstring)
+            self.assertNotIn(&#39;_private_function&#39;, mod.doc[&#34;subpkg&#34;].doc)
+
+        # Defined in example_pkg, referring to a member of its submodule
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;subpkg.A.__call__&#39;: True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn(&#39;A.__call__&#39;, mod.doc[&#39;subpkg&#39;].doc[&#39;A&#39;].doc[&#39;__call__&#39;].docstring)
+
+        # Using full refname
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;example_pkg.subpkg.A.__call__&#39;: True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn(&#39;A.__call__&#39;, mod.doc[&#39;subpkg&#39;].doc[&#39;A&#39;].doc[&#39;__call__&#39;].docstring)
+
+        # Entire module, absolute refname
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;example_pkg._private&#39;: True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn(&#39;module&#39;, mod.doc[&#39;_private&#39;].doc)
+            self.assertNotIn(&#39;_private&#39;, mod.doc[&#39;_private&#39;].doc)
+            self.assertNotIn(&#39;__call__&#39;, mod.doc[&#39;_private&#39;].doc[&#39;module&#39;].doc)
+
+        # Entire module, relative
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;_private&#39;: True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn(&#39;_private&#39;, mod.doc)
+            self.assertNotIn(&#39;_private&#39;, mod.doc[&#39;_private&#39;].doc)
+            self.assertNotIn(&#39;__call__&#39;, mod.doc[&#39;_private&#39;].doc[&#39;module&#39;].doc)
+
+        # Private instance variables
+        with patch.object(module, &#39;__pdoc__&#39;, {&#39;B._private_instance_var&#39;: True}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn(&#39;should be private&#39;, mod.doc[&#39;B&#39;].doc[&#39;_private_instance_var&#39;].docstring)
 
     def test__all__(self):
         module = pdoc.import_module(EXAMPLE_MODULE + &#39;.index&#39;)
@@ -1757,12 +2005,48 @@ not have a method with the specified name.</p></section>
         self.assertEqual(pdoc.Function(&#39;bug130&#39;, mod, bug130_str_annotation).params(annotate=True),
                          [&#39;a:\N{NBSP}str&#39;])
 
+        # builtin callables with signatures in docstrings
+        from itertools import repeat
+        self.assertEqual(pdoc.Function(&#39;repeat&#39;, mod, repeat).params(), [&#39;object&#39;, &#39;times&#39;])
+        self.assertEqual(pdoc.Function(&#39;slice&#39;, mod, slice).params(), [&#39;start&#39;, &#39;stop&#39;, &#39;step&#39;])
+
+        class get_sample(repeat):
+            &#34;&#34;&#34; get_sample(self: pdoc.int, pos: int) -&gt; Tuple[int, float] &#34;&#34;&#34;
+        self.assertEqual(pdoc.Function(&#39;get_sample&#39;, mod, get_sample).params(annotate=True),
+                         [&#39;self:\xa0int&#39;, &#39;pos:\xa0int&#39;])
+        self.assertEqual(pdoc.Function(&#39;get_sample&#39;, mod, get_sample).return_annotation(),
+                         &#39;Tuple[int,\xa0float]&#39;)
+
     def test_Function_return_annotation(self):
         import typing
 
         def f() -&gt; typing.List[typing.Union[str, pdoc.Doc]]: pass
         func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc), f)
         self.assertEqual(func.return_annotation(), &#39;List[Union[str,\N{NBSP}pdoc.Doc]]&#39;)
+
+    @ignore_warnings
+    def test_Variable_type_annotation(self):
+        import typing
+
+        class Foobar:
+            @property
+            def prop(self) -&gt; typing.Optional[int]:
+                pass
+
+        mod = pdoc.Module(pdoc)
+        cls = pdoc.Class(&#39;Foobar&#39;, mod, Foobar)
+        self.assertEqual(cls.doc[&#39;prop&#39;].type_annotation(), &#39;Union[int,\N{NBSP}NoneType]&#39;)
+
+    @ignore_warnings
+    @unittest.skipIf(sys.version_info &lt; (3, 6), &#39;variable annotation unsupported in &lt;Py3.6&#39;)
+    def test_Variable_type_annotation_py35plus(self):
+        exec(&#39;&#39;&#39;class Foo:
+                    var: int = 3
+                    &#34;&#34;&#34;var&#34;&#34;&#34;
+        &#39;&#39;&#39;)
+        mod = pdoc.Module(pdoc)
+        cls = pdoc.Class(&#39;Foobar&#39;, mod, locals()[&#39;Foo&#39;])
+        self.assertEqual(cls.doc[&#39;var&#39;].type_annotation(), &#39;int&#39;)
 
     @ignore_warnings
     def test_Class_docstring(self):
@@ -1867,11 +2151,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">setUp</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Hook method for setting up the test fixture before exercising it.</p></section>
+<div class="desc"><p>Hook method for setting up the test fixture before exercising it.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L388-L389" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L391-L392" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def setUp(self):
     pdoc.reset()</code></pre>
@@ -1881,11 +2165,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_Class_docstring</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L721-L748" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L830-L857" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@ignore_warnings
 def test_Class_docstring(self):
@@ -1921,11 +2205,11 @@ def test_Class_docstring(self):
 <span>def <span class="ident">test_Class_params</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L750-L765" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L859-L874" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@ignore_warnings
 def test_Class_params(self):
@@ -1949,11 +2233,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_Function_params</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L655-L712" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L728-L797" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_Function_params(self):
     mod = pdoc.Module(pdoc)
@@ -2012,18 +2296,30 @@ def test_Class_params(self):
         return
 
     self.assertEqual(pdoc.Function(&#39;bug130&#39;, mod, bug130_str_annotation).params(annotate=True),
-                     [&#39;a:\N{NBSP}str&#39;])</code></pre>
+                     [&#39;a:\N{NBSP}str&#39;])
+
+    # builtin callables with signatures in docstrings
+    from itertools import repeat
+    self.assertEqual(pdoc.Function(&#39;repeat&#39;, mod, repeat).params(), [&#39;object&#39;, &#39;times&#39;])
+    self.assertEqual(pdoc.Function(&#39;slice&#39;, mod, slice).params(), [&#39;start&#39;, &#39;stop&#39;, &#39;step&#39;])
+
+    class get_sample(repeat):
+        &#34;&#34;&#34; get_sample(self: pdoc.int, pos: int) -&gt; Tuple[int, float] &#34;&#34;&#34;
+    self.assertEqual(pdoc.Function(&#39;get_sample&#39;, mod, get_sample).params(annotate=True),
+                     [&#39;self:\xa0int&#39;, &#39;pos:\xa0int&#39;])
+    self.assertEqual(pdoc.Function(&#39;get_sample&#39;, mod, get_sample).return_annotation(),
+                     &#39;Tuple[int,\xa0float]&#39;)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test_Function_return_annotation"><code class="name flex">
 <span>def <span class="ident">test_Function_return_annotation</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L714-L719" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L799-L804" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_Function_return_annotation(self):
     import typing
@@ -2033,15 +2329,81 @@ def test_Class_params(self):
     self.assertEqual(func.return_annotation(), &#39;List[Union[str,\N{NBSP}pdoc.Doc]]&#39;)</code></pre>
 </details>
 </dd>
+<dt id="pdoc.test.ApiTest.test_Module_find_class"><code class="name flex">
+<span>def <span class="ident">test_Module_find_class</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L408-L415" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def test_Module_find_class(self):
+    class A:
+        __module__ = None
+
+    assert A.__module__ is None
+    mod = pdoc.Module(pdoc)
+    self.assertIsInstance(mod.find_class(pdoc.Doc), pdoc.Class)
+    self.assertIsInstance(mod.find_class(A), pdoc.External)</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.ApiTest.test_Variable_type_annotation"><code class="name flex">
+<span>def <span class="ident">test_Variable_type_annotation</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L806-L817" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@ignore_warnings
+def test_Variable_type_annotation(self):
+    import typing
+
+    class Foobar:
+        @property
+        def prop(self) -&gt; typing.Optional[int]:
+            pass
+
+    mod = pdoc.Module(pdoc)
+    cls = pdoc.Class(&#39;Foobar&#39;, mod, Foobar)
+    self.assertEqual(cls.doc[&#39;prop&#39;].type_annotation(), &#39;Union[int,\N{NBSP}NoneType]&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.ApiTest.test_Variable_type_annotation_py35plus"><code class="name flex">
+<span>def <span class="ident">test_Variable_type_annotation_py35plus</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L819-L828" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@ignore_warnings
+@unittest.skipIf(sys.version_info &lt; (3, 6), &#39;variable annotation unsupported in &lt;Py3.6&#39;)
+def test_Variable_type_annotation_py35plus(self):
+    exec(&#39;&#39;&#39;class Foo:
+                var: int = 3
+                &#34;&#34;&#34;var&#34;&#34;&#34;
+    &#39;&#39;&#39;)
+    mod = pdoc.Module(pdoc)
+    cls = pdoc.Class(&#39;Foobar&#39;, mod, locals()[&#39;Foo&#39;])
+    self.assertEqual(cls.doc[&#39;var&#39;].type_annotation(), &#39;int&#39;)</code></pre>
+</details>
+</dd>
 <dt id="pdoc.test.ApiTest.test__all__"><code class="name flex">
 <span>def <span class="ident">test__all__</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L531-L537" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L604-L610" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test__all__(self):
     module = pdoc.import_module(EXAMPLE_MODULE + &#39;.index&#39;)
@@ -2056,11 +2418,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test__pdoc__dict</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L503-L522" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L515-L540" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test__pdoc__dict(self):
     module = pdoc.import_module(EXAMPLE_MODULE)
@@ -2081,18 +2443,24 @@ def test_Class_params(self):
     with patch.object(module, &#39;__pdoc__&#39;, {&#39;B.inherited&#39;: False}):
         mod = pdoc.Module(module)
         pdoc.link_inheritance()
-        self.assertNotIn(&#39;inherited&#39;, mod.doc[&#39;B&#39;].doc)</code></pre>
+        self.assertNotIn(&#39;inherited&#39;, mod.doc[&#39;B&#39;].doc)
+
+    # GH-99: https://github.com/pdoc3/pdoc/issues/99
+    module = pdoc.import_module(EXAMPLE_MODULE + &#39;._exclude_dir&#39;)
+    with patch.object(module, &#39;__pdoc__&#39;, {&#39;downloaded_modules&#39;: False}, create=True):
+        mod = pdoc.Module(module)
+        self.assertNotIn(&#39;downloaded_modules&#39;, mod.doc)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.ApiTest.test__pdoc__invalid_value"><code class="name flex">
 <span>def <span class="ident">test__pdoc__invalid_value</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L524-L529" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L542-L547" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test__pdoc__invalid_value(self):
     module = pdoc.import_module(EXAMPLE_MODULE)
@@ -2102,15 +2470,81 @@ def test_Class_params(self):
         pdoc.link_inheritance()</code></pre>
 </details>
 </dd>
+<dt id="pdoc.test.ApiTest.test__pdoc__whitelist"><code class="name flex">
+<span>def <span class="ident">test__pdoc__whitelist</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L549-L602" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def test__pdoc__whitelist(self):
+    module = pdoc.import_module(EXAMPLE_MODULE)
+    mod = pdoc.Module(module)
+    pdoc.link_inheritance()
+    self.assertNotIn(&#39;__call__&#39;, mod.doc[&#39;A&#39;].doc)
+    self.assertNotIn(&#39;_private_function&#39;, mod.doc)
+
+    # Override docstring string
+    docstring = &#34;Overwrite private function doc&#34;
+    with patch.object(module, &#39;__pdoc__&#39;, {&#39;A.__call__&#39;: docstring}):
+        mod = pdoc.Module(module)
+        pdoc.link_inheritance()
+        self.assertEqual(mod.doc[&#39;A&#39;].doc[&#39;__call__&#39;].docstring, docstring)
+
+    # Module-relative
+    with patch.object(module, &#39;__pdoc__&#39;, {&#39;_private_function&#39;: True}):
+        mod = pdoc.Module(module)
+        pdoc.link_inheritance()
+        self.assertIn(&#39;Private function&#39;, mod.doc[&#39;_private_function&#39;].docstring)
+        self.assertNotIn(&#39;_private_function&#39;, mod.doc[&#34;subpkg&#34;].doc)
+
+    # Defined in example_pkg, referring to a member of its submodule
+    with patch.object(module, &#39;__pdoc__&#39;, {&#39;subpkg.A.__call__&#39;: True}):
+        mod = pdoc.Module(module)
+        pdoc.link_inheritance()
+        self.assertIn(&#39;A.__call__&#39;, mod.doc[&#39;subpkg&#39;].doc[&#39;A&#39;].doc[&#39;__call__&#39;].docstring)
+
+    # Using full refname
+    with patch.object(module, &#39;__pdoc__&#39;, {&#39;example_pkg.subpkg.A.__call__&#39;: True}):
+        mod = pdoc.Module(module)
+        pdoc.link_inheritance()
+        self.assertIn(&#39;A.__call__&#39;, mod.doc[&#39;subpkg&#39;].doc[&#39;A&#39;].doc[&#39;__call__&#39;].docstring)
+
+    # Entire module, absolute refname
+    with patch.object(module, &#39;__pdoc__&#39;, {&#39;example_pkg._private&#39;: True}):
+        mod = pdoc.Module(module)
+        pdoc.link_inheritance()
+        self.assertIn(&#39;module&#39;, mod.doc[&#39;_private&#39;].doc)
+        self.assertNotIn(&#39;_private&#39;, mod.doc[&#39;_private&#39;].doc)
+        self.assertNotIn(&#39;__call__&#39;, mod.doc[&#39;_private&#39;].doc[&#39;module&#39;].doc)
+
+    # Entire module, relative
+    with patch.object(module, &#39;__pdoc__&#39;, {&#39;_private&#39;: True}):
+        mod = pdoc.Module(module)
+        pdoc.link_inheritance()
+        self.assertIn(&#39;_private&#39;, mod.doc)
+        self.assertNotIn(&#39;_private&#39;, mod.doc[&#39;_private&#39;].doc)
+        self.assertNotIn(&#39;__call__&#39;, mod.doc[&#39;_private&#39;].doc[&#39;module&#39;].doc)
+
+    # Private instance variables
+    with patch.object(module, &#39;__pdoc__&#39;, {&#39;B._private_instance_var&#39;: True}):
+        mod = pdoc.Module(module)
+        pdoc.link_inheritance()
+        self.assertIn(&#39;should be private&#39;, mod.doc[&#39;B&#39;].doc[&#39;_private_instance_var&#39;].docstring)</code></pre>
+</details>
+</dd>
 <dt id="pdoc.test.ApiTest.test_builtin_methoddescriptors"><code class="name flex">
 <span>def <span class="ident">test_builtin_methoddescriptors</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L460-L464" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L472-L476" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_builtin_methoddescriptors(self):
     import parser
@@ -2123,11 +2557,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_class_variables_docstring_not_from_obj</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L450-L458" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L462-L470" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_class_variables_docstring_not_from_obj(self):
     class C:
@@ -2144,11 +2578,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_context</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L638-L653" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L711-L726" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_context(self):
     context = {}
@@ -2172,11 +2606,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_find_ident</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L539-L554" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L612-L627" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_find_ident(self):
     mod = pdoc.Module(EXAMPLE_MODULE)
@@ -2200,11 +2634,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_import_filename</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L405-L408" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L417-L420" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_import_filename(self):
     with patch.object(sys, &#39;path&#39;, [&#39;&#39;]), \
@@ -2216,11 +2650,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_imported_once</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L410-L412" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L422-L424" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_imported_once(self):
     with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
@@ -2231,11 +2665,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_inherited_members</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L574-L581" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L647-L654" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_inherited_members(self):
     mod = pdoc.Module(EXAMPLE_MODULE)
@@ -2251,11 +2685,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_inherits</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L556-L572" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L629-L645" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_inherits(self):
     module = pdoc.Module(EXAMPLE_MODULE)
@@ -2280,11 +2714,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_instance_var</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L429-L433" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L441-L445" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_instance_var(self):
     pdoc.reset()
@@ -2297,11 +2731,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_link_inheritance</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L614-L636" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L687-L709" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_link_inheritance(self):
     mod = pdoc.Module(EXAMPLE_MODULE)
@@ -2332,11 +2766,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_module</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L391-L403" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L394-L406" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_module(self):
     modules = {
@@ -2357,11 +2791,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_module_allsubmodules</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L424-L427" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L436-L439" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_module_allsubmodules(self):
     m = pdoc.Module(EXAMPLE_MODULE + &#39;._private&#39;)
@@ -2373,11 +2807,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_module_init</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L809-L812" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L918-L921" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_module_init(self):
     mod = pdoc.Module(&#39;pdoc.__init__&#39;)
@@ -2389,11 +2823,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_namespace</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L414-L422" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L426-L434" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_namespace(self):
     # Test the three namespace types
@@ -2410,11 +2844,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_qualname</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L487-L501" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L499-L513" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_qualname(self):
     module = pdoc.Module(EXAMPLE_MODULE)
@@ -2437,11 +2871,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_readonly_value_descriptors</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L435-L448" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L447-L460" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_readonly_value_descriptors(self):
     pdoc.reset()
@@ -2463,11 +2897,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_refname</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L466-L485" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L478-L497" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_refname(self):
     mod = EXAMPLE_MODULE + &#39;.&#39; + &#39;subpkg&#39;
@@ -2495,11 +2929,11 @@ def test_Class_params(self):
 <span>def <span class="ident">test_sorting</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L783-L807" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L892-L916" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@unittest.skipIf(sys.version_info &lt; (3, 6), reason=&#34;only deterministic on CPython 3.6+&#34;)
 def test_sorting(self):
@@ -2532,11 +2966,11 @@ def test_sorting(self):
 <span>def <span class="ident">test_subclasses</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L583-L612" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L656-L685" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@ignore_warnings
 def test_subclasses(self):
@@ -2574,11 +3008,11 @@ def test_subclasses(self):
 <span>def <span class="ident">test_url</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L767-L781" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L876-L890" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_url(self):
     mod = pdoc.Module(EXAMPLE_MODULE)
@@ -2604,14 +3038,14 @@ def test_subclasses(self):
 <span>(</span><span>methodName='runTest')</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Command-line interface unit tests.</p>
+<div class="desc"><p>Command-line interface unit tests.</p>
 <p>Create an instance of the class that will use the named test
 method when executed. Raises a ValueError if the instance does
-not have a method with the specified name.</p></section>
+not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L92-L380" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L92-L383" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class CliTest(unittest.TestCase):
     &#34;&#34;&#34;
@@ -2707,7 +3141,9 @@ not have a method with the specified name.</p></section>
         }
         for package, expected_files in package_files.items():
             with self.subTest(package=package):
-                with run_html(EXAMPLE_MODULE + package, config=&#39;show_source_code=False&#39;):
+                with run_html(EXAMPLE_MODULE + package,
+                              &#39;--config&#39;, &#39;show_type_annotations=False&#39;,
+                              config=&#39;show_source_code=False&#39;):
                     self._basic_html_assertions(expected_files)
                     self._check_files(include_patterns, exclude_patterns)
 
@@ -2720,6 +3156,7 @@ not have a method with the specified name.</p></section>
             for filenames, expected_files in filenames_files.items():
                 with self.subTest(filename=&#39;,&#39;.join(filenames)):
                     with run_html(*(os.path.join(EXAMPLE_MODULE, f) for f in filenames),
+                                  &#39;--config&#39;, &#39;show_type_annotations=False&#39;,
                                   config=&#39;show_source_code=False&#39;):
                         self._basic_html_assertions(expected_files)
                         self._check_files(include_patterns, exclude_patterns)
@@ -2837,7 +3274,7 @@ not have a method with the specified name.</p></section>
 
         with self.subTest(package=EXAMPLE_MODULE):
             with redirect_streams() as (stdout, _):
-                run(EXAMPLE_MODULE)
+                run(EXAMPLE_MODULE, config=&#39;show_type_annotations=False&#39;)
                 out = stdout.getvalue()
 
             header = &#39;Module {}\n{:=&lt;{}}&#39;.format(EXAMPLE_MODULE, &#39;&#39;,
@@ -2911,11 +3348,11 @@ not have a method with the specified name.</p></section>
 <dl>
 <dt id="pdoc.test.CliTest.ALL_FILES"><code class="name">var <span class="ident">ALL_FILES</span></code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 </dd>
 <dt id="pdoc.test.CliTest.PUBLIC_FILES"><code class="name">var <span class="ident">PUBLIC_FILES</span></code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -2924,11 +3361,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">setUp</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Hook method for setting up the test fixture before exercising it.</p></section>
+<div class="desc"><p>Hook method for setting up the test fixture before exercising it.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L118-L119" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L118-L119" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def setUp(self):
     pdoc.reset()</code></pre>
@@ -2938,11 +3375,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_config</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L358-L361" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L361-L364" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_config(self):
     with run_html(EXAMPLE_MODULE, config=&#39;link_prefix=&#34;/foobar/&#34;&#39;):
@@ -2954,11 +3391,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_external_links</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L246-L254" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L249-L257" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_external_links(self):
     with run_html(EXAMPLE_MODULE):
@@ -2975,11 +3412,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_force</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L234-L244" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L237-L247" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_force(self):
     with run_html(EXAMPLE_MODULE):
@@ -2998,11 +3435,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_google_analytics</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L370-L375" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L373-L378" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_google_analytics(self):
     expected = [&#39;google-analytics.com&#39;]
@@ -3016,11 +3453,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_html</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L137-L201" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L137-L204" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_html(self):
     include_patterns = [
@@ -3071,7 +3508,9 @@ not have a method with the specified name.</p></section>
     }
     for package, expected_files in package_files.items():
         with self.subTest(package=package):
-            with run_html(EXAMPLE_MODULE + package, config=&#39;show_source_code=False&#39;):
+            with run_html(EXAMPLE_MODULE + package,
+                          &#39;--config&#39;, &#39;show_type_annotations=False&#39;,
+                          config=&#39;show_source_code=False&#39;):
                 self._basic_html_assertions(expected_files)
                 self._check_files(include_patterns, exclude_patterns)
 
@@ -3084,6 +3523,7 @@ not have a method with the specified name.</p></section>
         for filenames, expected_files in filenames_files.items():
             with self.subTest(filename=&#39;,&#39;.join(filenames)):
                 with run_html(*(os.path.join(EXAMPLE_MODULE, f) for f in filenames),
+                              &#39;--config&#39;, &#39;show_type_annotations=False&#39;,
                               config=&#39;show_source_code=False&#39;):
                     self._basic_html_assertions(expected_files)
                     self._check_files(include_patterns, exclude_patterns)</code></pre>
@@ -3093,11 +3533,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_html_identifier</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L209-L216" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L212-L219" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_html_identifier(self):
     for package in (&#39;&#39;, &#39;._private&#39;):
@@ -3113,11 +3553,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_html_multiple_files</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L203-L207" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L206-L210" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_html_multiple_files(self):
     with chdir(TESTS_BASEDIR):
@@ -3130,11 +3570,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_html_no_source</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L228-L232" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L231-L235" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_html_no_source(self):
     with self.assertWarns(DeprecationWarning),\
@@ -3147,11 +3587,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_html_ref_links</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L218-L226" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L221-L229" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_html_ref_links(self):
     with run_html(EXAMPLE_MODULE, config=&#39;show_source_code=False&#39;):
@@ -3168,11 +3608,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_link_prefix</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L268-L272" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L271-L275" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_link_prefix(self):
     with self.assertWarns(DeprecationWarning),\
@@ -3185,11 +3625,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_output_text</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L363-L368" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L366-L371" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_output_text(self):
     with temp_dir() as path:
@@ -3203,11 +3643,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_pdf</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L347-L356" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L350-L359" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_pdf(self):
     with redirect_streams() as (stdout, stderr):
@@ -3225,11 +3665,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_relative_dir_path</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L377-L380" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L380-L383" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_relative_dir_path(self):
     with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
@@ -3241,11 +3681,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_template_dir</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L256-L266" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L259-L269" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_template_dir(self):
     old_tpl_dirs = pdoc.tpl_lookup.directories.copy()
@@ -3264,11 +3704,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_text</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L274-L336" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L277-L339" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_text(self):
     include_patterns = [
@@ -3312,7 +3752,7 @@ not have a method with the specified name.</p></section>
 
     with self.subTest(package=EXAMPLE_MODULE):
         with redirect_streams() as (stdout, _):
-            run(EXAMPLE_MODULE)
+            run(EXAMPLE_MODULE, config=&#39;show_type_annotations=False&#39;)
             out = stdout.getvalue()
 
         header = &#39;Module {}\n{:=&lt;{}}&#39;.format(EXAMPLE_MODULE, &#39;&#39;,
@@ -3339,11 +3779,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_text_identifier</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L338-L345" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L341-L348" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_text_identifier(self):
     with redirect_streams() as (stdout, _):
@@ -3362,7 +3802,7 @@ not have a method with the specified name.</p></section>
 <span>(</span><span>methodName='runTest')</span>
 </code></dt>
 <dd>
-<section class="desc"><p>A class whose instances are single test cases.</p>
+<div class="desc"><p>A class whose instances are single test cases.</p>
 <p>By default, the test code itself should be placed in a method named
 'runTest'.</p>
 <p>If the fixture may be used for many test cases, create as
@@ -3389,11 +3829,11 @@ by assert methods using difflib. It is looked up as an instance
 attribute so can be configured by individual tests if required.</p>
 <p>Create an instance of the class that will use the named test
 method when executed. Raises a ValueError if the instance does
-not have a method with the specified name.</p></section>
+not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L904-L1169" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1054-L1347" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Docformats(unittest.TestCase):
     @classmethod
@@ -3403,7 +3843,7 @@ not have a method with the specified name.</p></section>
 
     @staticmethod
     def _link(dobj, *args, **kwargs):
-        return &#39;&lt;a&gt;`{}`&lt;/a&gt;&#39;.format(dobj.refname)
+        return &#39;&lt;a&gt;{}&lt;/a&gt;&#39;.format(dobj.refname)
 
     def test_numpy(self):
         expected = &#39;&#39;&#39;&lt;p&gt;Summary line.&lt;/p&gt;
@@ -3419,24 +3859,23 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;p class=&#34;admonition-title&#34;&gt;Added in version:&amp;ensp;1.5.0&lt;/p&gt;
 &lt;/div&gt;
 &lt;/dd&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;x&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;{ &lt;code&gt;NoneType&lt;/code&gt;, &lt;code&gt;&#39;B&#39;&lt;/code&gt;, &lt;code&gt;&#39;C&#39;&lt;/code&gt; }, optional&lt;/dt&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;x&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;{ NoneType, &#39;B&#39;, &#39;C&#39; }&lt;/code&gt;, optional&lt;/dt&gt;
 &lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;n&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;int&lt;/code&gt; or &lt;code&gt;list&lt;/code&gt; of &lt;code&gt;int&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Description of num&lt;/dd&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;*args&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;**kwargs&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
 &lt;dd&gt;Passed on.&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;complex&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;Union[Set[&lt;a&gt;pdoc.Doc&lt;/a&gt;, &lt;a&gt;pdoc.Function&lt;/a&gt;], &lt;a&gt;pdoc&lt;/a&gt;]&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;The &lt;code&gt;List[&lt;a&gt;pdoc.Doc&lt;/a&gt;]&lt;/code&gt;s of the new signal.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;returns&#34;&gt;Returns&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;output&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;output&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;&lt;a&gt;pdoc.Doc&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;The output array&lt;/dd&gt;
+&lt;dt&gt;&lt;code&gt;List[&lt;a&gt;pdoc.Doc&lt;/a&gt;]&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;The output array&lt;/dd&gt;
 &lt;dt&gt;&lt;code&gt;foo&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
-&lt;/dl&gt;
-&lt;h2 id=&#34;returns_1&#34;&gt;Returns&lt;/h2&gt;
-&lt;dl&gt;
-&lt;dt&gt;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
-&lt;dd&gt;The output array&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;raises&#34;&gt;Raises&lt;/h2&gt;
 &lt;dl&gt;
@@ -3448,7 +3887,7 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;dt&gt;&lt;code&gt;TypeError&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
 &lt;/dl&gt;
-&lt;h2 id=&#34;returns_2&#34;&gt;Returns&lt;/h2&gt;
+&lt;h2 id=&#34;returns_1&#34;&gt;Returns&lt;/h2&gt;
 &lt;p&gt;None.&lt;/p&gt;
 &lt;h2 id=&#34;invalid&#34;&gt;Invalid&lt;/h2&gt;
 &lt;p&gt;no match&lt;/p&gt;
@@ -3456,11 +3895,11 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;p&gt;&lt;code&gt;fromstring&lt;/code&gt;, &lt;code&gt;loadtxt&lt;/code&gt;&lt;/p&gt;
 &lt;h2 id=&#34;see-also_1&#34;&gt;See Also&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;a&gt;&lt;code&gt;pdoc.text&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;&lt;a&gt;pdoc.text&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Function a with its description.&lt;/dd&gt;
-&lt;dt&gt;&lt;a&gt;&lt;code&gt;scipy.random.norm&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;&lt;a&gt;scipy.random.norm&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Random variates, PDFs, etc.&lt;/dd&gt;
-&lt;dt&gt;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;&lt;a&gt;pdoc.Doc&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;A class description that spans several lines.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;notes&#34;&gt;Notes&lt;/h2&gt;
@@ -3493,7 +3932,7 @@ Nomatch:&lt;/p&gt;
 &lt;dl&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg1&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;str&lt;/code&gt;, optional&lt;/dt&gt;
 &lt;dd&gt;Text1&lt;/dd&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;List&lt;/code&gt;[&lt;code&gt;str&lt;/code&gt;], optional,\
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;List[str]&lt;/code&gt;, optional,\
  default=&lt;code&gt;10&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Text2&lt;/dd&gt;
 &lt;/dl&gt;
@@ -3517,20 +3956,25 @@ code
 &lt;/dl&gt;
 &lt;h2 id=&#34;returns&#34;&gt;Returns&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;issue_10&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;issue_10&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;description didn&#39;t work across multiple lines
-if only a single item was listed. &lt;code&gt;inspect.cleandoc()&lt;/code&gt;
+if only a single item was listed. &lt;code&gt;&lt;a&gt;inspect.cleandoc()&lt;/a&gt;&lt;/code&gt;
 somehow stripped the required extra indentation.&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;h2 id=&#34;returns_1&#34;&gt;Returns&lt;/h2&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;code&gt;Dict[int, &lt;a&gt;pdoc.Doc&lt;/a&gt;]&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;Description.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;raises&#34;&gt;Raises&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;AttributeError&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;AttributeError&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;
 &lt;p&gt;The &lt;code&gt;Raises&lt;/code&gt; section is a list of all exceptions
 that are relevant to the interface.&lt;/p&gt;
 &lt;p&gt;and a third line.&lt;/p&gt;
 &lt;/dd&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;ValueError&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;ValueError&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;If &lt;code&gt;arg2&lt;/code&gt; is equal to &lt;code&gt;arg1&lt;/code&gt;.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;p&gt;Test a title without a blank line before it.&lt;/p&gt;
@@ -3541,8 +3985,9 @@ that are relevant to the interface.&lt;/p&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
 &lt;p&gt;Examples in doctest format.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; a = [1,2,3]
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; a = [1,2,3]
 &lt;/code&gt;&lt;/pre&gt;
+
 &lt;h2 id=&#34;todos&#34;&gt;Todos&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;For module TODOs&lt;/li&gt;
@@ -3554,16 +3999,33 @@ that are relevant to the interface.&lt;/p&gt;
     def test_doctests(self):
         expected = &#39;&#39;&#39;&lt;p&gt;Need an intro paragrapgh.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; Then code is indented one level
+line1
+line2
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Alternatively&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;fenced code works
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; doctest
+fenced code works
+always
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; nbytes(100)
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; nbytes(100)
 &#39;100.0 bytes&#39;
+line2
+&lt;/code&gt;&lt;/pre&gt;
 
-&amp;gt;&amp;gt;&amp;gt; asdf
+&lt;p&gt;some text&lt;/p&gt;
+&lt;p&gt;some text&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; another doctest
+line1
+line2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;example&#34;&gt;Example&lt;/h2&gt;
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; f()
+Traceback (most recent call last):
+    ...
+Exception: something went wrong
 &lt;/code&gt;&lt;/pre&gt;&#39;&#39;&#39;
         text = inspect.getdoc(self._docmodule.doctests)
         html = to_html(text, module=self._module, link=self._link)
@@ -3642,14 +4104,20 @@ Work [like this](http://foo/) and [like that].
 
 [like that]: ftp://bar
 
-data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
+data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D
+
+```
+http://url.com
+```&#34;&#34;&#34;
         expected = &#34;&#34;&#34;&lt;p&gt;Beautiful Soup
 &lt;a href=&#34;http://www.foo.bar&#34;&gt;http://www.foo.bar&lt;/a&gt;
 &lt;a href=&#34;http://www.foo.bar?q=&amp;quot;foo&amp;quot;&#34;&gt;http://www.foo.bar?q=&#34;foo&#34;&lt;/a&gt;
 &lt;a href=&#34;https://travis-ci.org/cs01/pygdbmi&#34;&gt;&lt;img src=&#34;https://foo&#34; /&gt;&lt;/a&gt;
 &lt;a href=&#34;https://foo.bar&#34;&gt;https://foo.bar&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Work &lt;a href=&#34;http://foo/&#34;&gt;like this&lt;/a&gt; and &lt;a href=&#34;ftp://bar&#34;&gt;like that&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&lt;/p&gt;&#34;&#34;&#34;
+&lt;p&gt;data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;http://url.com
+&lt;/code&gt;&lt;/pre&gt;&#34;&#34;&#34;
         html = to_html(text)
         self.assertEqual(html, expected)
 
@@ -3672,11 +4140,11 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
 <span>def <span class="ident">setUpClass</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Hook method for setting up class fixture before running tests in the class.</p></section>
+<div class="desc"><p>Hook method for setting up class fixture before running tests in the class.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L905-L908" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1055-L1058" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@classmethod
 def setUpClass(cls):
@@ -3691,25 +4159,42 @@ def setUpClass(cls):
 <span>def <span class="ident">test_doctests</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L1060-L1076" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1215-L1248" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_doctests(self):
         expected = &#39;&#39;&#39;&lt;p&gt;Need an intro paragrapgh.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; Then code is indented one level
+line1
+line2
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Alternatively&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;fenced code works
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; doctest
+fenced code works
+always
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; nbytes(100)
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; nbytes(100)
 &#39;100.0 bytes&#39;
+line2
+&lt;/code&gt;&lt;/pre&gt;
 
-&amp;gt;&amp;gt;&amp;gt; asdf
+&lt;p&gt;some text&lt;/p&gt;
+&lt;p&gt;some text&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; another doctest
+line1
+line2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;example&#34;&gt;Example&lt;/h2&gt;
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; f()
+Traceback (most recent call last):
+    ...
+Exception: something went wrong
 &lt;/code&gt;&lt;/pre&gt;&#39;&#39;&#39;
         text = inspect.getdoc(self._docmodule.doctests)
         html = to_html(text, module=self._module, link=self._link)
@@ -3720,11 +4205,11 @@ def setUpClass(cls):
 <span>def <span class="ident">test_google</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L995-L1058" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1144-L1213" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_google(self):
         expected = &#39;&#39;&#39;&lt;p&gt;Summary line.
@@ -3733,7 +4218,7 @@ Nomatch:&lt;/p&gt;
 &lt;dl&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg1&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;str&lt;/code&gt;, optional&lt;/dt&gt;
 &lt;dd&gt;Text1&lt;/dd&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;List&lt;/code&gt;[&lt;code&gt;str&lt;/code&gt;], optional,\
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;arg2&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;List[str]&lt;/code&gt;, optional,\
  default=&lt;code&gt;10&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Text2&lt;/dd&gt;
 &lt;/dl&gt;
@@ -3757,20 +4242,25 @@ code
 &lt;/dl&gt;
 &lt;h2 id=&#34;returns&#34;&gt;Returns&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;issue_10&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;issue_10&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;description didn&#39;t work across multiple lines
-if only a single item was listed. &lt;code&gt;inspect.cleandoc()&lt;/code&gt;
+if only a single item was listed. &lt;code&gt;&lt;a&gt;inspect.cleandoc()&lt;/a&gt;&lt;/code&gt;
 somehow stripped the required extra indentation.&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;h2 id=&#34;returns_1&#34;&gt;Returns&lt;/h2&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;code&gt;Dict[int, &lt;a&gt;pdoc.Doc&lt;/a&gt;]&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;Description.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;raises&#34;&gt;Raises&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;AttributeError&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;AttributeError&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;
 &lt;p&gt;The &lt;code&gt;Raises&lt;/code&gt; section is a list of all exceptions
 that are relevant to the interface.&lt;/p&gt;
 &lt;p&gt;and a third line.&lt;/p&gt;
 &lt;/dd&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;ValueError&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;ValueError&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;If &lt;code&gt;arg2&lt;/code&gt; is equal to &lt;code&gt;arg1&lt;/code&gt;.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;p&gt;Test a title without a blank line before it.&lt;/p&gt;
@@ -3781,8 +4271,9 @@ that are relevant to the interface.&lt;/p&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
 &lt;p&gt;Examples in doctest format.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; a = [1,2,3]
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; a = [1,2,3]
 &lt;/code&gt;&lt;/pre&gt;
+
 &lt;h2 id=&#34;todos&#34;&gt;Todos&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;For module TODOs&lt;/li&gt;
@@ -3796,11 +4287,11 @@ that are relevant to the interface.&lt;/p&gt;
 <span>def <span class="ident">test_latex_math</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L1162-L1169" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1340-L1347" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_latex_math(self):
         expected = r&#39;&#39;&#39;&lt;p&gt;Inline equation: &lt;span&gt;&lt;span class=&#34;MathJax_Preview&#34;&gt; v_t *\frac{1}{2}* j_i + [a] &amp;lt; 3 &lt;/span&gt;&lt;script type=&#34;math/tex&#34;&gt; v_t *\frac{1}{2}* j_i + [a] &lt; 3 &lt;/script&gt;&lt;/span&gt;.&lt;/p&gt;
@@ -3816,11 +4307,11 @@ that are relevant to the interface.&lt;/p&gt;
 <span>def <span class="ident">test_numpy</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L914-L978" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1064-L1127" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_numpy(self):
         expected = &#39;&#39;&#39;&lt;p&gt;Summary line.&lt;/p&gt;
@@ -3836,24 +4327,23 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;p class=&#34;admonition-title&#34;&gt;Added in version:&amp;ensp;1.5.0&lt;/p&gt;
 &lt;/div&gt;
 &lt;/dd&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;x&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;{ &lt;code&gt;NoneType&lt;/code&gt;, &lt;code&gt;&#39;B&#39;&lt;/code&gt;, &lt;code&gt;&#39;C&#39;&lt;/code&gt; }, optional&lt;/dt&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;x&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;{ NoneType, &#39;B&#39;, &#39;C&#39; }&lt;/code&gt;, optional&lt;/dt&gt;
 &lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;n&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;int&lt;/code&gt; or &lt;code&gt;list&lt;/code&gt; of &lt;code&gt;int&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Description of num&lt;/dd&gt;
 &lt;dt&gt;&lt;strong&gt;&lt;code&gt;*args&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;**kwargs&lt;/code&gt;&lt;/strong&gt;&lt;/dt&gt;
 &lt;dd&gt;Passed on.&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;complex&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;Union[Set[&lt;a&gt;pdoc.Doc&lt;/a&gt;, &lt;a&gt;pdoc.Function&lt;/a&gt;], &lt;a&gt;pdoc&lt;/a&gt;]&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;The &lt;code&gt;List[&lt;a&gt;pdoc.Doc&lt;/a&gt;]&lt;/code&gt;s of the new signal.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;returns&#34;&gt;Returns&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;strong&gt;&lt;code&gt;output&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;strong&gt;&lt;code&gt;output&lt;/code&gt;&lt;/strong&gt; :&amp;ensp;&lt;code&gt;&lt;a&gt;pdoc.Doc&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;The output array&lt;/dd&gt;
+&lt;dt&gt;&lt;code&gt;List[&lt;a&gt;pdoc.Doc&lt;/a&gt;]&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;The output array&lt;/dd&gt;
 &lt;dt&gt;&lt;code&gt;foo&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
-&lt;/dl&gt;
-&lt;h2 id=&#34;returns_1&#34;&gt;Returns&lt;/h2&gt;
-&lt;dl&gt;
-&lt;dt&gt;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
-&lt;dd&gt;The output array&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;raises&#34;&gt;Raises&lt;/h2&gt;
 &lt;dl&gt;
@@ -3865,7 +4355,7 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;dt&gt;&lt;code&gt;TypeError&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;&amp;nbsp;&lt;/dd&gt;
 &lt;/dl&gt;
-&lt;h2 id=&#34;returns_2&#34;&gt;Returns&lt;/h2&gt;
+&lt;h2 id=&#34;returns_1&#34;&gt;Returns&lt;/h2&gt;
 &lt;p&gt;None.&lt;/p&gt;
 &lt;h2 id=&#34;invalid&#34;&gt;Invalid&lt;/h2&gt;
 &lt;p&gt;no match&lt;/p&gt;
@@ -3873,11 +4363,11 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;p&gt;&lt;code&gt;fromstring&lt;/code&gt;, &lt;code&gt;loadtxt&lt;/code&gt;&lt;/p&gt;
 &lt;h2 id=&#34;see-also_1&#34;&gt;See Also&lt;/h2&gt;
 &lt;dl&gt;
-&lt;dt&gt;&lt;a&gt;&lt;code&gt;pdoc.text&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;&lt;a&gt;pdoc.text&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Function a with its description.&lt;/dd&gt;
-&lt;dt&gt;&lt;a&gt;&lt;code&gt;scipy.random.norm&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;&lt;a&gt;scipy.random.norm&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;Random variates, PDFs, etc.&lt;/dd&gt;
-&lt;dt&gt;&lt;a&gt;&lt;code&gt;pdoc.Doc&lt;/code&gt;&lt;/a&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;code&gt;&lt;a&gt;pdoc.Doc&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;A class description that spans several lines.&lt;/dd&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;notes&#34;&gt;Notes&lt;/h2&gt;
@@ -3893,11 +4383,11 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 <span>def <span class="ident">test_numpy_curly_brace_expansion</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L980-L993" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1129-L1142" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_numpy_curly_brace_expansion(self):
         # See: https://github.com/mwaskom/seaborn/blob/66191d8a179f1bfa42f03749bc4a07e1c0c08156/seaborn/regression.py#L514  # noqa: 501
@@ -3919,11 +4409,11 @@ prefix_{x,y}_partial : str
 <span>def <span class="ident">test_reST_directives</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L1078-L1119" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1250-L1291" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_reST_directives(self):
         expected = &#39;&#39;&#39;&lt;div class=&#34;admonition todo&#34;&gt;
@@ -3973,11 +4463,11 @@ lines.&lt;/p&gt;
 <span>def <span class="ident">test_reST_include</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L1121-L1138" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1293-L1310" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_reST_include(self):
         expected = &#39;&#39;&#39;&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;    x = 2
@@ -4003,11 +4493,11 @@ x =&lt;/p&gt;&#39;&#39;&#39;
 <span>def <span class="ident">test_urls</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L1140-L1160" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1312-L1338" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_urls(self):
         text = &#34;&#34;&#34;Beautiful Soup
@@ -4020,14 +4510,20 @@ Work [like this](http://foo/) and [like that].
 
 [like that]: ftp://bar
 
-data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
+data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D
+
+```
+http://url.com
+```&#34;&#34;&#34;
         expected = &#34;&#34;&#34;&lt;p&gt;Beautiful Soup
 &lt;a href=&#34;http://www.foo.bar&#34;&gt;http://www.foo.bar&lt;/a&gt;
 &lt;a href=&#34;http://www.foo.bar?q=&amp;quot;foo&amp;quot;&#34;&gt;http://www.foo.bar?q=&#34;foo&#34;&lt;/a&gt;
 &lt;a href=&#34;https://travis-ci.org/cs01/pygdbmi&#34;&gt;&lt;img src=&#34;https://foo&#34; /&gt;&lt;/a&gt;
 &lt;a href=&#34;https://foo.bar&#34;&gt;https://foo.bar&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Work &lt;a href=&#34;http://foo/&#34;&gt;like this&lt;/a&gt; and &lt;a href=&#34;ftp://bar&#34;&gt;like that&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&lt;/p&gt;&#34;&#34;&#34;
+&lt;p&gt;data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;http://url.com
+&lt;/code&gt;&lt;/pre&gt;&#34;&#34;&#34;
         html = to_html(text)
         self.assertEqual(html, expected)</code></pre>
 </details>
@@ -4039,14 +4535,14 @@ data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&#34;&#34;&#34;
 <span>(</span><span>methodName='runTest')</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Unit tests for helper functions for producing HTML.</p>
+<div class="desc"><p>Unit tests for helper functions for producing HTML.</p>
 <p>Create an instance of the class that will use the named test
 method when executed. Raises a ValueError if the instance does
-not have a method with the specified name.</p></section>
+not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L815-L901" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L924-L1051" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class HtmlHelpersTest(unittest.TestCase):
     &#34;&#34;&#34;
@@ -4077,29 +4573,70 @@ not have a method with the specified name.</p></section>
 
 `pdoc.Module` is a `Doc`, not `dict`.
 
+ref with underscore: `_x_x_`
+
 ```
 code block
 ```
 reference: `package.foo`
 &#39;&#39;&#39;
         expected = &#39;&#39;&#39;&lt;h1 id=&#34;title&#34;&gt;Title&lt;/h1&gt;
-&lt;p&gt;&lt;a href=&#34;#pdoc.Module&#34;&gt;Module&lt;/a&gt; is a &lt;a href=&#34;#pdoc.Doc&#34;&gt;Doc&lt;/a&gt;, not &lt;code&gt;dict&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;&lt;a href=&#34;#pdoc.Module&#34;&gt;Module&lt;/a&gt;&lt;/code&gt; is a &lt;code&gt;&lt;a href=&#34;#pdoc.Doc&#34;&gt;Doc&lt;/a&gt;&lt;/code&gt;,\
+ not &lt;code&gt;dict&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;ref with underscore: &lt;code&gt;&lt;a href=&#34;#pdoc._x_x_&#34;&gt;_x_x_&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;code block
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;reference: &lt;a href=&#34;/package.foo.ext&#34;&gt;package.foo&lt;/a&gt;&lt;/p&gt;&#39;&#39;&#39;
+&lt;p&gt;reference: &lt;code&gt;&lt;a href=&#34;/package.foo.ext&#34;&gt;package.foo&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;&#39;&#39;&#39;
 
         module = pdoc.Module(pdoc)
+        module.doc[&#39;_x_x_&#39;] = pdoc.Variable(&#39;_x_x_&#39;, module, &#39;&#39;)
 
-        def link(dobj, *args, **kwargs):
+        def link(dobj):
             return &#39;&lt;a href=&#34;{}&#34;&gt;{}&lt;/a&gt;&#39;.format(dobj.url(relative_to=module), dobj.qualname)
 
         html = to_html(text, module=module, link=link)
         self.assertEqual(html, expected)
 
-        self.assertIn(&#39;&lt;a href=&#39;, to_html(&#39;`pdoc.Doc.url()`&#39;, module=module, link=link))
+        self.assertEqual(to_html(&#39;`pdoc.Doc.url()`&#39;, module=module, link=link),
+                         &#39;&lt;p&gt;&lt;code&gt;&lt;a href=&#34;#pdoc.Doc.url&#34;&gt;Doc.url&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;&#39;)
 
-        self.assertIn(&#39;&lt;code&gt;foo.f()&lt;/code&gt;&#39;, to_html(&#39;`foo.f()`&#39;, module=module, link=link))
+        self.assertEqual(to_html(&#39;`foo.f()`&#39;, module=module, link=link),
+                         &#39;&lt;p&gt;&lt;code&gt;&lt;a href=&#34;/foo.f().ext&#34;&gt;foo.f()&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;&#39;)
+
+    def test_to_html_refname(self):
+        text = &#39;&#39;&#39;
+[`pdoc` x][pdoc] `pdoc`
+[x `pdoc`][pdoc] `[pdoc]()`
+
+`__x__`
+
+[`pdoc`](#)
+[``pdoc` ``](#)
+[```pdoc```](#)
+
+```
+pdoc
+```
+
+[pdoc]: #pdoc
+&#39;&#39;&#39;
+        expected = &#39;&#39;&#39;\
+&lt;p&gt;&lt;a href=&#34;#pdoc&#34;&gt;&lt;code&gt;pdoc&lt;/code&gt; x&lt;/a&gt; &lt;code&gt;&lt;a&gt;pdoc&lt;/a&gt;&lt;/code&gt;
+&lt;a href=&#34;#pdoc&#34;&gt;x &lt;code&gt;pdoc&lt;/code&gt;&lt;/a&gt; &lt;code&gt;[&lt;a&gt;pdoc&lt;/a&gt;]()&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;__x__&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;#&#34;&gt;&lt;code&gt;pdoc&lt;/code&gt;&lt;/a&gt;
+&lt;a href=&#34;#&#34;&gt;&lt;code&gt;pdoc`&lt;/code&gt;&lt;/a&gt;
+&lt;a href=&#34;#&#34;&gt;&lt;code&gt;pdoc&lt;/code&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;pdoc
+&lt;/code&gt;&lt;/pre&gt;\
+&#39;&#39;&#39;
+
+        def link(dobj):
+            return &#39;&lt;a&gt;{}&lt;/a&gt;&#39;.format(dobj.qualname)
+
+        html = to_html(text, module=pdoc.Module(pdoc), link=link)
+        self.assertEqual(html, expected)
 
     def test_to_html_refname_warning(self):
         mod = pdoc.Module(EXAMPLE_MODULE)
@@ -4146,11 +4683,11 @@ reference: `package.foo`
 <span>def <span class="ident">test_extract_toc</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L880-L891" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1030-L1041" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_extract_toc(self):
         text = &#39;xxx\n\n# Title\n\nfoo\n\n## Subtitle\n\nbar&#39;
@@ -4170,11 +4707,11 @@ reference: `package.foo`
 <span>def <span class="ident">test_format_git_link</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L893-L901" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1043-L1051" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@unittest.skipIf(shutil.which(&#34;git&#34;) is None or not os.path.exists(&#39;.git&#39;),
                  &#34;git not installed or we&#39;re not within git repo&#34;)
@@ -4191,11 +4728,11 @@ def test_format_git_link(self):
 <span>def <span class="ident">test_glimpse</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L833-L837" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L942-L946" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_glimpse(self):
     text = &#39;foo bar\n\nbaz&#39;
@@ -4208,11 +4745,11 @@ def test_format_git_link(self):
 <span>def <span class="ident">test_minify_css</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L820-L825" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L929-L934" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_minify_css(self):
     css = &#39;a { color: white; } /*comment*/ b {;}&#39;
@@ -4226,11 +4763,11 @@ def test_format_git_link(self):
 <span>def <span class="ident">test_minify_html</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L827-L831" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L936-L940" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_minify_html(self):
     html = &#39;  &lt;p&gt;   a   &lt;/p&gt;    &lt;pre&gt;    a\n    b&lt;/pre&gt;    c   \n    d   &#39;
@@ -4243,16 +4780,18 @@ def test_format_git_link(self):
 <span>def <span class="ident">test_to_html</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L839-L866" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L948-L982" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_to_html(self):
         text = &#39;&#39;&#39;# Title
 
 `pdoc.Module` is a `Doc`, not `dict`.
+
+ref with underscore: `_x_x_`
 
 ```
 code block
@@ -4260,34 +4799,84 @@ code block
 reference: `package.foo`
 &#39;&#39;&#39;
         expected = &#39;&#39;&#39;&lt;h1 id=&#34;title&#34;&gt;Title&lt;/h1&gt;
-&lt;p&gt;&lt;a href=&#34;#pdoc.Module&#34;&gt;Module&lt;/a&gt; is a &lt;a href=&#34;#pdoc.Doc&#34;&gt;Doc&lt;/a&gt;, not &lt;code&gt;dict&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;&lt;a href=&#34;#pdoc.Module&#34;&gt;Module&lt;/a&gt;&lt;/code&gt; is a &lt;code&gt;&lt;a href=&#34;#pdoc.Doc&#34;&gt;Doc&lt;/a&gt;&lt;/code&gt;,\
+ not &lt;code&gt;dict&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;ref with underscore: &lt;code&gt;&lt;a href=&#34;#pdoc._x_x_&#34;&gt;_x_x_&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;code block
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;reference: &lt;a href=&#34;/package.foo.ext&#34;&gt;package.foo&lt;/a&gt;&lt;/p&gt;&#39;&#39;&#39;
+&lt;p&gt;reference: &lt;code&gt;&lt;a href=&#34;/package.foo.ext&#34;&gt;package.foo&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;&#39;&#39;&#39;
 
         module = pdoc.Module(pdoc)
+        module.doc[&#39;_x_x_&#39;] = pdoc.Variable(&#39;_x_x_&#39;, module, &#39;&#39;)
 
-        def link(dobj, *args, **kwargs):
+        def link(dobj):
             return &#39;&lt;a href=&#34;{}&#34;&gt;{}&lt;/a&gt;&#39;.format(dobj.url(relative_to=module), dobj.qualname)
 
         html = to_html(text, module=module, link=link)
         self.assertEqual(html, expected)
 
-        self.assertIn(&#39;&lt;a href=&#39;, to_html(&#39;`pdoc.Doc.url()`&#39;, module=module, link=link))
+        self.assertEqual(to_html(&#39;`pdoc.Doc.url()`&#39;, module=module, link=link),
+                         &#39;&lt;p&gt;&lt;code&gt;&lt;a href=&#34;#pdoc.Doc.url&#34;&gt;Doc.url&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;&#39;)
 
-        self.assertIn(&#39;&lt;code&gt;foo.f()&lt;/code&gt;&#39;, to_html(&#39;`foo.f()`&#39;, module=module, link=link))</code></pre>
+        self.assertEqual(to_html(&#39;`foo.f()`&#39;, module=module, link=link),
+                         &#39;&lt;p&gt;&lt;code&gt;&lt;a href=&#34;/foo.f().ext&#34;&gt;foo.f()&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.HtmlHelpersTest.test_to_html_refname"><code class="name flex">
+<span>def <span class="ident">test_to_html_refname</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L984-L1016" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">    def test_to_html_refname(self):
+        text = &#39;&#39;&#39;
+[`pdoc` x][pdoc] `pdoc`
+[x `pdoc`][pdoc] `[pdoc]()`
+
+`__x__`
+
+[`pdoc`](#)
+[``pdoc` ``](#)
+[```pdoc```](#)
+
+```
+pdoc
+```
+
+[pdoc]: #pdoc
+&#39;&#39;&#39;
+        expected = &#39;&#39;&#39;\
+&lt;p&gt;&lt;a href=&#34;#pdoc&#34;&gt;&lt;code&gt;pdoc&lt;/code&gt; x&lt;/a&gt; &lt;code&gt;&lt;a&gt;pdoc&lt;/a&gt;&lt;/code&gt;
+&lt;a href=&#34;#pdoc&#34;&gt;x &lt;code&gt;pdoc&lt;/code&gt;&lt;/a&gt; &lt;code&gt;[&lt;a&gt;pdoc&lt;/a&gt;]()&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;__x__&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;#&#34;&gt;&lt;code&gt;pdoc&lt;/code&gt;&lt;/a&gt;
+&lt;a href=&#34;#&#34;&gt;&lt;code&gt;pdoc`&lt;/code&gt;&lt;/a&gt;
+&lt;a href=&#34;#&#34;&gt;&lt;code&gt;pdoc&lt;/code&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;pdoc
+&lt;/code&gt;&lt;/pre&gt;\
+&#39;&#39;&#39;
+
+        def link(dobj):
+            return &#39;&lt;a&gt;{}&lt;/a&gt;&#39;.format(dobj.qualname)
+
+        html = to_html(text, module=pdoc.Module(pdoc), link=link)
+        self.assertEqual(html, expected)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.HtmlHelpersTest.test_to_html_refname_warning"><code class="name flex">
 <span>def <span class="ident">test_to_html_refname_warning</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L868-L878" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1018-L1028" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_to_html_refname_warning(self):
     mod = pdoc.Module(EXAMPLE_MODULE)
@@ -4309,14 +4898,14 @@ reference: `package.foo`
 <span>(</span><span>methodName='runTest')</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Unit tests for the HTTP server functionality.</p>
+<div class="desc"><p>Unit tests for the HTTP server functionality.</p>
 <p>Create an instance of the class that will use the named test
 method when executed. Raises a ValueError if the instance does
-not have a method with the specified name.</p></section>
+not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L1173-L1246" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1351-L1424" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class HttpTest(unittest.TestCase):
     &#34;&#34;&#34;
@@ -4403,11 +4992,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_file</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L1229-L1234" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1407-L1412" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_file(self):
     with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
@@ -4421,11 +5010,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_head</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L1236-L1246" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1414-L1424" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_head(self):
     with self._http([&#39;pdoc&#39;]) as url:
@@ -4444,11 +5033,11 @@ not have a method with the specified name.</p></section>
 <span>def <span class="ident">test_http</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/9247165f2a104327229d70988e842c89f736a96d/pdoc/test/__init__.py#L1213-L1227" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/155f4ac9f1238efe229fae7a4ace8da7cfddddbc/pdoc/test/__init__.py#L1391-L1405" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_http(self):
     with self._http([&#39;pdoc&#39;, os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)]) as url:
@@ -4513,9 +5102,13 @@ not have a method with the specified name.</p></section>
 <li><code><a title="pdoc.test.ApiTest.test_Class_params" href="#pdoc.test.ApiTest.test_Class_params">test_Class_params</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_Function_params" href="#pdoc.test.ApiTest.test_Function_params">test_Function_params</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_Function_return_annotation" href="#pdoc.test.ApiTest.test_Function_return_annotation">test_Function_return_annotation</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_Module_find_class" href="#pdoc.test.ApiTest.test_Module_find_class">test_Module_find_class</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_Variable_type_annotation" href="#pdoc.test.ApiTest.test_Variable_type_annotation">test_Variable_type_annotation</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_Variable_type_annotation_py35plus" href="#pdoc.test.ApiTest.test_Variable_type_annotation_py35plus">test_Variable_type_annotation_py35plus</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test__all__" href="#pdoc.test.ApiTest.test__all__">test__all__</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test__pdoc__dict" href="#pdoc.test.ApiTest.test__pdoc__dict">test__pdoc__dict</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test__pdoc__invalid_value" href="#pdoc.test.ApiTest.test__pdoc__invalid_value">test__pdoc__invalid_value</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test__pdoc__whitelist" href="#pdoc.test.ApiTest.test__pdoc__whitelist">test__pdoc__whitelist</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_builtin_methoddescriptors" href="#pdoc.test.ApiTest.test_builtin_methoddescriptors">test_builtin_methoddescriptors</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_class_variables_docstring_not_from_obj" href="#pdoc.test.ApiTest.test_class_variables_docstring_not_from_obj">test_class_variables_docstring_not_from_obj</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_context" href="#pdoc.test.ApiTest.test_context">test_context</a></code></li>
@@ -4585,6 +5178,7 @@ not have a method with the specified name.</p></section>
 <li><code><a title="pdoc.test.HtmlHelpersTest.test_minify_css" href="#pdoc.test.HtmlHelpersTest.test_minify_css">test_minify_css</a></code></li>
 <li><code><a title="pdoc.test.HtmlHelpersTest.test_minify_html" href="#pdoc.test.HtmlHelpersTest.test_minify_html">test_minify_html</a></code></li>
 <li><code><a title="pdoc.test.HtmlHelpersTest.test_to_html" href="#pdoc.test.HtmlHelpersTest.test_to_html">test_to_html</a></code></li>
+<li><code><a title="pdoc.test.HtmlHelpersTest.test_to_html_refname" href="#pdoc.test.HtmlHelpersTest.test_to_html_refname">test_to_html_refname</a></code></li>
 <li><code><a title="pdoc.test.HtmlHelpersTest.test_to_html_refname_warning" href="#pdoc.test.HtmlHelpersTest.test_to_html_refname_warning">test_to_html_refname_warning</a></code></li>
 </ul>
 </li>
@@ -4603,7 +5197,7 @@ not have a method with the specified name.</p></section>
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.0</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
