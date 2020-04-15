@@ -54,7 +54,7 @@
           % endif
       </p>
   % endif
-  <section class="desc${inherits}">${docstring | to_html}</section>
+  <div class="desc${inherits}">${docstring | to_html}</div>
   % if not isinstance(d, pdoc.Module):
   ${show_source(d)}
   % endif
