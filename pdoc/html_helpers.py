@@ -409,7 +409,8 @@ def to_html(text: str, docformat: str = 'numpy,google', *,
     return _md.reset().convert(md)
 
 
-def to_markdown(text: str, docformat: str = 'numpy,google', *,
+def to_markdown(text: str, *,
+                docformat: str = None,
                 module: pdoc.Module = None, link: Callable[..., str] = None):
     """
     Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
@@ -418,7 +419,13 @@ def to_markdown(text: str, docformat: str = 'numpy,google', *,
     resolved) and `link` is the hyperlinking function like the one in the
     example template.
     """
-    assert all(i in (None, '', 'numpy', 'google') for i in docformat.split(',')), docformat
+    if docformat is None:
+        docformat = getattr(getattr(module, 'obj', None), '__docformat__', 'numpy,google ')
+        docformat, *_ = docformat.lower().split()
+    if not (set(docformat.split(',')) & {'', 'numpy', 'google'}):
+        warn('__docformat__ value {!r} in module {!r} not supported. '
+             'Supported values are: numpy, google.'.format(docformat, module))
+        docformat = 'numpy,google'
 
     text = _ToMarkdown.admonitions(text, module)
 
