@@ -818,14 +818,27 @@ class ApiTest(unittest.TestCase):
 
     @ignore_warnings
     @unittest.skipIf(sys.version_info < (3, 6), 'variable annotation unsupported in <Py3.6')
-    def test_Variable_type_annotation_py35plus(self):
-        exec('''class Foo:
-                    var: int = 3
-                    """var"""
-        ''')
-        mod = pdoc.Module(pdoc)
-        cls = pdoc.Class('Foobar', mod, locals()['Foo'])
-        self.assertEqual(cls.doc['var'].type_annotation(), 'int')
+    def test_Variable_type_annotation_py36plus(self):
+        with temp_dir() as path:
+            filename = os.path.join(path, 'module36syntax.py')
+            with open(filename, 'w') as f:
+                f.write('''
+var: str = 'x'
+"""dummy"""
+
+class Foo:
+    var: int = 3
+    """dummy"""
+
+    def __init__(self):
+        self.var2: float = 1
+        """dummy"""
+                ''')
+            mod = pdoc.Module(pdoc.import_module(filename))
+            self.assertEqual(mod.doc['var'].type_annotation(), 'str')
+            self.assertEqual(mod.doc['Foo'].doc['var'].type_annotation(), 'int')
+            self.assertIsInstance(mod.doc['Foo'].doc['var2'], pdoc.Variable)
+            self.assertEqual(mod.doc['Foo'].doc['var2'].type_annotation(), '')  # Won't fix
 
     @ignore_warnings
     def test_Class_docstring(self):

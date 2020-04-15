@@ -264,9 +264,9 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             target = assign_node.targets[0]
         elif isinstance(assign_node, ast_AnnAssign):
             target = assign_node.target
-            # TODO: use annotation
-            # Note, need only for instance variables. Class variables are already
-            # handled by `typing.get_type_hints()` elsewhere.
+            # Skip the annotation. PEP 526 says:
+            # > Putting the instance variable annotations together in the class
+            # > makes it easier to find them, and helps a first-time reader of the code.
         else:
             continue
 
@@ -1155,6 +1155,13 @@ class Function(Doc):
             else:
                 raise
             try:
+                # global variables
+                annot = _get_type_hints(not self.cls and self.module.obj)[self.name]
+            except Exception:
+                pass
+            else:
+                raise
+            try:
                 annot = inspect.signature(self.obj).return_annotation
             except Exception:
                 pass
@@ -1170,9 +1177,8 @@ class Function(Doc):
         except RuntimeError:  # Success.
             pass
         else:
-            # Don't warn on instance variables. Their annotations remain TODO
-            # to be found when parsing _pep224_docstrings()
-            if not getattr(self, 'instance_var', False):
+            # Don't warn on variables. The annotation just isn't available.
+            if not isinstance(self, Variable):
                 warn("Error handling return annotation for {!r}".format(self), stacklevel=3)
 
         if annot is inspect.Parameter.empty or not annot:

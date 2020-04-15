@@ -16,6 +16,13 @@
 
   def to_html(text):
     return _to_html(text, module=module, link=link, latex_math=latex_math)
+
+
+  def get_annotation(bound_method, sep=':'):
+    annot = show_type_annotations and bound_method(link=link) or ''
+    if annot:
+        annot = ' ' + sep + '\N{NBSP}' + annot
+    return annot
 %>
 
 <%def name="ident(name)"><span class="ident">${name}</span></%def>
@@ -100,11 +107,9 @@
     <dt id="${f.refname}"><code class="name flex">
         <%
             params = ', '.join(f.params(annotate=show_type_annotations, link=link))
-            returns = show_type_annotations and f.return_annotation(link=link) or ''
-            if returns:
-                returns = ' ->\N{NBSP}' + returns
+            return_type = get_annotation(f.return_annotation, '->')
         %>
-        <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${params})${returns}</span>
+        <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${params})${return_type}</span>
     </code></dt>
     <dd>${show_desc(f)}</dd>
   </%def>
@@ -147,7 +152,8 @@
     <h2 class="section-title" id="header-variables">Global variables</h2>
     <dl>
     % for v in variables:
-      <dt id="${v.refname}"><code class="name">var ${ident(v.name)}</code></dt>
+      <% return_type = get_annotation(v.type_annotation) %>
+      <dt id="${v.refname}"><code class="name">var ${ident(v.name)}${return_type}</code></dt>
       <dd>${show_desc(v)}</dd>
     % endfor
     </dl>
@@ -209,7 +215,8 @@
           <h3>Class variables</h3>
           <dl>
           % for v in class_vars:
-              <dt id="${v.refname}"><code class="name">var ${ident(v.name)}</code></dt>
+              <% return_type = get_annotation(v.type_annotation) %>
+              <dt id="${v.refname}"><code class="name">var ${ident(v.name)}${return_type}</code></dt>
               <dd>${show_desc(v)}</dd>
           % endfor
           </dl>
@@ -226,12 +233,8 @@
           <h3>Instance variables</h3>
           <dl>
           % for v in inst_vars:
-              <%
-                  var_type = show_type_annotations and v.type_annotation(link=link) or ''
-                  if var_type:
-                      var_type = ' ->\N{NBSP}' + var_type
-              %>
-              <dt id="${v.refname}"><code class="name">var ${ident(v.name)}${var_type}</code></dt>
+              <% return_type = get_annotation(v.type_annotation) %>
+              <dt id="${v.refname}"><code class="name">var ${ident(v.name)}${return_type}</code></dt>
               <dd>${show_desc(v)}</dd>
           % endfor
           </dl>
