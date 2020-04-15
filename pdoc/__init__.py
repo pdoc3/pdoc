@@ -90,6 +90,8 @@ def reset():
     _global_context.clear()
 
     # Clear LRU caches
+    for func in (_get_type_hints,):
+        func.cache_clear()
     for cls in (Doc, Module, Class, Function, Variable, External):
         for _, method in inspect.getmembers(cls):
             if isinstance(method, property):
