@@ -228,6 +228,12 @@ class CliTest(unittest.TestCase):
                 ],
             )
 
+    def test_docformat(self):
+        with self.assertWarns(UserWarning) as cm,\
+                run_html(EXAMPLE_MODULE, config='docformat="restructuredtext"'):
+            self._basic_html_assertions()
+        self.assertIn('numpy', cm.warning.args[0])
+
     def test_html_no_source(self):
         with self.assertWarns(DeprecationWarning),\
                 run_html(EXAMPLE_MODULE, html_no_source=None):

@@ -385,12 +385,13 @@ class _MathPattern(InlineProcessor):
         return wrapper, m.start(0), m.end(0)
 
 
-def to_html(text: str, docformat: str = 'numpy,google', *,
+def to_html(text: str, *,
+            docformat: str = None,
             module: pdoc.Module = None, link: Callable[..., str] = None,
             latex_math: bool = False):
     """
-    Returns HTML of `text` interpreted as `docformat`.
-    By default, Numpydoc and Google-style docstrings are assumed,
+    Returns HTML of `text` interpreted as `docformat`. `__docformat__` is respected
+    if present, otherwise Numpydoc and Google-style docstrings are assumed,
     as well as pure Markdown.
 
     `module` should be the documented module (so the references can be
@@ -414,13 +415,16 @@ def to_markdown(text: str, *,
                 module: pdoc.Module = None, link: Callable[..., str] = None):
     """
     Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
+    `__docformat__` is respected
+    if present, otherwise Numpydoc and Google-style docstrings are assumed,
+    as well as pure Markdown.
 
     `module` should be the documented module (so the references can be
     resolved) and `link` is the hyperlinking function like the one in the
     example template.
     """
-    if docformat is None:
-        docformat = getattr(getattr(module, 'obj', None), '__docformat__', 'numpy,google ')
+    if not docformat:
+        docformat = str(getattr(getattr(module, 'obj', None), '__docformat__', 'numpy,google '))
         docformat, *_ = docformat.lower().split()
     if not (set(docformat.split(',')) & {'', 'numpy', 'google'}):
         warn('__docformat__ value {!r} in module {!r} not supported. '

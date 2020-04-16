@@ -1,4 +1,4 @@
-<%!
+<%
     import re
     import pdoc
     from pdoc.html_helpers import to_markdown
@@ -10,7 +10,7 @@
         return '[{0}](#{1} "{1}")'.format(name, dobj.refname)
 
     def _to_md(text, module):
-        text = to_markdown(text, module=module, link=link)
+        text = to_markdown(text, docformat=docformat, module=module, link=link)
         # Setext H2 headings to atx H2 headings
         text = re.sub(r'\n(.+)\n-{3,}\n', r'\n## \1\n\n', text)
         # Convert admonitions into simpler paragraphs, dedent contents
