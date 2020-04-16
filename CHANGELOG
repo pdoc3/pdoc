@@ -1,3 +1,9 @@
+0.8.1  (2020-04-16)
+=====
+  - New search widget (config tunable `search_query`) using Google CSE.
+  - Support type annotations for variables (third time's the charm).
+  - Fix crash on `Module.is_namespace` given a dyunamic/generated module.
+
 0.8.0  (2020-04-15)
 =====
   - New features:
