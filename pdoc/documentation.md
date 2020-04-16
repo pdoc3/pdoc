@@ -14,7 +14,7 @@ variables is found by examining objects' abstract syntax trees.
 [^execution]:
     Documented modules are _executed_ in order to provide `__doc__`
     attributes. Any [non-fenced] global code in imported modules will
-    affect the current environment.
+    _affect the current runtime environment_.
 
 [non-fenced]: https://stackoverflow.com/questions/19578308/what-is-the-benefit-of-using-main-method-in-python/19578335#19578335
 
@@ -76,6 +76,7 @@ by introducing syntax for docstrings for variables.
 
 
 ### Docstrings inheritance
+[docstrings inheritance]: #docstrings-inheritance
 
 `pdoc` considers methods' docstrings inherited from superclass methods',
 following the normal class inheritance patterns.
@@ -97,13 +98,14 @@ Consider the following code example:
 
 In Python, the docstring for `B.test` doesn't exist, even though a
 docstring was defined for `A.test`.
-When `pdoc` generates documentation for the code such as above,
+Contrary, when `pdoc` generates documentation for code such as above,
 it will automatically attach the docstring for `A.test` to
-`B.test` if `B.test` does not define its own docstring.
+`B.test` if the latter doesn't define its own.
 In the default HTML template, such inherited docstrings are greyed out.
 
 
 ### Docstrings for variables
+[variable docstrings]: #docstrings-for-variables
 
 Python by itself [doesn't allow docstrings attached to variables][PEP-224].
 However, `pdoc` supports docstrings attached to module (or global)
@@ -131,11 +133,9 @@ and parsing the syntax tree.
 
 By convention, variables defined in a class' `__init__` method
 and attached to `self` are considered and documented as
-instance variables.
+_instance_ variables.
 
-Class and instance variables can also [inherit docstrings].
-
-[inherit docstrings]: #docstrings-inheritance
+Class and instance variables can also [inherit docstrings][docstrings inheritance].
 
 
 Overriding docstrings with `__pdoc__`
@@ -179,11 +179,12 @@ attaching a docstring to something. A good example is a
 
 Supported docstring formats
 ---------------------------
+[docstring-formats]: #supported-docstring-formats
 Currently, pure Markdown (with [extensions]), [numpydoc],
 and [Google-style] docstrings formats are supported,
 along with some [reST directives].
 
-Additionally, if `latex_math` [template config] option is enabled,
+Additionally, if `latex_math` [template config][custom templates] option is enabled,
 LaTeX math syntax is supported when placed between
 [recognized delimiters]: `\(...\)` for inline equations and
 `\[...\]` or `$$...$$` for block equations. Note, you need to escape
@@ -194,13 +195,12 @@ or, alternatively, use [raw string literals].
 [extensions]: https://python-markdown.github.io/extensions/#officially-supported-extensions
 [numpydoc]: https://numpydoc.readthedocs.io/
 [Google-style]: http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
-[reST directives]: #supported-rest-directives
-[template config]: #custom-templates
 [recognized delimiters]: https://docs.mathjax.org/en/latest/input/tex/delimiters.html
 [raw string literals]: https://www.journaldev.com/23598/python-raw-string
 
 
 ### Supported reST directives
+[reST directives]: #supported-rest-directives
 
 The following reST directives should work:
 
@@ -222,12 +222,15 @@ The following reST directives should work:
 
 Linking to other identifiers
 ----------------------------
+[cross-linking]: #linking-to-other-identifiers
 In your documentation, you may refer to other identifiers in
 your modules. When exporting to HTML, linking is automatically
 done whenever you surround an identifier with [backticks] ( \` ).
-The identifier name must be fully qualified, for example
+Unless within the current module,
+the identifier name must be fully qualified, for example
 <code>\`pdoc.Doc.docstring\`</code> is correct (and will link to
-`pdoc.Doc.docstring`) while <code>\`Doc.docstring\`</code> is _not_.
+`pdoc.Doc.docstring`) while <code>\`Doc.docstring\`</code>
+only works within `pdoc` module.
 
 [backticks]: https://en.wikipedia.org/wiki/Grave_accent#Use_in_programming
 
@@ -247,10 +250,8 @@ If you want to omit the source code preview, run:
 
     $ pdoc --html --config show_source_code=False my_package
 
-Find additional template configuration tunables in [Custom templates]
+Find additional template configuration tunables in [custom templates]
 section below.
-
-[Custom templates]: #custom-templates
 
 To run a local HTTP server while developing your package or writing
 docstrings for it, run:
@@ -316,6 +317,7 @@ Alternatively, use the [runnable script][cmd] included with this package.
 
 Custom templates
 ----------------
+[custom templates]: #custom-templates
 To override the built-in HTML/CSS and plain text templates, copy
 the relevant templates from `pdoc/templates` directory into a directory
 of your choosing and edit them. When you run [pdoc command][cmd]
