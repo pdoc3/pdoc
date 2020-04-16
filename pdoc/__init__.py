@@ -773,7 +773,10 @@ class Module(Doc):
         """
         `True` if this module is a namespace package.
         """
-        return self.obj.__spec__.origin in (None, 'namespace')  # None in Py3.7+
+        try:
+            return self.obj.__spec__.origin in (None, 'namespace')  # None in Py3.7+
+        except AttributeError:
+            return False
 
     def find_class(self, cls: type) -> Doc:
         """
