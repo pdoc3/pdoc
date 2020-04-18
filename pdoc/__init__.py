@@ -1249,6 +1249,7 @@ class Function(Doc):
 
         params = []
         kw_only = False
+        pos_only = False
         EMPTY = inspect.Parameter.empty
 
         if link:
@@ -1258,6 +1259,12 @@ class Function(Doc):
         for p in signature.parameters.values():  # type: inspect.Parameter
             if not _is_public(p.name) and p.default is not EMPTY:
                 continue
+
+            if p.kind == p.POSITIONAL_ONLY:
+                pos_only = True
+            elif pos_only:
+                params.append("/")
+                pos_only = False
 
             if p.kind == p.VAR_POSITIONAL:
                 kw_only = True
@@ -1286,6 +1293,9 @@ class Function(Doc):
                     s = linked_annotation.join(s.rsplit(annotation, 1))  # "rreplace" once
 
             params.append(s)
+
+        if pos_only:
+            params.append("/")
 
         return params
 
