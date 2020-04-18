@@ -3,6 +3,9 @@
 %>
 
 <%def name="mobile()" filter="minify_css">
+  :root {
+    --highlight-color: #fe9;
+  }
   .flex {
     display: flex !important;
   }
@@ -60,6 +63,15 @@
   h4 {
     margin: 0;
     font-size: 105%;
+  }
+  h1:target,
+  h2:target,
+  h3:target,
+  h4:target,
+  h5:target,
+  h6:target {
+    background: var(--highlight-color);
+    padding: .2em 0;
   }
 
   a {
@@ -168,6 +180,9 @@
     }
       .name:hover {
         background: #e0e0e0;
+      }
+      dt:target .name {
+        background: var(--highlight-color);
       }
       .name > span:first-child {
         white-space: nowrap;
