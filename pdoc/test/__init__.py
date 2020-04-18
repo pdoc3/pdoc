@@ -802,6 +802,15 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(pdoc.Function('get_sample', mod, get_sample).return_annotation(),
                          'Tuple[int,\xa0float]')
 
+    @unittest.skipIf(sys.version_info < (3, 8), "positional-only arguments unsupported in < py3.8")
+    def test_test_Function_params_python38_specific(self):
+        mod = pdoc.Module(pdoc)
+        func = pdoc.Function('f', mod, eval("lambda a, /, b: None"))
+        self.assertEqual(func.params(), ['a', '/', 'b'])
+
+        func = pdoc.Function('f', mod, eval("lambda a, /: None"))
+        self.assertEqual(func.params(), ['a', '/'])
+
     def test_Function_return_annotation(self):
         import typing
 
