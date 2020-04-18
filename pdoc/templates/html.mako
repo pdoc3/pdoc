@@ -399,6 +399,7 @@
     <script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
     <style>
         .gsc-control-cse {padding:0 !important;margin-top:1em}
+        body.gsc-overflow-hidden #sidebar {overflow: visible;}
     </style>
   % endif
 
