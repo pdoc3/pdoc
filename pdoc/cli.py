@@ -322,7 +322,7 @@ def recursive_write_files(m: pdoc.Module, ext: str, **kwargs):
                 w.write(m.html(**kwargs))
             elif ext == '.md':
                 w.write(m.text(**kwargs))
-            print(f) # print created file path to stdout    
+        print(f)  # print created file path to stdout
     except Exception:
         try:
             os.unlink(f)
