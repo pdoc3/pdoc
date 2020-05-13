@@ -241,6 +241,7 @@ class _ToMarkdown:
         text = text.replace(":param", "\nArgs:\n   ", 1)
         text = text.replace(":param",  "   ")
         text = text.replace(":return:", "\n\nReturns:")
+
         def googledoc_sections(match):
             section, body = match.groups('')
             if not body:
