@@ -129,6 +129,7 @@ class _ToMarkdown:
     — they are all perfect!) an insta-preview tool such as RegEx101.com
     will come in handy.
     """
+
     @staticmethod
     def _deflist(name, type, desc):
         """
