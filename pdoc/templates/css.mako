@@ -257,6 +257,9 @@
   img {
     max-width: 100%;
   }
+  td {
+    padding: 0 .5em;
+  }
 
   .admonition {
     padding: .1em .5em;
