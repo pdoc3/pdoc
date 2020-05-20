@@ -15,7 +15,7 @@
     <%
         returns = show_type_annotations and func.return_annotation() or ''
         if returns:
-            returns = ' -> ' + returns
+            returns = ' ‑> ' + returns
     %>
 `${func.name}(${", ".join(func.params(annotate=show_type_annotations))})${returns}`
 ${func.docstring | deflist}

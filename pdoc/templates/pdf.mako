@@ -34,7 +34,7 @@ ${('#' * level) + ' ' + string + id}
     <%
         returns = show_type_annotations and f.return_annotation() or ''
         if returns:
-            returns = ' -> ' + returns
+            returns = ' ‑> ' + returns
     %>
 > `${f.funcdef()} ${f.name}(${', '.join(f.params(annotate=show_type_annotations))})${returns}`
 </%def>

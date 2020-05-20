@@ -107,7 +107,7 @@
     <dt id="${f.refname}"><code class="name flex">
         <%
             params = ', '.join(f.params(annotate=show_type_annotations, link=link))
-            return_type = get_annotation(f.return_annotation, '->')
+            return_type = get_annotation(f.return_annotation, '‑>')
         %>
         <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${params})${return_type}</span>
     </code></dt>
