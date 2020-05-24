@@ -204,7 +204,8 @@ or, alternatively, use [raw string literals].
 
 The following reST directives should work:
 
-* specific and generic [admonitions],
+* specific and generic [admonitions] (attention, caution, danger,
+  error, hint, important, note, tip, warning, admonition),
 * [`.. image::`][image] or `.. figure::` (without options),
 * [`.. include::`][include], with support for the options:
   `:start-line:`, `:end-line:`, `:start-after:` and `:end-before:`.
