@@ -1339,29 +1339,48 @@ x =</p>'''
 
     def test_urls(self):
         text = """Beautiful Soup
-http://www.foo.bar
-http://www.foo.bar?q="foo"
 <a href="https://travis-ci.org/cs01/pygdbmi"><img src="https://foo" /></a>
 <https://foo.bar>
-
 Work [like this](http://foo/) and [like that].
-
 [like that]: ftp://bar
-
 data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D
-
 ```
 http://url.com
-```"""
+```
+[https://google.com](https://google.com)
+[https://en.wikipedia.org/wiki/Orange_(software)](https://en.wikipedia.org/wiki/Orange_(software))
+[Check https://google.com here](https://google.com)
+`https://google.com`
+
+http://www.foo.bar
+http://www.foo.bar?q="foo"
+https://en.wikipedia.org/wiki/Orange_(software)
+(https://google.com)
+(http://foo and http://bar)
+text ``x ` http://foo`` http://bar `http://foo`
+"""
+
         expected = """<p>Beautiful Soup
-<a href="http://www.foo.bar">http://www.foo.bar</a>
-<a href="http://www.foo.bar?q=&quot;foo&quot;">http://www.foo.bar?q="foo"</a>
 <a href="https://travis-ci.org/cs01/pygdbmi"><img src="https://foo" /></a>
-<a href="https://foo.bar">https://foo.bar</a></p>
-<p>Work <a href="http://foo/">like this</a> and <a href="ftp://bar">like that</a>.</p>
+<a href="https://foo.bar">https://foo.bar</a>
+Work <a href="http://foo/">like this</a> and <a href="ftp://bar">like that</a>.</p>
 <p>data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D</p>
 <pre><code>http://url.com
-</code></pre>"""
+</code></pre>
+
+<p><a href="https://google.com">https://google.com</a>
+<a href="https://en.wikipedia.org/wiki/Orange_(software)">\
+https://en.wikipedia.org/wiki/Orange_(software)</a>
+<a href="https://google.com">Check https://google.com here</a>
+<code>https://google.com</code></p>
+<p><a href="http://www.foo.bar">http://www.foo.bar</a>
+<a href="http://www.foo.bar?q=&quot;foo&quot;">http://www.foo.bar?q="foo"</a>
+<a href="https://en.wikipedia.org/wiki/Orange_(software)">\
+https://en.wikipedia.org/wiki/Orange_(software)</a>
+(<a href="https://google.com">https://google.com</a>)
+(<a href="http://foo">http://foo</a> and <a href="http://bar">http://bar</a>)
+text <code>x ` http://foo</code> <a href="http://bar">http://bar</a> <code>http://foo</code></p>"""
+
         html = to_html(text)
         self.assertEqual(html, expected)
 

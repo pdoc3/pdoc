@@ -361,9 +361,28 @@ class _ToMarkdown:
     @staticmethod
     def raw_urls(text):
         """Wrap URLs in Python-Markdown-compatible <angle brackets>."""
+        pattern = re.compile(r"""
+            ((?P<code_span>``.*``|`.*`)      # finds backticks
+            |
+            (?P<markdown_link>\[.*\]\(.*\))  # gets inline link
+            |
+            (?<![<\"\'])                     # does not start with <, ", '
+            (?P<url>(?:http|ftp)s?:\/\/      # url with protocol
+            [^>\s()]+                        # url part before any (, )
+            (?:\([^>\s)]*\))*                # optionally url part within parentheses
+            [^>\s)]*                         # url part after any )
+            ))""", re.VERBOSE)
+
+        def replace(match):
+            groups = match.groupdict("")
+
+            if groups["url"]:
+                return "<" + groups["url"] + ">"
+            else:
+                return match.group()
+
         with _fenced_code_blocks_hidden(text) as result:
-            result[0] = re.sub(r'(?<![<"\'])(\s*)((?:http|ftp)s?://[^>)\s]+)(\s*)',
-                               r'\1<\2>\3', result[0])
+            result[0] = re.sub(pattern, replace, result[0])
         text = result[0]
         return text
 
