@@ -61,3 +61,8 @@ The above features are explained in more detail in pdoc's [documentation]
 [`__pdoc__` dictionary]: https://pdoc3.github.io/pdoc/doc/pdoc/#overriding-docstrings-with-__pdoc__
 [customized templates]: https://pdoc3.github.io/pdoc/doc/pdoc/#custom-templates
 [development web server]: https://pdoc3.github.io/pdoc/doc/pdoc/#command-line-interface
+
+
+Development
+-----------
+Check [CONTRIBUTING.md](CONTRIBUTING.md) for hacking details.
