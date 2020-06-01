@@ -65,4 +65,4 @@ The above features are explained in more detail in pdoc's [documentation]
 
 Development
 -----------
-Check [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+Check [CONTRIBUTING.md](CONTRIBUTING.md) for hacking details.
