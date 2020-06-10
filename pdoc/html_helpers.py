@@ -577,6 +577,7 @@ def _git_project_root():
                 break
         except (subprocess.CalledProcessError, OSError):
             pass
+    path = os.path.normpath(path)
     return path
 
 
@@ -591,7 +592,7 @@ def _project_relative_path(absolute_path):
     for prefix_path in (_git_project_root() or os.getcwd(),
                         get_python_lib()):
         common_path = os.path.commonpath([prefix_path, absolute_path])
-        if common_path == prefix_path:
+        if os.path.samefile(common_path, prefix_path):
             # absolute_path is a descendant of prefix_path
             return os.path.relpath(absolute_path, prefix_path)
     raise RuntimeError(

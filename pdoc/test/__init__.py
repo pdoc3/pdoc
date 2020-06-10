@@ -1075,6 +1075,7 @@ pdoc
             template='https://github.com/pdoc3/pdoc/blob/{commit}/{path}#L{start_line}-L{end_line}',
             dobj=pdoc.Module(EXAMPLE_MODULE).find_ident('module.foo'),
         )
+        self.assertIsInstance(url, str)
         self.assertRegex(url, r"https://github.com/pdoc3/pdoc/blob/[0-9a-f]{40}"
                               r"/pdoc/test/example_pkg/module.py#L\d+-L\d+")
 
