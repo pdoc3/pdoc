@@ -5,7 +5,7 @@
         :end-line: 2
 ```
 
-.. include:: _include_me.py
+.. include:: foo/../_include_me.py
     :start-after: =
     :end-before: 4
 """

@@ -331,7 +331,7 @@ class _ToMarkdown:
         start_after = options.get('start-after')
         end_before = options.get('end-before')
 
-        with open(os.path.join(os.path.dirname(module.obj.__file__), path),
+        with open(os.path.normpath(os.path.join(os.path.dirname(module.obj.__file__), path)),
                   encoding='utf-8') as f:
             text = ''.join(list(f)[start_line:end_line])
 
