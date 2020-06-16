@@ -1277,22 +1277,26 @@ class Function(Doc):
             if not annotate:
                 p = p.replace(annotation=EMPTY)
 
-            s = str(p)
+            formatted = p.name
             if p.annotation is not EMPTY:
-                if sys.version_info < (3, 7):
-                    # PEP8-normalize whitespace
-                    s = re.sub(r'(?<!\s)=(?!\s)', ' = ', re.sub(r':(?!\s)', ': ', s, 1), 1)
+                annotation = inspect.formatannotation(p.annotation).replace(' ', '\N{NBSP}')
                 # "Eval" forward-declarations (typing string literals)
                 if isinstance(p.annotation, str):
-                    s = s.replace("'%s'" % p.annotation, p.annotation, 1)
-                s = s.replace(' ', '\N{NBSP}')  # prevent improper line breaking
-
+                    annotation = annotation.strip("'")
                 if link:
-                    annotation = inspect.formatannotation(p.annotation)
-                    linked_annotation = re.sub(r'[\w\.]+', _linkify, annotation)
-                    s = linked_annotation.join(s.rsplit(annotation, 1))  # "rreplace" once
+                    annotation = re.sub(r'[\w\.]+', _linkify, annotation)
+                formatted += ':\N{NBSP}' + annotation
+            if p.default is not EMPTY:
+                if p.annotation is not EMPTY:
+                    formatted += '\N{NBSP}=\N{NBSP}' + repr(p.default)
+                else:
+                    formatted += '=' + repr(p.default)
+            if p.kind == p.VAR_POSITIONAL:
+                formatted = '*' + formatted
+            elif p.kind == p.VAR_KEYWORD:
+                formatted = '**' + formatted
 
-            params.append(s)
+            params.append(formatted)
 
         if pos_only:
             params.append("/")

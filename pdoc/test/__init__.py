@@ -779,6 +779,13 @@ class ApiTest(unittest.TestCase):
                          ['a:\N{NBSP}int', '*b',
                           "c:\N{NBSP}List[<a href=\"#pdoc.Doc\">Doc</a>]\N{NBSP}=\N{NBSP}[]"])
 
+        # typed, linked, GH-311
+        def f(a: typing.Dict[str, pdoc.Doc]): pass
+
+        func = pdoc.Function('f', mod, f)
+        self.assertEqual(func.params(annotate=True, link=link),
+                         ["a:\N{NBSP}Dict[str,\N{NBSP}<a href=\"#pdoc.Doc\">Doc</a>]"])
+
         # shadowed name
         def f(pdoc: int): pass
         func = pdoc.Function('f', mod, f)
