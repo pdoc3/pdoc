@@ -231,6 +231,10 @@ class Docformats:
                 somehow stripped the required extra indentation.
 
         Returns:
+            A very special number
+            which is the answer of everything.
+
+        Returns:
             Dict[int, pdoc.Doc]: Description.
 
         Raises:

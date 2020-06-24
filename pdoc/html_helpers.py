@@ -257,7 +257,9 @@ class _ToMarkdown:
                     lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups())),
                     inspect.cleandoc('\n' + body)
                 )
-            return '\n{}\n-----\n{}'.format(section, body)
+            # Convert into markdown sections. End underlines with '='
+            # to avoid matching and re-processing as Numpy sections.
+            return '\n{}\n-----=\n{}'.format(section, body)
 
         text = re.compile(r'^([A-Z]\w+):$\n'
                           r'((?:\n?(?: {2,}.*|$))+)', re.MULTILINE).sub(googledoc_sections, text)

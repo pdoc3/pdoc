@@ -1214,6 +1214,9 @@ if only a single item was listed. <code><a>inspect.cleandoc()</a></code>
 somehow stripped the required extra indentation.</dd>
 </dl>
 <h2 id="returns_1">Returns</h2>
+<p>A very special number
+which is the answer of everything.</p>
+<h2 id="returns_2">Returns</h2>
 <dl>
 <dt><code>Dict[int, <a>pdoc.Doc</a>]</code></dt>
 <dd>Description.</dd>
