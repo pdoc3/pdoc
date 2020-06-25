@@ -138,7 +138,7 @@ def _render_template(template_name, **kwargs):
         raise
 
 
-def html(module_name, docfilter=None, reload=False, **kwargs) -> str:
+def html(module_name, docfilter=None, reload=False, skip_errors=False, **kwargs) -> str:
     """
     Returns the documentation for the module `module_name` in HTML
     format. The module must be a module or an importable string.
@@ -148,12 +148,13 @@ def html(module_name, docfilter=None, reload=False, **kwargs) -> str:
     that takes a single argument (a documentation object) and returns
     `True` or `False`. If `False`, that object will not be documented.
     """
-    mod = Module(import_module(module_name, reload=reload), docfilter=docfilter)
+    mod = Module(import_module(module_name, reload=reload),
+                 docfilter=docfilter, skip_errors=skip_errors)
     link_inheritance()
     return mod.html(**kwargs)
 
 
-def text(module_name, docfilter=None, reload=False, **kwargs) -> str:
+def text(module_name, docfilter=None, reload=False, skip_errors=False, **kwargs) -> str:
     """
     Returns the documentation for the module `module_name` in plain
     text format suitable for viewing on a terminal.
@@ -164,7 +165,8 @@ def text(module_name, docfilter=None, reload=False, **kwargs) -> str:
     that takes a single argument (a documentation object) and returns
     `True` or `False`. If `False`, that object will not be documented.
     """
-    mod = Module(import_module(module_name, reload=reload), docfilter=docfilter)
+    mod = Module(import_module(module_name, reload=reload),
+                 docfilter=docfilter, skip_errors=skip_errors)
     link_inheritance()
     return mod.text(**kwargs)
 
@@ -197,7 +199,8 @@ def import_module(module: Union[str, ModuleType],
             try:
                 module = importlib.import_module(module_path)
             except Exception as e:
-                raise ImportError('Error importing {!r}: {}'.format(module, e))
+                raise ImportError('Error importing {!r}: {}: {}'
+                                  .format(module, e.__class__.__name__, e))
 
     assert inspect.ismodule(module)
     # If this is pdoc itself, return without reloading. Otherwise later
@@ -547,7 +550,8 @@ class Module(Doc):
     __slots__ = ('supermodule', 'doc', '_context', '_is_inheritance_linked')
 
     def __init__(self, module: Union[ModuleType, str], *, docfilter: Callable[[Doc], bool] = None,
-                 supermodule: 'Module' = None, context: Context = None):
+                 supermodule: 'Module' = None, context: Context = None,
+                 skip_errors: bool = False):
         """
         Creates a `Module` documentation object given the actual
         module Python object.
@@ -560,6 +564,10 @@ class Module(Doc):
 
         `context` is an instance of `pdoc.Context`. If `None` a
         global context object will be used.
+
+        If `skip_errors` is `True` and an unimportable, erroneous
+        submodule is encountered, a warning will be issued instead
+        of raising an exception.
         """
         if isinstance(module, str):
             module = import_module(module)
@@ -649,9 +657,17 @@ class Module(Doc):
 
                 assert self.refname == self.name
                 fullname = "%s.%s" % (self.name, root)
-                self.doc[root] = m = Module(import_module(fullname),
-                                            docfilter=docfilter, supermodule=self,
-                                            context=self._context)
+                try:
+                    m = Module(import_module(fullname),
+                               docfilter=docfilter, supermodule=self,
+                               context=self._context, skip_errors=skip_errors)
+                except Exception as ex:
+                    if skip_errors:
+                        warn(str(ex), Module.ImportWarning)
+                        continue
+                    raise
+
+                self.doc[root] = m
                 # Skip empty namespace packages because they may
                 # as well be other auxiliary directories
                 if m.is_namespace and not m.doc:
@@ -672,6 +688,14 @@ class Module(Doc):
             if isinstance(docobj, Class):
                 self._context.update((obj.refname, obj)
                                      for obj in docobj.doc.values())
+
+    class ImportWarning(UserWarning):
+        """
+        Our custom import warning because the builtin is ignored by default.
+        https://docs.python.org/3/library/warnings.html#default-warning-filter
+        """
+
+    __pdoc__['Module.ImportWarning'] = False
 
     @property
     def __pdoc__(self):

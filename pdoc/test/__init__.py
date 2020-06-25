@@ -391,6 +391,13 @@ class CliTest(unittest.TestCase):
             with run_html('.'):
                 self._check_files(())
 
+    def test_skip_errors(self):
+        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_skip_errors')),\
+                redirect_streams(),\
+                self.assertWarns(pdoc.Module.ImportWarning) as cm:
+            run('.', skip_errors=None)
+        self.assertIn('ZeroDivision', cm.warning.args[0])
+
 
 class ApiTest(unittest.TestCase):
     """

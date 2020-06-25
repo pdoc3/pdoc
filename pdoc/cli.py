@@ -140,6 +140,11 @@ aa(
          "for specified modules. If you just want to use the default hostname "
          "and port ({}:{}), set the parameter to :.".format(DEFAULT_HOST, DEFAULT_PORT),
 )
+aa(
+    "--skip-errors",
+    action="store_true",
+    help="Upon unimportable modules, warn instead of raising."
+)
 
 args = argparse.Namespace()
 
@@ -254,6 +259,7 @@ class _WebDoc(BaseHTTPRequestHandler):
         """
         return pdoc.html(self.import_path_from_req_url,
                          reload=True, http_server=True, external_links=True,
+                         skip_errors=args.skip_errors,
                          **self.template_config)
 
     def resolve_ext(self, import_path):
@@ -450,7 +456,8 @@ def main(_args=None):
                        isinstance(obj, pdoc.Class) and f in obj.doc
                        for f in _filters)
 
-    modules = [pdoc.Module(module, docfilter=docfilter)
+    modules = [pdoc.Module(module, docfilter=docfilter,
+                           skip_errors=args.skip_errors)
                for module in args.modules]
     pdoc.link_inheritance()
 
