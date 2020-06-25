@@ -89,9 +89,9 @@ ${function(m) | indent}
 ## Start the output logic for an entire module.
 
 <%
-  variables = module.variables()
-  classes = module.classes()
-  functions = module.functions()
+  variables = module.variables(sort=sort_identifiers)
+  classes = module.classes(sort=sort_identifiers)
+  functions = module.functions(sort=sort_identifiers)
   submodules = module.submodules()
   heading = 'Namespace' if module.is_namespace else 'Module'
 %>

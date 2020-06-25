@@ -80,9 +80,9 @@ links-as-notes: true
 % for module in modules:
 <%
     submodules = module.submodules()
-    variables = module.variables()
-    functions = module.functions()
-    classes = module.classes()
+    variables = module.variables(sort=sort_identifiers)
+    functions = module.functions(sort=sort_identifiers)
+    classes = module.classes(sort=sort_identifiers)
 
     def to_md(text):
         return _to_md(text, module)
