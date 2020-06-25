@@ -482,7 +482,7 @@ or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
     chromium --headless --disable-gpu --print-to-pdf=pdf.pdf pdf.html
 
-    wkhtmltopdf -s A4 --print-media-type pdf.html pdf.pdf
+    wkhtmltopdf --encoding utf8 -s A4 --print-media-type pdf.html pdf.pdf
 
 or similar, at your own discretion.""",
               file=sys.stderr)
