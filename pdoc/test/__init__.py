@@ -67,7 +67,8 @@ def run(*args, _check=True, **kwargs) -> int:
 
 @contextmanager
 def run_html(*args, **kwargs):
-    with temp_dir() as path:
+    with temp_dir() as path, \
+            redirect_streams():
         run(*args, html=None, output_dir=path, **kwargs)
         with chdir(path):
             yield
@@ -370,7 +371,8 @@ class CliTest(unittest.TestCase):
             self._check_files(['/foobar/' + EXAMPLE_MODULE])
 
     def test_output_text(self):
-        with temp_dir() as path:
+        with temp_dir() as path, \
+                redirect_streams():
             run(EXAMPLE_MODULE, output_dir=path)
             with chdir(path):
                 self._basic_html_assertions([file.replace('.html', '.md')
