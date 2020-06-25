@@ -43,6 +43,13 @@ ${('#' * level) + ' ' + string + id}
 > `class ${c.name}(${', '.join(c.params(annotate=show_type_annotations))})`
 </%def>
 
+<%def name="vartype(v)">
+<% annot = show_type_annotations and v.type_annotation() or '' %>
+%if annot:
+Type: `${annot}`
+%endif
+</%def>
+
 ---
 description: |
     API documentation for modules: ${', '.join(m.name for m in modules)}.
@@ -80,6 +87,7 @@ ${title(2, 'Sub-modules')}
 ${title(2, 'Variables')}
     % for v in variables:
 ${title(3, 'Variable `%s`' % v.name, v.refname)}
+${vartype(v)}
 ${v.docstring | to_md, subh, subh}
     % endfor
 % endif
@@ -129,6 +137,7 @@ ${title(4, 'Descendants')}
 ${title(4, 'Class variables')}
             % for v in class_vars:
 ${title(5, 'Variable `%s`' % v.name, v.refname)}
+${vartype(v)}
 ${v.docstring | to_md, subh, subh}
             % endfor
         % endif
@@ -137,6 +146,7 @@ ${v.docstring | to_md, subh, subh}
 ${title(4, 'Instance variables')}
             % for v in inst_vars:
 ${title(5, 'Variable `%s`' % v.name, v.refname)}
+${vartype(v)}
 ${v.docstring | to_md, subh, subh}
             % endfor
         % endif

@@ -22,7 +22,12 @@ ${func.docstring | deflist}
 </%def>
 
 <%def name="variable(var)" buffered="True">
-`${var.name}`
+    <%
+        annot = show_type_annotations and var.type_annotation() or ''
+        if annot:
+            annot = ': ' + annot
+    %>
+`${var.name}${annot}`
 ${var.docstring | deflist}
 </%def>
 

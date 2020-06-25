@@ -864,6 +864,9 @@ class Foo:
             self.assertIsInstance(mod.doc['Foo'].doc['var2'], pdoc.Variable)
             self.assertEqual(mod.doc['Foo'].doc['var2'].type_annotation(), '')  # Won't fix
 
+            self.assertIn('var: str', mod.text())
+            self.assertIn('var: int', mod.text())
+
     @ignore_warnings
     def test_Class_docstring(self):
         class A:
