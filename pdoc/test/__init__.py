@@ -362,8 +362,9 @@ class CliTest(unittest.TestCase):
         self.assertIn('pdoc3.github.io', out)
         self.assertIn('pandoc', err)
 
-        self.assertIn(str(inspect.signature(pdoc.Doc.__init__)).replace('self, ', ''),
-                      out)
+        pdoc_Doc_params = str(inspect.signature(pdoc.Doc.__init__)).replace('self, ', '')
+        self.assertIn(pdoc_Doc_params.replace(' ', ''),
+                      out.replace('>', '').replace('\n', '').replace(' ', ''))
 
     def test_config(self):
         with run_html(EXAMPLE_MODULE, config='link_prefix="/foobar/"'):

@@ -31,16 +31,30 @@ ${('#' * level) + ' ' + string + id}
 </%def>
 
 <%def name="funcdef(f)">
-    <%
-        returns = show_type_annotations and f.return_annotation() or ''
-        if returns:
-            returns = ' \N{non-breaking hyphen}> ' + returns
-    %>
-> `${f.funcdef()} ${f.name}(${', '.join(f.params(annotate=show_type_annotations))})${returns}`
+<%
+    params = f.params(annotate=show_type_annotations)
+    returns = show_type_annotations and f.return_annotation() or ''
+    if returns:
+        returns = ' \N{non-breaking hyphen}> ' + returns
+%>
+%if params:
+>     ${f.funcdef()} ${f.name}(
+>         ${',\n>         '.join(params)}
+>     )${returns}
+%else:
+>     ${f.funcdef()} ${f.name}()${returns}
+%endif
 </%def>
 
 <%def name="classdef(c)">
-> `class ${c.name}(${', '.join(c.params(annotate=show_type_annotations))})`
+<% params = c.params(annotate=show_type_annotations) %>
+%if params:
+>     class ${c.name}(
+>         ${',\n>         '.join(params)}
+>     )
+%else:
+>     class ${c.name}
+%endif
 </%def>
 
 <%def name="vartype(v)">
