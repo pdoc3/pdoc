@@ -1200,6 +1200,8 @@ Nomatch:</p>
 <dt><strong><code>arg2</code></strong> :&ensp;<code>List[str]</code>, optional,\
  default=<code>10</code></dt>
 <dd>Text2</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>array-like object</code></dt>
+<dd>foo</dd>
 </dl>
 <h2 id="args_1">Args</h2>
 <dl>

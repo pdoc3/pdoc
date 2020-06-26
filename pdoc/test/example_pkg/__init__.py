@@ -212,6 +212,7 @@ class Docformats:
         Args:
             arg1 (str, optional): Text1
             arg2 (List[str], optional, default=10): Text2
+            data (array-like object): foo
 
         Args:
           arg1 (int): Description of arg1
