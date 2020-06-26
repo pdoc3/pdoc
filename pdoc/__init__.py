@@ -547,7 +547,8 @@ class Module(Doc):
         it was imported from. It is always an absolute import path.
         """
 
-    __slots__ = ('supermodule', 'doc', '_context', '_is_inheritance_linked')
+    __slots__ = ('supermodule', 'doc', '_context', '_is_inheritance_linked',
+                 '_skipped_submodules')
 
     def __init__(self, module: Union[ModuleType, str], *, docfilter: Callable[[Doc], bool] = None,
                  supermodule: 'Module' = None, context: Context = None,
@@ -592,6 +593,8 @@ class Module(Doc):
 
         self._is_inheritance_linked = False
         """Re-entry guard for `pdoc.Module._link_inheritance()`."""
+
+        self._skipped_submodules = set()
 
         var_docstrings, _ = _pep224_docstrings(self)
 
@@ -653,6 +656,7 @@ class Module(Doc):
                 if not _is_public(root) and not _is_whitelisted(root, self):
                     continue
                 if _is_blacklisted(root, self):
+                    self._skipped_submodules.add(root)
                     continue
 
                 assert self.refname == self.name
@@ -726,6 +730,9 @@ class Module(Doc):
                     warn('Setting `__pdoc__[key] = None` is deprecated; '
                          'use `__pdoc__[key] = False` '
                          '(key: {!r}, module: {!r}).'.format(name, self.name))
+
+                if name in self._skipped_submodules:
+                    continue
 
                 if (not name.endswith('.__init__') and
                         name not in self.doc and refname not in self._context):

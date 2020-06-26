@@ -553,6 +553,10 @@ class ApiTest(unittest.TestCase):
         module = pdoc.import_module(EXAMPLE_MODULE + '._exclude_dir')
         with patch.object(module, '__pdoc__', {'downloaded_modules': False}, create=True):
             mod = pdoc.Module(module)
+            # GH-206: https://github.com/pdoc3/pdoc/issues/206
+            with warnings.catch_warnings(record=True) as cm:
+                pdoc.link_inheritance()
+            self.assertEqual(cm, [])
             self.assertNotIn('downloaded_modules', mod.doc)
 
     def test__pdoc__invalid_value(self):
