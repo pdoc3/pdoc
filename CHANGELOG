@@ -1,3 +1,30 @@
+0.8.2  (2020-06-26)
+=====
+  - Enhancements:
+    - New CLI switch `--skip-errors` for skipping invalid/broken modules with
+      a warning instead of raising an error.
+    - CSS tweak to highlight :target-ed section.
+    - Paths to generated files (with `--output-dir`) are now printed to stdout.
+    - Support for `__docformat__` from PEP 258.
+    - Support for Python 3.8 positional-only arguments.
+  - Bugfixes:
+    - Better handle raw URLs and some markdown links.
+    - Consistently use `sort_identifiers` and variable type annotations in
+      markdown and PDF templates.
+    - Don't warn about missing key for `__pdoc__`-skipped submodules.
+    - Fix git path comparison and normalize `.. include::` paths on Windos.
+    - Fix sidebar scrollbar visible thrugh search results overlay.
+    - Avoid extracting doctest comments into HTML sidebar TOC.
+    - Support Google-style docstring multi-line Returns statement containing
+      description only.
+    - Support hyphens in Google-style docstring argument types.
+    - Fix hyperlinks for type annotations with spaces.
+  - Other:
+    - Bump HTML template CDN resources.
+    - Use non-breaking hyphen in return annotation arrow.
+    - Multi-line func/class signature in PDF template.
+    - Other minor docs improvements.
+
 0.8.1  (2020-04-16)
 =====
   - New search widget (config tunable `search_query`) using Google CSE.
