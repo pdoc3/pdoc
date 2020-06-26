@@ -3,20 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.8.1" />
+<meta name="generator" content="pdoc 0.8.2" />
 <title>pdoc.test.example_pkg.subpkg2 API documentation</title>
 <meta name="description" content="Module docstring" />
-<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
-<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<link rel="preconnect" href="https://www.google.com">
 <script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
-<style>.gsc-control-cse {padding:0 !important;margin-top:1em}</style>
+<style>
+.gsc-control-cse {padding:0 !important;margin-top:1em}
+body.gsc-overflow-hidden #sidebar {overflow: visible;}
+</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js" integrity="sha256-eOgo0OtLL4cdq7RdwRUiGKLX9XsIJ7nGhWEKbohmVAQ=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
 <style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em}</style>
 <link rel="canonical" href="https://pdoc3.github.io/pdoc/doc/pdoc/test/example_pkg/subpkg2/">
-<link rel="icon" href="https://pdoc.github.io/pdoc/logo.png">
+<link rel="icon" href="https://pdoc3.github.io/pdoc/logo.png">
 <script data-ad-client="ca-pub-2900001379782823" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script></head>
 <body>
 <main>
@@ -29,7 +35,7 @@
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L0-L354" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L0-L359" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Module docstring&#34;&#34;&#34;
 from collections import namedtuple
@@ -245,6 +251,7 @@ class Docformats:
         Args:
             arg1 (str, optional): Text1
             arg2 (List[str], optional, default=10): Text2
+            data (array-like object): foo
 
         Args:
           arg1 (int): Description of arg1
@@ -262,6 +269,10 @@ class Docformats:
             issue_10: description didn&#39;t work across multiple lines
                 if only a single item was listed. `inspect.cleandoc()`
                 somehow stripped the required extra indentation.
+
+        Returns:
+            A very special number
+            which is the answer of everything.
 
         Returns:
             Dict[int, pdoc.Doc]: Description.
@@ -451,7 +462,7 @@ Exception: something went wrong
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L256-L289" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L261-L294" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def doctests(self):
     &#34;&#34;&#34;
@@ -497,7 +508,7 @@ Exception: something went wrong
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L19-L20" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L19-L20" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def foo(env=os.environ):
     &#34;&#34;&#34;Doesn&#39;t leak environ&#34;&#34;&#34;</code></pre>
@@ -515,6 +526,8 @@ Nomatch:</p>
 <dd>Text1</dd>
 <dt><strong><code>arg2</code></strong> :&ensp;<code>List[str]</code>, optional, default=<code>10</code></dt>
 <dd>Text2</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>array-like object</code></dt>
+<dd>foo</dd>
 </dl>
 <h2 id="args_1">Args</h2>
 <dl>
@@ -542,6 +555,9 @@ if only a single item was listed. <code>inspect.cleandoc()</code>
 somehow stripped the required extra indentation.</dd>
 </dl>
 <h2 id="returns_1">Returns</h2>
+<p>A very special number
+which is the answer of everything.</p>
+<h2 id="returns_2">Returns</h2>
 <dl>
 <dt><code>Dict[int, <a title="pdoc.Doc" href="../../../index.html#pdoc.Doc">Doc</a>]</code></dt>
 <dd>Description.</dd>
@@ -574,7 +590,7 @@ that are relevant to the interface.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L207-L254" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L207-L259" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def google(self):
     &#34;&#34;&#34;
@@ -584,6 +600,7 @@ that are relevant to the interface.</p>
     Args:
         arg1 (str, optional): Text1
         arg2 (List[str], optional, default=10): Text2
+        data (array-like object): foo
 
     Args:
       arg1 (int): Description of arg1
@@ -601,6 +618,10 @@ that are relevant to the interface.</p>
         issue_10: description didn&#39;t work across multiple lines
             if only a single item was listed. `inspect.cleandoc()`
             somehow stripped the required extra indentation.
+
+    Returns:
+        A very special number
+        which is the answer of everything.
 
     Returns:
         Dict[int, pdoc.Doc]: Description.
@@ -637,7 +658,7 @@ that are relevant to the interface.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L341-L351" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L346-L356" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def latex_math():
     &#34;&#34;&#34;
@@ -719,7 +740,7 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L140-L205" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L140-L205" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def numpy(self):
     &#34;&#34;&#34;
@@ -797,7 +818,7 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L23-L24" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L23-L24" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def object_as_arg_default(*args, a=object(), **kwargs):
     &#34;&#34;&#34;Html-encodes angle brackets in params&#34;&#34;&#34;</code></pre>
@@ -848,7 +869,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L291-L326" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L296-L331" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def reST_directives(self):
     &#34;&#34;&#34;
@@ -901,7 +922,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L31-L43" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L31-L43" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class A:
     &#34;&#34;&#34;`A` is base class for `example_pkg.B`.&#34;&#34;&#34;  # Test refname link
@@ -931,7 +952,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L39-L40" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L39-L40" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def inherited(self):  # Inherited in B
     &#34;&#34;&#34;A.inherited docstring&#34;&#34;&#34;</code></pre>
@@ -945,7 +966,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L33-L34" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L33-L34" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def overridden(self):
     &#34;&#34;&#34;A.overridden docstring&#34;&#34;&#34;</code></pre>
@@ -959,7 +980,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L36-L37" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L36-L37" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def overridden_same_docstring(self):
     &#34;&#34;&#34;A.overridden_same_docstring docstring&#34;&#34;&#34;</code></pre>
@@ -978,7 +999,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L58-L128" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L58-L128" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class B(A, int):
     &#34;&#34;&#34;
@@ -1086,7 +1107,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L91-L93" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L91-L93" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@classmethod
 def cls(cls):
@@ -1101,7 +1122,7 @@ def cls(cls):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L87-L89" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L87-L89" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@staticmethod
 def static(x):
@@ -1121,7 +1142,7 @@ def static(x):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L106-L109" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L106-L109" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def p(self):
@@ -1135,7 +1156,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L52-L55" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L52-L55" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def __get__(self, instance, instance_type=None):
     if instance is not None:
@@ -1149,7 +1170,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L52-L55" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L52-L55" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def __get__(self, instance, instance_type=None):
     if instance is not None:
@@ -1168,7 +1189,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L84-L85" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L84-L85" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def f(self, a: int, b: int = 1, *args, c: str = &#39;c&#39;, **kwargs):
     &#34;&#34;&#34;B.f docstring&#34;&#34;&#34;</code></pre>
@@ -1182,7 +1203,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L121-L122" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L121-L122" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def overridden(self):
     pass</code></pre>
@@ -1210,7 +1231,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L131-L131" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L131-L131" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class C(B): pass  # noqa: E701, E302</code></pre>
 </details>
@@ -1256,7 +1277,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L132-L132" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L132-L132" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class D(C): pass  # noqa: E701, E302</code></pre>
 </details>
@@ -1296,7 +1317,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L139-L326" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L139-L331" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Docformats:
     def numpy(self):
@@ -1374,6 +1395,7 @@ def p(self):
         Args:
             arg1 (str, optional): Text1
             arg2 (List[str], optional, default=10): Text2
+            data (array-like object): foo
 
         Args:
           arg1 (int): Description of arg1
@@ -1391,6 +1413,10 @@ def p(self):
             issue_10: description didn&#39;t work across multiple lines
                 if only a single item was listed. `inspect.cleandoc()`
                 somehow stripped the required extra indentation.
+
+        Returns:
+            A very special number
+            which is the answer of everything.
 
         Returns:
             Dict[int, pdoc.Doc]: Description.
@@ -1523,7 +1549,7 @@ Exception: something went wrong
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L256-L289" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L261-L294" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def doctests(self):
     &#34;&#34;&#34;
@@ -1573,6 +1599,8 @@ Nomatch:</p>
 <dd>Text1</dd>
 <dt><strong><code>arg2</code></strong> :&ensp;<code>List[str]</code>, optional, default=<code>10</code></dt>
 <dd>Text2</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>array-like object</code></dt>
+<dd>foo</dd>
 </dl>
 <h2 id="args_1">Args</h2>
 <dl>
@@ -1600,6 +1628,9 @@ if only a single item was listed. <code>inspect.cleandoc()</code>
 somehow stripped the required extra indentation.</dd>
 </dl>
 <h2 id="returns_1">Returns</h2>
+<p>A very special number
+which is the answer of everything.</p>
+<h2 id="returns_2">Returns</h2>
 <dl>
 <dt><code>Dict[int, <a title="pdoc.Doc" href="../../../index.html#pdoc.Doc">Doc</a>]</code></dt>
 <dd>Description.</dd>
@@ -1632,7 +1663,7 @@ that are relevant to the interface.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L207-L254" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L207-L259" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def google(self):
     &#34;&#34;&#34;
@@ -1642,6 +1673,7 @@ that are relevant to the interface.</p>
     Args:
         arg1 (str, optional): Text1
         arg2 (List[str], optional, default=10): Text2
+        data (array-like object): foo
 
     Args:
       arg1 (int): Description of arg1
@@ -1659,6 +1691,10 @@ that are relevant to the interface.</p>
         issue_10: description didn&#39;t work across multiple lines
             if only a single item was listed. `inspect.cleandoc()`
             somehow stripped the required extra indentation.
+
+    Returns:
+        A very special number
+        which is the answer of everything.
 
     Returns:
         Dict[int, pdoc.Doc]: Description.
@@ -1751,7 +1787,7 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L140-L205" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L140-L205" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def numpy(self):
     &#34;&#34;&#34;
@@ -1866,7 +1902,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L291-L326" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L296-L331" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def reST_directives(self):
     &#34;&#34;&#34;
@@ -1917,7 +1953,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L354-L355" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L359-L360" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Location(namedtuple(&#39;Location&#39;, &#39;lat lon&#39;)):
     &#34;&#34;&#34;Geo-location, GPS position.&#34;&#34;&#34;</code></pre>
@@ -1935,7 +1971,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/test/example_pkg/subpkg2/__init__.py#L49-L55" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/test/example_pkg/subpkg2/__init__.py#L49-L55" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class ReadOnlyValueDescriptor:
     &#34;&#34;&#34;Read-only value descriptor&#34;&#34;&#34;
@@ -2046,9 +2082,7 @@ data-gaCategoryParameter="pdoc.test.example_pkg.subpkg2">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.2</a>.</p>
 </footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-<script>hljs.initHighlightingOnLoad()</script>
 <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-43663477-5','auto');ga('require','cleanUrlTracker',{indexFilename:'index.html',trailingSlash:'add'});ga('require','outboundLinkTracker',{events:['click','auxclick','contextmenu']});ga('require','maxScrollTracker');ga('require','pageVisibilityTracker');ga('send','pageview');setTimeout(function(){ga('send','event','pageview','view')},15000);</script><script async src='https://www.google-analytics.com/analytics.js'></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js'></script></body>
 </html>

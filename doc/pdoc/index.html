@@ -3,22 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.8.1" />
+<meta name="generator" content="pdoc 0.8.2" />
 <title>pdoc API documentation</title>
 <meta name="description" content="Python package `pdoc` provides types, functions, and a command-line
 interface for accessing public documentation of Python modules, and
 for presenting …" />
-<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
-<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<link rel="preconnect" href="https://www.google.com">
 <script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
-<style>.gsc-control-cse {padding:0 !important;margin-top:1em}</style>
+<style>
+.gsc-control-cse {padding:0 !important;margin-top:1em}
+body.gsc-overflow-hidden #sidebar {overflow: visible;}
+</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js" integrity="sha256-eOgo0OtLL4cdq7RdwRUiGKLX9XsIJ7nGhWEKbohmVAQ=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
 <style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em}</style>
 <link rel="canonical" href="https://pdoc3.github.io/pdoc/doc/pdoc/">
-<link rel="icon" href="https://pdoc.github.io/pdoc/logo.png">
+<link rel="icon" href="https://pdoc3.github.io/pdoc/logo.png">
 <script data-ad-client="ca-pub-2900001379782823" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script></head>
 <body>
 <main>
@@ -165,7 +171,8 @@ or, alternatively, use <a href="https://www.journaldev.com/23598/python-raw-stri
 <h3 id="supported-rest-directives">Supported <abbr title="reStructuredText">reST</abbr> directives</h3>
 <p>The following <abbr title="reStructuredText">reST</abbr> directives should work:</p>
 <ul>
-<li>specific and generic <a href="http://docutils.sourceforge.net/docs/ref/rst/directives.html#admonitions">admonitions</a>,</li>
+<li>specific and generic <a href="http://docutils.sourceforge.net/docs/ref/rst/directives.html#admonitions">admonitions</a> (attention, caution, danger,
+error, hint, important, note, tip, warning, admonition),</li>
 <li><a href="http://docutils.sourceforge.net/docs/ref/rst/directives.html#images"><code>.. image::</code></a> or <code>.. figure::</code> (without options),</li>
 <li><a href="http://docutils.sourceforge.net/docs/ref/rst/directives.html#including-an-external-document-fragment"><code>.. include::</code></a>, with support for the options:
 <code>:start-line:</code>, <code>:end-line:</code>, <code>:start-after:</code> and <code>:end-before:</code>.</li>
@@ -305,7 +312,7 @@ an underscore is <a href="https://docs.python.org/3/tutorial/classes.html#privat
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L0-L1409" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L0-L1456" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 Python package `pdoc` provides types, functions, and a command-line
@@ -423,7 +430,9 @@ def _render_template(template_name, **kwargs):
         config.update((var, getattr(config_module, var, None))
                       for var in config_module.__dict__
                       if var not in MAKO_INTERNALS)
-    known_keys = set(config) | {&#39;module&#39;, &#39;modules&#39;, &#39;http_server&#39;, &#39;external_links&#39;}  # deprecated
+    known_keys = (set(config)
+                  | {&#39;docformat&#39;}  # Feature. https://github.com/pdoc3/pdoc/issues/169
+                  | {&#39;module&#39;, &#39;modules&#39;, &#39;http_server&#39;, &#39;external_links&#39;})  # deprecated
     invalid_keys = {k: v for k, v in kwargs.items() if k not in known_keys}
     if invalid_keys:
         warn(&#39;Unknown configuration variables (not in config.mako): {}&#39;.format(invalid_keys))
@@ -445,7 +454,7 @@ def _render_template(template_name, **kwargs):
         raise
 
 
-def html(module_name, docfilter=None, reload=False, **kwargs) -&gt; str:
+def html(module_name, docfilter=None, reload=False, skip_errors=False, **kwargs) -&gt; str:
     &#34;&#34;&#34;
     Returns the documentation for the module `module_name` in HTML
     format. The module must be a module or an importable string.
@@ -455,12 +464,13 @@ def html(module_name, docfilter=None, reload=False, **kwargs) -&gt; str:
     that takes a single argument (a documentation object) and returns
     `True` or `False`. If `False`, that object will not be documented.
     &#34;&#34;&#34;
-    mod = Module(import_module(module_name, reload=reload), docfilter=docfilter)
+    mod = Module(import_module(module_name, reload=reload),
+                 docfilter=docfilter, skip_errors=skip_errors)
     link_inheritance()
     return mod.html(**kwargs)
 
 
-def text(module_name, docfilter=None, reload=False, **kwargs) -&gt; str:
+def text(module_name, docfilter=None, reload=False, skip_errors=False, **kwargs) -&gt; str:
     &#34;&#34;&#34;
     Returns the documentation for the module `module_name` in plain
     text format suitable for viewing on a terminal.
@@ -471,7 +481,8 @@ def text(module_name, docfilter=None, reload=False, **kwargs) -&gt; str:
     that takes a single argument (a documentation object) and returns
     `True` or `False`. If `False`, that object will not be documented.
     &#34;&#34;&#34;
-    mod = Module(import_module(module_name, reload=reload), docfilter=docfilter)
+    mod = Module(import_module(module_name, reload=reload),
+                 docfilter=docfilter, skip_errors=skip_errors)
     link_inheritance()
     return mod.text(**kwargs)
 
@@ -504,7 +515,8 @@ def import_module(module: Union[str, ModuleType],
             try:
                 module = importlib.import_module(module_path)
             except Exception as e:
-                raise ImportError(&#39;Error importing {!r}: {}&#39;.format(module, e))
+                raise ImportError(&#39;Error importing {!r}: {}: {}&#39;
+                                  .format(module, e.__class__.__name__, e))
 
     assert inspect.ismodule(module)
     # If this is pdoc itself, return without reloading. Otherwise later
@@ -851,10 +863,12 @@ class Module(Doc):
         it was imported from. It is always an absolute import path.
         &#34;&#34;&#34;
 
-    __slots__ = (&#39;supermodule&#39;, &#39;doc&#39;, &#39;_context&#39;, &#39;_is_inheritance_linked&#39;)
+    __slots__ = (&#39;supermodule&#39;, &#39;doc&#39;, &#39;_context&#39;, &#39;_is_inheritance_linked&#39;,
+                 &#39;_skipped_submodules&#39;)
 
     def __init__(self, module: Union[ModuleType, str], *, docfilter: Callable[[Doc], bool] = None,
-                 supermodule: &#39;Module&#39; = None, context: Context = None):
+                 supermodule: &#39;Module&#39; = None, context: Context = None,
+                 skip_errors: bool = False):
         &#34;&#34;&#34;
         Creates a `Module` documentation object given the actual
         module Python object.
@@ -867,6 +881,10 @@ class Module(Doc):
 
         `context` is an instance of `pdoc.Context`. If `None` a
         global context object will be used.
+
+        If `skip_errors` is `True` and an unimportable, erroneous
+        submodule is encountered, a warning will be issued instead
+        of raising an exception.
         &#34;&#34;&#34;
         if isinstance(module, str):
             module = import_module(module)
@@ -891,6 +909,8 @@ class Module(Doc):
 
         self._is_inheritance_linked = False
         &#34;&#34;&#34;Re-entry guard for `pdoc.Module._link_inheritance()`.&#34;&#34;&#34;
+
+        self._skipped_submodules = set()
 
         var_docstrings, _ = _pep224_docstrings(self)
 
@@ -952,13 +972,22 @@ class Module(Doc):
                 if not _is_public(root) and not _is_whitelisted(root, self):
                     continue
                 if _is_blacklisted(root, self):
+                    self._skipped_submodules.add(root)
                     continue
 
                 assert self.refname == self.name
                 fullname = &#34;%s.%s&#34; % (self.name, root)
-                self.doc[root] = m = Module(import_module(fullname),
-                                            docfilter=docfilter, supermodule=self,
-                                            context=self._context)
+                try:
+                    m = Module(import_module(fullname),
+                               docfilter=docfilter, supermodule=self,
+                               context=self._context, skip_errors=skip_errors)
+                except Exception as ex:
+                    if skip_errors:
+                        warn(str(ex), Module.ImportWarning)
+                        continue
+                    raise
+
+                self.doc[root] = m
                 # Skip empty namespace packages because they may
                 # as well be other auxiliary directories
                 if m.is_namespace and not m.doc:
@@ -979,6 +1008,14 @@ class Module(Doc):
             if isinstance(docobj, Class):
                 self._context.update((obj.refname, obj)
                                      for obj in docobj.doc.values())
+
+    class ImportWarning(UserWarning):
+        &#34;&#34;&#34;
+        Our custom import warning because the builtin is ignored by default.
+        https://docs.python.org/3/library/warnings.html#default-warning-filter
+        &#34;&#34;&#34;
+
+    __pdoc__[&#39;Module.ImportWarning&#39;] = False
 
     @property
     def __pdoc__(self):
@@ -1009,6 +1046,9 @@ class Module(Doc):
                     warn(&#39;Setting `__pdoc__[key] = None` is deprecated; &#39;
                          &#39;use `__pdoc__[key] = False` &#39;
                          &#39;(key: {!r}, module: {!r}).&#39;.format(name, self.name))
+
+                if name in self._skipped_submodules:
+                    continue
 
                 if (not name.endswith(&#39;.__init__&#39;) and
                         name not in self.doc and refname not in self._context):
@@ -1556,6 +1596,7 @@ class Function(Doc):
 
         params = []
         kw_only = False
+        pos_only = False
         EMPTY = inspect.Parameter.empty
 
         if link:
@@ -1565,6 +1606,12 @@ class Function(Doc):
         for p in signature.parameters.values():  # type: inspect.Parameter
             if not _is_public(p.name) and p.default is not EMPTY:
                 continue
+
+            if p.kind == p.POSITIONAL_ONLY:
+                pos_only = True
+            elif pos_only:
+                params.append(&#34;/&#34;)
+                pos_only = False
 
             if p.kind == p.VAR_POSITIONAL:
                 kw_only = True
@@ -1577,22 +1624,29 @@ class Function(Doc):
             if not annotate:
                 p = p.replace(annotation=EMPTY)
 
-            s = str(p)
+            formatted = p.name
             if p.annotation is not EMPTY:
-                if sys.version_info &lt; (3, 7):
-                    # PEP8-normalize whitespace
-                    s = re.sub(r&#39;(?&lt;!\s)=(?!\s)&#39;, &#39; = &#39;, re.sub(r&#39;:(?!\s)&#39;, &#39;: &#39;, s, 1), 1)
+                annotation = inspect.formatannotation(p.annotation).replace(&#39; &#39;, &#39;\N{NBSP}&#39;)
                 # &#34;Eval&#34; forward-declarations (typing string literals)
                 if isinstance(p.annotation, str):
-                    s = s.replace(&#34;&#39;%s&#39;&#34; % p.annotation, p.annotation, 1)
-                s = s.replace(&#39; &#39;, &#39;\N{NBSP}&#39;)  # prevent improper line breaking
-
+                    annotation = annotation.strip(&#34;&#39;&#34;)
                 if link:
-                    annotation = inspect.formatannotation(p.annotation)
-                    linked_annotation = re.sub(r&#39;[\w\.]+&#39;, _linkify, annotation)
-                    s = linked_annotation.join(s.rsplit(annotation, 1))  # &#34;rreplace&#34; once
+                    annotation = re.sub(r&#39;[\w\.]+&#39;, _linkify, annotation)
+                formatted += &#39;:\N{NBSP}&#39; + annotation
+            if p.default is not EMPTY:
+                if p.annotation is not EMPTY:
+                    formatted += &#39;\N{NBSP}=\N{NBSP}&#39; + repr(p.default)
+                else:
+                    formatted += &#39;=&#39; + repr(p.default)
+            if p.kind == p.VAR_POSITIONAL:
+                formatted = &#39;*&#39; + formatted
+            elif p.kind == p.VAR_KEYWORD:
+                formatted = &#39;**&#39; + formatted
 
-            params.append(s)
+            params.append(formatted)
+
+        if pos_only:
+            params.append(&#34;/&#34;)
 
         return params
 
@@ -1751,7 +1805,7 @@ object's <code>directories</code> attribute.</p></div>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="pdoc.html"><code class="name flex">
-<span>def <span class="ident">html</span></span>(<span>module_name, docfilter=None, reload=False, **kwargs) -> str</span>
+<span>def <span class="ident">html</span></span>(<span>module_name, docfilter=None, reload=False, skip_errors=False, **kwargs) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns the documentation for the module <code>module_name</code> in HTML
@@ -1763,9 +1817,9 @@ that takes a single argument (a documentation object) and returns
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L139-L151" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L141-L154" class="git-link">Browse git</a>
 </summary>
-<pre><code class="python">def html(module_name, docfilter=None, reload=False, **kwargs) -&gt; str:
+<pre><code class="python">def html(module_name, docfilter=None, reload=False, skip_errors=False, **kwargs) -&gt; str:
     &#34;&#34;&#34;
     Returns the documentation for the module `module_name` in HTML
     format. The module must be a module or an importable string.
@@ -1775,13 +1829,14 @@ that takes a single argument (a documentation object) and returns
     that takes a single argument (a documentation object) and returns
     `True` or `False`. If `False`, that object will not be documented.
     &#34;&#34;&#34;
-    mod = Module(import_module(module_name, reload=reload), docfilter=docfilter)
+    mod = Module(import_module(module_name, reload=reload),
+                 docfilter=docfilter, skip_errors=skip_errors)
     link_inheritance()
     return mod.html(**kwargs)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.import_module"><code class="name flex">
-<span>def <span class="ident">import_module</span></span>(<span>module: Union[str, module], *, reload: bool = False) -> module</span>
+<span>def <span class="ident">import_module</span></span>(<span>module: Union[str, module], *, reload: bool = False) ‑> module</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Return module object matching <code>module</code> specification (either a python
@@ -1789,7 +1844,7 @@ module path or a filesystem path to file/directory).</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L170-L205" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L174-L210" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def import_module(module: Union[str, ModuleType],
                   *, reload: bool = False) -&gt; ModuleType:
@@ -1819,7 +1874,8 @@ module path or a filesystem path to file/directory).</p></div>
             try:
                 module = importlib.import_module(module_path)
             except Exception as e:
-                raise ImportError(&#39;Error importing {!r}: {}&#39;.format(module, e))
+                raise ImportError(&#39;Error importing {!r}: {}: {}&#39;
+                                  .format(module, e.__class__.__name__, e))
 
     assert inspect.ismodule(module)
     # If this is pdoc itself, return without reloading. Otherwise later
@@ -1841,7 +1897,7 @@ inherited <code><a title="pdoc.Doc.docstring" href="#pdoc.Doc.docstring">Doc.doc
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L375-L394" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L380-L399" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def link_inheritance(context: Context = None):
     &#34;&#34;&#34;
@@ -1873,7 +1929,7 @@ inherited <code><a title="pdoc.Doc.docstring" href="#pdoc.Doc.docstring">Doc.doc
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L87-L100" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L87-L100" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def reset():
     &#34;&#34;&#34;Resets the global `pdoc.Context` to the initial (empty) state.&#34;&#34;&#34;
@@ -1892,7 +1948,7 @@ inherited <code><a title="pdoc.Doc.docstring" href="#pdoc.Doc.docstring">Doc.doc
 </details>
 </dd>
 <dt id="pdoc.text"><code class="name flex">
-<span>def <span class="ident">text</span></span>(<span>module_name, docfilter=None, reload=False, **kwargs) -> str</span>
+<span>def <span class="ident">text</span></span>(<span>module_name, docfilter=None, reload=False, skip_errors=False, **kwargs) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns the documentation for the module <code>module_name</code> in plain
@@ -1905,9 +1961,9 @@ that takes a single argument (a documentation object) and returns
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L154-L167" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L157-L171" class="git-link">Browse git</a>
 </summary>
-<pre><code class="python">def text(module_name, docfilter=None, reload=False, **kwargs) -&gt; str:
+<pre><code class="python">def text(module_name, docfilter=None, reload=False, skip_errors=False, **kwargs) -&gt; str:
     &#34;&#34;&#34;
     Returns the documentation for the module `module_name` in plain
     text format suitable for viewing on a terminal.
@@ -1918,7 +1974,8 @@ that takes a single argument (a documentation object) and returns
     that takes a single argument (a documentation object) and returns
     `True` or `False`. If `False`, that object will not be documented.
     &#34;&#34;&#34;
-    mod = Module(import_module(module_name, reload=reload), docfilter=docfilter)
+    mod = Module(import_module(module_name, reload=reload),
+                 docfilter=docfilter, skip_errors=skip_errors)
     link_inheritance()
     return mod.text(**kwargs)</code></pre>
 </details>
@@ -1942,7 +1999,7 @@ read with <code>inspect.getdoc()</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L852-L1074" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L885-L1107" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Class(Doc):
     &#34;&#34;&#34;
@@ -2182,7 +2239,7 @@ read with <code>inspect.getdoc()</code>.</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="pdoc.Class.class_variables"><code class="name flex">
-<span>def <span class="ident">class_variables</span></span>(<span>self, include_inherited=True, sort=True) -> List[<a title="pdoc.Variable" href="#pdoc.Variable">Variable</a>]</span>
+<span>def <span class="ident">class_variables</span></span>(<span>self, include_inherited=True, sort=True) ‑> List[<a title="pdoc.Variable" href="#pdoc.Variable">Variable</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns an optionally-sorted list of <code><a title="pdoc.Variable" href="#pdoc.Variable">Variable</a></code> objects that
@@ -2190,7 +2247,7 @@ represent this class' class variables.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L983-L990" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L1016-L1023" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def class_variables(self, include_inherited=True, sort=True) -&gt; List[&#39;Variable&#39;]:
     &#34;&#34;&#34;
@@ -2203,7 +2260,7 @@ represent this class' class variables.</p></div>
 </details>
 </dd>
 <dt id="pdoc.Class.functions"><code class="name flex">
-<span>def <span class="ident">functions</span></span>(<span>self, include_inherited=True, sort=True) -> List[<a title="pdoc.Function" href="#pdoc.Function">Function</a>]</span>
+<span>def <span class="ident">functions</span></span>(<span>self, include_inherited=True, sort=True) ‑> List[<a title="pdoc.Function" href="#pdoc.Function">Function</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns an optionally-sorted list of <code><a title="pdoc.Function" href="#pdoc.Function">Function</a></code> objects that
@@ -2211,7 +2268,7 @@ represent this class' static functions.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L1011-L1018" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L1044-L1051" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def functions(self, include_inherited=True, sort=True) -&gt; List[&#39;Function&#39;]:
     &#34;&#34;&#34;
@@ -2224,7 +2281,7 @@ represent this class' static functions.</p></div>
 </details>
 </dd>
 <dt id="pdoc.Class.inherited_members"><code class="name flex">
-<span>def <span class="ident">inherited_members</span></span>(<span>self) -> List[Tuple[<a title="pdoc.Class" href="#pdoc.Class">Class</a>, List[<a title="pdoc.Doc" href="#pdoc.Doc">Doc</a>]]]</span>
+<span>def <span class="ident">inherited_members</span></span>(<span>self) ‑> List[Tuple[<a title="pdoc.Class" href="#pdoc.Class">Class</a>, List[<a title="pdoc.Doc" href="#pdoc.Doc">Doc</a>]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns all inherited members as a list of tuples
@@ -2233,7 +2290,7 @@ sorted by MRO.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L1020-L1030" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L1053-L1063" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def inherited_members(self) -&gt; List[Tuple[&#39;Class&#39;, List[Doc]]]:
     &#34;&#34;&#34;
@@ -2249,7 +2306,7 @@ sorted by MRO.</p></div>
 </details>
 </dd>
 <dt id="pdoc.Class.instance_variables"><code class="name flex">
-<span>def <span class="ident">instance_variables</span></span>(<span>self, include_inherited=True, sort=True) -> List[<a title="pdoc.Variable" href="#pdoc.Variable">Variable</a>]</span>
+<span>def <span class="ident">instance_variables</span></span>(<span>self, include_inherited=True, sort=True) ‑> List[<a title="pdoc.Variable" href="#pdoc.Variable">Variable</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns an optionally-sorted list of <code><a title="pdoc.Variable" href="#pdoc.Variable">Variable</a></code> objects that
@@ -2258,7 +2315,7 @@ are those defined in a class's <code>__init__</code> as <code>self.variable = ..
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L992-L1000" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L1025-L1033" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def instance_variables(self, include_inherited=True, sort=True) -&gt; List[&#39;Variable&#39;]:
     &#34;&#34;&#34;
@@ -2272,7 +2329,7 @@ are those defined in a class's <code>__init__</code> as <code>self.variable = ..
 </details>
 </dd>
 <dt id="pdoc.Class.methods"><code class="name flex">
-<span>def <span class="ident">methods</span></span>(<span>self, include_inherited=True, sort=True) -> List[<a title="pdoc.Function" href="#pdoc.Function">Function</a>]</span>
+<span>def <span class="ident">methods</span></span>(<span>self, include_inherited=True, sort=True) ‑> List[<a title="pdoc.Function" href="#pdoc.Function">Function</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns an optionally-sorted list of <code><a title="pdoc.Function" href="#pdoc.Function">Function</a></code> objects that
@@ -2280,7 +2337,7 @@ represent this class' methods.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L1002-L1009" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L1035-L1042" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def methods(self, include_inherited=True, sort=True) -&gt; List[&#39;Function&#39;]:
     &#34;&#34;&#34;
@@ -2293,7 +2350,7 @@ represent this class' methods.</p></div>
 </details>
 </dd>
 <dt id="pdoc.Class.mro"><code class="name flex">
-<span>def <span class="ident">mro</span></span>(<span>self, only_documented=False) -> List[<a title="pdoc.Class" href="#pdoc.Class">Class</a>]</span>
+<span>def <span class="ident">mro</span></span>(<span>self, only_documented=False) ‑> List[<a title="pdoc.Class" href="#pdoc.Class">Class</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns a list of ancestor (superclass) documentation objects
@@ -2303,7 +2360,7 @@ if the types are documented, and <code><a title="pdoc.External" href="#pdoc.Exte
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L928-L949" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L961-L982" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def mro(self, only_documented=False) -&gt; List[&#39;Class&#39;]:
     &#34;&#34;&#34;
@@ -2330,7 +2387,7 @@ if the types are documented, and <code><a title="pdoc.External" href="#pdoc.Exte
 </details>
 </dd>
 <dt id="pdoc.Class.params"><code class="name flex">
-<span>def <span class="ident">params</span></span>(<span>self, *, annotate=False, link=None) -> List[str]</span>
+<span>def <span class="ident">params</span></span>(<span>self, *, annotate=False, link=None) ‑> List[str]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Return a list of formatted parameters accepted by the
@@ -2338,7 +2395,7 @@ class constructor (method <code>__init__</code>). See <code><a title="pdoc.Funct
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L962-L974" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L995-L1007" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def params(self, *, annotate=False, link=None) -&gt; List[str]:
     &#34;&#34;&#34;
@@ -2356,7 +2413,7 @@ class constructor (method <code>__init__</code>). See <code><a title="pdoc.Funct
 </details>
 </dd>
 <dt id="pdoc.Class.subclasses"><code class="name flex">
-<span>def <span class="ident">subclasses</span></span>(<span>self) -> List[<a title="pdoc.Class" href="#pdoc.Class">Class</a>]</span>
+<span>def <span class="ident">subclasses</span></span>(<span>self) ‑> List[<a title="pdoc.Class" href="#pdoc.Class">Class</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns a list of subclasses of this class that are visible to the
@@ -2366,7 +2423,7 @@ and <code><a title="pdoc.External" href="#pdoc.External">External</a></code> oth
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L951-L960" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L984-L993" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def subclasses(self) -&gt; List[&#39;Class&#39;]:
     &#34;&#34;&#34;
@@ -2412,7 +2469,7 @@ a global context object will be used.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L69-L81" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L69-L81" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Context(dict):
     &#34;&#34;&#34;
@@ -2457,7 +2514,7 @@ read with <code>inspect.getdoc()</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L397-L533" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L402-L538" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Doc:
     &#34;&#34;&#34;
@@ -2636,7 +2693,7 @@ object, used for show (e.g. <code>Doc.qualname</code>).</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L481-L487" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L486-L492" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def qualname(self) -&gt; str:
@@ -2656,7 +2713,7 @@ documentation object provides this property.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L470-L479" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L475-L484" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def refname(self) -&gt; str:
@@ -2677,7 +2734,7 @@ available, an empty string.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L457-L468" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L462-L473" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property  # type: ignore
 @lru_cache()
@@ -2697,7 +2754,7 @@ def source(self) -&gt; str:
 <h3>Methods</h3>
 <dl>
 <dt id="pdoc.Doc.url"><code class="name flex">
-<span>def <span class="ident">url</span></span>(<span>self, relative_to: Module = None, *, link_prefix: str = '', top_ancestor: bool = False) -> str</span>
+<span>def <span class="ident">url</span></span>(<span>self, relative_to: <a title="pdoc.Module" href="#pdoc.Module">Module</a> = None, *, link_prefix: str = '', top_ancestor: bool = False) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Canonical relative URL (including page fragment) for this
@@ -2710,7 +2767,7 @@ the top ancestor in the object's <code><a title="pdoc.Doc.inherits" href="#pdoc.
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L489-L518" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L494-L523" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@lru_cache()
 def url(self, relative_to: &#39;Module&#39; = None, *, link_prefix: str = &#39;&#39;,
@@ -2761,7 +2818,7 @@ should be a fully qualified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L1375-L1410" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L1422-L1457" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class External(Doc):
     &#34;&#34;&#34;
@@ -2814,7 +2871,7 @@ should be a fully qualified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L1406-L1410" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L1453-L1457" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def url(self, *args, **kwargs):
     &#34;&#34;&#34;
@@ -2855,7 +2912,7 @@ all other cases, it should be <code>False</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L1077-L1329" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L1110-L1376" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Function(Doc):
     &#34;&#34;&#34;
@@ -3030,6 +3087,7 @@ all other cases, it should be <code>False</code>.</p></div>
 
         params = []
         kw_only = False
+        pos_only = False
         EMPTY = inspect.Parameter.empty
 
         if link:
@@ -3039,6 +3097,12 @@ all other cases, it should be <code>False</code>.</p></div>
         for p in signature.parameters.values():  # type: inspect.Parameter
             if not _is_public(p.name) and p.default is not EMPTY:
                 continue
+
+            if p.kind == p.POSITIONAL_ONLY:
+                pos_only = True
+            elif pos_only:
+                params.append(&#34;/&#34;)
+                pos_only = False
 
             if p.kind == p.VAR_POSITIONAL:
                 kw_only = True
@@ -3051,22 +3115,29 @@ all other cases, it should be <code>False</code>.</p></div>
             if not annotate:
                 p = p.replace(annotation=EMPTY)
 
-            s = str(p)
+            formatted = p.name
             if p.annotation is not EMPTY:
-                if sys.version_info &lt; (3, 7):
-                    # PEP8-normalize whitespace
-                    s = re.sub(r&#39;(?&lt;!\s)=(?!\s)&#39;, &#39; = &#39;, re.sub(r&#39;:(?!\s)&#39;, &#39;: &#39;, s, 1), 1)
+                annotation = inspect.formatannotation(p.annotation).replace(&#39; &#39;, &#39;\N{NBSP}&#39;)
                 # &#34;Eval&#34; forward-declarations (typing string literals)
                 if isinstance(p.annotation, str):
-                    s = s.replace(&#34;&#39;%s&#39;&#34; % p.annotation, p.annotation, 1)
-                s = s.replace(&#39; &#39;, &#39;\N{NBSP}&#39;)  # prevent improper line breaking
-
+                    annotation = annotation.strip(&#34;&#39;&#34;)
                 if link:
-                    annotation = inspect.formatannotation(p.annotation)
-                    linked_annotation = re.sub(r&#39;[\w\.]+&#39;, _linkify, annotation)
-                    s = linked_annotation.join(s.rsplit(annotation, 1))  # &#34;rreplace&#34; once
+                    annotation = re.sub(r&#39;[\w\.]+&#39;, _linkify, annotation)
+                formatted += &#39;:\N{NBSP}&#39; + annotation
+            if p.default is not EMPTY:
+                if p.annotation is not EMPTY:
+                    formatted += &#39;\N{NBSP}=\N{NBSP}&#39; + repr(p.default)
+                else:
+                    formatted += &#39;=&#39; + repr(p.default)
+            if p.kind == p.VAR_POSITIONAL:
+                formatted = &#39;*&#39; + formatted
+            elif p.kind == p.VAR_KEYWORD:
+                formatted = &#39;**&#39; + formatted
 
-            params.append(s)
+            params.append(formatted)
+
+        if pos_only:
+            params.append(&#34;/&#34;)
 
         return params
 
@@ -3129,7 +3200,7 @@ If not, this is None.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L1103-L1111" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L1136-L1144" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def is_method(self) -&gt; bool:
@@ -3146,7 +3217,7 @@ def is_method(self) -&gt; bool:
 <h3>Methods</h3>
 <dl>
 <dt id="pdoc.Function.funcdef"><code class="name flex">
-<span>def <span class="ident">funcdef</span></span>(<span>self) -> str</span>
+<span>def <span class="ident">funcdef</span></span>(<span>self) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Generates the string of keywords used to define the function,
@@ -3154,7 +3225,7 @@ for example <code>def</code> or <code>async def</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L1121-L1126" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L1154-L1159" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def funcdef(self) -&gt; str:
     &#34;&#34;&#34;
@@ -3165,7 +3236,7 @@ for example <code>def</code> or <code>async def</code>.</p></div>
 </details>
 </dd>
 <dt id="pdoc.Function.params"><code class="name flex">
-<span>def <span class="ident">params</span></span>(<span>self, *, annotate: bool = False, link: Callable[[pdoc.Doc], str] = None) -> List[str]</span>
+<span>def <span class="ident">params</span></span>(<span>self, *, annotate: bool = False, link: Callable[[<a title="pdoc.Doc" href="#pdoc.Doc">Doc</a>], str] = None) ‑> List[str]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns a list where each element is a nicely formatted
@@ -3177,7 +3248,7 @@ type hint annotations.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L1195-L1207" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L1228-L1240" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def params(self, *, annotate: bool = False, link: Callable[[Doc], str] = None) -&gt; List[str]:
     &#34;&#34;&#34;
@@ -3195,14 +3266,14 @@ type hint annotations.</p></div>
 </details>
 </dd>
 <dt id="pdoc.Function.return_annotation"><code class="name flex">
-<span>def <span class="ident">return_annotation</span></span>(<span>self, *, link=None) -> str</span>
+<span>def <span class="ident">return_annotation</span></span>(<span>self, *, link=None) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Formatted function return type annotation or empty string if none.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L1143-L1193" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L1176-L1226" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def return_annotation(self, *, link=None) -&gt; str:
     &#34;&#34;&#34;Formatted function return type annotation or empty string if none.&#34;&#34;&#34;
@@ -3277,7 +3348,7 @@ type hint annotations.</p></div>
 </dd>
 <dt id="pdoc.Module"><code class="flex name class">
 <span>class <span class="ident">Module</span></span>
-<span>(</span><span>module: Union[module, str], *, docfilter: Callable[[pdoc.Doc], bool] = None, supermodule: Module = None, context: <a title="pdoc.Context" href="#pdoc.Context">Context</a> = None)</span>
+<span>(</span><span>module: Union[module, str], *, docfilter: Callable[[<a title="pdoc.Doc" href="#pdoc.Doc">Doc</a>], bool] = None, supermodule: <a title="pdoc.Module" href="#pdoc.Module">Module</a> = None, context: <a title="pdoc.Context" href="#pdoc.Context">Context</a> = None, skip_errors: bool = False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Representation of a module's documentation.</p>
@@ -3288,11 +3359,14 @@ sub-objects are documentated (see also: <code><a title="pdoc.html" href="#pdoc.h
 <p><code>supermodule</code> is the parent <code><a title="pdoc.Module" href="#pdoc.Module">Module</a></code> this module is
 a submodule of.</p>
 <p><code>context</code> is an instance of <code><a title="pdoc.Context" href="#pdoc.Context">Context</a></code>. If <code>None</code> a
-global context object will be used.</p></div>
+global context object will be used.</p>
+<p>If <code>skip_errors</code> is <code>True</code> and an unimportable, erroneous
+submodule is encountered, a warning will be issued instead
+of raising an exception.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L536-L849" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L541-L882" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Module(Doc):
     &#34;&#34;&#34;
@@ -3303,10 +3377,12 @@ global context object will be used.</p></div>
         it was imported from. It is always an absolute import path.
         &#34;&#34;&#34;
 
-    __slots__ = (&#39;supermodule&#39;, &#39;doc&#39;, &#39;_context&#39;, &#39;_is_inheritance_linked&#39;)
+    __slots__ = (&#39;supermodule&#39;, &#39;doc&#39;, &#39;_context&#39;, &#39;_is_inheritance_linked&#39;,
+                 &#39;_skipped_submodules&#39;)
 
     def __init__(self, module: Union[ModuleType, str], *, docfilter: Callable[[Doc], bool] = None,
-                 supermodule: &#39;Module&#39; = None, context: Context = None):
+                 supermodule: &#39;Module&#39; = None, context: Context = None,
+                 skip_errors: bool = False):
         &#34;&#34;&#34;
         Creates a `Module` documentation object given the actual
         module Python object.
@@ -3319,6 +3395,10 @@ global context object will be used.</p></div>
 
         `context` is an instance of `pdoc.Context`. If `None` a
         global context object will be used.
+
+        If `skip_errors` is `True` and an unimportable, erroneous
+        submodule is encountered, a warning will be issued instead
+        of raising an exception.
         &#34;&#34;&#34;
         if isinstance(module, str):
             module = import_module(module)
@@ -3343,6 +3423,8 @@ global context object will be used.</p></div>
 
         self._is_inheritance_linked = False
         &#34;&#34;&#34;Re-entry guard for `pdoc.Module._link_inheritance()`.&#34;&#34;&#34;
+
+        self._skipped_submodules = set()
 
         var_docstrings, _ = _pep224_docstrings(self)
 
@@ -3404,13 +3486,22 @@ global context object will be used.</p></div>
                 if not _is_public(root) and not _is_whitelisted(root, self):
                     continue
                 if _is_blacklisted(root, self):
+                    self._skipped_submodules.add(root)
                     continue
 
                 assert self.refname == self.name
                 fullname = &#34;%s.%s&#34; % (self.name, root)
-                self.doc[root] = m = Module(import_module(fullname),
-                                            docfilter=docfilter, supermodule=self,
-                                            context=self._context)
+                try:
+                    m = Module(import_module(fullname),
+                               docfilter=docfilter, supermodule=self,
+                               context=self._context, skip_errors=skip_errors)
+                except Exception as ex:
+                    if skip_errors:
+                        warn(str(ex), Module.ImportWarning)
+                        continue
+                    raise
+
+                self.doc[root] = m
                 # Skip empty namespace packages because they may
                 # as well be other auxiliary directories
                 if m.is_namespace and not m.doc:
@@ -3431,6 +3522,14 @@ global context object will be used.</p></div>
             if isinstance(docobj, Class):
                 self._context.update((obj.refname, obj)
                                      for obj in docobj.doc.values())
+
+    class ImportWarning(UserWarning):
+        &#34;&#34;&#34;
+        Our custom import warning because the builtin is ignored by default.
+        https://docs.python.org/3/library/warnings.html#default-warning-filter
+        &#34;&#34;&#34;
+
+    __pdoc__[&#39;Module.ImportWarning&#39;] = False
 
     @property
     def __pdoc__(self):
@@ -3461,6 +3560,9 @@ global context object will be used.</p></div>
                     warn(&#39;Setting `__pdoc__[key] = None` is deprecated; &#39;
                          &#39;use `__pdoc__[key] = False` &#39;
                          &#39;(key: {!r}, module: {!r}).&#39;.format(name, self.name))
+
+                if name in self._skipped_submodules:
+                    continue
 
                 if (not name.endswith(&#39;.__init__&#39;) and
                         name not in self.doc and refname not in self._context):
@@ -3625,7 +3727,7 @@ global context object will be used.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L771-L779" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L804-L812" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def is_namespace(self) -&gt; bool:
@@ -3645,7 +3747,7 @@ def is_namespace(self) -&gt; bool:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L762-L769" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L795-L802" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def is_package(self) -&gt; bool:
@@ -3665,7 +3767,7 @@ def is_package(self) -&gt; bool:
 <h3>Methods</h3>
 <dl>
 <dt id="pdoc.Module.classes"><code class="name flex">
-<span>def <span class="ident">classes</span></span>(<span>self, sort=True) -> List[<a title="pdoc.Class" href="#pdoc.Class">Class</a>]</span>
+<span>def <span class="ident">classes</span></span>(<span>self, sort=True) ‑> List[<a title="pdoc.Class" href="#pdoc.Class">Class</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns all documented module-level classes in the module,
@@ -3673,7 +3775,7 @@ optionally sorted alphabetically, as a list of <code><a title="pdoc.Class" href=
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L822-L827" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L855-L860" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def classes(self, sort=True) -&gt; List[&#39;Class&#39;]:
     &#34;&#34;&#34;
@@ -3684,7 +3786,7 @@ optionally sorted alphabetically, as a list of <code><a title="pdoc.Class" href=
 </details>
 </dd>
 <dt id="pdoc.Module.find_class"><code class="name flex">
-<span>def <span class="ident">find_class</span></span>(<span>self, cls: type) -> <a title="pdoc.Doc" href="#pdoc.Doc">Doc</a></span>
+<span>def <span class="ident">find_class</span></span>(<span>self, cls: type) ‑> <a title="pdoc.Doc" href="#pdoc.Doc">Doc</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Given a Python <code>cls</code> object, try to find it in this module
@@ -3692,7 +3794,7 @@ or in any of the exported identifiers of the submodules.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L781-L789" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L814-L822" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def find_class(self, cls: type) -&gt; Doc:
     &#34;&#34;&#34;
@@ -3706,7 +3808,7 @@ or in any of the exported identifiers of the submodules.</p></div>
 </details>
 </dd>
 <dt id="pdoc.Module.find_ident"><code class="name flex">
-<span>def <span class="ident">find_ident</span></span>(<span>self, name: str) -> <a title="pdoc.Doc" href="#pdoc.Doc">Doc</a></span>
+<span>def <span class="ident">find_ident</span></span>(<span>self, name: str) ‑> <a title="pdoc.Doc" href="#pdoc.Doc">Doc</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Searches this module and <strong>all</strong> other public modules
@@ -3718,7 +3820,7 @@ returned. If one cannot be found, then an instance of
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L791-L809" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L824-L842" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def find_ident(self, name: str) -&gt; Doc:
     &#34;&#34;&#34;
@@ -3742,7 +3844,7 @@ returned. If one cannot be found, then an instance of
 </details>
 </dd>
 <dt id="pdoc.Module.functions"><code class="name flex">
-<span>def <span class="ident">functions</span></span>(<span>self, sort=True) -> List[<a title="pdoc.Function" href="#pdoc.Function">Function</a>]</span>
+<span>def <span class="ident">functions</span></span>(<span>self, sort=True) ‑> List[<a title="pdoc.Function" href="#pdoc.Function">Function</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns all documented module-level functions in the module,
@@ -3750,7 +3852,7 @@ optionally sorted alphabetically, as a list of <code><a title="pdoc.Function" hr
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L829-L834" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L862-L867" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def functions(self, sort=True) -&gt; List[&#39;Function&#39;]:
     &#34;&#34;&#34;
@@ -3761,7 +3863,7 @@ optionally sorted alphabetically, as a list of <code><a title="pdoc.Function" hr
 </details>
 </dd>
 <dt id="pdoc.Module.html"><code class="name flex">
-<span>def <span class="ident">html</span></span>(<span>self, minify=True, **kwargs) -> str</span>
+<span>def <span class="ident">html</span></span>(<span>self, minify=True, **kwargs) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns the documentation for this module as
@@ -3772,7 +3874,7 @@ self-contained HTML.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L745-L760" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L778-L793" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def html(self, minify=True, **kwargs) -&gt; str:
     &#34;&#34;&#34;
@@ -3793,7 +3895,7 @@ self-contained HTML.</p>
 </details>
 </dd>
 <dt id="pdoc.Module.submodules"><code class="name flex">
-<span>def <span class="ident">submodules</span></span>(<span>self) -> List[<a title="pdoc.Module" href="#pdoc.Module">Module</a>]</span>
+<span>def <span class="ident">submodules</span></span>(<span>self) ‑> List[<a title="pdoc.Module" href="#pdoc.Module">Module</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns all documented sub-modules of the module sorted
@@ -3801,7 +3903,7 @@ alphabetically as a list of <code><a title="pdoc.Module" href="#pdoc.Module">Mod
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L836-L841" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L869-L874" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def submodules(self) -&gt; List[&#39;Module&#39;]:
     &#34;&#34;&#34;
@@ -3812,14 +3914,14 @@ alphabetically as a list of <code><a title="pdoc.Module" href="#pdoc.Module">Mod
 </details>
 </dd>
 <dt id="pdoc.Module.text"><code class="name flex">
-<span>def <span class="ident">text</span></span>(<span>self, **kwargs) -> str</span>
+<span>def <span class="ident">text</span></span>(<span>self, **kwargs) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns the documentation for this module as plain text.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L738-L743" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L771-L776" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def text(self, **kwargs) -&gt; str:
     &#34;&#34;&#34;
@@ -3830,7 +3932,7 @@ alphabetically as a list of <code><a title="pdoc.Module" href="#pdoc.Module">Mod
 </details>
 </dd>
 <dt id="pdoc.Module.variables"><code class="name flex">
-<span>def <span class="ident">variables</span></span>(<span>self, sort=True) -> List[<a title="pdoc.Variable" href="#pdoc.Variable">Variable</a>]</span>
+<span>def <span class="ident">variables</span></span>(<span>self, sort=True) ‑> List[<a title="pdoc.Variable" href="#pdoc.Variable">Variable</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns all documented module-level variables in the module,
@@ -3838,7 +3940,7 @@ optionally sorted alphabetically, as a list of <code><a title="pdoc.Variable" hr
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L815-L820" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L848-L853" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def variables(self, sort=True) -&gt; List[&#39;Variable&#39;]:
     &#34;&#34;&#34;
@@ -3879,7 +3981,7 @@ variable.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L1332-L1372" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L1379-L1419" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Variable(Doc):
     &#34;&#34;&#34;
@@ -3943,14 +4045,14 @@ opposed to class variable).</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="pdoc.Variable.type_annotation"><code class="name flex">
-<span>def <span class="ident">type_annotation</span></span>(<span>self, *, link=None) -> str</span>
+<span>def <span class="ident">type_annotation</span></span>(<span>self, *, link=None) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Formatted variable type annotation or empty string if none.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/4c6cfcb0c50606817b310e32e2062fc1de80f9e1/pdoc/__init__.py#L1370-L1372" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/__init__.py#L1417-L1419" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def type_annotation(self, *, link=None) -&gt; str:
     &#34;&#34;&#34;Formatted variable type annotation or empty string if none.&#34;&#34;&#34;
@@ -4114,9 +4216,7 @@ data-gaCategoryParameter="pdoc">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.2</a>.</p>
 </footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-<script>hljs.initHighlightingOnLoad()</script>
 <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-43663477-5','auto');ga('require','cleanUrlTracker',{indexFilename:'index.html',trailingSlash:'add'});ga('require','outboundLinkTracker',{events:['click','auxclick','contextmenu']});ga('require','maxScrollTracker');ga('require','pageVisibilityTracker');ga('send','pageview');setTimeout(function(){ga('send','event','pageview','view')},15000);</script><script async src='https://www.google-analytics.com/analytics.js'></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js'></script></body>
 </html>
