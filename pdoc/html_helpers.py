@@ -362,7 +362,10 @@ class _ToMarkdown:
     def raw_urls(text):
         """Wrap URLs in Python-Markdown-compatible <angle brackets>."""
         pattern = re.compile(r"""
-            ((?P<code_span>``.*``|`.*`)      # finds backticks
+            (?P<code_span>                   # matches whole code span
+                (?<!`)(?P<fence>`+)(?!`)     # a string of backticks
+                .*?
+                (?<!`)(?P=fence)(?!`))
             |
             (?P<markdown_link>\[.*\]\(.*\))  # gets inline link
             |
