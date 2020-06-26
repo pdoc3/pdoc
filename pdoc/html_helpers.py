@@ -348,6 +348,8 @@ class _ToMarkdown:
     def _directive_opts(text: str) -> dict:
         return dict(re.findall(r'^ *:([^:]+): *(.*)', text, re.MULTILINE))
 
+    DOCTESTS_RE = re.compile(r'^(?:>>> .*)(?:\n.+)*', re.MULTILINE)
+
     @staticmethod
     def doctests(text):
         """
@@ -355,7 +357,7 @@ class _ToMarkdown:
         doctest blocks so they render as Python code.
         """
         with _fenced_code_blocks_hidden(text) as result:
-            result[0] = re.compile(r'^(?:>>> .*)(?:\n.+)*', re.MULTILINE).sub(
+            result[0] = _ToMarkdown.DOCTESTS_RE.sub(
                 lambda match: '```python\n' + match.group() + '\n```\n', result[0])
         text = result[0]
         return text
@@ -533,6 +535,7 @@ def extract_toc(text: str):
     """
     Returns HTML Table of Contents containing markdown titles in `text`.
     """
+    text = _ToMarkdown.DOCTESTS_RE.sub('', text)
     toc, _ = _md.reset().convert('[TOC]\n\n@CUT@\n\n' + text).split('@CUT@', 1)
     if toc.endswith('<p>'):  # CUT was put into its own paragraph
         toc = toc[:-3].rstrip()
