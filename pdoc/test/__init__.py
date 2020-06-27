@@ -1080,11 +1080,37 @@ pdoc
         self.assertIn('example_pkg.nonexisting', cm.warning.args[0])
 
     def test_extract_toc(self):
-        text = 'xxx\n\n# Title\n\nfoo\n\n## Subtitle\n\nbar\n\n>>> # doctests skipped'
+        text = '''xxx
+
+# Title
+
+>>> # doctests skipped
+# doctest output, skipped
+
+## Subtitle
+
+```
+>>> # code skipped
+# skipped
+```
+
+# Title 2
+
+```
+>>> # code skipped
+# skipped
+```
+
+## Subtitle 2
+'''
         expected = '''<div class="toc">
 <ul>
 <li><a href="#title">Title</a><ul>
 <li><a href="#subtitle">Subtitle</a></li>
+</ul>
+</li>
+<li><a href="#title-2">Title 2</a><ul>
+<li><a href="#subtitle-2">Subtitle 2</a></li>
 </ul>
 </li>
 </ul>

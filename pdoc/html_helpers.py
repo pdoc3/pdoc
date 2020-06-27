@@ -535,7 +535,9 @@ def extract_toc(text: str):
     """
     Returns HTML Table of Contents containing markdown titles in `text`.
     """
-    text = _ToMarkdown.DOCTESTS_RE.sub('', text)
+    with _fenced_code_blocks_hidden(text) as result:
+        result[0] = _ToMarkdown.DOCTESTS_RE.sub('', result[0])
+    text = result[0]
     toc, _ = _md.reset().convert('[TOC]\n\n@CUT@\n\n' + text).split('@CUT@', 1)
     if toc.endswith('<p>'):  # CUT was put into its own paragraph
         toc = toc[:-3].rstrip()
