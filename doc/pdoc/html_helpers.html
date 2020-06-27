@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.8.2" />
+<meta name="generator" content="pdoc 0.8.3" />
 <title>pdoc.html_helpers API documentation</title>
 <meta name="description" content="Helper functions for HTML output." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/html_helpers.py#L0-L635" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L0-L637" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 Helper functions for HTML output.
@@ -574,7 +574,9 @@ def extract_toc(text: str):
     &#34;&#34;&#34;
     Returns HTML Table of Contents containing markdown titles in `text`.
     &#34;&#34;&#34;
-    text = _ToMarkdown.DOCTESTS_RE.sub(&#39;&#39;, text)
+    with _fenced_code_blocks_hidden(text) as result:
+        result[0] = _ToMarkdown.DOCTESTS_RE.sub(&#39;&#39;, result[0])
+    text = result[0]
     toc, _ = _md.reset().convert(&#39;[TOC]\n\n@CUT@\n\n&#39; + text).split(&#39;@CUT@&#39;, 1)
     if toc.endswith(&#39;&lt;p&gt;&#39;):  # CUT was put into its own paragraph
         toc = toc[:-3].rstrip()
@@ -690,13 +692,15 @@ def _str_template_fields(template):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/html_helpers.py#L534-L542" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L534-L544" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def extract_toc(text: str):
     &#34;&#34;&#34;
     Returns HTML Table of Contents containing markdown titles in `text`.
     &#34;&#34;&#34;
-    text = _ToMarkdown.DOCTESTS_RE.sub(&#39;&#39;, text)
+    with _fenced_code_blocks_hidden(text) as result:
+        result[0] = _ToMarkdown.DOCTESTS_RE.sub(&#39;&#39;, result[0])
+    text = result[0]
     toc, _ = _md.reset().convert(&#39;[TOC]\n\n@CUT@\n\n&#39; + text).split(&#39;@CUT@&#39;, 1)
     if toc.endswith(&#39;&lt;p&gt;&#39;):  # CUT was put into its own paragraph
         toc = toc[:-3].rstrip()
@@ -712,7 +716,7 @@ from <code>dobj</code> and the working environment.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/html_helpers.py#L545-L563" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L547-L565" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def format_git_link(template: str, dobj: pdoc.Doc):
     &#34;&#34;&#34;
@@ -745,7 +749,7 @@ but never longer than <code>max_length</code> characters.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/html_helpers.py#L48-L69" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L48-L69" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def glimpse(text: str, max_length=153, *, paragraph=True,
             _split_paragraph=partial(re.compile(r&#39;\s*\n\s*\n\s*&#39;).split, maxsplit=1),
@@ -779,7 +783,7 @@ but never longer than <code>max_length</code> characters.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/html_helpers.py#L23-L31" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L23-L31" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@lru_cache()
 def minify_css(css: str,
@@ -801,7 +805,7 @@ def minify_css(css: str,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/html_helpers.py#L34-L45" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L34-L45" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def minify_html(html: str,
                 _minify=partial(
@@ -830,7 +834,7 @@ example template.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/html_helpers.py#L408-L430" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L408-L430" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def to_html(text: str, *,
             docformat: str = None,
@@ -871,7 +875,7 @@ example template.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/html_helpers.py#L433-L480" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L433-L480" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def to_markdown(text: str, *,
                 docformat: str = None,
@@ -939,7 +943,7 @@ doesn't match any documented objects.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/1c5c9d7da8335a90fcd83899056ea5fadb2998c9/pdoc/html_helpers.py#L483-L489" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L483-L489" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class ReferenceWarning(UserWarning):
     &#34;&#34;&#34;
@@ -1003,7 +1007,7 @@ data-gaCategoryParameter="pdoc.html_helpers">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.3</a>.</p>
 </footer>
 <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-43663477-5','auto');ga('require','cleanUrlTracker',{indexFilename:'index.html',trailingSlash:'add'});ga('require','outboundLinkTracker',{events:['click','auxclick','contextmenu']});ga('require','maxScrollTracker');ga('require','pageVisibilityTracker');ga('send','pageview');setTimeout(function(){ga('send','event','pageview','view')},15000);</script><script async src='https://www.google-analytics.com/analytics.js'></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js'></script></body>
 </html>
