@@ -102,9 +102,9 @@ def _fenced_code_blocks_hidden(text):
             hidden[new] = orig
             return new
 
-        text = re.compile(r'^(?P<fence>```|~~~).*\n'
+        text = re.compile(r'^(?P<fence>```+|~~~+).*\n'
                           r'(?:.*\n)*?'
-                          r'^(?P=fence)(?!.)', re.MULTILINE).sub(replace, text)
+                          r'^(?P=fence)[ ]*(?!.)', re.MULTILINE).sub(replace, text)
         return text
 
     def unhide(text):
