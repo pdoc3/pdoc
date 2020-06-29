@@ -1384,8 +1384,7 @@ x = 3
 x =</p>'''
         mod = pdoc.Module(pdoc.import_module(
             os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_reST_include', 'test.py')))
-        text = inspect.getdoc(mod.obj)
-        html = to_html(text, module=mod)
+        html = to_html(mod.docstring, module=mod)
         self.assertEqual(html, expected)
 
         # Ensure includes are resolved within docstrings already,
@@ -1449,6 +1448,16 @@ text <code>x ` http://foo</code> <a href="http://bar">http://bar</a> <code>http:
         html = to_html(text, module=self._module, link=self._link, latex_math=True)
         self.assertEqual(html, expected)
 
+    def test_fenced_code(self):
+        # GH-207
+        text = '''\
+```
+cmd `pwd`
+```
+'''
+        expected = '''<pre><code>cmd `pwd`\n</code></pre>'''
+        html = to_html(text, module=self._module)
+        self.assertEqual(html, expected)
 
 @unittest.skipIf('win' in sys.platform, "signal.SIGALRM doesn't work on Windos")
 class HttpTest(unittest.TestCase):

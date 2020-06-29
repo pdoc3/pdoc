@@ -356,10 +356,8 @@ class _ToMarkdown:
         Fence non-fenced (`~~~`) top-level (0-indented)
         doctest blocks so they render as Python code.
         """
-        with _fenced_code_blocks_hidden(text) as result:
-            result[0] = _ToMarkdown.DOCTESTS_RE.sub(
-                lambda match: '```python\n' + match.group() + '\n```\n', result[0])
-        text = result[0]
+        text = _ToMarkdown.DOCTESTS_RE.sub(
+            lambda match: '```python\n' + match.group() + '\n```\n', text)
         return text
 
     @staticmethod
@@ -380,11 +378,8 @@ class _ToMarkdown:
                 [^>\s)]*                     # url part after any )
             )""", re.VERBOSE)
 
-        with _fenced_code_blocks_hidden(text) as result:
-            result[0] = pattern.sub(
-                lambda m: ('<' + m.group('url') + '>') if m.group('url') else m.group(),
-                result[0])
-        text = result[0]
+        text = pattern.sub(
+            lambda m: ('<' + m.group('url') + '>') if m.group('url') else m.group(), text)
         return text
 
 
@@ -451,32 +446,38 @@ def to_markdown(text: str, *,
              'Supported values are: numpy, google.'.format(docformat, module))
         docformat = 'numpy,google'
 
-    text = _ToMarkdown.admonitions(text, module)
+    with _fenced_code_blocks_hidden(text) as result:
+        text = result[0]
 
-    if 'google' in docformat:
-        text = _ToMarkdown.google(text)
+        text = _ToMarkdown.admonitions(text, module)
 
-    text = _ToMarkdown.doctests(text)
-    text = _ToMarkdown.raw_urls(text)
+        if 'google' in docformat:
+            text = _ToMarkdown.google(text)
 
-    # If doing both, do numpy after google, otherwise google-style's
-    # headings are incorrectly interpreted as numpy params
-    if 'numpy' in docformat:
-        text = _ToMarkdown.numpy(text)
+        text = _ToMarkdown.doctests(text)
+        text = _ToMarkdown.raw_urls(text)
 
-    if module and link:
-        # Hyperlink markdown code spans not within markdown hyperlinks.
-        # E.g. `code` yes, but not [`code`](...). RE adapted from:
-        # https://github.com/Python-Markdown/markdown/blob/ada40c66/markdown/inlinepatterns.py#L106
-        # Also avoid linking triple-backticked arg names in deflists.
-        linkify = partial(_linkify, link=link, module=module, wrap_code=True)
-        text = re.sub(r'(?P<inside_link>\[[^\]]*?)?'
-                      r'(?:(?<!\\)(?:\\{2})+(?=`)|(?<!\\)(?P<fence>`+)'
-                      r'(?P<code>.+?)(?<!`)'
-                      r'(?P=fence)(?!`))',
-                      lambda m: (m.group()
-                                 if m.group('inside_link') or len(m.group('fence')) > 2
-                                 else linkify(m)), text)
+        # If doing both, do numpy after google, otherwise google-style's
+        # headings are incorrectly interpreted as numpy params
+        if 'numpy' in docformat:
+            text = _ToMarkdown.numpy(text)
+
+        if module and link:
+            # Hyperlink markdown code spans not within markdown hyperlinks.
+            # E.g. `code` yes, but not [`code`](...). RE adapted from:
+            # https://github.com/Python-Markdown/markdown/blob/ada40c66/markdown/inlinepatterns.py#L106
+            # Also avoid linking triple-backticked arg names in deflists.
+            linkify = partial(_linkify, link=link, module=module, wrap_code=True)
+            text = re.sub(r'(?P<inside_link>\[[^\]]*?)?'
+                          r'(?:(?<!\\)(?:\\{2})+(?=`)|(?<!\\)(?P<fence>`+)'
+                          r'(?P<code>.+?)(?<!`)'
+                          r'(?P=fence)(?!`))',
+                          lambda m: (m.group()
+                                     if m.group('inside_link') or len(m.group('fence')) > 2
+                                     else linkify(m)), text)
+        result[0] = text
+    text = result[0]
+
     return text
 
 
