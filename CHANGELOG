@@ -1,3 +1,7 @@
+0.8.4  (2020-06-30)
+=====
+  - Fix inline code interpretation inside fenced code blocks.
+
 0.8.3  (2020-06-27)
 =====
   - Fix extracting TOC with interleaved doctests in fenced code blocks,

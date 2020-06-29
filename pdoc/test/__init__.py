@@ -1459,6 +1459,7 @@ cmd `pwd`
         html = to_html(text, module=self._module)
         self.assertEqual(html, expected)
 
+
 @unittest.skipIf('win' in sys.platform, "signal.SIGALRM doesn't work on Windos")
 class HttpTest(unittest.TestCase):
     """
