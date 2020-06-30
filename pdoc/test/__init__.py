@@ -375,7 +375,7 @@ class CliTest(unittest.TestCase):
                 open('pdf.md', 'w') as f:
             run('pdoc', pdf=None)
             f.write(stdout.getvalue())
-            subprocess.run(pdoc.cli._PANDOC_COMMAND, shell=True, check=True, capture_output=True)
+            subprocess.run(pdoc.cli._PANDOC_COMMAND, shell=True, check=True)
             self.assertTrue(os.path.exists('pdf.pdf'))
 
     def test_config(self):
