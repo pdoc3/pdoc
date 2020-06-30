@@ -468,10 +468,10 @@ PDF-ready markdown written to standard output.
                               ^^^^^^^^^^^^^^^
 Convert this file to PDF using e.g. Pandoc:
 
-    pandoc --metadata=title:"MyProject Documentation"             \\
-           --toc --toc-depth=4 --from=markdown+abbreviations      \\
-           --pdf-engine=xelatex --variable=mainfont:"DejaVu Sans" \\
-           --output=pdf.pdf pdf.md
+    pandoc --metadata=title:"MyProject Documentation"               \\
+           --from=markdown+abbreviations+tex_math_single_backslash  \\
+           --pdf-engine=xelatex --variable=mainfont:"DejaVu Sans"   \\
+           --toc --toc-depth=4 --output=pdf.pdf  pdf.md
 
 or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
