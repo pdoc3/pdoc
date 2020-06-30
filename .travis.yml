@@ -19,6 +19,10 @@ matrix:
       before_script:
         - pip install flake8 coverage mypy
         - wget -O/tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/2.10/pandoc-2.10-1-amd64.deb && sudo dpkg -i /tmp/pandoc.deb
+      addons:
+        apt:
+          packages:
+            - texlive-xetex
       script:
         - find -name '*.md' | xargs .github/lint-markdown.sh
         - flake8
