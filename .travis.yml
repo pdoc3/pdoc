@@ -18,10 +18,7 @@ matrix:
       name: 'Lint, Coverage'
       before_script:
         - pip install flake8 coverage mypy
-      addons:
-        apt:
-          packages:
-            - pandoc
+        - wget -O/tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/2.10/pandoc-2.10-1-amd64.deb && dpkg -i /tmp/pandoc.deb
       script:
         - find -name '*.md' | xargs .github/lint-markdown.sh
         - flake8
