@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.8.3" />
+<meta name="generator" content="pdoc 0.8.4" />
 <title>pdoc.html_helpers API documentation</title>
 <meta name="description" content="Helper functions for HTML output." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L0-L637" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/50473fe2233847077e37129f07ab87be0d6dbc5d/pdoc/html_helpers.py#L0-L638" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 Helper functions for HTML output.
@@ -141,9 +141,9 @@ def _fenced_code_blocks_hidden(text):
             hidden[new] = orig
             return new
 
-        text = re.compile(r&#39;^(?P&lt;fence&gt;```|~~~).*\n&#39;
+        text = re.compile(r&#39;^(?P&lt;fence&gt;```+|~~~+).*\n&#39;
                           r&#39;(?:.*\n)*?&#39;
-                          r&#39;^(?P=fence)(?!.)&#39;, re.MULTILINE).sub(replace, text)
+                          r&#39;^(?P=fence)[ ]*(?!.)&#39;, re.MULTILINE).sub(replace, text)
         return text
 
     def unhide(text):
@@ -395,10 +395,8 @@ class _ToMarkdown:
         Fence non-fenced (`~~~`) top-level (0-indented)
         doctest blocks so they render as Python code.
         &#34;&#34;&#34;
-        with _fenced_code_blocks_hidden(text) as result:
-            result[0] = _ToMarkdown.DOCTESTS_RE.sub(
-                lambda match: &#39;```python\n&#39; + match.group() + &#39;\n```\n&#39;, result[0])
-        text = result[0]
+        text = _ToMarkdown.DOCTESTS_RE.sub(
+            lambda match: &#39;```python\n&#39; + match.group() + &#39;\n```\n&#39;, text)
         return text
 
     @staticmethod
@@ -419,11 +417,8 @@ class _ToMarkdown:
                 [^&gt;\s)]*                     # url part after any )
             )&#34;&#34;&#34;, re.VERBOSE)
 
-        with _fenced_code_blocks_hidden(text) as result:
-            result[0] = pattern.sub(
-                lambda m: (&#39;&lt;&#39; + m.group(&#39;url&#39;) + &#39;&gt;&#39;) if m.group(&#39;url&#39;) else m.group(),
-                result[0])
-        text = result[0]
+        text = pattern.sub(
+            lambda m: (&#39;&lt;&#39; + m.group(&#39;url&#39;) + &#39;&gt;&#39;) if m.group(&#39;url&#39;) else m.group(), text)
         return text
 
 
@@ -490,32 +485,38 @@ def to_markdown(text: str, *,
              &#39;Supported values are: numpy, google.&#39;.format(docformat, module))
         docformat = &#39;numpy,google&#39;
 
-    text = _ToMarkdown.admonitions(text, module)
+    with _fenced_code_blocks_hidden(text) as result:
+        text = result[0]
 
-    if &#39;google&#39; in docformat:
-        text = _ToMarkdown.google(text)
+        text = _ToMarkdown.admonitions(text, module)
 
-    text = _ToMarkdown.doctests(text)
-    text = _ToMarkdown.raw_urls(text)
+        if &#39;google&#39; in docformat:
+            text = _ToMarkdown.google(text)
 
-    # If doing both, do numpy after google, otherwise google-style&#39;s
-    # headings are incorrectly interpreted as numpy params
-    if &#39;numpy&#39; in docformat:
-        text = _ToMarkdown.numpy(text)
+        text = _ToMarkdown.doctests(text)
+        text = _ToMarkdown.raw_urls(text)
 
-    if module and link:
-        # Hyperlink markdown code spans not within markdown hyperlinks.
-        # E.g. `code` yes, but not [`code`](...). RE adapted from:
-        # https://github.com/Python-Markdown/markdown/blob/ada40c66/markdown/inlinepatterns.py#L106
-        # Also avoid linking triple-backticked arg names in deflists.
-        linkify = partial(_linkify, link=link, module=module, wrap_code=True)
-        text = re.sub(r&#39;(?P&lt;inside_link&gt;\[[^\]]*?)?&#39;
-                      r&#39;(?:(?&lt;!\\)(?:\\{2})+(?=`)|(?&lt;!\\)(?P&lt;fence&gt;`+)&#39;
-                      r&#39;(?P&lt;code&gt;.+?)(?&lt;!`)&#39;
-                      r&#39;(?P=fence)(?!`))&#39;,
-                      lambda m: (m.group()
-                                 if m.group(&#39;inside_link&#39;) or len(m.group(&#39;fence&#39;)) &gt; 2
-                                 else linkify(m)), text)
+        # If doing both, do numpy after google, otherwise google-style&#39;s
+        # headings are incorrectly interpreted as numpy params
+        if &#39;numpy&#39; in docformat:
+            text = _ToMarkdown.numpy(text)
+
+        if module and link:
+            # Hyperlink markdown code spans not within markdown hyperlinks.
+            # E.g. `code` yes, but not [`code`](...). RE adapted from:
+            # https://github.com/Python-Markdown/markdown/blob/ada40c66/markdown/inlinepatterns.py#L106
+            # Also avoid linking triple-backticked arg names in deflists.
+            linkify = partial(_linkify, link=link, module=module, wrap_code=True)
+            text = re.sub(r&#39;(?P&lt;inside_link&gt;\[[^\]]*?)?&#39;
+                          r&#39;(?:(?&lt;!\\)(?:\\{2})+(?=`)|(?&lt;!\\)(?P&lt;fence&gt;`+)&#39;
+                          r&#39;(?P&lt;code&gt;.+?)(?&lt;!`)&#39;
+                          r&#39;(?P=fence)(?!`))&#39;,
+                          lambda m: (m.group()
+                                     if m.group(&#39;inside_link&#39;) or len(m.group(&#39;fence&#39;)) &gt; 2
+                                     else linkify(m)), text)
+        result[0] = text
+    text = result[0]
+
     return text
 
 
@@ -692,7 +693,7 @@ def _str_template_fields(template):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L534-L544" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/50473fe2233847077e37129f07ab87be0d6dbc5d/pdoc/html_helpers.py#L535-L545" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def extract_toc(text: str):
     &#34;&#34;&#34;
@@ -716,7 +717,7 @@ from <code>dobj</code> and the working environment.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L547-L565" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/50473fe2233847077e37129f07ab87be0d6dbc5d/pdoc/html_helpers.py#L548-L566" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def format_git_link(template: str, dobj: pdoc.Doc):
     &#34;&#34;&#34;
@@ -749,7 +750,7 @@ but never longer than <code>max_length</code> characters.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L48-L69" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/50473fe2233847077e37129f07ab87be0d6dbc5d/pdoc/html_helpers.py#L48-L69" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def glimpse(text: str, max_length=153, *, paragraph=True,
             _split_paragraph=partial(re.compile(r&#39;\s*\n\s*\n\s*&#39;).split, maxsplit=1),
@@ -783,7 +784,7 @@ but never longer than <code>max_length</code> characters.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L23-L31" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/50473fe2233847077e37129f07ab87be0d6dbc5d/pdoc/html_helpers.py#L23-L31" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@lru_cache()
 def minify_css(css: str,
@@ -805,7 +806,7 @@ def minify_css(css: str,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L34-L45" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/50473fe2233847077e37129f07ab87be0d6dbc5d/pdoc/html_helpers.py#L34-L45" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def minify_html(html: str,
                 _minify=partial(
@@ -834,7 +835,7 @@ example template.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L408-L430" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/50473fe2233847077e37129f07ab87be0d6dbc5d/pdoc/html_helpers.py#L403-L425" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def to_html(text: str, *,
             docformat: str = None,
@@ -875,7 +876,7 @@ example template.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L433-L480" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/50473fe2233847077e37129f07ab87be0d6dbc5d/pdoc/html_helpers.py#L428-L481" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def to_markdown(text: str, *,
                 docformat: str = None,
@@ -898,32 +899,38 @@ example template.</p></div>
              &#39;Supported values are: numpy, google.&#39;.format(docformat, module))
         docformat = &#39;numpy,google&#39;
 
-    text = _ToMarkdown.admonitions(text, module)
+    with _fenced_code_blocks_hidden(text) as result:
+        text = result[0]
 
-    if &#39;google&#39; in docformat:
-        text = _ToMarkdown.google(text)
+        text = _ToMarkdown.admonitions(text, module)
 
-    text = _ToMarkdown.doctests(text)
-    text = _ToMarkdown.raw_urls(text)
+        if &#39;google&#39; in docformat:
+            text = _ToMarkdown.google(text)
 
-    # If doing both, do numpy after google, otherwise google-style&#39;s
-    # headings are incorrectly interpreted as numpy params
-    if &#39;numpy&#39; in docformat:
-        text = _ToMarkdown.numpy(text)
+        text = _ToMarkdown.doctests(text)
+        text = _ToMarkdown.raw_urls(text)
 
-    if module and link:
-        # Hyperlink markdown code spans not within markdown hyperlinks.
-        # E.g. `code` yes, but not [`code`](...). RE adapted from:
-        # https://github.com/Python-Markdown/markdown/blob/ada40c66/markdown/inlinepatterns.py#L106
-        # Also avoid linking triple-backticked arg names in deflists.
-        linkify = partial(_linkify, link=link, module=module, wrap_code=True)
-        text = re.sub(r&#39;(?P&lt;inside_link&gt;\[[^\]]*?)?&#39;
-                      r&#39;(?:(?&lt;!\\)(?:\\{2})+(?=`)|(?&lt;!\\)(?P&lt;fence&gt;`+)&#39;
-                      r&#39;(?P&lt;code&gt;.+?)(?&lt;!`)&#39;
-                      r&#39;(?P=fence)(?!`))&#39;,
-                      lambda m: (m.group()
-                                 if m.group(&#39;inside_link&#39;) or len(m.group(&#39;fence&#39;)) &gt; 2
-                                 else linkify(m)), text)
+        # If doing both, do numpy after google, otherwise google-style&#39;s
+        # headings are incorrectly interpreted as numpy params
+        if &#39;numpy&#39; in docformat:
+            text = _ToMarkdown.numpy(text)
+
+        if module and link:
+            # Hyperlink markdown code spans not within markdown hyperlinks.
+            # E.g. `code` yes, but not [`code`](...). RE adapted from:
+            # https://github.com/Python-Markdown/markdown/blob/ada40c66/markdown/inlinepatterns.py#L106
+            # Also avoid linking triple-backticked arg names in deflists.
+            linkify = partial(_linkify, link=link, module=module, wrap_code=True)
+            text = re.sub(r&#39;(?P&lt;inside_link&gt;\[[^\]]*?)?&#39;
+                          r&#39;(?:(?&lt;!\\)(?:\\{2})+(?=`)|(?&lt;!\\)(?P&lt;fence&gt;`+)&#39;
+                          r&#39;(?P&lt;code&gt;.+?)(?&lt;!`)&#39;
+                          r&#39;(?P=fence)(?!`))&#39;,
+                          lambda m: (m.group()
+                                     if m.group(&#39;inside_link&#39;) or len(m.group(&#39;fence&#39;)) &gt; 2
+                                     else linkify(m)), text)
+        result[0] = text
+    text = result[0]
+
     return text</code></pre>
 </details>
 </dd>
@@ -943,7 +950,7 @@ doesn't match any documented objects.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/72c0ae580e296f4cc17ea05e95398f555badde02/pdoc/html_helpers.py#L483-L489" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/50473fe2233847077e37129f07ab87be0d6dbc5d/pdoc/html_helpers.py#L484-L490" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class ReferenceWarning(UserWarning):
     &#34;&#34;&#34;
@@ -1007,7 +1014,7 @@ data-gaCategoryParameter="pdoc.html_helpers">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.4</a>.</p>
 </footer>
 <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-43663477-5','auto');ga('require','cleanUrlTracker',{indexFilename:'index.html',trailingSlash:'add'});ga('require','outboundLinkTracker',{events:['click','auxclick','contextmenu']});ga('require','maxScrollTracker');ga('require','pageVisibilityTracker');ga('send','pageview');setTimeout(function(){ga('send','event','pageview','view')},15000);</script><script async src='https://www.google-analytics.com/analytics.js'></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js'></script></body>
 </html>
