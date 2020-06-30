@@ -23,6 +23,7 @@ matrix:
         - flake8
         - mypy pdoc
         - time catchsegv coverage run setup.py test
+        - PDOC_TEST_PANDOC=1 python -m unittest pdoc.test.CliTest.test_pdf_pandoc
       after_success:
         - bash <(curl -s https://codecov.io/bash)
 

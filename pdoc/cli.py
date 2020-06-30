@@ -362,6 +362,14 @@ def _warn_deprecated(option, alternative='', use_config_mako=False):
     warn(msg, DeprecationWarning, stacklevel=2)
 
 
+_PANDOC_COMMAND = '''\
+pandoc --metadata=title:"MyProject Documentation"               \\
+       --from=markdown+abbreviations+tex_math_single_backslash  \\
+       --pdf-engine=xelatex --variable=mainfont:"DejaVu Sans"   \\
+       --toc --toc-depth=4 --output=pdf.pdf  pdf.md\
+'''
+
+
 def main(_args=None):
     """ Command-line entry point """
     global args
@@ -463,15 +471,13 @@ def main(_args=None):
 
     if args.pdf:
         _print_pdf(modules, **template_config)
+        import textwrap
         print("""
 PDF-ready markdown written to standard output.
                               ^^^^^^^^^^^^^^^
 Convert this file to PDF using e.g. Pandoc:
 
-    pandoc --metadata=title:"MyProject Documentation"               \\
-           --from=markdown+abbreviations+tex_math_single_backslash  \\
-           --pdf-engine=xelatex --variable=mainfont:"DejaVu Sans"   \\
-           --toc --toc-depth=4 --output=pdf.pdf  pdf.md
+{PANDOC_CMD}
 
 or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
@@ -491,7 +497,7 @@ or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
     wkhtmltopdf --encoding utf8 -s A4 --print-media-type pdf.html pdf.pdf
 
-or similar, at your own discretion.""",
+or similar, at your own discretion.""".format(PANDOC_CMD=textwrap.indent(_PANDOC_COMMAND, '    ')),
               file=sys.stderr)
         sys.exit(0)
 
