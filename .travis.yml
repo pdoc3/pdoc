@@ -17,7 +17,7 @@ matrix:
     - python: '3.8'
       name: 'Lint, Coverage'
       before_script:
-        - pip install flake8 coverage mypy
+        - pip install flake8 coverage mypy pandoc
       script:
         - find -name '*.md' | xargs .github/lint-markdown.sh
         - flake8
