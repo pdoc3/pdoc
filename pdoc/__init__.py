@@ -882,6 +882,33 @@ class Module(Doc):
         return url + _URL_MODULE_SUFFIX
 
 
+def _getmembers_all(obj: type) -> List[Tuple[str, object]]:
+    mro = obj.__mro__[:-1]  # Skip object
+    names = set(dir(obj))
+    # Add keys from bases
+    for base in mro:
+        names.update(base.__dict__.keys())
+    # Add members for which type annotations exist
+    names.update(_get_type_hints(obj).keys())
+
+    results = []
+    for name in names:
+        try:
+            value = getattr(obj, name)
+        except AttributeError:
+            for base in mro:
+                if name in base.__dict__:
+                    value = base.__dict__[name]
+                    break
+            else:
+                # Missing slot member or a buggy __dir__;
+                # In out case likely a type-annotated member
+                # which we'll interpret as a variable
+                value = None
+        results.append((name, value))
+    return results
+
+
 class Class(Doc):
     """
     Representation of a class' documentation.
@@ -902,14 +929,31 @@ class Class(Doc):
         self.doc = {}  # type: Dict[str, Union[Function, Variable]]
         """A mapping from identifier name to a `pdoc.Doc` objects."""
 
+        # Annotations for filtering.
+        # Use only own, non-inherited annotations (the rest will be inherited)
+        annotations = getattr(self.obj, '__annotations__', {})
+
         public_objs = [(_name, inspect.unwrap(obj))
-                       for _name, obj in inspect.getmembers(self.obj)
+                       for _name, obj in _getmembers_all(self.obj)
                        # Filter only *own* members. The rest are inherited
                        # in Class._fill_inheritance()
-                       if _name in self.obj.__dict__
+                       if (_name in self.obj.__dict__ or _name in annotations)
                        and (_is_public(_name) or _is_whitelisted(_name, self))]
-        index = list(self.obj.__dict__).index
-        public_objs.sort(key=lambda i: index(i[0]))
+
+        def definition_order_index(
+                name,
+                _annot_index=list(annotations).index,
+                _dict_index=list(self.obj.__dict__).index):
+            try:
+                return _dict_index(name)
+            except ValueError:
+                pass
+            try:
+                return _annot_index(name) - len(annotations)  # sort annotated first
+            except ValueError:
+                return 9e9
+
+        public_objs.sort(key=lambda i: definition_order_index(i[0]))
 
         var_docstrings, instance_var_docstrings = _pep224_docstrings(self)
 

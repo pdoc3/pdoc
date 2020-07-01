@@ -972,6 +972,33 @@ class Foo:
         self.assertEqual(mod.name, 'pdoc')
         self.assertIn('Module', mod.doc)
 
+    @ignore_warnings
+    @unittest.skipIf(sys.version_info < (3, 6), 'variable type annotation unsupported in <Py3.6')
+    def test_class_members(self):
+        module = pdoc.Module(EXAMPLE_MODULE)
+
+        # GH-200
+        from enum import Enum
+
+        class Tag(Enum):
+            Char = 1
+
+            def func(self):
+                return self
+
+        cls = pdoc.Class('Tag', module, Tag)
+        self.assertIsInstance(cls.doc['Char'], pdoc.Variable)
+        self.assertIsInstance(cls.doc['func'], pdoc.Function)
+
+        # GH-210, GH-212
+        class Employee2:
+            """ An employee. """
+            name: str
+
+        cls = pdoc.Class('Employee2', module, Employee2)
+        self.assertIsInstance(cls.doc['name'], pdoc.Variable)
+        self.assertEqual(cls.doc['name'].type_annotation(), 'str')
+
 
 class HtmlHelpersTest(unittest.TestCase):
     """
