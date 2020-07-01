@@ -23,7 +23,7 @@ from functools import lru_cache, reduce, partial
 from itertools import tee, groupby
 from types import ModuleType
 from typing import (
-    cast, Callable, Dict, Generator, Iterable, List, Mapping, Optional, Set, Tuple,
+    cast, Any, Callable, Dict, Generator, Iterable, List, Mapping, Optional, Set, Tuple,
     Type, TypeVar, Union,
 )
 from warnings import warn
@@ -882,7 +882,7 @@ class Module(Doc):
         return url + _URL_MODULE_SUFFIX
 
 
-def _getmembers_all(obj: type) -> List[Tuple[str, object]]:
+def _getmembers_all(obj: type) -> List[Tuple[str, Any]]:
     mro = obj.__mro__[:-1]  # Skip object
     names = set(dir(obj))
     # Add keys from bases
