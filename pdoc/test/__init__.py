@@ -991,11 +991,9 @@ class Foo:
         self.assertIsInstance(cls.doc['func'], pdoc.Function)
 
         # GH-210, GH-212
-        class Employee2:
-            """ An employee. """
-            name: str
-
-        cls = pdoc.Class('Employee2', module, Employee2)
+        my_locals = {}
+        exec('class Employee:\n name: str', my_locals)
+        cls = pdoc.Class('Employee', module, my_locals['Employee'])
         self.assertIsInstance(cls.doc['name'], pdoc.Variable)
         self.assertEqual(cls.doc['name'].type_annotation(), 'str')
 
