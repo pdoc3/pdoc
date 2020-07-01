@@ -7,6 +7,7 @@ import importlib
 import inspect
 import os
 import os.path as path
+import json
 import re
 import sys
 import warnings
@@ -75,6 +76,14 @@ aa(
     "--html-dir",
     type=str,
     help=argparse.SUPPRESS,
+)
+aa(
+    "--html-search-type",
+    type=str,
+    metavar='STRING',
+    default=None,
+    help="When set, type of search to use. One of 'google' or 'lunr'. "
+         "If unset, no search will be used.",
 )
 aa(
     "-o", "--output-dir",
@@ -314,9 +323,11 @@ def _quit_if_exists(m: pdoc.Module, ext: str):
             sys.exit(1)
 
 
-def recursive_write_files(m: pdoc.Module, ext: str, **kwargs):
+def recursive_write_files(m: pdoc.Module, ext: str, **kwargs) -> list:
     assert ext in ('.html', '.md')
+
     f = module_path(m, ext=ext)
+    written_files = []
 
     dirpath = path.dirname(f)
     if not os.access(dirpath, os.R_OK):
@@ -329,6 +340,7 @@ def recursive_write_files(m: pdoc.Module, ext: str, **kwargs):
             elif ext == '.md':
                 w.write(m.text(**kwargs))
         print(f)  # print created file path to stdout
+        written_files.append(m)
     except Exception:
         try:
             os.unlink(f)
@@ -337,7 +349,10 @@ def recursive_write_files(m: pdoc.Module, ext: str, **kwargs):
         raise
 
     for submodule in m.submodules():
-        recursive_write_files(submodule, ext=ext, **kwargs)
+        submodule_files = recursive_write_files(submodule, ext=ext, **kwargs)
+        written_files.extend(submodule_files)
+
+    return written_files
 
 
 def _flatten_submodules(modules: Sequence[pdoc.Module]):
@@ -360,6 +375,50 @@ def _warn_deprecated(option, alternative='', use_config_mako=False):
             msg += ' or override config.mako template'
         msg += '.'
     warn(msg, DeprecationWarning, stacklevel=2)
+
+
+def _generate_lunr_search(top_module, written_files, template_config) -> None:
+    # Generate index.js for search
+    index = []
+    for written_file in written_files:
+        info = {}
+        info['ref'] = (written_file.url()[len(top_module.name)+1:]
+                       if top_module.is_package else written_file.url())
+        info['name'] = written_file.name
+        info['refname'] = written_file.refname
+        info['docstring'] = written_file.docstring
+
+        index.append(info)
+
+        for dobj in (
+            written_file.variables()
+            + written_file.classes()
+            + written_file.functions()
+        ):
+            info = {}
+            info['ref'] = (dobj.url()[len(top_module.name)+1:]
+                           if top_module.is_package else dobj.url())
+            info['name'] = dobj.name
+            ref = dobj.refname + ('()' if isinstance(dobj, pdoc.Function) else '')
+            info['refname'] = ref
+            info['docstring'] = dobj.docstring
+
+            index.append(info)
+
+    main_path = path.join(args.output_dir,
+                          *top_module.name.split('.') if top_module.is_package else '')
+    f = path.join(main_path, 'index.js')
+    with open(f, 'w+', encoding='utf-8') as w:
+        w.write("index=")
+        json.dump(index, w)
+
+    # Generate search.html
+    f = path.join(main_path, 'search.html')
+    with open(f, 'w+', encoding='utf-8') as w:
+        rendered_template = pdoc._render_template(
+            '/html.mako', module=top_module, _render_search=True, **template_config
+        )
+        w.write(rendered_template)
 
 
 def main(_args=None):
@@ -404,6 +463,8 @@ def main(_args=None):
     if args.external_links:
         _warn_deprecated('--external-links')
         template_config['external_links'] = True
+    if args.html_search_type:
+        template_config['search_type'] = args.html_search_type
 
     if args.template_dir is not None:
         if not path.isdir(args.template_dir):
@@ -498,7 +559,10 @@ or similar, at your own discretion.""",
     for module in modules:
         if args.html:
             _quit_if_exists(module, ext='.html')
-            recursive_write_files(module, ext='.html', **template_config)
+            written_files = recursive_write_files(module, ext='.html', **template_config)
+            if args.html_search_type == 'lunr':
+                _generate_lunr_search(module, written_files, template_config)
+
         elif args.output_dir:  # Generate text files
             _quit_if_exists(module, ext='.md')
             recursive_write_files(module, ext='.md', **template_config)

@@ -42,16 +42,25 @@
     # tracking id (UA-XXXXXX-Y).
     google_analytics = ''
 
-    # If set, insert Google Custom Search search bar widget above the sidebar index.
-    # The whitespace-separated tokens represent arbitrary extra queries (at least one
-    # must match) passed to regular Google search. Example:
-    #search_query = 'inurl:github.com/USER/PROJECT  site:PROJECT.github.io  site:PROJECT.website'
-    search_query = ''
-
     # If set, render LaTeX math syntax within \(...\) (inline equations),
     # or within \[...\] or $$...$$ or `.. math::` (block equations)
     # as nicely-formatted math formulas using MathJax.
     # Note: in Python docstrings, either all backslashes need to be escaped (\\)
     # or you need to use raw r-strings.
     latex_math = False
+
+    # The whitespace-separated tokens represent arbitrary extra queries (at least one
+    # must match) passed to regular Google search. Example:
+    # google_search_query = 'inurl:github.com/USER/PROJECT  site:PROJECT.github.io  site:PROJECT.website'
+    google_search_query = ''
+
+    # The fuzziness of the lunr search. Setting it to 0 will allow you to specify
+    # the fuzziness in the query by using '~'.
+    #
+    # https://lunrjs.com/guides/searching.html#fuzzy-matches
+    #
+    # WARNING: SETTING THIS NUMBER TOO HIGH WILL GIVE TOO MANY RESULTS AND MAKE
+    # YOUR BROWSER REALLY SLOW OR EVEN FREEZE IT. WE RECOMEND YOU KEEP THIS 
+    # BETWEEN 0 AND 3.
+    lunr_search_fuzziness = 1
 %>

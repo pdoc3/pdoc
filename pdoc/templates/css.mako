@@ -26,6 +26,24 @@
       margin-bottom: 2cm;
     }
 
+  .search-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    box-sizing: border-box;
+    resize: vertical;
+    outline: none;
+  }
+
+  #search-results li {
+    padding: 10px;
+  }
+
+  #search-results .content {
+    opacity: 60%;
+  }
+
   .http-server-breadcrumbs {
     font-size: 130%;
     margin: 0 0 15px 0;

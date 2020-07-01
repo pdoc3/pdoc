@@ -116,7 +116,9 @@ def _render_template(template_name, **kwargs):
                       if var not in MAKO_INTERNALS)
     known_keys = (set(config)
                   | {'docformat'}  # Feature. https://github.com/pdoc3/pdoc/issues/169
-                  | {'module', 'modules', 'http_server', 'external_links'})  # deprecated
+                  | {'search_type'}  # Feature. https://github.com/pdoc3/pdoc/issues/184
+                  | {'module', 'modules', 'http_server', 'external_links'}  # deprecated
+                  | {'_render_search'})  # Private function to generate search only.
     invalid_keys = {k: v for k, v in kwargs.items() if k not in known_keys}
     if invalid_keys:
         warn('Unknown configuration variables (not in config.mako): {}'.format(invalid_keys))

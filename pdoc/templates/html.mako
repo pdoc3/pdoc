@@ -276,7 +276,7 @@
   </section>
 </%def>
 
-<%def name="module_index(module)">
+<%def name="module_index(module, search_tab=False)">
   <%
   variables = module.variables(sort=sort_identifiers)
   classes = module.classes(sort=sort_identifiers)
@@ -288,11 +288,22 @@
 
     <%include file="logo.mako"/>
 
-    % if search_query:
-        <div class="gcse-search" style="height: 70px"
-             data-as_oq="${' '.join(search_query.strip().split()) | h }"
-             data-gaCategoryParameter="${module.refname | h}">
+    % if search_type == 'lunr':
+      <form action="${'../'*module.name.count('.')}search.html" method="GET">
+        <div class="search-nav-container">
+          <input type="text" id="search-box" name="q" class="search-input" placeholder="Search the docs...">
         </div>
+      </form>
+    % elif search_type == "google" and google_search_query:
+      <div class="gcse-search" style="height: 70px"
+          data-as_oq="${' '.join(google_search_query.strip().split()) | h }"
+          data-gaCategoryParameter="${module.refname | h}">
+      </div>
+    % endif
+
+    % if search_tab:
+      <h1><a href="index.html">Back to index</a></h1>
+      <% return ""%>
     % endif
 
     <h1>Index</h1>
@@ -352,7 +363,6 @@
       </ul>
     </li>
     % endif
-
     </ul>
   </nav>
 </%def>
@@ -368,7 +378,10 @@
     module_list = 'modules' in context.keys()  # Whether we're showing module list in server mode
 %>
 
-  % if module_list:
+  % if _render_search:
+    <title>Search package</title>
+    <meta name="description" content="Search the documentation." />
+  % elif module_list:
     <title>Python module list</title>
     <meta name="description" content="A list of documented Python modules." />
   % else:
@@ -394,15 +407,6 @@
     </script><script async src='https://www.google-analytics.com/analytics.js'></script>
   % endif
 
-  % if search_query:
-    <link rel="preconnect" href="https://www.google.com">
-    <script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
-    <style>
-        .gsc-control-cse {padding:0 !important;margin-top:1em}
-        body.gsc-overflow-hidden #sidebar {overflow: visible;}
-    </style>
-  % endif
-
   % if latex_math:
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
   % endif
@@ -412,19 +416,37 @@
     <script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
   % endif
 
+  % if search_type == "google" and google_search_query:
+    <link rel="preconnect" href="https://www.google.com">
+    <script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
+    <style>
+        .gsc-control-cse {padding:0 !important;margin-top:1em}
+        body.gsc-overflow-hidden #sidebar {overflow: visible;}
+    </style>
+  % endif
+
   <%include file="head.mako"/>
 </head>
 <body>
 <main>
-  % if module_list:
-    <article id="content">
-      ${show_module_list(modules)}
-    </article>
+  % if not _render_search:
+    % if module_list:
+      <article id="content">
+        ${show_module_list(modules)}
+      </article>
+    % else:
+      <article id="content">
+        ${show_module(module)}
+      </article>
+      ${module_index(module)}
+    % endif
+
   % else:
-    <article id="content">
-      ${show_module(module)}
-    </article>
-    ${module_index(module)}
+    <%namespace name="search" file="search.mako"/>
+    ${search.html()}
+    ${module_index(module, True)}
+    ${search.js()}
+
   % endif
 </main>
 
