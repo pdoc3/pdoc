@@ -1285,7 +1285,7 @@ that are relevant to the interface.</p>
 </dl>
 <h2 id="examples">Examples</h2>
 <p>Examples in doctest format.</p>
-<pre><code class="python">&gt;&gt;&gt; a = [1,2,3]
+<pre><code class="python-repl">&gt;&gt;&gt; a = [1,2,3]
 </code></pre>
 
 <h2 id="todos">Todos</h2>
@@ -1309,20 +1309,20 @@ always
 </code></pre>
 
 <h2 id="examples">Examples</h2>
-<pre><code class="python">&gt;&gt;&gt; nbytes(100)
+<pre><code class="python-repl">&gt;&gt;&gt; nbytes(100)
 '100.0 bytes'
 line2
 </code></pre>
 
 <p>some text</p>
 <p>some text</p>
-<pre><code class="python">&gt;&gt;&gt; another doctest
+<pre><code class="python-repl">&gt;&gt;&gt; another doctest
 line1
 line2
 </code></pre>
 
 <h2 id="example">Example</h2>
-<pre><code class="python">&gt;&gt;&gt; f()
+<pre><code class="python-repl">&gt;&gt;&gt; f()
 Traceback (most recent call last):
     ...
 Exception: something went wrong
