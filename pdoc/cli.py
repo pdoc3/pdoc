@@ -78,14 +78,6 @@ aa(
     help=argparse.SUPPRESS,
 )
 aa(
-    "--html-search-type",
-    type=str,
-    metavar='STRING',
-    default=None,
-    help="When set, type of search to use. One of 'google' or 'lunr'. "
-         "If unset, no search will be used.",
-)
-aa(
     "-o", "--output-dir",
     type=str,
     metavar='DIR',
@@ -377,34 +369,40 @@ def _warn_deprecated(option, alternative='', use_config_mako=False):
     warn(msg, DeprecationWarning, stacklevel=2)
 
 
-def _generate_lunr_search(top_module, written_files, template_config) -> None:
+def _generate_lunr_search(top_module, modules, template_config) -> None:
     # Generate index.js for search
     index = []
-    for written_file in written_files:
+    for module in modules:
         info = {}
-        info['ref'] = (written_file.url()[len(top_module.name)+1:]
-                       if top_module.is_package else written_file.url())
-        info['name'] = written_file.name
-        info['refname'] = written_file.refname
-        info['docstring'] = written_file.docstring
+        url = module.url()
+        if top_module.is_package:  # Reference from subfolder if its a package
+            url = "/".join(url.split("/")[1:])
+
+        info['ref'] = url
+        info['name'] = module.name
+        info['refname'] = module.refname
+        info['docstring'] = module.docstring
 
         index.append(info)
 
         for dobj in (
-            written_file.variables()
-            + written_file.classes()
-            + written_file.functions()
+            module.variables()
+            + module.classes()
+            + module.functions()
         ):
             info = {}
-            info['ref'] = (dobj.url()[len(top_module.name)+1:]
-                           if top_module.is_package else dobj.url())
+            url = dobj.url()
+            if top_module.is_package:  # Reference from subfolder if its a package
+                url = "/".join(url.split("/")[1:])
+
+            info['ref'] = url
             info['name'] = dobj.name
-            ref = dobj.refname + ('()' if isinstance(dobj, pdoc.Function) else '')
-            info['refname'] = ref
+            info['refname'] = dobj.refname + ('()' if isinstance(dobj, pdoc.Function) else '')
             info['docstring'] = dobj.docstring
 
             index.append(info)
 
+    # If top module is a package, output it on the subfolder, else, in the output dir
     main_path = path.join(args.output_dir,
                           *top_module.name.split('.') if top_module.is_package else '')
     f = path.join(main_path, 'index.js')
@@ -416,7 +414,7 @@ def _generate_lunr_search(top_module, written_files, template_config) -> None:
     f = path.join(main_path, 'search.html')
     with open(f, 'w+', encoding='utf-8') as w:
         rendered_template = pdoc._render_template(
-            '/html.mako', module=top_module, _render_search=True, **template_config
+            '/search.mako', module=top_module, **template_config
         )
         w.write(rendered_template)
 
@@ -463,8 +461,6 @@ def main(_args=None):
     if args.external_links:
         _warn_deprecated('--external-links')
         template_config['external_links'] = True
-    if args.html_search_type:
-        template_config['search_type'] = args.html_search_type
 
     if args.template_dir is not None:
         if not path.isdir(args.template_dir):
@@ -472,6 +468,8 @@ def main(_args=None):
                   file=sys.stderr)
             sys.exit(1)
         pdoc.tpl_lookup.directories.insert(0, args.template_dir)
+
+    render_config = pdoc._get_config(**template_config)
 
     # Support loading modules specified as python paths relative to cwd
     sys.path.append(os.getcwd())
@@ -559,9 +557,9 @@ or similar, at your own discretion.""",
     for module in modules:
         if args.html:
             _quit_if_exists(module, ext='.html')
-            written_files = recursive_write_files(module, ext='.html', **template_config)
-            if args.html_search_type == 'lunr':
-                _generate_lunr_search(module, written_files, template_config)
+            modules = recursive_write_files(module, ext='.html', **template_config)
+            if render_config.get("lunr_search", False):
+                _generate_lunr_search(module, modules, template_config)
 
         elif args.output_dir:  # Generate text files
             _quit_if_exists(module, ext='.md')

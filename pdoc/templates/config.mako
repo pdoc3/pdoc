@@ -54,6 +54,9 @@
     # google_search_query = 'inurl:github.com/USER/PROJECT  site:PROJECT.github.io  site:PROJECT.website'
     google_search_query = ''
 
+    # Enables lunr.js search.
+    lunr_search = False
+
     # The fuzziness of the lunr search. Setting it to 0 will allow you to specify
     # the fuzziness in the query by using '~'.
     #
@@ -61,6 +64,6 @@
     #
     # WARNING: SETTING THIS NUMBER TOO HIGH WILL GIVE TOO MANY RESULTS AND MAKE
     # YOUR BROWSER REALLY SLOW OR EVEN FREEZE IT. WE RECOMEND YOU KEEP THIS 
-    # BETWEEN 0 AND 3.
+    # BETWEEN 0 AND 2.
     lunr_search_fuzziness = 1
 %>

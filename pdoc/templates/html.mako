@@ -4,7 +4,6 @@
   import pdoc
   from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html, format_git_link
 
-
   def link(dobj: pdoc.Doc, name=None):
     name = name or dobj.qualname + ('()' if isinstance(dobj, pdoc.Function) else '')
     if isinstance(dobj, pdoc.External) and not external_links:
@@ -288,22 +287,24 @@
 
     <%include file="logo.mako"/>
 
-    % if search_type == 'lunr':
-      <form action="${'../'*module.name.count('.')}search.html" method="GET">
+    % if lunr_search:
+      <form id="search-bar-form" action="${'../' * (module.url().count('/') - 1)}search.html" method="GET" style="display:none">
         <div class="search-nav-container">
           <input type="text" id="search-box" name="q" class="search-input" placeholder="Search the docs...">
         </div>
       </form>
-    % elif search_type == "google" and google_search_query:
+
+      ## Only show the search-bar if JavaScript is supported/enabled.
+      <script>
+        document.getElementById('search-bar-form').style.display='block';
+      </script>
+    % endif
+
+    % if google_search_query:
       <div class="gcse-search" style="height: 70px"
           data-as_oq="${' '.join(google_search_query.strip().split()) | h }"
           data-gaCategoryParameter="${module.refname | h}">
       </div>
-    % endif
-
-    % if search_tab:
-      <h1><a href="index.html">Back to index</a></h1>
-      <% return ""%>
     % endif
 
     <h1>Index</h1>
@@ -378,10 +379,7 @@
     module_list = 'modules' in context.keys()  # Whether we're showing module list in server mode
 %>
 
-  % if _render_search:
-    <title>Search package</title>
-    <meta name="description" content="Search the documentation." />
-  % elif module_list:
+  % if module_list:
     <title>Python module list</title>
     <meta name="description" content="A list of documented Python modules." />
   % else:
@@ -416,7 +414,7 @@
     <script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
   % endif
 
-  % if search_type == "google" and google_search_query:
+  % if google_search_query:
     <link rel="preconnect" href="https://www.google.com">
     <script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
     <style>
@@ -429,24 +427,15 @@
 </head>
 <body>
 <main>
-  % if not _render_search:
-    % if module_list:
-      <article id="content">
-        ${show_module_list(modules)}
-      </article>
-    % else:
-      <article id="content">
-        ${show_module(module)}
-      </article>
-      ${module_index(module)}
-    % endif
-
+  % if module_list:
+    <article id="content">
+      ${show_module_list(modules)}
+    </article>
   % else:
-    <%namespace name="search" file="search.mako"/>
-    ${search.html()}
-    ${module_index(module, True)}
-    ${search.js()}
-
+    <article id="content">
+      ${show_module(module)}
+    </article>
+    ${module_index(module)}
   % endif
 </main>
 

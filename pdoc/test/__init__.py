@@ -242,13 +242,12 @@ class CliTest(unittest.TestCase):
             self._check_files(exclude_patterns=['class="source"', 'Hidden'])
 
     def test_html_with_google(self):
-        with run_html(EXAMPLE_MODULE, html_search_type='google',
-                      config='google_search_query="anything"'):
+        with run_html(EXAMPLE_MODULE, config='google_search_query="anything"'):
             self._basic_html_assertions()
             self._check_files(include_patterns=['class="gcse-search"'])
 
     def test_html_with_lunr(self):
-        with run_html(EXAMPLE_MODULE, html_search_type='lunr'):
+        with run_html(EXAMPLE_MODULE, config='lunr_search=True'):
             files = self.PUBLIC_FILES + ["example_pkg/search.html", "example_pkg/index.js"]
             self._basic_html_assertions(expected_files=files)
             self._check_files(exclude_patterns=['class="gcse-search"'])
