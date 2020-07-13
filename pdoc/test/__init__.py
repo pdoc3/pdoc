@@ -247,7 +247,7 @@ class CliTest(unittest.TestCase):
             self._check_files(include_patterns=['class="gcse-search"'])
 
     def test_html_with_lunr(self):
-        with run_html(EXAMPLE_MODULE, config='lunr_search=True'):
+        with run_html(EXAMPLE_MODULE, config='lunr_search={"fuzziness": 1}'):
             files = self.PUBLIC_FILES + ["example_pkg/search.html", "example_pkg/index.js"]
             self._basic_html_assertions(expected_files=files)
             self._check_files(exclude_patterns=['class="gcse-search"'])
