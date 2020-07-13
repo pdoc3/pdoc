@@ -89,7 +89,6 @@ function _search(query) {
 
     if (query === null || query === '') {
         searchStatus.innerHTML = 'No query provided so there is nothing to search.';
-        searchStatus.innerHTML = JSON.stringify(idx);
         return null;
     };
 

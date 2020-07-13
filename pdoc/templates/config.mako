@@ -72,7 +72,6 @@
     # --------------
     #lunr_search = {
     #   'fuzziness': 1,
-    #   'stopwords': [ ... ],
     #}
     lunr_search = None
 %>
