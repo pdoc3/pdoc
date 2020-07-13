@@ -49,21 +49,30 @@
     # or you need to use raw r-strings.
     latex_math = False
 
+    # If set, insert Google Custom Search search bar widget above the sidebar index.
     # The whitespace-separated tokens represent arbitrary extra queries (at least one
     # must match) passed to regular Google search. Example:
     # google_search_query = 'inurl:github.com/USER/PROJECT  site:PROJECT.github.io  site:PROJECT.website'
     google_search_query = ''
 
-    # Enables lunr.js search.
-    lunr_search = False
-
+    # Lunr.js search config. If set, will enable the search using lunr.js.
+    #
+    # Fuzziness
+    # ---------
     # The fuzziness of the lunr search. Setting it to 0 will allow you to specify
-    # the fuzziness in the query by using '~'.
+    # the fuzziness in the query by using '~'. If unspecified, defaults to `1`.
     #
     # https://lunrjs.com/guides/searching.html#fuzzy-matches
     #
-    # WARNING: SETTING THIS NUMBER TOO HIGH WILL GIVE TOO MANY RESULTS AND MAKE
+    # WARNING: SETTING THIS NUMBER TOO HIGH MAY GIVE TOO MANY RESULTS AND MAKE
     # YOUR BROWSER REALLY SLOW OR EVEN FREEZE IT. WE RECOMEND YOU KEEP THIS 
     # BETWEEN 0 AND 2.
-    lunr_search_fuzziness = 1
+    #
+    # Example config
+    # --------------
+    #lunr_search = {
+    #   'fuzziness': 1,
+    #   'stopwords': [ ... ],
+    #}
+    lunr_search = None
 %>

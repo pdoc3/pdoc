@@ -371,19 +371,18 @@ def _warn_deprecated(option, alternative='', use_config_mako=False):
 
 def _generate_lunr_search(top_module, modules, template_config) -> None:
     # Generate index.js for search
-    index = []
+    index = {}
     for module in modules:
         info = {}
         url = module.url()
         if top_module.is_package:  # Reference from subfolder if its a package
             url = "/".join(url.split("/")[1:])
 
-        info['ref'] = url
         info['name'] = module.name
         info['refname'] = module.refname
         info['docstring'] = module.docstring
 
-        index.append(info)
+        index[url] = info
 
         for dobj in (
             module.variables()
@@ -395,12 +394,11 @@ def _generate_lunr_search(top_module, modules, template_config) -> None:
             if top_module.is_package:  # Reference from subfolder if its a package
                 url = "/".join(url.split("/")[1:])
 
-            info['ref'] = url
             info['name'] = dobj.name
             info['refname'] = dobj.refname + ('()' if isinstance(dobj, pdoc.Function) else '')
             info['docstring'] = dobj.docstring
 
-            index.append(info)
+            index[url] = info
 
     # If top module is a package, output it on the subfolder, else, in the output dir
     main_path = path.join(args.output_dir,

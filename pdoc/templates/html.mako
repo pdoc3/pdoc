@@ -275,7 +275,7 @@
   </section>
 </%def>
 
-<%def name="module_index(module, search_tab=False)">
+<%def name="module_index(module)">
   <%
   variables = module.variables(sort=sort_identifiers)
   classes = module.classes(sort=sort_identifiers)
@@ -286,6 +286,13 @@
   <nav id="sidebar">
 
     <%include file="logo.mako"/>
+
+    % if google_search_query:
+      <div class="gcse-search" style="height: 70px"
+          data-as_oq="${' '.join(google_search_query.strip().split()) | h }"
+          data-gaCategoryParameter="${module.refname | h}">
+      </div>
+    % endif
 
     % if lunr_search:
       <form id="search-bar-form" action="${'../' * (module.url().count('/') - 1)}search.html" method="GET" style="display:none">
@@ -298,13 +305,6 @@
       <script>
         document.getElementById('search-bar-form').style.display='block';
       </script>
-    % endif
-
-    % if google_search_query:
-      <div class="gcse-search" style="height: 70px"
-          data-as_oq="${' '.join(google_search_query.strip().split()) | h }"
-          data-gaCategoryParameter="${module.refname | h}">
-      </div>
     % endif
 
     <h1>Index</h1>
@@ -398,6 +398,15 @@
   <style media="screen and (min-width: 700px)">${css.desktop()}</style>
   <style media="print">${css.print()}</style>
 
+  % if google_search_query:
+    <link rel="preconnect" href="https://www.google.com">
+    <script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
+    <style>
+        .gsc-control-cse {padding:0 !important;margin-top:1em}
+        body.gsc-overflow-hidden #sidebar {overflow: visible;}
+    </style>
+  % endif
+
   % if google_analytics:
     <script>
     window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
@@ -413,16 +422,6 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js" integrity="sha256-eOgo0OtLL4cdq7RdwRUiGKLX9XsIJ7nGhWEKbohmVAQ=" crossorigin></script>
     <script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
   % endif
-
-  % if google_search_query:
-    <link rel="preconnect" href="https://www.google.com">
-    <script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
-    <style>
-        .gsc-control-cse {padding:0 !important;margin-top:1em}
-        body.gsc-overflow-hidden #sidebar {overflow: visible;}
-    </style>
-  % endif
-
   <%include file="head.mako"/>
 </head>
 <body>

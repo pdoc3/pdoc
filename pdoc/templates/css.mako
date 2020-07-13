@@ -44,49 +44,6 @@
     opacity: 60%;
   }
 
-  #search-modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    padding-top: 100px;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-  }
-
-  #modal-content {
-    background-color: #fefefe;
-    margin: auto;
-    padding: 30px;
-    border: 1px solid #888;
-    width: 80%;
-    height: 70%;
-  }
-
-  #modal-close-button {
-    color: #aaaaaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-  }
-
-  #modal-close-button:hover,
-  #modal-close-button:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
-  }
-
-  #lurn_results_iframe {
-    width: 100%;
-    height: 95%;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-  }
-
   .http-server-breadcrumbs {
     font-size: 130%;
     margin: 0 0 15px 0;

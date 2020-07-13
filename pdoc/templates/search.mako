@@ -50,11 +50,11 @@
 <script src="index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.8/lunr.js" integrity="sha256-JZUIb2pF9vF82f9JemSl6XISUBX4tvjrprJM21J63G8=" crossorigin></script>
 <script>
+const RESULT_CONTENT_CHARS_LIMIT = 180
 var searchStatus = document.getElementById('search-status');
 var searchResults = document.getElementById('search-results');
 var searchInput = document.getElementById('search-box');
 var idx = null;
-var documentsIndex = null;
 var query = new URLSearchParams(window.location.search).get('q');
 searchInput.value = query
 search(searchInput.value);
@@ -63,6 +63,7 @@ function search(query) {
     try {
         _search(query);
     } catch (exception){
+        // This is just to give feedback to the user but still allow developers to see what went wrong
         searchStatus.innerHTML = `Something went wrong and the results couldn't get displayed.`;
         throw exception
     };
@@ -70,7 +71,6 @@ function search(query) {
 
 function _search(query) {
     if (idx === null){
-        documentsIndex = {};
         idx = lunr(function () {
                 this.ref('ref');
                 this.field('refname', {'boost':10});
@@ -78,23 +78,22 @@ function _search(query) {
                 this.field('docstring');
                 this.metadataWhitelist = ['position'];
 
-                index.forEach(function(doc) { 
+                var doc;
+                Object.keys(index).forEach(function (key) {
+                    doc = index[key];
+                    doc['ref'] = key;
                     this.add(doc);
-                    documentsIndex[doc.ref] = {
-                        'refname': doc.refname,
-                        'name': doc.name,
-                        'docstring': doc.docstring,
-                    };
                 }, this);
             });        
     };
 
     if (query === null || query === '') {
         searchStatus.innerHTML = 'No query provided so there is nothing to search.';
+        searchStatus.innerHTML = JSON.stringify(idx);
         return null;
     };
 
-    var fuzziness = ${lunr_search_fuzziness};
+    var fuzziness = ${lunr_search.get('fuzziness', 1)};
     if (fuzziness != 0) {
         query += "~" + fuzziness;
     };
@@ -107,16 +106,16 @@ function _search(query) {
         var ul = document.createElement('ul');
         var count = 0;
         results.forEach(function(result) {
-            var liLink = '<a href="' + result.ref + '">' + documentsIndex[result.ref].refname + '</a>';
+            var liLink = '<a href="' + result.ref + '">' + index[result.ref].refname + '</a>';
 
             Object.keys(result.matchData.metadata).forEach(function (term) {
                 if (!('name' in result.matchData.metadata[term] || 'refname' in result.matchData.metadata[term])) {
-                    var docstring = documentsIndex[result.ref].docstring;
+                    var docstring = index[result.ref].docstring;
 
                     result.matchData.metadata[term].docstring.position.forEach(function(positions) {
                         var start;
-                        if (positions[0] - 180 > 0) {
-                            start = '...' + docstring.slice(positions[0] - 180, positions[0]);
+                        if (positions[0] - RESULT_CONTENT_CHARS_LIMIT > 0) {
+                            start = '...' + docstring.slice(positions[0] - RESULT_CONTENT_CHARS_LIMIT, positions[0]);
                         } else {
                             start = docstring.slice(0, positions[0]);
                         };
@@ -124,8 +123,8 @@ function _search(query) {
                         var match = docstring.slice(positions[0], positions[0] + positions[1]);
 
                         var end;
-                        if (positions[0] + positions[1] + 180 < docstring.length) {
-                            end = docstring.slice(positions[0] + positions[1], positions[0] + positions[1] + 180) + '...';
+                        if (positions[0] + positions[1] + RESULT_CONTENT_CHARS_LIMIT < docstring.length) {
+                            end = docstring.slice(positions[0] + positions[1], positions[0] + positions[1] + RESULT_CONTENT_CHARS_LIMIT) + '...';
                         } else {
                             end = docstring.slice(positions[0] + positions[1], docstring.length);
                         };
