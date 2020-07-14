@@ -294,7 +294,7 @@
       </div>
     % endif
 
-    % if lunr_search:
+    % if lunr_search is not None:
       <form id="search-bar-form" action="${'../' * (module.url().count('/') - 1)}search.html" method="GET" style="display:none">
         <div class="search-nav-container">
           <input type="text" id="search-box" name="q" class="search-input" placeholder="Search the docs...">

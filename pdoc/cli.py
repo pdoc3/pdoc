@@ -556,7 +556,7 @@ or similar, at your own discretion.""",
         if args.html:
             _quit_if_exists(module, ext='.html')
             modules = recursive_write_files(module, ext='.html', **template_config)
-            if render_config.get("lunr_search", False):
+            if render_config.get("lunr_search") is not None:
                 _generate_lunr_search(module, modules, template_config)
 
         elif args.output_dir:  # Generate text files
