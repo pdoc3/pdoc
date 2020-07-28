@@ -421,8 +421,18 @@ def main(_args=None):
     except KeyError:
         pass  # pdoc was not invoked while in a virtual environment
     else:
+        from glob import glob
         from distutils.sysconfig import get_python_lib
-        sys.path.append(get_python_lib(prefix=venv_dir))
+        libdir = get_python_lib(prefix=venv_dir)
+        sys.path.append(libdir)
+        # Resolve egg-links from `setup.py develop` or `pip install -e`
+        # XXX: Welcome a more canonical approach
+        for pth in glob(path.join(libdir, '*.egg-link')):
+            try:
+                with open(pth) as f:
+                    sys.path.append(path.join(libdir, f.readline().rstrip()))
+            except IOError:
+                warn('Invalid egg-link in venv: {!r}'.format(pth))
 
     if args.http:
         template_config['link_prefix'] = "/"
