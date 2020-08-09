@@ -944,6 +944,11 @@ class Foo:
 
         self.assertEqual(pdoc.Class('G', mod, G).params(), ['self', 'a', 'b', 'c=100'])
 
+        class G2(typing.Generic[T]):
+            pass
+
+        self.assertEqual(pdoc.Class('G2', mod, G2).params(), ['*args', '**kwds'])
+
     def test_url(self):
         mod = pdoc.Module(EXAMPLE_MODULE)
         pdoc.link_inheritance()
