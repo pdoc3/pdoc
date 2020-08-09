@@ -1248,7 +1248,10 @@ class Function(Doc):
                 inspect.isclass(doc_obj.obj)
                 and doc_obj.obj.__init__ is not object.__init__
             ):
-                signature = inspect.signature(doc_obj.obj.__init__)
+                # Remove the first argument (self) from __init__ signature
+                init_sig = inspect.signature(doc_obj.obj.__init__)
+                init_params = list(init_sig.parameters.values())
+                signature = init_sig.replace(parameters=init_params[1:])
             else:
                 signature = inspect.signature(doc_obj.obj)
         except ValueError:

@@ -364,7 +364,7 @@ class CliTest(unittest.TestCase):
         self.assertIn('pdoc3.github.io', out)
         self.assertIn('pandoc', err)
 
-        pdoc_Doc_params = str(inspect.signature(pdoc.Doc.__init__))
+        pdoc_Doc_params = str(inspect.signature(pdoc.Doc.__init__)).replace('self, ', '')
         self.assertIn(pdoc_Doc_params.replace(' ', ''),
                       out.replace('>', '').replace('\n', '').replace(' ', ''))
 
@@ -928,7 +928,7 @@ class Foo:
                 pass
 
         mod = pdoc.Module(pdoc)
-        self.assertEqual(pdoc.Class('C', mod, C).params(), ['self', 'x'])
+        self.assertEqual(pdoc.Class('C', mod, C).params(), ['x'])
         with patch.dict(mod.obj.__pdoc__, {'C.__init__': False}):
             self.assertEqual(pdoc.Class('C', mod, C).params(), [])
 
@@ -942,7 +942,7 @@ class Foo:
             def __init__(self, a, b, c=100):
                 pass
 
-        self.assertEqual(pdoc.Class('G', mod, G).params(), ['self', 'a', 'b', 'c=100'])
+        self.assertEqual(pdoc.Class('G', mod, G).params(), ['a', 'b', 'c=100'])
 
         class G2(typing.Generic[T]):
             pass
