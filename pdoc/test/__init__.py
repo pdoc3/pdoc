@@ -36,6 +36,8 @@ EXAMPLE_MODULE = 'example_pkg'
 
 sys.path.insert(0, TESTS_BASEDIR)
 
+T = typing.TypeVar("T")
+
 
 @contextmanager
 def temp_dir():
@@ -362,7 +364,7 @@ class CliTest(unittest.TestCase):
         self.assertIn('pdoc3.github.io', out)
         self.assertIn('pandoc', err)
 
-        pdoc_Doc_params = str(inspect.signature(pdoc.Doc.__init__)).replace('self, ', '')
+        pdoc_Doc_params = str(inspect.signature(pdoc.Doc.__init__))
         self.assertIn(pdoc_Doc_params.replace(' ', ''),
                       out.replace('>', '').replace('\n', '').replace(' ', ''))
 
@@ -901,12 +903,23 @@ class Foo:
             def __init__(self):
                 """baz"""
 
+        class F(typing.Generic[T]):
+            """baz"""
+
+            def __init__(self):
+                """bar"""
+
+        class G(F[int]):
+            """foo"""
+
         mod = pdoc.Module(pdoc)
         self.assertEqual(pdoc.Class('A', mod, A).docstring, """foo""")
         self.assertEqual(pdoc.Class('B', mod, B).docstring, """foo""")
         self.assertEqual(pdoc.Class('C', mod, C).docstring, """foo\n\nbar""")
         self.assertEqual(pdoc.Class('D', mod, D).docstring, """baz\n\nbar""")
         self.assertEqual(pdoc.Class('E', mod, E).docstring, """foo\n\nbaz""")
+        self.assertEqual(pdoc.Class('F', mod, F).docstring, """baz\n\nbar""")
+        self.assertEqual(pdoc.Class('G', mod, G).docstring, """foo\n\nbar""")
 
     @ignore_warnings
     def test_Class_params(self):
@@ -915,7 +928,7 @@ class Foo:
                 pass
 
         mod = pdoc.Module(pdoc)
-        self.assertEqual(pdoc.Class('C', mod, C).params(), ['x'])
+        self.assertEqual(pdoc.Class('C', mod, C).params(), ['self', 'x'])
         with patch.dict(mod.obj.__pdoc__, {'C.__init__': False}):
             self.assertEqual(pdoc.Class('C', mod, C).params(), [])
 
@@ -924,6 +937,12 @@ class Foo:
             __signature__ = inspect.signature(lambda a, b, c=None, *, d=1, e: None)
 
         self.assertEqual(pdoc.Class('C2', mod, C2).params(), ['a', 'b', 'c=None', '*', 'd=1', 'e'])
+
+        class G(typing.Generic[T]):
+            def __init__(self, a, b, c=100):
+                pass
+
+        self.assertEqual(pdoc.Class('G', mod, G).params(), ['self', 'a', 'b', 'c=100'])
 
     def test_url(self):
         mod = pdoc.Module(EXAMPLE_MODULE)

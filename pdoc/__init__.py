@@ -1242,7 +1242,15 @@ class Function(Doc):
     @staticmethod
     def _params(doc_obj, annotate=False, link=None, module=None):
         try:
-            signature = inspect.signature(doc_obj.obj)
+            # We want __init__ to actually be implemented somewhere in the
+            # MRO to still satisfy https://github.com/pdoc3/pdoc/issues/124
+            if (
+                inspect.isclass(doc_obj.obj)
+                and doc_obj.obj.__init__ is not object.__init__
+            ):
+                signature = inspect.signature(doc_obj.obj.__init__)
+            else:
+                signature = inspect.signature(doc_obj.obj)
         except ValueError:
             signature = Function._signature_from_string(doc_obj)
             if not signature:
