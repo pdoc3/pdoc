@@ -4,6 +4,7 @@
   import pdoc
   from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html, format_git_link
 
+
   def link(dobj: pdoc.Doc, name=None):
     name = name or dobj.qualname + ('()' if isinstance(dobj, pdoc.Function) else '')
     if isinstance(dobj, pdoc.External) and not external_links:
@@ -288,10 +289,10 @@
     <%include file="logo.mako"/>
 
     % if google_search_query:
-      <div class="gcse-search" style="height: 70px"
-          data-as_oq="${' '.join(google_search_query.strip().split()) | h }"
-          data-gaCategoryParameter="${module.refname | h}">
-      </div>
+        <div class="gcse-search" style="height: 70px"
+             data-as_oq="${' '.join(google_search_query.strip().split()) | h }"
+             data-gaCategoryParameter="${module.refname | h}">
+        </div>
     % endif
 
     % if lunr_search is not None:
@@ -364,6 +365,7 @@
       </ul>
     </li>
     % endif
+
     </ul>
   </nav>
 </%def>
@@ -398,6 +400,13 @@
   <style media="screen and (min-width: 700px)">${css.desktop()}</style>
   <style media="print">${css.print()}</style>
 
+  % if google_analytics:
+    <script>
+    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+    ga('create', '${google_analytics}', 'auto'); ga('send', 'pageview');
+    </script><script async src='https://www.google-analytics.com/analytics.js'></script>
+  % endif
+
   % if google_search_query:
     <link rel="preconnect" href="https://www.google.com">
     <script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
@@ -405,13 +414,6 @@
         .gsc-control-cse {padding:0 !important;margin-top:1em}
         body.gsc-overflow-hidden #sidebar {overflow: visible;}
     </style>
-  % endif
-
-  % if google_analytics:
-    <script>
-    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-    ga('create', '${google_analytics}', 'auto'); ga('send', 'pageview');
-    </script><script async src='https://www.google-analytics.com/analytics.js'></script>
   % endif
 
   % if latex_math:
@@ -422,6 +424,7 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js" integrity="sha256-eOgo0OtLL4cdq7RdwRUiGKLX9XsIJ7nGhWEKbohmVAQ=" crossorigin></script>
     <script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
   % endif
+
   <%include file="head.mako"/>
 </head>
 <body>
