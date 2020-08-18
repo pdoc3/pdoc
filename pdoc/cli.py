@@ -467,8 +467,6 @@ def main(_args=None):
             sys.exit(1)
         pdoc.tpl_lookup.directories.insert(0, args.template_dir)
 
-    render_config = pdoc._get_config(**template_config)
-
     # Support loading modules specified as python paths relative to cwd
     sys.path.append(os.getcwd())
 
@@ -552,11 +550,15 @@ or similar, at your own discretion.""",
               file=sys.stderr)
         sys.exit(0)
 
+    enable_lunr_search = (args.html and
+                          pdoc._get_config(**template_config).get('lunr_search') is not None)
+
     for module in modules:
         if args.html:
             _quit_if_exists(module, ext='.html')
             modules = recursive_write_files(module, ext='.html', **template_config)
-            if render_config.get("lunr_search") is not None:
+
+            if enable_lunr_search:
                 _generate_lunr_search(module, modules, template_config)
 
         elif args.output_dir:  # Generate text files
