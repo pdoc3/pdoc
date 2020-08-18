@@ -71,8 +71,8 @@ function _search(query) {
     if (idx === null){
         idx = lunr(function () {
                 this.ref('i');
-                this.field('ref', {boost: 10});
-                this.field('name', {boost: 5});
+                this.field('ref', {boost: 5});
+                this.field('name', {boost: 10});
                 this.field('doc');
                 this.metadataWhitelist = ['position'];
 
