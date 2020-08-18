@@ -380,6 +380,16 @@ def _warn_deprecated(option, alternative='', use_config_mako=False):
 def _generate_lunr_search(top_module: pdoc.Module,
                           modules: List[pdoc.Module],
                           template_config: dict):
+    def trim_docstring(docstring):
+        return re.sub(r'''
+            \s+|                   # whitespace sequences
+            \s+[-=~]{3,}\s+|       # title underlines
+            ^[ \t]*[`~]{3,}\w*$|   # code blocks
+            \s*[`#*]+\s*|          # common markdown chars
+            \s*([^\w\d_>])\1\s*|   # sequences of punct of the same kind
+            \s*</?\w*[^>]*>\s*     # simple HTML tags
+        ''', ' ', docstring, flags=re.VERBOSE | re.MULTILINE)
+
     # Generate index.js for search
     index = []
     urls = []  # type: List[str]
@@ -392,7 +402,7 @@ def _generate_lunr_search(top_module: pdoc.Module,
 
         index.append({
             'ref': module.refname,
-            'doc': module.docstring,
+            'doc': trim_docstring(module.docstring),
             'url': url_id,
         })
 
@@ -403,7 +413,7 @@ def _generate_lunr_search(top_module: pdoc.Module,
         ):
             index.append({
                 'ref': dobj.refname,
-                'doc': dobj.docstring,
+                'doc': trim_docstring(dobj.docstring),
                 'url': url_id,
             })
             if isinstance(dobj, pdoc.Function):
