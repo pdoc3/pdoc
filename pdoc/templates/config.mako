@@ -42,36 +42,21 @@
     # tracking id (UA-XXXXXX-Y).
     google_analytics = ''
 
+    # If set, insert Google Custom Search search bar widget above the sidebar index.
+    # The whitespace-separated tokens represent arbitrary extra queries (at least one
+    # must match) passed to regular Google search. Example:
+    #google_search_query = 'inurl:github.com/USER/PROJECT  site:PROJECT.github.io  site:PROJECT.website'
+    google_search_query = ''
+
+    # Enable offline search using Lunr.js. For explanation of 'fuzziness' parameter, which is
+    # added to every query word, see: https://lunrjs.com/guides/searching.html#fuzzy-matches
+    #lunr_search = {'fuzziness': 1}
+    lunr_search = None
+
     # If set, render LaTeX math syntax within \(...\) (inline equations),
     # or within \[...\] or $$...$$ or `.. math::` (block equations)
     # as nicely-formatted math formulas using MathJax.
     # Note: in Python docstrings, either all backslashes need to be escaped (\\)
     # or you need to use raw r-strings.
     latex_math = False
-
-    # If set, insert Google Custom Search search bar widget above the sidebar index.
-    # The whitespace-separated tokens represent arbitrary extra queries (at least one
-    # must match) passed to regular Google search. Example:
-    # google_search_query = 'inurl:github.com/USER/PROJECT  site:PROJECT.github.io  site:PROJECT.website'
-    google_search_query = ''
-
-    # Lunr.js search config. If set, will enable the search using lunr.js.
-    #
-    # Fuzziness
-    # ---------
-    # The fuzziness of the lunr search. Setting it to 0 will allow you to specify
-    # the fuzziness in the query by using '~'. If unspecified, defaults to `1`.
-    #
-    # https://lunrjs.com/guides/searching.html#fuzzy-matches
-    #
-    # WARNING: SETTING THIS NUMBER TOO HIGH MAY GIVE TOO MANY RESULTS AND MAKE
-    # YOUR BROWSER REALLY SLOW OR EVEN FREEZE IT. WE RECOMEND YOU KEEP THIS 
-    # BETWEEN 0 AND 2.
-    #
-    # Example config
-    # --------------
-    #lunr_search = {
-    #   'fuzziness': 1,
-    #}
-    lunr_search = None
 %>
