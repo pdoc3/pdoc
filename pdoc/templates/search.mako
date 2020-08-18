@@ -24,7 +24,7 @@
 <article id="content">
   <h1>Search the docs</h1>
   <h3 id="search-status"></h3>
-  <div id="search-results"></div>
+  <ul id="search-results"></ul>
   <noscript>
   <h3>JavaScript is not supported/enabled in your browser, so the search function will not work.</h3>
   </noscript>
@@ -48,7 +48,7 @@
 <script src="index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.8/lunr.min.js" integrity="sha512-HiJdkRySzXhiUcX2VweXaiy8yeY212ep/j51zR/z5IPCX4ZUOxaf6naJ/0dQL/2l+ZL+B9in/u4nT8QJZ/3mig==" crossorigin></script>
 <script>
-const RESULT_CONTENT_CHARS_LIMIT = 180
+const PAD_CHARS = 30
 var searchStatus = document.getElementById('search-status');
 var searchResults = document.getElementById('search-results');
 var searchInput = document.getElementById('lunr-search');
@@ -101,53 +101,43 @@ function _search(query) {
     if (results.length == 0) {
         searchStatus.innerHTML = 'No results have been found for your search. Make sure that all words are spelled correctly.';
     } else {
-        var ul = document.createElement('ul');
-        var count = 0;
         results.forEach(function(result) {
             const dobj = INDEX[parseInt(result.ref)];
             const url = URLS[dobj.url] + '#' + dobj.ref;
             const pretty_name = dobj.ref + (dobj.func ? '()' : '');
-            const liLink = '<a href="' + url + '">'  + pretty_name + '</a>';
+            const docstring = dobj.doc;
 
-            Object.keys(result.matchData.metadata).forEach(function (term) {
-                if (result.matchData.metadata[term].doc) {
-                    var docstring = dobj.doc;
+            let text = Object.values(result.matchData.metadata)
+                    .filter(({doc}) => doc !== undefined)
+                    .map(({doc: {position}}) => {
+                        return position.map(([start, length]) => {
+                            const end = start + length;
+                            return [
+                                start,
+                                (start - PAD_CHARS > 0 ? '…' : '') +
+                                docstring.substring(start - PAD_CHARS, start) +
+                                '<mark>' + docstring.slice(start, end) + '</mark>' +
+                                docstring.substring(end, end + PAD_CHARS) +
+                                (end + PAD_CHARS < docstring.length ? '…' : '')
+                            ];
+                        });
+                    })
+                    .flat()
+                    .sort(([pos1,], [pos2,]) => pos1 - pos2)
+                    .map(([, text]) => text)
+                    .join('')
+                    .replace(/……/g, '…');
 
-                    result.matchData.metadata[term].doc.position.forEach(function(positions) {
-                        var start;
-                        if (positions[0] - RESULT_CONTENT_CHARS_LIMIT > 0) {
-                            start = '...' + docstring.slice(positions[0] - RESULT_CONTENT_CHARS_LIMIT, positions[0]);
-                        } else {
-                            start = docstring.slice(0, positions[0]);
-                        };
+            if (text)
+                text = '<div>' + text + '</div>';
+            text = '<a href="' + url + '">'  + pretty_name + '</a>' + text;
 
-                        var match = docstring.slice(positions[0], positions[0] + positions[1]);
+            const li = document.createElement('li');
+            li.innerHTML = text;
+            searchResults.appendChild(li);
+         });
 
-                        var end;
-                        if (positions[0] + positions[1] + RESULT_CONTENT_CHARS_LIMIT < docstring.length) {
-                            end = docstring.slice(positions[0] + positions[1], positions[0] + positions[1] + RESULT_CONTENT_CHARS_LIMIT) + '...';
-                        } else {
-                            end = docstring.slice(positions[0] + positions[1], docstring.length);
-                        };
-
-                        var liContent = '<div>' + start + '<mark>' + match + '</mark>' + end + '</div>';
-
-                        var li = document.createElement('li');
-                        li.innerHTML = liLink + liContent;
-                        ul.appendChild(li);
-                        count += 1
-                     });
-                } else {
-                    var li = document.createElement('li');
-                    li.innerHTML = liLink;
-                    ul.appendChild(li);
-                    count += 1
-                };
-            });
-        });
-
-        searchResults.appendChild(ul);
-        searchStatus.innerHTML = 'Your search brought back ' + count + ' result(s):';
+        searchStatus.innerHTML = 'Your search yielded ' + results.length + ' result(s):';
     };
 };
 </script>
