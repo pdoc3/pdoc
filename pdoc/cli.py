@@ -371,42 +371,44 @@ def _warn_deprecated(option, alternative='', use_config_mako=False):
 
 def _generate_lunr_search(top_module, modules, template_config) -> None:
     # Generate index.js for search
-    index = {}
+    index = []
+    urls = []  # type: List[str]
     for module in modules:
-        info = {}
         url = module.url()
         if top_module.is_package:  # Reference from subfolder if its a package
-            url = "/".join(url.split("/")[1:])
+            _, url = url.split('/', maxsplit=1)
+        url_id = len(urls)
+        urls.append(url)
 
-        info['name'] = module.name
-        info['refname'] = module.refname
-        info['docstring'] = module.docstring
+        index.append({
+            'ref': module.refname,
+            'doc': module.docstring,
+            'url': url_id,
+        })
 
-        index[url] = info
 
         for dobj in (
             module.variables()
             + module.classes()
             + module.functions()
         ):
-            info = {}
-            url = dobj.url()
-            if top_module.is_package:  # Reference from subfolder if its a package
-                url = "/".join(url.split("/")[1:])
-
-            info['name'] = dobj.name
-            info['refname'] = dobj.refname + ('()' if isinstance(dobj, pdoc.Function) else '')
-            info['docstring'] = dobj.docstring
-
-            index[url] = info
+            index.append({
+                'ref': dobj.refname,
+                'doc': dobj.docstring,
+                'url': url_id,
+            })
+            if isinstance(dobj, pdoc.Function):
+                index[-1]['func'] = 1
 
     # If top module is a package, output it on the subfolder, else, in the output dir
     main_path = path.join(args.output_dir,
                           *top_module.name.split('.') if top_module.is_package else '')
     f = path.join(main_path, 'index.js')
     with open(f, 'w+', encoding='utf-8') as w:
-        w.write("index=")
-        json.dump(index, w)
+        f.write("URLS=")
+        json.dump(urls, f, indent=0, separators=(',', ':'))
+        f.write(";\nINDEX=")
+        json.dump(index, f, indent=0, separators=(',', ':'))
 
     # Generate search.html
     f = path.join(main_path, 'search.html')

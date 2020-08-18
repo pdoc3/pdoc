@@ -70,19 +70,20 @@ function search(query) {
 function _search(query) {
     if (idx === null){
         idx = lunr(function () {
-                this.ref('ref');
-                this.field('refname', {'boost':10});
-                this.field('name', {'boost': 5});
-                this.field('docstring');
+                this.ref('i');
+                this.field('ref', {boost: 10});
+                this.field('name', {boost: 5});
+                this.field('doc');
                 this.metadataWhitelist = ['position'];
 
-                var doc;
-                Object.keys(index).forEach(function (key) {
-                    doc = index[key];
-                    doc['ref'] = key;
+                INDEX.forEach((doc, i) => {
+                    const parts = doc.ref.split('.');
+                    doc['name'] = parts[parts.length - 1];
+                    doc['i'] = i;
+
                     this.add(doc);
                 }, this);
-            });        
+            });
     };
 
     if (query === null || query === '') {
@@ -103,13 +104,16 @@ function _search(query) {
         var ul = document.createElement('ul');
         var count = 0;
         results.forEach(function(result) {
-            var liLink = '<a href="' + result.ref + '">' + index[result.ref].refname + '</a>';
+            const dobj = INDEX[parseInt(result.ref)];
+            const url = URLS[dobj.url] + '#' + dobj.ref;
+            const pretty_name = dobj.ref + (dobj.func ? '()' : '');
+            const liLink = '<a href="' + url + '">'  + pretty_name + '</a>';
 
             Object.keys(result.matchData.metadata).forEach(function (term) {
-                if (!('name' in result.matchData.metadata[term] || 'refname' in result.matchData.metadata[term])) {
-                    var docstring = index[result.ref].docstring;
+                if (result.matchData.metadata[term].doc) {
+                    var docstring = dobj.doc;
 
-                    result.matchData.metadata[term].docstring.position.forEach(function(positions) {
+                    result.matchData.metadata[term].doc.position.forEach(function(positions) {
                         var start;
                         if (positions[0] - RESULT_CONTENT_CHARS_LIMIT > 0) {
                             start = '...' + docstring.slice(positions[0] - RESULT_CONTENT_CHARS_LIMIT, positions[0]);
