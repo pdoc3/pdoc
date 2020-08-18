@@ -28,20 +28,13 @@
 
   .search-input {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    box-sizing: border-box;
-    resize: vertical;
-    outline: none;
+    font-size: 1em;
+    padding: 6px 9px 5px 9px;
+    border: 1px solid silver;
   }
 
   #search-results li {
-    padding: 10px;
-  }
-
-  #search-results .content {
-    opacity: 60%;
+    padding: 10px 0;
   }
 
   .http-server-breadcrumbs {
