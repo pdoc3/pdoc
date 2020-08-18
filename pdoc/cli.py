@@ -11,8 +11,10 @@ import json
 import re
 import sys
 import warnings
+from contextlib import contextmanager
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from typing import Sequence
+from itertools import chain
+from typing import List, Sequence
 from warnings import warn
 
 import pdoc
@@ -315,30 +317,36 @@ def _quit_if_exists(m: pdoc.Module, ext: str):
             sys.exit(1)
 
 
-def recursive_write_files(m: pdoc.Module, ext: str, **kwargs) -> list:
-    assert ext in ('.html', '.md')
-
-    f = module_path(m, ext=ext)
-    written_files = []
-
-    dirpath = path.dirname(f)
-    if not os.access(dirpath, os.R_OK):
-        os.makedirs(dirpath)
-
+@contextmanager
+def _open_write_file(filename):
     try:
-        with open(f, 'w+', encoding='utf-8') as w:
-            if ext == '.html':
-                w.write(m.html(**kwargs))
-            elif ext == '.md':
-                w.write(m.text(**kwargs))
-        print(f)  # print created file path to stdout
-        written_files.append(m)
+        with open(filename, 'w', encoding='utf-8') as f:
+            yield f
+            print(filename)  # print created file path to stdout
     except Exception:
         try:
-            os.unlink(f)
+            os.unlink(filename)
         except Exception:
             pass
         raise
+
+
+def recursive_write_files(m: pdoc.Module, ext: str, **kwargs) -> list:
+    assert ext in ('.html', '.md')
+
+    filepath = module_path(m, ext=ext)
+    written_files = []
+
+    dirpath = path.dirname(filepath)
+    if not os.access(dirpath, os.R_OK):
+        os.makedirs(dirpath)
+
+    with _open_write_file(filepath) as f:
+        if ext == '.html':
+            f.write(m.html(**kwargs))
+        elif ext == '.md':
+            f.write(m.text(**kwargs))
+    written_files.append(m)
 
     for submodule in m.submodules():
         submodule_files = recursive_write_files(submodule, ext=ext, **kwargs)
@@ -369,7 +377,9 @@ def _warn_deprecated(option, alternative='', use_config_mako=False):
     warn(msg, DeprecationWarning, stacklevel=2)
 
 
-def _generate_lunr_search(top_module, modules, template_config) -> None:
+def _generate_lunr_search(top_module: pdoc.Module,
+                          modules: List[pdoc.Module],
+                          template_config: dict):
     # Generate index.js for search
     index = []
     urls = []  # type: List[str]
@@ -386,11 +396,10 @@ def _generate_lunr_search(top_module, modules, template_config) -> None:
             'url': url_id,
         })
 
-
-        for dobj in (
-            module.variables()
-            + module.classes()
-            + module.functions()
+        for dobj in chain(
+                module.variables(),
+                module.classes(),
+                module.functions(),
         ):
             index.append({
                 'ref': dobj.refname,
@@ -400,23 +409,21 @@ def _generate_lunr_search(top_module, modules, template_config) -> None:
             if isinstance(dobj, pdoc.Function):
                 index[-1]['func'] = 1
 
-    # If top module is a package, output it on the subfolder, else, in the output dir
+    # If top module is a package, output the index in its subfolder, else, in the output dir
     main_path = path.join(args.output_dir,
                           *top_module.name.split('.') if top_module.is_package else '')
-    f = path.join(main_path, 'index.js')
-    with open(f, 'w+', encoding='utf-8') as w:
+    with _open_write_file(path.join(main_path, 'index.js')) as f:
         f.write("URLS=")
         json.dump(urls, f, indent=0, separators=(',', ':'))
         f.write(";\nINDEX=")
         json.dump(index, f, indent=0, separators=(',', ':'))
 
     # Generate search.html
-    f = path.join(main_path, 'search.html')
-    with open(f, 'w+', encoding='utf-8') as w:
+    with _open_write_file(path.join(main_path, 'search.html')) as f:
         rendered_template = pdoc._render_template(
             '/search.mako', module=top_module, **template_config
         )
-        w.write(rendered_template)
+        f.write(rendered_template)
 
 
 def main(_args=None):
