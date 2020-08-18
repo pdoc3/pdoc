@@ -296,16 +296,10 @@
     % endif
 
     % if lunr_search is not None:
-      <form id="search-bar-form" action="${'../' * (module.url().count('/') - 1)}search.html" method="GET" style="display:none">
-        <div class="search-nav-container">
-          <input type="text" id="search-box" name="q" class="search-input" placeholder="Search the docs...">
-        </div>
+      <form action="${'../' * (module.url().count('/') - 1)}search.html">
+          <input id="lunr-search" name="q" placeholder="Search ..." disabled>
       </form>
-
-      ## Only show the search-bar if JavaScript is supported/enabled.
-      <script>
-        document.getElementById('search-bar-form').style.display='block';
-      </script>
+      <script>document.getElementById('lunr-search').disabled = false;</script>
     % endif
 
     <h1>Index</h1>

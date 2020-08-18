@@ -26,7 +26,7 @@
       margin-bottom: 2cm;
     }
 
-  .search-input {
+  #lunr-search {
     width: 100%;
     font-size: 1em;
     padding: 6px 9px 5px 9px;

@@ -31,10 +31,8 @@
 </article>
 
 <nav id="sidebar">
-  <form id="search-bar-form" method="GET">
-    <div class="search-nav-container">
-      <input type="text" id="search-box" class="search-input" name="q" placeholder="Search the docs...">
-    </div>
+  <form>
+      <input id="lunr-search" class="search-input" name="q" placeholder="Search ...">
   </form>
   <h1><a href="${module.url().split('/')[-1]}">Back to index</a></h1>
 </nav>
@@ -53,7 +51,7 @@
 const RESULT_CONTENT_CHARS_LIMIT = 180
 var searchStatus = document.getElementById('search-status');
 var searchResults = document.getElementById('search-results');
-var searchInput = document.getElementById('search-box');
+var searchInput = document.getElementById('lunr-search');
 var idx = null;
 var query = new URLSearchParams(window.location.search).get('q');
 searchInput.value = query
@@ -128,7 +126,7 @@ function _search(query) {
                             end = docstring.slice(positions[0] + positions[1], docstring.length);
                         };
 
-                        var liContent = '<div class="content">' + start + '<mark>' + match + '</mark>' + end + '</div>';
+                        var liContent = '<div>' + start + '<mark>' + match + '</mark>' + end + '</div>';
 
                         var li = document.createElement('li');
                         li.innerHTML = liLink + liContent;
