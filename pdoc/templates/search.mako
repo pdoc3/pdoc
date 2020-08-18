@@ -48,7 +48,7 @@
 </footer>
 
 <script src="index.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.8/lunr.js" integrity="sha256-JZUIb2pF9vF82f9JemSl6XISUBX4tvjrprJM21J63G8=" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.8/lunr.min.js" integrity="sha512-HiJdkRySzXhiUcX2VweXaiy8yeY212ep/j51zR/z5IPCX4ZUOxaf6naJ/0dQL/2l+ZL+B9in/u4nT8QJZ/3mig==" crossorigin></script>
 <script>
 const RESULT_CONTENT_CHARS_LIMIT = 180
 var searchStatus = document.getElementById('search-status');
