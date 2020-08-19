@@ -90,10 +90,11 @@ function _search(query) {
         return null;
     };
 
-    var fuzziness = ${lunr_search.get('fuzziness', 1)};
-    if (fuzziness != 0) {
-        query += "~" + fuzziness;
-    };
+    const fuzziness = ${int(lunr_search.get('fuzziness', 1))};
+    if (fuzziness) {
+        query = query.split(/\s+/)
+                .map(str => str.includes('~') ? str : str + '~' + fuzziness).join(' ');
+    }
         
     var results = idx.search(query);
 
