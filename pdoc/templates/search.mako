@@ -37,7 +37,6 @@
   <h1><a href="${module.url().split('/')[-1]}">Back to index</a></h1>
 </nav>
 </main>
-</body>
 
 <footer id="footer">
     <%include file="credits.mako"/>
@@ -141,3 +140,4 @@ function _search(query) {
     };
 };
 </script>
+</body>
