@@ -297,7 +297,7 @@
 
     % if lunr_search is not None:
       <form action="${'../' * (module.url().count('/') - 1)}search.html">
-          <input id="lunr-search" name="q" placeholder="Search ..." disabled>
+          <input id="lunr-search" name="q" placeholder="Search ..." aria-label="Search" disabled>
       </form>
       <script>document.getElementById('lunr-search').disabled = false;</script>
     % endif
