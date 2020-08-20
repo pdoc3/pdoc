@@ -26,16 +26,14 @@
       margin-bottom: 2cm;
     }
 
+  % if lunr_search:
   #lunr-search {
     width: 100%;
     font-size: 1em;
     padding: 6px 9px 5px 9px;
     border: 1px solid silver;
   }
-
-  #search-results li {
-    padding: 10px 0;
-  }
+  % endif
 
   .http-server-breadcrumbs {
     font-size: 130%;
