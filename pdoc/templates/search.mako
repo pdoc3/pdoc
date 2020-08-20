@@ -45,7 +45,7 @@
     'use strict';
 
     const lunr_index = build_index();
-    search(new URL(window.location).searchParams.get('q'));
+    search(decodeURIComponent(new URL(window.location).hash.substring(1)));
 
     function set_status(message) {
         document.getElementById('search-status').innerHTML = message;
