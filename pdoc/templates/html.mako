@@ -295,7 +295,7 @@
         </div>
     % endif
 
-    % if lunr_search:
+    % if lunr_search is not None:
       <%include file="_lunr_search.inc.mako"/>
     % endif
 

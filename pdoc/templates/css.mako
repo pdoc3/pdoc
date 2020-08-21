@@ -26,7 +26,7 @@
       margin-bottom: 2cm;
     }
 
-  % if lunr_search:
+  % if lunr_search is not None:
   #lunr-search {
     width: 100%;
     font-size: 1em;

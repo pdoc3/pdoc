@@ -401,7 +401,7 @@ def _generate_lunr_search(top_module: pdoc.Module,
         urls.append(url)
 
         index.append({
-            'ref': module.refname,
+            'ref': module.name,
             'doc': trim_docstring(module.docstring),
             'url': url_id,
         })
@@ -412,7 +412,7 @@ def _generate_lunr_search(top_module: pdoc.Module,
                 module.functions(),
         ):
             index.append({
-                'ref': dobj.refname,
+                'ref': dobj.name,
                 'doc': trim_docstring(dobj.docstring),
                 'url': url_id,
             })
