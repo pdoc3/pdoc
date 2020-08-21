@@ -398,7 +398,7 @@ def _generate_lunr_search(top_module: pdoc.Module,
     def add_to_index(dobj):
         info = {
             'ref': dobj.refname,
-            'url': len(urls),
+            'url': len(urls) - 1,
         }
 
         if index_docstrings:
