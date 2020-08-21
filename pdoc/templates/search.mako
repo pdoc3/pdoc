@@ -48,7 +48,7 @@
     search(decodeURIComponent(new URL(window.location).hash.substring(1)));
 
     function set_status(message) {
-        document.getElementById('search-status').innerHTML = message;
+        document.getElementById('search-status').textContent = message;
     }
 
     async function build_index() {
@@ -77,6 +77,8 @@
     }
 
     async function _search(query) {
+        const input_query = query;
+
         if (!query) {
             set_status('No query provided, so there is nothing to search.');
             return;
@@ -93,8 +95,9 @@
             set_status('No results match your query.');
             return;
         }
+        const plural = results.length != 1 ? 'results' : 'result';
+        set_status('Search for "'+ input_query +'" yielded ' + results.length + ' ' + plural+ ':');
 
-        set_status('Search for "' + query + '" yielded ' + results.length + ' result(s):');
         results.forEach(function (result) {
             const dobj = INDEX[parseInt(result.ref)];
             const docstring = dobj.doc;
