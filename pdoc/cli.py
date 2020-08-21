@@ -393,31 +393,41 @@ def _generate_lunr_search(top_module: pdoc.Module,
     # Generate index.js for search
     index = []
     urls = []  # type: List[str]
+
+    def add_to_index(dobj):
+        info = {
+            'ref': dobj.refname,
+            'doc': trim_docstring(dobj.docstring),
+            'url': len(urls),
+        }
+
+        if isinstance(dobj, pdoc.Function):
+            info['func'] = 1
+
+        index.append(info)
+
     for module in modules:
         url = module.url()
         if top_module.is_package:  # Reference from subfolder if its a package
             _, url = url.split('/', maxsplit=1)
-        url_id = len(urls)
         urls.append(url)
 
-        index.append({
-            'ref': module.name,
-            'doc': trim_docstring(module.docstring),
-            'url': url_id,
-        })
+        add_to_index(module)
+
+        for cls in module.classes():
+            add_to_index(cls)
+
+            for dobj in chain(
+                cls.methods(),
+                cls.functions(),
+            ):
+                add_to_index(dobj)
 
         for dobj in chain(
                 module.variables(),
-                module.classes(),
                 module.functions(),
         ):
-            index.append({
-                'ref': dobj.name,
-                'doc': trim_docstring(dobj.docstring),
-                'url': url_id,
-            })
-            if isinstance(dobj, pdoc.Function):
-                index[-1]['func'] = 1
+            add_to_index(dobj)
 
     # If top module is a package, output the index in its subfolder, else, in the output dir
     main_path = path.join(args.output_dir,
