@@ -103,27 +103,30 @@
             const docstring = dobj.doc;
             const url = URLS[dobj.url] + '#' + dobj.ref;
             const pretty_name = dobj.ref + (dobj.func ? '()' : '');
-            let text = Object.values(result.matchData.metadata)
-                    .filter(({doc}) => doc !== undefined)
-                    .map(({doc: {position}}) => {
-                        return position.map(([start, length]) => {
-                            const PAD_CHARS = 30;
-                            const end = start + length;
-                            return [
-                                start,
-                                (start - PAD_CHARS > 0 ? '…' : '') +
-                                docstring.substring(start - PAD_CHARS, start) +
-                                '<mark>' + docstring.slice(start, end) + '</mark>' +
-                                docstring.substring(end, end + PAD_CHARS) +
-                                (end + PAD_CHARS < docstring.length ? '…' : '')
-                            ];
-                        });
-                    })
-                    .flat()
-                    .sort(([pos1,], [pos2,]) => pos1 - pos2)
-                    .map(([, text]) => text)
-                    .join('')
-                    .replace(/……/g, '…');
+            let text = '';
+            if (docstring) {
+                text = Object.values(result.matchData.metadata)
+                        .filter(({doc}) => doc !== undefined)
+                        .map(({doc: {position}}) => {
+                            return position.map(([start, length]) => {
+                                const PAD_CHARS = 30;
+                                const end = start + length;
+                                return [
+                                    start,
+                                    (start - PAD_CHARS > 0 ? '…' : '') +
+                                    docstring.substring(start - PAD_CHARS, start) +
+                                    '<mark>' + docstring.slice(start, end) + '</mark>' +
+                                    docstring.substring(end, end + PAD_CHARS) +
+                                    (end + PAD_CHARS < docstring.length ? '…' : '')
+                                ];
+                            });
+                        })
+                        .flat()
+                        .sort(([pos1,], [pos2,]) => pos1 - pos2)
+                        .map(([, text]) => text)
+                        .join('')
+                        .replace(/……/g, '…');
+            };
 
             if (text)
                 text = '<div>' + text + '</div>';

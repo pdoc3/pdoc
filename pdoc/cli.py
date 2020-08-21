@@ -391,15 +391,18 @@ def _generate_lunr_search(top_module: pdoc.Module,
         ''', ' ', docstring, flags=re.VERBOSE | re.MULTILINE)
 
     # Generate index.js for search
+    index_docstrings = pdoc._get_config(**template_config)['lunr_search'].get('docstrings', True)
     index = []
     urls = []  # type: List[str]
 
     def add_to_index(dobj):
         info = {
             'ref': dobj.refname,
-            'doc': trim_docstring(dobj.docstring),
             'url': len(urls),
         }
+
+        if index_docstrings:
+            info['doc'] = trim_docstring(dobj.docstring)
 
         if isinstance(dobj, pdoc.Function):
             info['func'] = 1
