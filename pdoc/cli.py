@@ -377,60 +377,58 @@ def _warn_deprecated(option, alternative='', use_config_mako=False):
     warn(msg, DeprecationWarning, stacklevel=2)
 
 
+def _trim_docstring(docstring):
+    return re.sub(r'''
+        \s+|                   # whitespace sequences
+        \s+[-=~]{3,}\s+|       # title underlines
+        ^[ \t]*[`~]{3,}\w*$|   # code blocks
+        \s*[`#*]+\s*|          # common markdown chars
+        \s*([^\w\d_>])\1\s*|   # sequences of punct of the same kind
+        \s*</?\w*[^>]*>\s*     # simple HTML tags
+    ''', ' ', docstring, flags=re.VERBOSE | re.MULTILINE)
+
+
+def _recursive_add_to_index(dobj, url_id, docstrings):
+    index = []
+
+    info = {
+        'ref': dobj.refname,
+        'url': url_id,
+    }
+
+    if docstrings:
+        info['doc'] = _trim_docstring(dobj.docstring)
+
+    if isinstance(dobj, pdoc.Function):
+        info['func'] = 1
+
+    index.append(info)
+
+    for member_dobj in getattr(dobj, 'doc', {}).values():
+        if not isinstance(member_dobj, pdoc.Module):
+            sub_index = _recursive_add_to_index(member_dobj, url_id, docstrings)
+            index.extend(sub_index)
+
+    return index
+
+
 def _generate_lunr_search(top_module: pdoc.Module,
                           modules: List[pdoc.Module],
+                          docstrings: bool,
                           template_config: dict):
-    def trim_docstring(docstring):
-        return re.sub(r'''
-            \s+|                   # whitespace sequences
-            \s+[-=~]{3,}\s+|       # title underlines
-            ^[ \t]*[`~]{3,}\w*$|   # code blocks
-            \s*[`#*]+\s*|          # common markdown chars
-            \s*([^\w\d_>])\1\s*|   # sequences of punct of the same kind
-            \s*</?\w*[^>]*>\s*     # simple HTML tags
-        ''', ' ', docstring, flags=re.VERBOSE | re.MULTILINE)
-
     # Generate index.js for search
-    index_docstrings = pdoc._get_config(**template_config)['lunr_search'].get('docstrings', True)
     index = []
-    urls = []  # type: List[str]
-
-    def add_to_index(dobj):
-        info = {
-            'ref': dobj.refname,
-            'url': len(urls) - 1,
-        }
-
-        if index_docstrings:
-            info['doc'] = trim_docstring(dobj.docstring)
-
-        if isinstance(dobj, pdoc.Function):
-            info['func'] = 1
-
-        index.append(info)
+    urls = []
 
     for module in modules:
         url = module.url()
         if top_module.is_package:  # Reference from subfolder if its a package
             _, url = url.split('/', maxsplit=1)
         urls.append(url)
+        url_id = len(urls) - 1
 
-        add_to_index(module)
-
-        for cls in module.classes():
-            add_to_index(cls)
-
-            for dobj in chain(
-                cls.methods(),
-                cls.functions(),
-            ):
-                add_to_index(dobj)
-
-        for dobj in chain(
-                module.variables(),
-                module.functions(),
-        ):
-            add_to_index(dobj)
+        sub_index = _recursive_add_to_index(module, url_id, docstrings)
+        index.extend(sub_index)
 
     # If top module is a package, output the index in its subfolder, else, in the output dir
     main_path = path.join(args.output_dir,
@@ -582,16 +580,16 @@ or similar, at your own discretion.""",
               file=sys.stderr)
         sys.exit(0)
 
-    enable_lunr_search = (args.html and
-                          pdoc._get_config(**template_config).get('lunr_search') is not None)
+    pdoc_config = pdoc._get_config(**template_config)
 
     for module in modules:
         if args.html:
             _quit_if_exists(module, ext='.html')
             modules = recursive_write_files(module, ext='.html', **template_config)
 
-            if enable_lunr_search:
-                _generate_lunr_search(module, modules, template_config)
+            if pdoc_config.get('lunr_search') is not None:
+                _generate_lunr_search(module, modules, pdoc_config.get("docstrings"),
+                                      template_config)
 
         elif args.output_dir:  # Generate text files
             _quit_if_exists(module, ext='.md')
