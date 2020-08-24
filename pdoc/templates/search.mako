@@ -72,7 +72,7 @@
     function search(query) {
         _search(query).catch(err => {
             set_status("Something went wrong. See development console for details.");
-            throw err
+            throw err;
         });
     }
 
