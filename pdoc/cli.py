@@ -579,15 +579,15 @@ or similar, at your own discretion.""",
               file=sys.stderr)
         sys.exit(0)
 
-    pdoc_config = pdoc._get_config(**template_config)
+    lunr_config = pdoc._get_config(**template_config).get('lunr_search')
 
     for module in modules:
         if args.html:
             _quit_if_exists(module, ext='.html')
             modules = recursive_write_files(module, ext='.html', **template_config)
 
-            if pdoc_config.get('lunr_search') is not None:
-                _generate_lunr_search(module, modules, pdoc_config.get("docstrings"),
+            if lunr_config is not None:
+                _generate_lunr_search(module, modules, lunr_config.get("docstrings", True),
                                       template_config)
 
         elif args.output_dir:  # Generate text files
