@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.8.4" />
+<meta name="generator" content="pdoc 0.8.5" />
 <title>pdoc.cli API documentation</title>
 <meta name="description" content="pdoc&#39;s CLI interface and helper functions." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/50473fe2233847077e37129f07ab87be0d6dbc5d/pdoc/cli.py#L0-L511" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/cf084313bdfa6c9fa24a0f28893a77b3209a8816/pdoc/cli.py#L0-L521" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">#!/usr/bin/env python3
 &#34;&#34;&#34;pdoc&#39;s CLI interface and helper functions.&#34;&#34;&#34;
@@ -460,8 +460,18 @@ def main(_args=None):
     except KeyError:
         pass  # pdoc was not invoked while in a virtual environment
     else:
+        from glob import glob
         from distutils.sysconfig import get_python_lib
-        sys.path.append(get_python_lib(prefix=venv_dir))
+        libdir = get_python_lib(prefix=venv_dir)
+        sys.path.append(libdir)
+        # Resolve egg-links from `setup.py develop` or `pip install -e`
+        # XXX: Welcome a more canonical approach
+        for pth in glob(path.join(libdir, &#39;*.egg-link&#39;)):
+            try:
+                with open(pth) as f:
+                    sys.path.append(path.join(libdir, f.readline().rstrip()))
+            except IOError:
+                warn(&#39;Invalid egg-link in venv: {!r}&#39;.format(pth))
 
     if args.http:
         template_config[&#39;link_prefix&#39;] = &#34;/&#34;
@@ -507,10 +517,10 @@ PDF-ready markdown written to standard output.
                               ^^^^^^^^^^^^^^^
 Convert this file to PDF using e.g. Pandoc:
 
-    pandoc --metadata=title:&#34;MyProject Documentation&#34;             \\
-           --toc --toc-depth=4 --from=markdown+abbreviations      \\
-           --pdf-engine=xelatex --variable=mainfont:&#34;DejaVu Sans&#34; \\
-           --output=pdf.pdf pdf.md
+    pandoc --metadata=title:&#34;MyProject Documentation&#34;               \\
+           --from=markdown+abbreviations+tex_math_single_backslash  \\
+           --pdf-engine=xelatex --variable=mainfont:&#34;DejaVu Sans&#34;   \\
+           --toc --toc-depth=4 --output=pdf.pdf  pdf.md
 
 or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
@@ -566,7 +576,7 @@ if __name__ == &#34;__main__&#34;:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/50473fe2233847077e37129f07ab87be0d6dbc5d/pdoc/cli.py#L365-L508" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/cf084313bdfa6c9fa24a0f28893a77b3209a8816/pdoc/cli.py#L365-L518" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def main(_args=None):
     &#34;&#34;&#34; Command-line entry point &#34;&#34;&#34;
@@ -627,8 +637,18 @@ if __name__ == &#34;__main__&#34;:
     except KeyError:
         pass  # pdoc was not invoked while in a virtual environment
     else:
+        from glob import glob
         from distutils.sysconfig import get_python_lib
-        sys.path.append(get_python_lib(prefix=venv_dir))
+        libdir = get_python_lib(prefix=venv_dir)
+        sys.path.append(libdir)
+        # Resolve egg-links from `setup.py develop` or `pip install -e`
+        # XXX: Welcome a more canonical approach
+        for pth in glob(path.join(libdir, &#39;*.egg-link&#39;)):
+            try:
+                with open(pth) as f:
+                    sys.path.append(path.join(libdir, f.readline().rstrip()))
+            except IOError:
+                warn(&#39;Invalid egg-link in venv: {!r}&#39;.format(pth))
 
     if args.http:
         template_config[&#39;link_prefix&#39;] = &#34;/&#34;
@@ -674,10 +694,10 @@ PDF-ready markdown written to standard output.
                               ^^^^^^^^^^^^^^^
 Convert this file to PDF using e.g. Pandoc:
 
-    pandoc --metadata=title:&#34;MyProject Documentation&#34;             \\
-           --toc --toc-depth=4 --from=markdown+abbreviations      \\
-           --pdf-engine=xelatex --variable=mainfont:&#34;DejaVu Sans&#34; \\
-           --output=pdf.pdf pdf.md
+    pandoc --metadata=title:&#34;MyProject Documentation&#34;               \\
+           --from=markdown+abbreviations+tex_math_single_backslash  \\
+           --pdf-engine=xelatex --variable=mainfont:&#34;DejaVu Sans&#34;   \\
+           --toc --toc-depth=4 --output=pdf.pdf  pdf.md
 
 or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
@@ -722,7 +742,7 @@ or similar, at your own discretion.&#34;&#34;&#34;,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/50473fe2233847077e37129f07ab87be0d6dbc5d/pdoc/cli.py#L298-L299" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/cf084313bdfa6c9fa24a0f28893a77b3209a8816/pdoc/cli.py#L298-L299" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def module_path(m: pdoc.Module, ext: str):
     return path.join(args.output_dir, *re.sub(r&#39;\.html$&#39;, ext, m.url()).split(&#39;/&#39;))</code></pre>
@@ -736,7 +756,7 @@ or similar, at your own discretion.&#34;&#34;&#34;,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/50473fe2233847077e37129f07ab87be0d6dbc5d/pdoc/cli.py#L317-L340" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/cf084313bdfa6c9fa24a0f28893a77b3209a8816/pdoc/cli.py#L317-L340" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def recursive_write_files(m: pdoc.Module, ext: str, **kwargs):
     assert ext in (&#39;.html&#39;, &#39;.md&#39;)
@@ -801,7 +821,7 @@ data-gaCategoryParameter="pdoc.cli">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.4</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.5</a>.</p>
 </footer>
 <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-43663477-5','auto');ga('require','cleanUrlTracker',{indexFilename:'index.html',trailingSlash:'add'});ga('require','outboundLinkTracker',{events:['click','auxclick','contextmenu']});ga('require','maxScrollTracker');ga('require','pageVisibilityTracker');ga('send','pageview');setTimeout(function(){ga('send','event','pageview','view')},15000);</script><script async src='https://www.google-analytics.com/analytics.js'></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js'></script></body>
 </html>
