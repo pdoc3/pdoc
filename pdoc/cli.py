@@ -413,7 +413,7 @@ def _recursive_add_to_index(dobj, url_id, docstrings):
 
 def _generate_lunr_search(top_module: pdoc.Module,
                           modules: List[pdoc.Module],
-                          docstrings: bool,
+                          index_docstrings: bool,
                           template_config: dict):
     # Generate index.js for search
     index = []
@@ -426,7 +426,7 @@ def _generate_lunr_search(top_module: pdoc.Module,
         urls.append(url)
         url_id = len(urls) - 1
 
-        sub_index = _recursive_add_to_index(module, url_id, docstrings)
+        sub_index = _recursive_add_to_index(module, url_id, index_docstrings)
         index.extend(sub_index)
 
     # If top module is a package, output the index in its subfolder, else, in the output dir
@@ -587,7 +587,8 @@ or similar, at your own discretion.""",
             modules = recursive_write_files(module, ext='.html', **template_config)
 
             if lunr_config is not None:
-                _generate_lunr_search(module, modules, lunr_config.get("docstrings", True),
+                _generate_lunr_search(module, modules,
+                                      lunr_config.get("index_docstrings", True),
                                       template_config)
 
         elif args.output_dir:  # Generate text files

@@ -56,7 +56,7 @@
     # Docstrings: 
     # Whether to generate index for the docstrings. Defaults to 'True'.
     #
-    #lunr_search = {'fuzziness': 1, 'docstrings': True}
+    #lunr_search = {'fuzziness': 1, 'index_docstrings': True}
     lunr_search = None
 
     # If set, render LaTeX math syntax within \(...\) (inline equations),
