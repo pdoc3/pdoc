@@ -48,14 +48,10 @@
     #google_search_query = 'inurl:github.com/USER/PROJECT  site:PROJECT.github.io  site:PROJECT.website'
     google_search_query = ''
 
-    # Enable offline search using Lunr.js. This is a dict with all the posible config there.
-    #
-    # Fuzziness:
-    # https://lunrjs.com/guides/searching.html#fuzzy-matches. Defaults to '1'.
-    #
-    # Docstrings: 
-    # Whether to generate index for the docstrings. Defaults to 'True'.
-    #
+    # Enable offline search using Lunr.js. For explanation of 'fuzziness' parameter, which is
+    # added to every query word, see: https://lunrjs.com/guides/searching.html#fuzzy-matches
+    # If 'index_docstrings' is False, a shorter index is built, indexing only
+    # the full object reference names.
     #lunr_search = {'fuzziness': 1, 'index_docstrings': True}
     lunr_search = None
 
