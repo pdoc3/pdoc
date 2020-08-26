@@ -14,7 +14,7 @@ import warnings
 from contextlib import contextmanager
 from functools import lru_cache
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from typing import Sequence
+from typing import Dict, List, Sequence
 from warnings import warn
 
 import pdoc
@@ -408,8 +408,8 @@ def _generate_lunr_search(top_module: pdoc.Module,
             url_cache[url] = len(url_cache)
         return url_cache[url]
 
-    index = []
-    url_cache = {}
+    index = []  # type: List[Dict]
+    url_cache = {}  # type: Dict[str, int]
     recursive_add_to_index(top_module)
     urls = [i[0] for i in sorted(url_cache.items(), key=lambda i: i[1])]
 
