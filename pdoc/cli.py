@@ -434,9 +434,9 @@ def _generate_lunr_search(top_module: pdoc.Module,
                           *top_module.name.split('.') if top_module.is_package else '')
     with _open_write_file(path.join(main_path, 'index.js')) as f:
         f.write("URLS=")
-        json.dump(urls, f)
-        f.write(";INDEX=")
-        json.dump(index, f)
+        json.dump(urls, f, indent=0, separators=(',', ':'))
+        f.write(";\nINDEX=")
+        json.dump(index, f, indent=0, separators=(',', ':'))
 
     # Generate search.html
     with _open_write_file(path.join(main_path, 'search.html')) as f:
