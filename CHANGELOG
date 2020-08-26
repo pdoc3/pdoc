@@ -1,3 +1,8 @@
+0.8.5  (2020-08-27)
+=====
+  - Fix installation issue on non-UTF-8 platforms.
+  - Fix working with 'develop' installations in virtual environments.
+
 0.8.4  (2020-06-30)
 =====
   - Fix inline code interpretation inside fenced code blocks.
