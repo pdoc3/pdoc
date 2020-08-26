@@ -12,8 +12,9 @@ import re
 import sys
 import warnings
 from contextlib import contextmanager
+from functools import lru_cache
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from typing import List, Sequence
+from typing import Sequence
 from warnings import warn
 
 import pdoc
@@ -330,11 +331,9 @@ def _open_write_file(filename):
         raise
 
 
-def recursive_write_files(m: pdoc.Module, ext: str, **kwargs) -> list:
+def recursive_write_files(m: pdoc.Module, ext: str, **kwargs):
     assert ext in ('.html', '.md')
-
     filepath = module_path(m, ext=ext)
-    written_files = []
 
     dirpath = path.dirname(filepath)
     if not os.access(dirpath, os.R_OK):
@@ -345,13 +344,9 @@ def recursive_write_files(m: pdoc.Module, ext: str, **kwargs) -> list:
             f.write(m.html(**kwargs))
         elif ext == '.md':
             f.write(m.text(**kwargs))
-    written_files.append(m)
 
     for submodule in m.submodules():
-        submodule_files = recursive_write_files(submodule, ext=ext, **kwargs)
-        written_files.extend(submodule_files)
-
-    return written_files
+        recursive_write_files(submodule, ext=ext, **kwargs)
 
 
 def _flatten_submodules(modules: Sequence[pdoc.Module]):
@@ -377,7 +372,6 @@ def _warn_deprecated(option, alternative='', use_config_mako=False):
 
 
 def _generate_lunr_search(top_module: pdoc.Module,
-                          modules: List[pdoc.Module],
                           index_docstrings: bool,
                           template_config: dict):
     """Generate index.js for search"""
@@ -395,7 +389,7 @@ def _generate_lunr_search(top_module: pdoc.Module,
     def recursive_add_to_index(dobj):
         info = {
             'ref': dobj.refname,
-            'url': url_id,
+            'url': to_url_id(dobj.module),
         }
         if index_docstrings:
             info['doc'] = trim_docstring(dobj.docstring)
@@ -403,18 +397,21 @@ def _generate_lunr_search(top_module: pdoc.Module,
             info['func'] = 1
         index.append(info)
         for member_dobj in getattr(dobj, 'doc', {}).values():
-            if not isinstance(member_dobj, pdoc.Module):
-                recursive_add_to_index(member_dobj)
+            recursive_add_to_index(member_dobj)
 
-    index = []
-    urls = []
-    for module in modules:
+    @lru_cache()
+    def to_url_id(module):
         url = module.url()
         if top_module.is_package:  # Reference from subfolder if its a package
             _, url = url.split('/', maxsplit=1)
-        urls.append(url)
-        url_id = len(urls) - 1
-        recursive_add_to_index(module)
+        if url not in url_cache:
+            url_cache[url] = len(url_cache)
+        return url_cache[url]
+
+    index = []
+    url_cache = {}
+    recursive_add_to_index(top_module)
+    urls = [i[0] for i in sorted(url_cache.items(), key=lambda i: i[1])]
 
     # If top module is a package, output the index in its subfolder, else, in the output dir
     main_path = path.join(args.output_dir,
@@ -571,12 +568,11 @@ or similar, at your own discretion.""",
     for module in modules:
         if args.html:
             _quit_if_exists(module, ext='.html')
-            modules = recursive_write_files(module, ext='.html', **template_config)
+            recursive_write_files(module, ext='.html', **template_config)
 
             if lunr_config is not None:
-                _generate_lunr_search(module, modules,
-                                      lunr_config.get("index_docstrings", True),
-                                      template_config)
+                _generate_lunr_search(
+                    module, lunr_config.get("index_docstrings", True), template_config)
 
         elif args.output_dir:  # Generate text files
             _quit_if_exists(module, ext='.md')
