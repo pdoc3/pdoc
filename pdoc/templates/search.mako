@@ -77,8 +77,6 @@
     }
 
     async function _search(query) {
-        const input_query = query;
-
         if (!query) {
             set_status('No query provided, so there is nothing to search.');
             return;
@@ -95,8 +93,10 @@
             set_status('No results match your query.');
             return;
         }
-        const plural = results.length != 1 ? 'results' : 'result';
-        set_status('Search for "'+ input_query +'" yielded ' + results.length + ' ' + plural+ ':');
+
+        set_status(
+            'Search for "' + encodeURIComponent(query) + '" yielded ' + results.length + ' ' +
+            (results.length === 1 ? 'result' : 'results') + ':');
 
         results.forEach(function (result) {
             const dobj = INDEX[parseInt(result.ref)];
