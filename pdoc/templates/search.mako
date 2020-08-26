@@ -111,7 +111,7 @@
                             return position.map(([start, length]) => {
                                 const PAD_CHARS = 30;
                                 const end = start + length;
-                                // TODO: merge overlapping matches
+                                ## TODO: merge overlapping matches
                                 return [
                                     start,
                                     (start - PAD_CHARS > 0 ? '…' : '') +

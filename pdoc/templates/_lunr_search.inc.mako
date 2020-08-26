@@ -30,7 +30,7 @@
         search(input.value);
     });
 
-    // On page load
+    ## On page load
     const query = new URL(window.location).searchParams.get('q');
     if (query)
         search(query);
