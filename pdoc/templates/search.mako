@@ -127,7 +127,7 @@
                         .map(([, text]) => text)
                         .join('')
                         .replace(/……/g, '…');
-            };
+            }
 
             if (text)
                 text = '<div>' + text + '</div>';
