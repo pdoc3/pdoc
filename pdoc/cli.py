@@ -376,58 +376,45 @@ def _warn_deprecated(option, alternative='', use_config_mako=False):
     warn(msg, DeprecationWarning, stacklevel=2)
 
 
-def _trim_docstring(docstring):
-    return re.sub(r'''
-        \s+|                   # whitespace sequences
-        \s+[-=~]{3,}\s+|       # title underlines
-        ^[ \t]*[`~]{3,}\w*$|   # code blocks
-        \s*[`#*]+\s*|          # common markdown chars
-        \s*([^\w\d_>])\1\s*|   # sequences of punct of the same kind
-        \s*</?\w*[^>]*>\s*     # simple HTML tags
-    ''', ' ', docstring, flags=re.VERBOSE | re.MULTILINE)
-
-
-def _recursive_add_to_index(dobj, url_id, docstrings):
-    index = []
-
-    info = {
-        'ref': dobj.refname,
-        'url': url_id,
-    }
-
-    if docstrings:
-        info['doc'] = _trim_docstring(dobj.docstring)
-
-    if isinstance(dobj, pdoc.Function):
-        info['func'] = 1
-
-    index.append(info)
-
-    for member_dobj in getattr(dobj, 'doc', {}).values():
-        if not isinstance(member_dobj, pdoc.Module):
-            sub_index = _recursive_add_to_index(member_dobj, url_id, docstrings)
-            index.extend(sub_index)
-
-    return index
-
-
 def _generate_lunr_search(top_module: pdoc.Module,
                           modules: List[pdoc.Module],
                           index_docstrings: bool,
                           template_config: dict):
-    # Generate index.js for search
+    """Generate index.js for search"""
+
+    def trim_docstring(docstring):
+        return re.sub(r'''
+            \s+|                   # whitespace sequences
+            \s+[-=~]{3,}\s+|       # title underlines
+            ^[ \t]*[`~]{3,}\w*$|   # code blocks
+            \s*[`#*]+\s*|          # common markdown chars
+            \s*([^\w\d_>])\1\s*|   # sequences of punct of the same kind
+            \s*</?\w*[^>]*>\s*     # simple HTML tags
+        ''', ' ', docstring, flags=re.VERBOSE | re.MULTILINE)
+
+    def recursive_add_to_index(dobj):
+        info = {
+            'ref': dobj.refname,
+            'url': url_id,
+        }
+        if index_docstrings:
+            info['doc'] = trim_docstring(dobj.docstring)
+        if isinstance(dobj, pdoc.Function):
+            info['func'] = 1
+        index.append(info)
+        for member_dobj in getattr(dobj, 'doc', {}).values():
+            if not isinstance(member_dobj, pdoc.Module):
+                recursive_add_to_index(member_dobj)
+
     index = []
     urls = []
-
     for module in modules:
         url = module.url()
         if top_module.is_package:  # Reference from subfolder if its a package
             _, url = url.split('/', maxsplit=1)
         urls.append(url)
         url_id = len(urls) - 1
-
-        sub_index = _recursive_add_to_index(module, url_id, index_docstrings)
-        index.extend(sub_index)
+        recursive_add_to_index(module)
 
     # If top module is a package, output the index in its subfolder, else, in the output dir
     main_path = path.join(args.output_dir,
