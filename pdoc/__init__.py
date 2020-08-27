@@ -100,11 +100,7 @@ def reset():
                 method.cache_clear()
 
 
-def _render_template(template_name, **kwargs):
-    """
-    Returns the Mako template with the given name.  If the template
-    cannot be found, a nicer error message is displayed.
-    """
+def _get_config(**kwargs):
     # Apply config.mako configuration
     MAKO_INTERNALS = Template('').module.__dict__.keys()
     DEFAULT_CONFIG = path.join(path.dirname(__file__), 'templates', 'config.mako')
@@ -114,13 +110,31 @@ def _render_template(template_name, **kwargs):
         config.update((var, getattr(config_module, var, None))
                       for var in config_module.__dict__
                       if var not in MAKO_INTERNALS)
+
     known_keys = (set(config)
                   | {'docformat'}  # Feature. https://github.com/pdoc3/pdoc/issues/169
-                  | {'module', 'modules', 'http_server', 'external_links'})  # deprecated
+                  # deprecated
+                  | {'module', 'modules', 'http_server', 'external_links', 'search_query'})
     invalid_keys = {k: v for k, v in kwargs.items() if k not in known_keys}
     if invalid_keys:
         warn('Unknown configuration variables (not in config.mako): {}'.format(invalid_keys))
     config.update(kwargs)
+
+    if 'search_query' in config:
+        warn('Option `search_query` has been depricated, use `google_search_query` instead',
+             DeprecationWarning, stacklevel=2)
+        config['google_search_query'] = config['search_query']
+        del config['search_query']
+
+    return config
+
+
+def _render_template(template_name, **kwargs):
+    """
+    Returns the Mako template with the given name.  If the template
+    cannot be found, a nicer error message is displayed.
+    """
+    config = _get_config(**kwargs)
 
     try:
         t = tpl_lookup.get_template(template_name)

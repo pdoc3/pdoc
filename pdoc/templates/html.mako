@@ -288,11 +288,15 @@
 
     <%include file="logo.mako"/>
 
-    % if search_query:
+    % if google_search_query:
         <div class="gcse-search" style="height: 70px"
-             data-as_oq="${' '.join(search_query.strip().split()) | h }"
+             data-as_oq="${' '.join(google_search_query.strip().split()) | h }"
              data-gaCategoryParameter="${module.refname | h}">
         </div>
+    % endif
+
+    % if lunr_search is not None:
+      <%include file="_lunr_search.inc.mako"/>
     % endif
 
     <h1>Index</h1>
@@ -394,7 +398,7 @@
     </script><script async src='https://www.google-analytics.com/analytics.js'></script>
   % endif
 
-  % if search_query:
+  % if google_search_query:
     <link rel="preconnect" href="https://www.google.com">
     <script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
     <style>

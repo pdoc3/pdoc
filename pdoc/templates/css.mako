@@ -26,6 +26,15 @@
       margin-bottom: 2cm;
     }
 
+  % if lunr_search is not None:
+  #lunr-search {
+    width: 100%;
+    font-size: 1em;
+    padding: 6px 9px 5px 9px;
+    border: 1px solid silver;
+  }
+  % endif
+
   .http-server-breadcrumbs {
     font-size: 130%;
     margin: 0 0 15px 0;
