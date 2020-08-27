@@ -414,14 +414,19 @@ class CliTest(unittest.TestCase):
     @unittest.skipIf(sys.version_info < (3, 6), 'variable annotation unsupported in <Py3.6')
     def test_resolve_typing_forwardrefs(self):
         # GH-245
-        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_resolve_typing_forwardrefs')),\
-                redirect_streams() as (out, err):
-            run('foo')
-        out = out.getvalue()
-        self.assertIn('bar', out)
-        self.assertIn('baz', out)
-        self.assertIn('dt', out)
-        self.assertIn('datetime', out)
+        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_resolve_typing_forwardrefs')):
+            with redirect_streams() as (out, _err):
+                run('postponed')
+            out = out.getvalue()
+            self.assertIn('bar', out)
+            self.assertIn('baz', out)
+            self.assertIn('dt', out)
+            self.assertIn('datetime', out)
+
+            with redirect_streams() as (out, _err):
+                run('evaluated')
+            out = out.getvalue()
+            self.assertIn('Set[Bar]', out)
 
 
 class ApiTest(unittest.TestCase):

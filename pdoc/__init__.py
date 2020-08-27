@@ -1261,7 +1261,12 @@ class Function(Doc):
         if annot is inspect.Parameter.empty or not annot:
             return ''
 
-        s = annot if isinstance(annot, str) else inspect.formatannotation(annot)
+        if isinstance(annot, str):
+            s = annot
+        else:
+            s = inspect.formatannotation(annot)
+            s = re.sub(r'\b(typing\.)?ForwardRef\((?P<quot>[\"\'])(?P<str>.*?)(?P=quot)\)',
+                       r'\g<str>', s)
         s = s.replace(' ', '\N{NBSP}')  # Better line breaks in html signatures
 
         if link:
