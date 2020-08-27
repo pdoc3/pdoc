@@ -1,3 +1,8 @@
+0.9.1  (2020-09-28)
+=====
+  - Fix circular imports and generally handling of typing annotations when
+    they are unresolvable (regression since 0.9.0).
+
 0.9.0  (2020-08-27)
 =====
   - New offline search function using Lunr.js (see `lunr_config` config tunable).
