@@ -883,6 +883,7 @@ class Module(Doc):
 
 
 def _getmembers_all(obj: type) -> List[Tuple[str, Any]]:
+    # The following code based on inspect.getmembers() @ 5b23f7618d43
     mro = obj.__mro__[:-1]  # Skip object
     names = set(dir(obj))
     # Add keys from bases
