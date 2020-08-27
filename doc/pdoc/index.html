@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.0" />
+<meta name="generator" content="pdoc 0.9.1" />
 <title>pdoc API documentation</title>
 <meta name="description" content="Python package `pdoc` provides types, functions, and a command-line
 interface for accessing public documentation of Python modules, and
@@ -312,7 +312,7 @@ an underscore is <a href="https://docs.python.org/3/tutorial/classes.html#privat
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L0-L1526" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L0-L1516" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 Python package `pdoc` provides types, functions, and a command-line
@@ -1219,8 +1219,8 @@ def _getmembers_all(obj: type) -&gt; List[Tuple[str, Any]]:
     # Add keys from bases
     for base in mro:
         names.update(base.__dict__.keys())
-    # Add members for which type annotations exist
-    names.update(_get_type_hints(obj).keys())
+        # Add members for which type annotations exist
+        names.update(getattr(obj, &#39;__annotations__&#39;, {}).keys())
 
     results = []
     for name in names:
@@ -1551,42 +1551,24 @@ class Function(Doc):
     def return_annotation(self, *, link=None) -&gt; str:
         &#34;&#34;&#34;Formatted function return type annotation or empty string if none.&#34;&#34;&#34;
         annot = &#39;&#39;
-        try:
-            try:
-                annot = _get_type_hints(self.obj)[&#39;return&#39;]
-            except Exception:
-                pass
-            else:
-                raise
-            try:
-                # This works mainly for non-property variables, and the rest are passed through
-                annot = _get_type_hints(cast(Class, self.cls).obj)[self.name]
-            except Exception:
-                pass
-            else:
-                raise
-            try:
+        for method in (
+                lambda: _get_type_hints(self.obj)[&#39;return&#39;],
+                # Mainly for non-property variables
+                lambda: _get_type_hints(cast(Class, self.cls).obj)[self.name],
                 # global variables
-                annot = _get_type_hints(not self.cls and self.module.obj)[self.name]
-            except Exception:
-                pass
-            else:
-                raise
-            try:
-                annot = inspect.signature(self.obj).return_annotation
-            except Exception:
-                pass
-            else:
-                raise
-            try:
+                lambda: _get_type_hints(not self.cls and self.module.obj)[self.name],
+                lambda: inspect.signature(self.obj).return_annotation,
+                # Use raw annotation strings in unmatched forward declarations
+                lambda: cast(Class, self.cls).obj.__annotations__[self.name],
                 # Extract annotation from the docstring for C builtin function
-                annot = Function._signature_from_string(self).return_annotation
+                lambda: Function._signature_from_string(self).return_annotation,
+        ):
+            try:
+                annot = method()
             except Exception:
-                pass
+                continue
             else:
-                raise
-        except RuntimeError:  # Success.
-            pass
+                break
         else:
             # Don&#39;t warn on variables. The annotation just isn&#39;t available.
             if not isinstance(self, Variable):
@@ -1594,7 +1576,15 @@ class Function(Doc):
 
         if annot is inspect.Parameter.empty or not annot:
             return &#39;&#39;
-        s = inspect.formatannotation(annot).replace(&#39; &#39;, &#39;\N{NBSP}&#39;)  # Better line breaks
+
+        if isinstance(annot, str):
+            s = annot
+        else:
+            s = inspect.formatannotation(annot)
+            s = re.sub(r&#39;\b(typing\.)?ForwardRef\((?P&lt;quot&gt;[\&#34;\&#39;])(?P&lt;str&gt;.*?)(?P=quot)\)&#39;,
+                       r&#39;\g&lt;str&gt;&#39;, s)
+        s = s.replace(&#39; &#39;, &#39;\N{NBSP}&#39;)  # Better line breaks in html signatures
+
         if link:
             from pdoc.html_helpers import _linkify
             s = re.sub(r&#39;[\w\.]+&#39;, partial(_linkify, link=link, module=self.module), s)
@@ -1887,7 +1877,7 @@ that takes a single argument (a documentation object) and returns
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L155-L168" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L155-L168" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def html(module_name, docfilter=None, reload=False, skip_errors=False, **kwargs) -&gt; str:
     &#34;&#34;&#34;
@@ -1914,7 +1904,7 @@ module path or a filesystem path to file/directory).</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L188-L224" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L188-L224" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def import_module(module: Union[str, ModuleType],
                   *, reload: bool = False) -&gt; ModuleType:
@@ -1967,7 +1957,7 @@ inherited <code><a title="pdoc.Doc.docstring" href="#pdoc.Doc.docstring">Doc.doc
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L394-L413" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L394-L413" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def link_inheritance(context: Context = None):
     &#34;&#34;&#34;
@@ -1999,7 +1989,7 @@ inherited <code><a title="pdoc.Doc.docstring" href="#pdoc.Doc.docstring">Doc.doc
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L87-L100" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L87-L100" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def reset():
     &#34;&#34;&#34;Resets the global `pdoc.Context` to the initial (empty) state.&#34;&#34;&#34;
@@ -2031,7 +2021,7 @@ that takes a single argument (a documentation object) and returns
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L171-L185" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L171-L185" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def text(module_name, docfilter=None, reload=False, skip_errors=False, **kwargs) -&gt; str:
     &#34;&#34;&#34;
@@ -2069,7 +2059,7 @@ read with <code>inspect.getdoc()</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L927-L1166" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L927-L1166" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Class(Doc):
     &#34;&#34;&#34;
@@ -2334,7 +2324,7 @@ represent this class' class variables.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1075-L1082" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1075-L1082" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def class_variables(self, include_inherited=True, sort=True) -&gt; List[&#39;Variable&#39;]:
     &#34;&#34;&#34;
@@ -2355,7 +2345,7 @@ represent this class' static functions.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1103-L1110" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1103-L1110" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def functions(self, include_inherited=True, sort=True) -&gt; List[&#39;Function&#39;]:
     &#34;&#34;&#34;
@@ -2377,7 +2367,7 @@ sorted by MRO.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1112-L1122" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1112-L1122" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def inherited_members(self) -&gt; List[Tuple[&#39;Class&#39;, List[Doc]]]:
     &#34;&#34;&#34;
@@ -2402,7 +2392,7 @@ are those defined in a class's <code>__init__</code> as <code>self.variable = ..
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1084-L1092" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1084-L1092" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def instance_variables(self, include_inherited=True, sort=True) -&gt; List[&#39;Variable&#39;]:
     &#34;&#34;&#34;
@@ -2424,7 +2414,7 @@ represent this class' methods.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1094-L1101" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1094-L1101" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def methods(self, include_inherited=True, sort=True) -&gt; List[&#39;Function&#39;]:
     &#34;&#34;&#34;
@@ -2447,7 +2437,7 @@ if the types are documented, and <code><a title="pdoc.External" href="#pdoc.Exte
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1020-L1041" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1020-L1041" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def mro(self, only_documented=False) -&gt; List[&#39;Class&#39;]:
     &#34;&#34;&#34;
@@ -2482,7 +2472,7 @@ class constructor (method <code>__init__</code>). See <code><a title="pdoc.Funct
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1054-L1066" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1054-L1066" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def params(self, *, annotate=False, link=None) -&gt; List[str]:
     &#34;&#34;&#34;
@@ -2510,7 +2500,7 @@ and <code><a title="pdoc.External" href="#pdoc.External">External</a></code> oth
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1043-L1052" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1043-L1052" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def subclasses(self) -&gt; List[&#39;Class&#39;]:
     &#34;&#34;&#34;
@@ -2556,7 +2546,7 @@ a global context object will be used.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L69-L81" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L69-L81" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Context(dict):
     &#34;&#34;&#34;
@@ -2601,7 +2591,7 @@ read with <code>inspect.getdoc()</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L416-L552" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L416-L552" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Doc:
     &#34;&#34;&#34;
@@ -2780,7 +2770,7 @@ object, used for show (e.g. <code>Doc.qualname</code>).</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L500-L506" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L500-L506" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def qualname(self) -&gt; str:
@@ -2800,7 +2790,7 @@ documentation object provides this property.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L489-L498" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L489-L498" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def refname(self) -&gt; str:
@@ -2821,7 +2811,7 @@ available, an empty string.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L476-L487" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L476-L487" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property  # type: ignore
 @lru_cache()
@@ -2854,7 +2844,7 @@ the top ancestor in the object's <code><a title="pdoc.Doc.inherits" href="#pdoc.
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L508-L537" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L508-L537" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@lru_cache()
 def url(self, relative_to: &#39;Module&#39; = None, *, link_prefix: str = &#39;&#39;,
@@ -2905,7 +2895,7 @@ should be a fully qualified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1492-L1527" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1482-L1517" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class External(Doc):
     &#34;&#34;&#34;
@@ -2958,7 +2948,7 @@ should be a fully qualified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1523-L1527" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1513-L1517" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def url(self, *args, **kwargs):
     &#34;&#34;&#34;
@@ -2999,7 +2989,7 @@ all other cases, it should be <code>False</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1169-L1446" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1169-L1436" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Function(Doc):
     &#34;&#34;&#34;
@@ -3070,42 +3060,24 @@ all other cases, it should be <code>False</code>.</p></div>
     def return_annotation(self, *, link=None) -&gt; str:
         &#34;&#34;&#34;Formatted function return type annotation or empty string if none.&#34;&#34;&#34;
         annot = &#39;&#39;
-        try:
-            try:
-                annot = _get_type_hints(self.obj)[&#39;return&#39;]
-            except Exception:
-                pass
-            else:
-                raise
-            try:
-                # This works mainly for non-property variables, and the rest are passed through
-                annot = _get_type_hints(cast(Class, self.cls).obj)[self.name]
-            except Exception:
-                pass
-            else:
-                raise
-            try:
+        for method in (
+                lambda: _get_type_hints(self.obj)[&#39;return&#39;],
+                # Mainly for non-property variables
+                lambda: _get_type_hints(cast(Class, self.cls).obj)[self.name],
                 # global variables
-                annot = _get_type_hints(not self.cls and self.module.obj)[self.name]
-            except Exception:
-                pass
-            else:
-                raise
-            try:
-                annot = inspect.signature(self.obj).return_annotation
-            except Exception:
-                pass
-            else:
-                raise
-            try:
+                lambda: _get_type_hints(not self.cls and self.module.obj)[self.name],
+                lambda: inspect.signature(self.obj).return_annotation,
+                # Use raw annotation strings in unmatched forward declarations
+                lambda: cast(Class, self.cls).obj.__annotations__[self.name],
                 # Extract annotation from the docstring for C builtin function
-                annot = Function._signature_from_string(self).return_annotation
+                lambda: Function._signature_from_string(self).return_annotation,
+        ):
+            try:
+                annot = method()
             except Exception:
-                pass
+                continue
             else:
-                raise
-        except RuntimeError:  # Success.
-            pass
+                break
         else:
             # Don&#39;t warn on variables. The annotation just isn&#39;t available.
             if not isinstance(self, Variable):
@@ -3113,7 +3085,15 @@ all other cases, it should be <code>False</code>.</p></div>
 
         if annot is inspect.Parameter.empty or not annot:
             return &#39;&#39;
-        s = inspect.formatannotation(annot).replace(&#39; &#39;, &#39;\N{NBSP}&#39;)  # Better line breaks
+
+        if isinstance(annot, str):
+            s = annot
+        else:
+            s = inspect.formatannotation(annot)
+            s = re.sub(r&#39;\b(typing\.)?ForwardRef\((?P&lt;quot&gt;[\&#34;\&#39;])(?P&lt;str&gt;.*?)(?P=quot)\)&#39;,
+                       r&#39;\g&lt;str&gt;&#39;, s)
+        s = s.replace(&#39; &#39;, &#39;\N{NBSP}&#39;)  # Better line breaks in html signatures
+
         if link:
             from pdoc.html_helpers import _linkify
             s = re.sub(r&#39;[\w\.]+&#39;, partial(_linkify, link=link, module=self.module), s)
@@ -3298,7 +3278,7 @@ If not, this is None.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1195-L1203" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1195-L1203" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def is_method(self) -&gt; bool:
@@ -3323,7 +3303,7 @@ for example <code>def</code> or <code>async def</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1213-L1218" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1213-L1218" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def funcdef(self) -&gt; str:
     &#34;&#34;&#34;
@@ -3346,7 +3326,7 @@ type hint annotations.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1287-L1299" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1277-L1289" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def params(self, *, annotate: bool = False, link: Callable[[Doc], str] = None) -&gt; List[str]:
     &#34;&#34;&#34;
@@ -3371,47 +3351,29 @@ type hint annotations.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1235-L1285" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1235-L1275" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def return_annotation(self, *, link=None) -&gt; str:
     &#34;&#34;&#34;Formatted function return type annotation or empty string if none.&#34;&#34;&#34;
     annot = &#39;&#39;
-    try:
-        try:
-            annot = _get_type_hints(self.obj)[&#39;return&#39;]
-        except Exception:
-            pass
-        else:
-            raise
-        try:
-            # This works mainly for non-property variables, and the rest are passed through
-            annot = _get_type_hints(cast(Class, self.cls).obj)[self.name]
-        except Exception:
-            pass
-        else:
-            raise
-        try:
+    for method in (
+            lambda: _get_type_hints(self.obj)[&#39;return&#39;],
+            # Mainly for non-property variables
+            lambda: _get_type_hints(cast(Class, self.cls).obj)[self.name],
             # global variables
-            annot = _get_type_hints(not self.cls and self.module.obj)[self.name]
-        except Exception:
-            pass
-        else:
-            raise
-        try:
-            annot = inspect.signature(self.obj).return_annotation
-        except Exception:
-            pass
-        else:
-            raise
-        try:
+            lambda: _get_type_hints(not self.cls and self.module.obj)[self.name],
+            lambda: inspect.signature(self.obj).return_annotation,
+            # Use raw annotation strings in unmatched forward declarations
+            lambda: cast(Class, self.cls).obj.__annotations__[self.name],
             # Extract annotation from the docstring for C builtin function
-            annot = Function._signature_from_string(self).return_annotation
+            lambda: Function._signature_from_string(self).return_annotation,
+    ):
+        try:
+            annot = method()
         except Exception:
-            pass
+            continue
         else:
-            raise
-    except RuntimeError:  # Success.
-        pass
+            break
     else:
         # Don&#39;t warn on variables. The annotation just isn&#39;t available.
         if not isinstance(self, Variable):
@@ -3419,7 +3381,15 @@ type hint annotations.</p></div>
 
     if annot is inspect.Parameter.empty or not annot:
         return &#39;&#39;
-    s = inspect.formatannotation(annot).replace(&#39; &#39;, &#39;\N{NBSP}&#39;)  # Better line breaks
+
+    if isinstance(annot, str):
+        s = annot
+    else:
+        s = inspect.formatannotation(annot)
+        s = re.sub(r&#39;\b(typing\.)?ForwardRef\((?P&lt;quot&gt;[\&#34;\&#39;])(?P&lt;str&gt;.*?)(?P=quot)\)&#39;,
+                   r&#39;\g&lt;str&gt;&#39;, s)
+    s = s.replace(&#39; &#39;, &#39;\N{NBSP}&#39;)  # Better line breaks in html signatures
+
     if link:
         from pdoc.html_helpers import _linkify
         s = re.sub(r&#39;[\w\.]+&#39;, partial(_linkify, link=link, module=self.module), s)
@@ -3464,7 +3434,7 @@ of raising an exception.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L555-L896" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L555-L896" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Module(Doc):
     &#34;&#34;&#34;
@@ -3825,7 +3795,7 @@ of raising an exception.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L818-L826" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L818-L826" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def is_namespace(self) -&gt; bool:
@@ -3845,7 +3815,7 @@ def is_namespace(self) -&gt; bool:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L809-L816" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L809-L816" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def is_package(self) -&gt; bool:
@@ -3873,7 +3843,7 @@ optionally sorted alphabetically, as a list of <code><a title="pdoc.Class" href=
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L869-L874" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L869-L874" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def classes(self, sort=True) -&gt; List[&#39;Class&#39;]:
     &#34;&#34;&#34;
@@ -3892,7 +3862,7 @@ or in any of the exported identifiers of the submodules.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L828-L836" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L828-L836" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def find_class(self, cls: type) -&gt; Doc:
     &#34;&#34;&#34;
@@ -3918,7 +3888,7 @@ returned. If one cannot be found, then an instance of
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L838-L856" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L838-L856" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def find_ident(self, name: str) -&gt; Doc:
     &#34;&#34;&#34;
@@ -3950,7 +3920,7 @@ optionally sorted alphabetically, as a list of <code><a title="pdoc.Function" hr
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L876-L881" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L876-L881" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def functions(self, sort=True) -&gt; List[&#39;Function&#39;]:
     &#34;&#34;&#34;
@@ -3972,7 +3942,7 @@ self-contained HTML.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L792-L807" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L792-L807" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def html(self, minify=True, **kwargs) -&gt; str:
     &#34;&#34;&#34;
@@ -4001,7 +3971,7 @@ alphabetically as a list of <code><a title="pdoc.Module" href="#pdoc.Module">Mod
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L883-L888" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L883-L888" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def submodules(self) -&gt; List[&#39;Module&#39;]:
     &#34;&#34;&#34;
@@ -4019,7 +3989,7 @@ alphabetically as a list of <code><a title="pdoc.Module" href="#pdoc.Module">Mod
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L785-L790" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L785-L790" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def text(self, **kwargs) -&gt; str:
     &#34;&#34;&#34;
@@ -4038,7 +4008,7 @@ optionally sorted alphabetically, as a list of <code><a title="pdoc.Variable" hr
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L862-L867" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L862-L867" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def variables(self, sort=True) -&gt; List[&#39;Variable&#39;]:
     &#34;&#34;&#34;
@@ -4079,7 +4049,7 @@ variable.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1449-L1489" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1439-L1479" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Variable(Doc):
     &#34;&#34;&#34;
@@ -4150,7 +4120,7 @@ opposed to class variable).</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/__init__.py#L1487-L1489" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/__init__.py#L1477-L1479" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def type_annotation(self, *, link=None) -&gt; str:
     &#34;&#34;&#34;Formatted variable type annotation or empty string if none.&#34;&#34;&#34;
@@ -4314,7 +4284,7 @@ data-gaCategoryParameter="pdoc">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
 </footer>
 <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-43663477-5','auto');ga('require','cleanUrlTracker',{indexFilename:'index.html',trailingSlash:'add'});ga('require','outboundLinkTracker',{events:['click','auxclick','contextmenu']});ga('require','maxScrollTracker');ga('require','pageVisibilityTracker');ga('send','pageview');setTimeout(function(){ga('send','event','pageview','view')},15000);</script><script async src='https://www.google-analytics.com/analytics.js'></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js'></script></body>
 </html>

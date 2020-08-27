@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.0" />
+<meta name="generator" content="pdoc 0.9.1" />
 <title>pdoc.html_helpers API documentation</title>
 <meta name="description" content="Helper functions for HTML output." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/html_helpers.py#L0-L638" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/html_helpers.py#L0-L638" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 Helper functions for HTML output.
@@ -693,7 +693,7 @@ def _str_template_fields(template):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/html_helpers.py#L535-L545" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/html_helpers.py#L535-L545" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def extract_toc(text: str):
     &#34;&#34;&#34;
@@ -717,7 +717,7 @@ from <code>dobj</code> and the working environment.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/html_helpers.py#L548-L566" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/html_helpers.py#L548-L566" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def format_git_link(template: str, dobj: pdoc.Doc):
     &#34;&#34;&#34;
@@ -750,7 +750,7 @@ but never longer than <code>max_length</code> characters.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/html_helpers.py#L48-L69" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/html_helpers.py#L48-L69" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def glimpse(text: str, max_length=153, *, paragraph=True,
             _split_paragraph=partial(re.compile(r&#39;\s*\n\s*\n\s*&#39;).split, maxsplit=1),
@@ -784,7 +784,7 @@ but never longer than <code>max_length</code> characters.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/html_helpers.py#L23-L31" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/html_helpers.py#L23-L31" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@lru_cache()
 def minify_css(css: str,
@@ -806,7 +806,7 @@ def minify_css(css: str,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/html_helpers.py#L34-L45" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/html_helpers.py#L34-L45" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def minify_html(html: str,
                 _minify=partial(
@@ -835,7 +835,7 @@ example template.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/html_helpers.py#L403-L425" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/html_helpers.py#L403-L425" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def to_html(text: str, *,
             docformat: str = None,
@@ -876,7 +876,7 @@ example template.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/html_helpers.py#L428-L481" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/html_helpers.py#L428-L481" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def to_markdown(text: str, *,
                 docformat: str = None,
@@ -950,7 +950,7 @@ doesn't match any documented objects.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/532d9a3ef8f5ade0fe9f3034f804534d94a539c2/pdoc/html_helpers.py#L484-L490" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/html_helpers.py#L484-L490" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class ReferenceWarning(UserWarning):
     &#34;&#34;&#34;
@@ -1014,7 +1014,7 @@ data-gaCategoryParameter="pdoc.html_helpers">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
 </footer>
 <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-43663477-5','auto');ga('require','cleanUrlTracker',{indexFilename:'index.html',trailingSlash:'add'});ga('require','outboundLinkTracker',{events:['click','auxclick','contextmenu']});ga('require','maxScrollTracker');ga('require','pageVisibilityTracker');ga('send','pageview');setTimeout(function(){ga('send','event','pageview','view')},15000);</script><script async src='https://www.google-analytics.com/analytics.js'></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js'></script></body>
 </html>
