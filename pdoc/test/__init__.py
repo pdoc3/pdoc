@@ -411,6 +411,13 @@ class CliTest(unittest.TestCase):
             run('.', skip_errors=None)
         self.assertIn('ZeroDivision', cm.warning.args[0])
 
+    @unittest.skipIf(sys.version_info < (3, 6), 'variable annotation unsupported in <Py3.6')
+    def test_resolve_typing_forwardrefs(self):
+        # GH-245
+        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_resolve_typing_forwardrefs')),\
+                redirect_streams():
+            run('foo')
+
 
 class ApiTest(unittest.TestCase):
     """

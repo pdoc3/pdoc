@@ -26,6 +26,7 @@ from typing import (
     cast, Any, Callable, Dict, Generator, Iterable, List, Mapping, Optional, Set, Tuple,
     Type, TypeVar, Union,
 )
+from unittest.mock import patch
 from warnings import warn
 
 from mako.lookup import TemplateLookup
@@ -209,7 +210,8 @@ def import_module(module: Union[str, ModuleType],
     if isinstance(module, Module):
         module = module.obj
     if isinstance(module, str):
-        with _module_path(module) as module_path:
+        with _module_path(module) as module_path, \
+                patch.object(typing, 'TYPE_CHECKING', True):
             try:
                 module = importlib.import_module(module_path)
             except Exception as e:
@@ -903,8 +905,8 @@ def _getmembers_all(obj: type) -> List[Tuple[str, Any]]:
     # Add keys from bases
     for base in mro:
         names.update(base.__dict__.keys())
-    # Add members for which type annotations exist
-    names.update(_get_type_hints(obj).keys())
+        # Add members for which type annotations exist
+        names.update(getattr(obj, '__annotations__', {}).keys())
 
     results = []
     for name in names:
