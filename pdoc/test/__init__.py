@@ -415,8 +415,13 @@ class CliTest(unittest.TestCase):
     def test_resolve_typing_forwardrefs(self):
         # GH-245
         with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_resolve_typing_forwardrefs')),\
-                redirect_streams():
+                redirect_streams() as (out, err):
             run('foo')
+        out = out.getvalue()
+        self.assertIn('bar', out)
+        self.assertIn('baz', out)
+        self.assertIn('dt', out)
+        self.assertIn('datetime', out)
 
 
 class ApiTest(unittest.TestCase):

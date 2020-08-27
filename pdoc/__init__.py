@@ -26,7 +26,6 @@ from typing import (
     cast, Any, Callable, Dict, Generator, Iterable, List, Mapping, Optional, Set, Tuple,
     Type, TypeVar, Union,
 )
-from unittest.mock import patch
 from warnings import warn
 
 from mako.lookup import TemplateLookup
@@ -210,8 +209,7 @@ def import_module(module: Union[str, ModuleType],
     if isinstance(module, Module):
         module = module.obj
     if isinstance(module, str):
-        with _module_path(module) as module_path, \
-                patch.object(typing, 'TYPE_CHECKING', True):
+        with _module_path(module) as module_path:
             try:
                 module = importlib.import_module(module_path)
             except Exception as e:
@@ -1265,6 +1263,13 @@ class Function(Doc):
             else:
                 raise
             try:
+                # Use raw annotation strings in unmatched forward declarations
+                annot = cast(Class, self.cls).obj.__annotations__[self.name]
+            except Exception:
+                pass
+            else:
+                raise
+            try:
                 # Extract annotation from the docstring for C builtin function
                 annot = Function._signature_from_string(self).return_annotation
             except Exception:
@@ -1280,7 +1285,10 @@ class Function(Doc):
 
         if annot is inspect.Parameter.empty or not annot:
             return ''
-        s = inspect.formatannotation(annot).replace(' ', '\N{NBSP}')  # Better line breaks
+
+        s = annot if isinstance(annot, str) else inspect.formatannotation(annot)
+        s = s.replace(' ', '\N{NBSP}')  # Better line breaks in html signatures
+
         if link:
             from pdoc.html_helpers import _linkify
             s = re.sub(r'[\w\.]+', partial(_linkify, link=link, module=self.module), s)
