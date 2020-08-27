@@ -1,7 +1,13 @@
 """Module docstring"""
+from __future__ import annotations
+
 from collections import namedtuple
 import subprocess
 import os
+import typing
+
+if typing.TYPE_CHECKING:
+    import datetime
 
 CONST = 'const'
 """CONST docstring"""
@@ -14,6 +20,18 @@ foreign_var = subprocess.CalledProcessError(0, '')
 """foreign var docstring"""
 
 __pdoc__ = {}
+
+
+class Foo:
+    def bar(self, a: datetime.datetime) -> None:
+        """Resolves typehints when using `typing.TYPE_CHECKING`"""
+
+    baz: typing.Optional[datetime.datetime] = None
+    """Resolves typehints when using `typing.TYPE_CHECKING`"""
+
+
+def bar(self, a: datetime.datetime) -> None:
+    """Resolves typehints when using `typing.TYPE_CHECKING`"""
 
 
 def foo(env=os.environ):

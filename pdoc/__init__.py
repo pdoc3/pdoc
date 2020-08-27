@@ -211,10 +211,13 @@ def import_module(module: Union[str, ModuleType],
     if isinstance(module, str):
         with _module_path(module) as module_path:
             try:
+                typing.TYPE_CHECKING = True
                 module = importlib.import_module(module_path)
             except Exception as e:
                 raise ImportError('Error importing {!r}: {}: {}'
                                   .format(module, e.__class__.__name__, e))
+            finally:
+                typing.TYPE_CHECKING = False
 
     assert inspect.ismodule(module)
     # If this is pdoc itself, return without reloading. Otherwise later
