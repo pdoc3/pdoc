@@ -357,7 +357,7 @@ class _ToMarkdown:
         doctest blocks so they render as Python code.
         """
         text = _ToMarkdown.DOCTESTS_RE.sub(
-            lambda match: '```python\n' + match.group() + '\n```\n', text)
+            lambda match: '```python-repl\n' + match.group() + '\n```\n', text)
         return text
 
     @staticmethod
