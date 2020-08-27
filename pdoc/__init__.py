@@ -1235,49 +1235,24 @@ class Function(Doc):
     def return_annotation(self, *, link=None) -> str:
         """Formatted function return type annotation or empty string if none."""
         annot = ''
-        try:
-            try:
-                annot = _get_type_hints(self.obj)['return']
-            except Exception:
-                pass
-            else:
-                raise
-            try:
-                # This works mainly for non-property variables, and the rest are passed through
-                annot = _get_type_hints(cast(Class, self.cls).obj)[self.name]
-            except Exception:
-                pass
-            else:
-                raise
-            try:
+        for method in (
+                lambda: _get_type_hints(self.obj)['return'],
+                # Mainly for non-property variables
+                lambda: _get_type_hints(cast(Class, self.cls).obj)[self.name],
                 # global variables
-                annot = _get_type_hints(not self.cls and self.module.obj)[self.name]
-            except Exception:
-                pass
-            else:
-                raise
-            try:
-                annot = inspect.signature(self.obj).return_annotation
-            except Exception:
-                pass
-            else:
-                raise
-            try:
+                lambda: _get_type_hints(not self.cls and self.module.obj)[self.name],
+                lambda: inspect.signature(self.obj).return_annotation,
                 # Use raw annotation strings in unmatched forward declarations
-                annot = cast(Class, self.cls).obj.__annotations__[self.name]
-            except Exception:
-                pass
-            else:
-                raise
-            try:
+                lambda: cast(Class, self.cls).obj.__annotations__[self.name],
                 # Extract annotation from the docstring for C builtin function
-                annot = Function._signature_from_string(self).return_annotation
+                lambda: Function._signature_from_string(self).return_annotation,
+        ):
+            try:
+                annot = method()
             except Exception:
-                pass
+                continue
             else:
-                raise
-        except RuntimeError:  # Success.
-            pass
+                break
         else:
             # Don't warn on variables. The annotation just isn't available.
             if not isinstance(self, Variable):
