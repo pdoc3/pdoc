@@ -262,10 +262,16 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             tree = tree.body[0]  # ast.parse creates a dummy ast.Module wrapper
 
             # For classes, maybe add instance variables defined in __init__
-            for node in tree.body:
-                if isinstance(node, ast.FunctionDef) and node.name == '__init__':
-                    instance_vars, _ = _pep224_docstrings(doc_obj, _init_tree=node)
-                    break
+            init_nodes = [
+                node
+                for node in tree.body
+                if isinstance(node, ast.FunctionDef) and node.name == "__init__"
+            ]
+            if init_nodes:
+                # Get the *last* init node in case it is preceded by @overrides.
+                instance_vars, _ = _pep224_docstrings(
+                    doc_obj, _init_tree=init_nodes[-1]
+                )
 
     try:
         ast_AnnAssign = ast.AnnAssign   # type: Type
