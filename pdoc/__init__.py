@@ -113,6 +113,7 @@ def _get_config(**kwargs):
 
     known_keys = (set(config)
                   | {'docformat'}  # Feature. https://github.com/pdoc3/pdoc/issues/169
+                  | {'top_module'}  # Used to link when generating lunr.js search
                   # deprecated
                   | {'module', 'modules', 'http_server', 'external_links', 'search_query'})
     invalid_keys = {k: v for k, v in kwargs.items() if k not in known_keys}

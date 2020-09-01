@@ -36,7 +36,7 @@
         search(query);
 
     function search(query) {
-        const url = '${'../' * module.name.count('.')}search.html#' + encodeURIComponent(query);
+        const url = '${'../' * module.url(relative_to=top_module).count('/')}search.html#' + encodeURIComponent(query);
         new tingle.modal({
             cssClass: ['modal-dialog'],
             onClose: () => {

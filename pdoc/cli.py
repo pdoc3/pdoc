@@ -582,6 +582,7 @@ or similar, at your own discretion.""",
     for module in modules:
         if args.html:
             _quit_if_exists(module, ext='.html')
+            template_config['top_module'] = module
             recursive_write_files(module, ext='.html', **template_config)
 
             if lunr_config is not None:
