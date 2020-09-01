@@ -401,9 +401,12 @@ def _generate_lunr_search(top_module: pdoc.Module,
 
     @lru_cache()
     def to_url_id(module):
-        url = module.url()
-        if top_module.is_package:  # Reference from subfolder if its a package
-            _, url = url.split('/', maxsplit=1)
+        # We want to reference the url from the location of search.html. We want to
+        # replace all the already known recrusion - 1
+        # (list index start at 0, so we dont need to change anything)
+        recusion = top_module.url().count('/')
+        url = '/'.join(module.url().split('/')[recusion:])
+
         if url not in url_cache:
             url_cache[url] = len(url_cache)
         return url_cache[url]
@@ -413,9 +416,10 @@ def _generate_lunr_search(top_module: pdoc.Module,
     recursive_add_to_index(top_module)
     urls = [i[0] for i in sorted(url_cache.items(), key=lambda i: i[1])]
 
-    # If top module is a package, output the index in its subfolder, else, in the output dir
+    # If the top module is not a package, this means its a script. In this case, we want to
+    # remove the script name, leaving us the reference to the folder
     main_path = path.join(args.output_dir,
-                          *top_module.name.split('.') if top_module.is_package else '')
+                          *top_module.name.split('.')[:None if top_module.is_package else -1])
     with _open_write_file(path.join(main_path, 'index.js')) as f:
         f.write("URLS=")
         json.dump(urls, f, indent=0, separators=(',', ':'))
