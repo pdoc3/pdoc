@@ -402,10 +402,10 @@ def _generate_lunr_search(top_module: pdoc.Module,
     @lru_cache()
     def to_url_id(module):
         # We want to reference the url from the location of search.html. We want to
-        # replace all the already known recrusion - 1
+        # replace all the already known recursion - 1
         # (list index start at 0, so we dont need to change anything)
-        recrusion = top_module.url().count('/')
-        url = '/'.join(module.url().split('/')[recrusion:])
+        recursion = top_module.url().count('/')
+        url = '/'.join(module.url().split('/')[recursion:])
 
         if url not in url_cache:
             url_cache[url] = len(url_cache)
