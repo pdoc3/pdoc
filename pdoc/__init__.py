@@ -20,7 +20,7 @@ import typing
 from contextlib import contextmanager
 from copy import copy
 from functools import lru_cache, reduce, partial
-from itertools import tee, groupby
+from itertools import tee, groupby, chain
 from types import ModuleType
 from typing import (
     cast, Any, Callable, Dict, Generator, Iterable, List, Mapping, Optional, Set, Tuple,
@@ -661,22 +661,27 @@ class Module(Doc):
                         if isdir(join(pth, file)) and '.' not in file:
                             yield file
 
-            for root in iter_modules(self.obj.__path__):
+            file_submodules = iter_modules(self.obj.__path__) if hasattr(self.obj, '__path__') else []
+            non_file_submodules = [obj for _, obj in public_objs if inspect.ismodule(obj)]
+
+            for root in chain(file_submodules, non_file_submodules):
                 # Ignore if this module was already doc'd.
                 if root in self.doc:
                     continue
 
+                root_name = root.__name__ if isinstance(root, ModuleType) else root
+
                 # Ignore if it isn't exported
-                if not _is_public(root) and not _is_whitelisted(root, self):
+                if not _is_public(root_name) and not _is_whitelisted(root_name, self):
                     continue
-                if _is_blacklisted(root, self):
-                    self._skipped_submodules.add(root)
+                if _is_blacklisted(root_name, self):
+                    self._skipped_submodules.add(root_name)
                     continue
 
                 assert self.refname == self.name
-                fullname = "%s.%s" % (self.name, root)
+
                 try:
-                    m = Module(import_module(fullname),
+                    m = Module(import_module(root if isinstance(root, ModuleType) else "%s.%s" % (self.name, root)),
                                docfilter=docfilter, supermodule=self,
                                context=self._context, skip_errors=skip_errors)
                 except Exception as ex:
@@ -811,9 +816,9 @@ class Module(Doc):
         """
         `True` if this module is a package.
 
-        Works by checking whether the module has a `__path__` attribute.
+        Works by checking `__package__`.
         """
-        return hasattr(self.obj, "__path__")
+        return not bool(self.obj.__package__)
 
     @property
     def is_namespace(self) -> bool:
