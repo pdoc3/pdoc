@@ -900,8 +900,7 @@ class Foo:
 
     @overload
     def __init__(self, var2: float):
-        self.var2: float = var2
-        """dummy1"""
+        pass
 
     def __init__(self, var2):
         self.var2: float = float(var2)
