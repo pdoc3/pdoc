@@ -242,8 +242,10 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
     The second dict contains instance variables and is non-empty only in case
     `doc_obj` is a `pdoc.Class` which has `__init__` method.
     """
-    # No variables in namespace packages
-    if isinstance(doc_obj, Module) and doc_obj.is_namespace:
+    is_builtins = type(doc_obj.obj).__module__ == 'builtins'
+
+    # No variables in builtins or namespace packages.
+    if is_builtins or (isinstance(doc_obj, Module) and doc_obj.is_namespace):
         return {}, {}
 
     vars = {}  # type: Dict[str, str]
