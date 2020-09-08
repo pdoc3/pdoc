@@ -889,6 +889,8 @@ class ApiTest(unittest.TestCase):
             filename = os.path.join(path, 'module36syntax.py')
             with open(filename, 'w') as f:
                 f.write('''
+from typing import overload
+
 var: str = 'x'
 """dummy"""
 
@@ -896,15 +898,20 @@ class Foo:
     var: int = 3
     """dummy"""
 
-    def __init__(self):
-        self.var2: float = 1
-        """dummy"""
+    @overload
+    def __init__(self, var2: float):
+        pass
+
+    def __init__(self, var2):
+        self.var2: float = float(var2)
+        """dummy2"""
                 ''')
             mod = pdoc.Module(pdoc.import_module(filename))
             self.assertEqual(mod.doc['var'].type_annotation(), 'str')
             self.assertEqual(mod.doc['Foo'].doc['var'].type_annotation(), 'int')
             self.assertIsInstance(mod.doc['Foo'].doc['var2'], pdoc.Variable)
             self.assertEqual(mod.doc['Foo'].doc['var2'].type_annotation(), '')  # Won't fix
+            self.assertEqual(mod.doc['Foo'].doc['var2'].docstring, 'dummy2')
 
             self.assertIn('var: str', mod.text())
             self.assertIn('var: int', mod.text())
