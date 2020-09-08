@@ -1174,7 +1174,7 @@ def _formatannotation(annot):
     'MyType'
     """
     is_new_type = (getattr(annot, '__qualname__', '').startswith('NewType.') and
-                   annot.__module__ == 'typing')
+                   getattr(annot, '__module__', '') == 'typing')
     if is_new_type:
         return annot.__name__
     return inspect.formatannotation(annot)
