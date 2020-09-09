@@ -841,6 +841,16 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(pdoc.Function('bug130', mod, bug130_str_annotation).params(annotate=True),
                          ['a:\N{NBSP}str'])
 
+        # typed, NewType
+        CustomType = typing.NewType('CustomType', bool)
+
+        def bug253_newtype_annotation(a: CustomType):
+            return
+
+        self.assertEqual(
+            pdoc.Function('bug253', mod, bug253_newtype_annotation).params(annotate=True),
+            ['a:\N{NBSP}CustomType'])
+
         # builtin callables with signatures in docstrings
         from itertools import repeat
         self.assertEqual(pdoc.Function('repeat', mod, repeat).params(), ['object', 'times'])

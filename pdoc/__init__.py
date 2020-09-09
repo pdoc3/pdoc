@@ -1167,6 +1167,20 @@ class Class(Doc):
         del self._super_members
 
 
+def _formatannotation(annot):
+    """
+    Format annotation, properly handling NewType types
+
+    >>> _formatannotation(NewType('MyType', str))
+    'MyType'
+    """
+    is_new_type = (getattr(annot, '__qualname__', '').startswith('NewType.') and
+                   getattr(annot, '__module__', '') == 'typing')
+    if is_new_type:
+        return annot.__name__
+    return inspect.formatannotation(annot)
+
+
 class Function(Doc):
     """
     Representation of documentation for a function or method.
@@ -1265,7 +1279,7 @@ class Function(Doc):
         if isinstance(annot, str):
             s = annot
         else:
-            s = inspect.formatannotation(annot)
+            s = _formatannotation(annot)
             s = re.sub(r'\b(typing\.)?ForwardRef\((?P<quot>[\"\'])(?P<str>.*?)(?P=quot)\)',
                        r'\g<str>', s)
         s = s.replace(' ', '\N{NBSP}')  # Better line breaks in html signatures
@@ -1371,7 +1385,7 @@ class Function(Doc):
 
             formatted = p.name
             if p.annotation is not EMPTY:
-                annotation = inspect.formatannotation(p.annotation).replace(' ', '\N{NBSP}')
+                annotation = _formatannotation(p.annotation).replace(' ', '\N{NBSP}')
                 # "Eval" forward-declarations (typing string literals)
                 if isinstance(p.annotation, str):
                     annotation = annotation.strip("'")
