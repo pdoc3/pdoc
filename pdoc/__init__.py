@@ -1171,13 +1171,17 @@ def _formatannotation(annot):
     """
     Format annotation, properly handling NewType types
 
-    >>> _formatannotation(NewType('MyType', str))
+    >>> import typing
+    >>> _formatannotation(typing.NewType('MyType', str))
     'MyType'
     """
-    is_new_type = (getattr(annot, '__qualname__', '').startswith('NewType.') and
-                   getattr(annot, '__module__', '') == 'typing')
-    if is_new_type:
+    module = getattr(annot, '__module__', '')
+    is_newtype = (getattr(annot, '__qualname__', '').startswith('NewType.') and
+                  module == 'typing')
+    if is_newtype:
         return annot.__name__
+    if module.startswith('nptyping'):  # GH-231
+        return repr(annot)
     return inspect.formatannotation(annot)
 
 
