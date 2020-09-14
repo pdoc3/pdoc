@@ -244,8 +244,8 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
     """
     is_builtins = type(doc_obj.obj).__module__ == 'builtins'
 
-    # No variables in builtins or namespace packages.
-    if is_builtins or (isinstance(doc_obj, Module) and doc_obj.is_namespace):
+    # No variables in namespace packages.
+    if isinstance(doc_obj, Module) and doc_obj.is_namespace:
         return {}, {}
 
     vars = {}  # type: Dict[str, str]
@@ -257,7 +257,11 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
         try:
             tree = ast.parse(inspect.getsource(doc_obj.obj))
         except (OSError, TypeError, SyntaxError) as exc:
-            warn("Couldn't read PEP-224 variable docstrings from {!r}: {}".format(doc_obj, exc))
+            # That's OK if a builtin does not a docstring. Maybe the
+            # source isn't accessible. Do not emit a warning for that.
+            if not is_builtins:
+                warn("Couldn't read PEP-224 variable docstrings from {!r}: {}".format(doc_obj, exc))
+
             return {}, {}
 
         if isinstance(doc_obj, Class):
