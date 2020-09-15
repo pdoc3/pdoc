@@ -104,13 +104,13 @@ In the default HTML template, such inherited docstrings are greyed out.
 
 
 ### Docstring of `__init__()` method
-[docstring init method]: #docstring-init-method
+[init docstring]: #docstring-of-__init__-method
 
 Note that the docstring of a class's `__init__()` method is directly
 appended to the class's docstring when generating the documentation
 with `pdoc`. A valid approach is to not document the `__init__()` method
 at all and directly add, for example, a `Parameters` section to the
-docstring of the class that describes the arguments of the __init__()
+docstring of the class that describes the arguments of the `__init__()`
 method.  That way all necessary information on how to instantiate the
 class is directly provided by the docstring of the class.
 
