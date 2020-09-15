@@ -510,8 +510,7 @@ class ApiTest(unittest.TestCase):
             vars_dont = 0
             but_clss_have_doc = int
 
-        with self.assertWarns(UserWarning):
-            doc = pdoc.Class('C', pdoc.Module('pdoc'), C)
+        doc = pdoc.Class('C', pdoc.Module('pdoc'), C)
         self.assertEqual(doc.doc['vars_dont'].docstring, '')
         self.assertIn('integer', doc.doc['but_clss_have_doc'].docstring)
 

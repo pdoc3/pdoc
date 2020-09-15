@@ -253,7 +253,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
         tree = _init_tree
     else:
         try:
-            tree = ast.parse(inspect.getsource(doc_obj.obj))
+            tree = ast.parse(doc_obj.source or None)  # type: ignore
         except (OSError, TypeError, SyntaxError) as exc:
             warn("Couldn't read PEP-224 variable docstrings from {!r}: {}".format(doc_obj, exc))
             return {}, {}
