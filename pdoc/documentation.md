@@ -103,8 +103,8 @@ it will automatically attach the docstring for `A.test` to
 In the default HTML template, such inherited docstrings are greyed out.
 
 
-### Docstrings of __init__() methods
-[docstrings init methods]: #docstrings-init-methods
+### Docstring of `__init__()` method
+[docstring init method]: #docstring-init-method
 
 Note that the docstring of a class's `__init__()` method is directly
 appended to the class's docstring when generating the documentation
