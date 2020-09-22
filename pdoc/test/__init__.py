@@ -1290,6 +1290,11 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <dt><code><a>pdoc.Doc</a></code></dt>
 <dd>A class description that spans several lines.</dd>
 </dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="python-repl">&gt;&gt;&gt; doctest
+...
+</code></pre>
+
 <h2 id="notes">Notes</h2>
 <p>Foo bar.</p>
 <h3 id="h3-title">H3 Title</h3>
