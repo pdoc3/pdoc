@@ -1108,7 +1108,6 @@ reference: `package.foo`
 <p>ref with underscore: <code><a href="#pdoc._x_x_">_x_x_</a></code></p>
 <pre><code>code block
 </code></pre>
-
 <p>reference: <code><a href="/package.foo.ext">package.foo</a></code></p>'''
 
         module = pdoc.Module(pdoc)
@@ -1291,10 +1290,9 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <dd>A class description that spans several lines.</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code class="python-repl">&gt;&gt;&gt; doctest
+<pre><code class="language-python-repl">&gt;&gt;&gt; doctest
 ...
 </code></pre>
-
 <h2 id="notes">Notes</h2>
 <p>Foo bar.</p>
 <h3 id="h3-title">H3 Title</h3>
@@ -1383,9 +1381,8 @@ that are relevant to the interface.</p>
 </dl>
 <h2 id="examples">Examples</h2>
 <p>Examples in doctest format.</p>
-<pre><code class="python-repl">&gt;&gt;&gt; a = [1,2,3]
+<pre><code class="language-python-repl">&gt;&gt;&gt; a = [1,2,3]
 </code></pre>
-
 <h2 id="todos">Todos</h2>
 <ul>
 <li>For module TODOs</li>
@@ -1405,22 +1402,19 @@ line2
 fenced code works
 always
 </code></pre>
-
 <h2 id="examples">Examples</h2>
-<pre><code class="python-repl">&gt;&gt;&gt; nbytes(100)
+<pre><code class="language-python-repl">&gt;&gt;&gt; nbytes(100)
 '100.0 bytes'
 line2
 </code></pre>
-
 <p>some text</p>
 <p>some text</p>
-<pre><code class="python-repl">&gt;&gt;&gt; another doctest
+<pre><code class="language-python-repl">&gt;&gt;&gt; another doctest
 line1
 line2
 </code></pre>
-
 <h2 id="example">Example</h2>
-<pre><code class="python-repl">&gt;&gt;&gt; f()
+<pre><code class="language-python-repl">&gt;&gt;&gt; f()
 Traceback (most recent call last):
     ...
 Exception: something went wrong
@@ -1473,9 +1467,8 @@ lines.</p>
         self.assertEqual(html, expected)
 
     def test_reST_include(self):
-        expected = '''<pre><code class="python">    x = 2
+        expected = '''<pre><code class="language-python">    x = 2
 </code></pre>
-
 <p>1
 x = 2
 x = 3
@@ -1520,7 +1513,6 @@ Work <a href="http://foo/">like this</a> and <a href="ftp://bar">like that</a>.<
 <p>data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D</p>
 <pre><code>http://url.com
 </code></pre>
-
 <p><a href="https://google.com">https://google.com</a>
 <a href="https://en.wikipedia.org/wiki/Orange_(software)">\
 https://en.wikipedia.org/wiki/Orange_(software)</a>
