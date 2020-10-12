@@ -23,7 +23,7 @@ from functools import lru_cache, reduce, partial
 from itertools import tee, groupby
 from types import ModuleType
 from typing import (
-    cast, Callable, Dict, Generator, Iterable, List, Mapping, Optional, Set, Tuple,
+    cast, Any, Callable, Dict, Generator, Iterable, List, Mapping, Optional, Set, Tuple,
     Type, TypeVar, Union,
 )
 from warnings import warn
@@ -100,11 +100,7 @@ def reset():
                 method.cache_clear()
 
 
-def _render_template(template_name, **kwargs):
-    """
-    Returns the Mako template with the given name.  If the template
-    cannot be found, a nicer error message is displayed.
-    """
+def _get_config(**kwargs):
     # Apply config.mako configuration
     MAKO_INTERNALS = Template('').module.__dict__.keys()
     DEFAULT_CONFIG = path.join(path.dirname(__file__), 'templates', 'config.mako')
@@ -114,13 +110,31 @@ def _render_template(template_name, **kwargs):
         config.update((var, getattr(config_module, var, None))
                       for var in config_module.__dict__
                       if var not in MAKO_INTERNALS)
+
     known_keys = (set(config)
                   | {'docformat'}  # Feature. https://github.com/pdoc3/pdoc/issues/169
-                  | {'module', 'modules', 'http_server', 'external_links'})  # deprecated
+                  # deprecated
+                  | {'module', 'modules', 'http_server', 'external_links', 'search_query'})
     invalid_keys = {k: v for k, v in kwargs.items() if k not in known_keys}
     if invalid_keys:
         warn('Unknown configuration variables (not in config.mako): {}'.format(invalid_keys))
     config.update(kwargs)
+
+    if 'search_query' in config:
+        warn('Option `search_query` has been depricated, use `google_search_query` instead',
+             DeprecationWarning, stacklevel=2)
+        config['google_search_query'] = config['search_query']
+        del config['search_query']
+
+    return config
+
+
+def _render_template(template_name, **kwargs):
+    """
+    Returns the Mako template with the given name.  If the template
+    cannot be found, a nicer error message is displayed.
+    """
+    config = _get_config(**kwargs)
 
     try:
         t = tpl_lookup.get_template(template_name)
@@ -239,7 +253,10 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
         tree = _init_tree
     else:
         try:
-            tree = ast.parse(inspect.getsource(doc_obj.obj))
+            # Maybe raise exceptions with appropriate message
+            # before using cleaned doc_obj.source
+            _ = inspect.findsource(doc_obj.obj)
+            tree = ast.parse(doc_obj.source)  # type: ignore
         except (OSError, TypeError, SyntaxError) as exc:
             warn("Couldn't read PEP-224 variable docstrings from {!r}: {}".format(doc_obj, exc))
             return {}, {}
@@ -248,7 +265,8 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             tree = tree.body[0]  # ast.parse creates a dummy ast.Module wrapper
 
             # For classes, maybe add instance variables defined in __init__
-            for node in tree.body:
+            # Get the *last* __init__ node in case it is preceded by @overloads.
+            for node in reversed(tree.body):
                 if isinstance(node, ast.FunctionDef) and node.name == '__init__':
                     instance_vars, _ = _pep224_docstrings(doc_obj, _init_tree=node)
                     break
@@ -882,6 +900,34 @@ class Module(Doc):
         return url + _URL_MODULE_SUFFIX
 
 
+def _getmembers_all(obj: type) -> List[Tuple[str, Any]]:
+    # The following code based on inspect.getmembers() @ 5b23f7618d43
+    mro = obj.__mro__[:-1]  # Skip object
+    names = set(dir(obj))
+    # Add keys from bases
+    for base in mro:
+        names.update(base.__dict__.keys())
+        # Add members for which type annotations exist
+        names.update(getattr(obj, '__annotations__', {}).keys())
+
+    results = []
+    for name in names:
+        try:
+            value = getattr(obj, name)
+        except AttributeError:
+            for base in mro:
+                if name in base.__dict__:
+                    value = base.__dict__[name]
+                    break
+            else:
+                # Missing slot member or a buggy __dir__;
+                # In out case likely a type-annotated member
+                # which we'll interpret as a variable
+                value = None
+        results.append((name, value))
+    return results
+
+
 class Class(Doc):
     """
     Representation of a class' documentation.
@@ -902,14 +948,31 @@ class Class(Doc):
         self.doc = {}  # type: Dict[str, Union[Function, Variable]]
         """A mapping from identifier name to a `pdoc.Doc` objects."""
 
+        # Annotations for filtering.
+        # Use only own, non-inherited annotations (the rest will be inherited)
+        annotations = getattr(self.obj, '__annotations__', {})
+
         public_objs = [(_name, inspect.unwrap(obj))
-                       for _name, obj in inspect.getmembers(self.obj)
+                       for _name, obj in _getmembers_all(self.obj)
                        # Filter only *own* members. The rest are inherited
                        # in Class._fill_inheritance()
-                       if _name in self.obj.__dict__
+                       if (_name in self.obj.__dict__ or _name in annotations)
                        and (_is_public(_name) or _is_whitelisted(_name, self))]
-        index = list(self.obj.__dict__).index
-        public_objs.sort(key=lambda i: index(i[0]))
+
+        def definition_order_index(
+                name,
+                _annot_index=list(annotations).index,
+                _dict_index=list(self.obj.__dict__).index):
+            try:
+                return _dict_index(name)
+            except ValueError:
+                pass
+            try:
+                return _annot_index(name) - len(annotations)  # sort annotated first
+            except ValueError:
+                return 9e9
+
+        public_objs.sort(key=lambda i: definition_order_index(i[0]))
 
         var_docstrings, instance_var_docstrings = _pep224_docstrings(self)
 
@@ -1107,6 +1170,24 @@ class Class(Doc):
         del self._super_members
 
 
+def _formatannotation(annot):
+    """
+    Format annotation, properly handling NewType types
+
+    >>> import typing
+    >>> _formatannotation(typing.NewType('MyType', str))
+    'MyType'
+    """
+    module = getattr(annot, '__module__', '')
+    is_newtype = (getattr(annot, '__qualname__', '').startswith('NewType.') and
+                  module == 'typing')
+    if is_newtype:
+        return annot.__name__
+    if module.startswith('nptyping'):  # GH-231
+        return repr(annot)
+    return inspect.formatannotation(annot)
+
+
 class Function(Doc):
     """
     Representation of documentation for a function or method.
@@ -1176,42 +1257,24 @@ class Function(Doc):
     def return_annotation(self, *, link=None) -> str:
         """Formatted function return type annotation or empty string if none."""
         annot = ''
-        try:
-            try:
-                annot = _get_type_hints(self.obj)['return']
-            except Exception:
-                pass
-            else:
-                raise
-            try:
-                # This works mainly for non-property variables, and the rest are passed through
-                annot = _get_type_hints(cast(Class, self.cls).obj)[self.name]
-            except Exception:
-                pass
-            else:
-                raise
-            try:
+        for method in (
+                lambda: _get_type_hints(self.obj)['return'],
+                # Mainly for non-property variables
+                lambda: _get_type_hints(cast(Class, self.cls).obj)[self.name],
                 # global variables
-                annot = _get_type_hints(not self.cls and self.module.obj)[self.name]
-            except Exception:
-                pass
-            else:
-                raise
-            try:
-                annot = inspect.signature(self.obj).return_annotation
-            except Exception:
-                pass
-            else:
-                raise
-            try:
+                lambda: _get_type_hints(not self.cls and self.module.obj)[self.name],
+                lambda: inspect.signature(self.obj).return_annotation,
+                # Use raw annotation strings in unmatched forward declarations
+                lambda: cast(Class, self.cls).obj.__annotations__[self.name],
                 # Extract annotation from the docstring for C builtin function
-                annot = Function._signature_from_string(self).return_annotation
+                lambda: Function._signature_from_string(self).return_annotation,
+        ):
+            try:
+                annot = method()
             except Exception:
-                pass
+                continue
             else:
-                raise
-        except RuntimeError:  # Success.
-            pass
+                break
         else:
             # Don't warn on variables. The annotation just isn't available.
             if not isinstance(self, Variable):
@@ -1219,7 +1282,15 @@ class Function(Doc):
 
         if annot is inspect.Parameter.empty or not annot:
             return ''
-        s = inspect.formatannotation(annot).replace(' ', '\N{NBSP}')  # Better line breaks
+
+        if isinstance(annot, str):
+            s = annot
+        else:
+            s = _formatannotation(annot)
+            s = re.sub(r'\b(typing\.)?ForwardRef\((?P<quot>[\"\'])(?P<str>.*?)(?P=quot)\)',
+                       r'\g<str>', s)
+        s = s.replace(' ', '\N{NBSP}')  # Better line breaks in html signatures
+
         if link:
             from pdoc.html_helpers import _linkify
             s = re.sub(r'[\w\.]+', partial(_linkify, link=link, module=self.module), s)
@@ -1242,7 +1313,18 @@ class Function(Doc):
     @staticmethod
     def _params(doc_obj, annotate=False, link=None, module=None):
         try:
-            signature = inspect.signature(doc_obj.obj)
+            # We want __init__ to actually be implemented somewhere in the
+            # MRO to still satisfy https://github.com/pdoc3/pdoc/issues/124
+            if (
+                inspect.isclass(doc_obj.obj)
+                and doc_obj.obj.__init__ is not object.__init__
+            ):
+                # Remove the first argument (self) from __init__ signature
+                init_sig = inspect.signature(doc_obj.obj.__init__)
+                init_params = list(init_sig.parameters.values())
+                signature = init_sig.replace(parameters=init_params[1:])
+            else:
+                signature = inspect.signature(doc_obj.obj)
         except ValueError:
             signature = Function._signature_from_string(doc_obj)
             if not signature:
@@ -1310,7 +1392,7 @@ class Function(Doc):
 
             formatted = p.name
             if p.annotation is not EMPTY:
-                annotation = inspect.formatannotation(p.annotation).replace(' ', '\N{NBSP}')
+                annotation = _formatannotation(p.annotation).replace(' ', '\N{NBSP}')
                 # "Eval" forward-declarations (typing string literals)
                 if isinstance(p.annotation, str):
                     annotation = annotation.strip("'")

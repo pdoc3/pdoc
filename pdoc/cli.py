@@ -7,11 +7,14 @@ import importlib
 import inspect
 import os
 import os.path as path
+import json
 import re
 import sys
 import warnings
+from contextlib import contextmanager
+from functools import lru_cache
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from typing import Sequence
+from typing import Dict, List, Sequence
 from warnings import warn
 
 import pdoc
@@ -314,27 +317,33 @@ def _quit_if_exists(m: pdoc.Module, ext: str):
             sys.exit(1)
 
 
-def recursive_write_files(m: pdoc.Module, ext: str, **kwargs):
-    assert ext in ('.html', '.md')
-    f = module_path(m, ext=ext)
-
-    dirpath = path.dirname(f)
-    if not os.access(dirpath, os.R_OK):
-        os.makedirs(dirpath)
-
+@contextmanager
+def _open_write_file(filename):
     try:
-        with open(f, 'w+', encoding='utf-8') as w:
-            if ext == '.html':
-                w.write(m.html(**kwargs))
-            elif ext == '.md':
-                w.write(m.text(**kwargs))
-        print(f)  # print created file path to stdout
+        with open(filename, 'w', encoding='utf-8') as f:
+            yield f
+            print(filename)  # print created file path to stdout
     except Exception:
         try:
-            os.unlink(f)
+            os.unlink(filename)
         except Exception:
             pass
         raise
+
+
+def recursive_write_files(m: pdoc.Module, ext: str, **kwargs):
+    assert ext in ('.html', '.md')
+    filepath = module_path(m, ext=ext)
+
+    dirpath = path.dirname(filepath)
+    if not os.access(dirpath, os.R_OK):
+        os.makedirs(dirpath)
+
+    with _open_write_file(filepath) as f:
+        if ext == '.html':
+            f.write(m.html(**kwargs))
+        elif ext == '.md':
+            f.write(m.text(**kwargs))
 
     for submodule in m.submodules():
         recursive_write_files(submodule, ext=ext, **kwargs)
@@ -362,12 +371,63 @@ def _warn_deprecated(option, alternative='', use_config_mako=False):
     warn(msg, DeprecationWarning, stacklevel=2)
 
 
-_PANDOC_COMMAND = '''\
-pandoc --metadata=title:"MyProject Documentation"               \\
-       --from=markdown+abbreviations+tex_math_single_backslash  \\
-       --pdf-engine=xelatex --variable=mainfont:"DejaVu Sans"   \\
-       --toc --toc-depth=4 --output=pdf.pdf  pdf.md\
-'''
+def _generate_lunr_search(top_module: pdoc.Module,
+                          index_docstrings: bool,
+                          template_config: dict):
+    """Generate index.js for search"""
+
+    def trim_docstring(docstring):
+        return re.sub(r'''
+            \s+|                   # whitespace sequences
+            \s+[-=~]{3,}\s+|       # title underlines
+            ^[ \t]*[`~]{3,}\w*$|   # code blocks
+            \s*[`#*]+\s*|          # common markdown chars
+            \s*([^\w\d_>])\1\s*|   # sequences of punct of the same kind
+            \s*</?\w*[^>]*>\s*     # simple HTML tags
+        ''', ' ', docstring, flags=re.VERBOSE | re.MULTILINE)
+
+    def recursive_add_to_index(dobj):
+        info = {
+            'ref': dobj.refname,
+            'url': to_url_id(dobj.module),
+        }
+        if index_docstrings:
+            info['doc'] = trim_docstring(dobj.docstring)
+        if isinstance(dobj, pdoc.Function):
+            info['func'] = 1
+        index.append(info)
+        for member_dobj in getattr(dobj, 'doc', {}).values():
+            recursive_add_to_index(member_dobj)
+
+    @lru_cache()
+    def to_url_id(module):
+        url = module.url()
+        if top_module.is_package:  # Reference from subfolder if its a package
+            _, url = url.split('/', maxsplit=1)
+        if url not in url_cache:
+            url_cache[url] = len(url_cache)
+        return url_cache[url]
+
+    index = []  # type: List[Dict]
+    url_cache = {}  # type: Dict[str, int]
+    recursive_add_to_index(top_module)
+    urls = [i[0] for i in sorted(url_cache.items(), key=lambda i: i[1])]
+
+    # If top module is a package, output the index in its subfolder, else, in the output dir
+    main_path = path.join(args.output_dir,
+                          *top_module.name.split('.') if top_module.is_package else '')
+    with _open_write_file(path.join(main_path, 'index.js')) as f:
+        f.write("URLS=")
+        json.dump(urls, f, indent=0, separators=(',', ':'))
+        f.write(";\nINDEX=")
+        json.dump(index, f, indent=0, separators=(',', ':'))
+
+    # Generate search.html
+    with _open_write_file(path.join(main_path, 'search.html')) as f:
+        rendered_template = pdoc._render_template(
+            '/search.mako', module=top_module, **template_config
+        )
+        f.write(rendered_template)
 
 
 def main(_args=None):
@@ -429,8 +489,18 @@ def main(_args=None):
     except KeyError:
         pass  # pdoc was not invoked while in a virtual environment
     else:
+        from glob import glob
         from distutils.sysconfig import get_python_lib
-        sys.path.append(get_python_lib(prefix=venv_dir))
+        libdir = get_python_lib(prefix=venv_dir)
+        sys.path.append(libdir)
+        # Resolve egg-links from `setup.py develop` or `pip install -e`
+        # XXX: Welcome a more canonical approach
+        for pth in glob(path.join(libdir, '*.egg-link')):
+            try:
+                with open(pth) as f:
+                    sys.path.append(path.join(libdir, f.readline().rstrip()))
+            except IOError:
+                warn('Invalid egg-link in venv: {!r}'.format(pth))
 
     if args.http:
         template_config['link_prefix'] = "/"
@@ -501,10 +571,17 @@ or similar, at your own discretion.""".format(PANDOC_CMD=textwrap.indent(_PANDOC
               file=sys.stderr)
         sys.exit(0)
 
+    lunr_config = pdoc._get_config(**template_config).get('lunr_search')
+
     for module in modules:
         if args.html:
             _quit_if_exists(module, ext='.html')
             recursive_write_files(module, ext='.html', **template_config)
+
+            if lunr_config is not None:
+                _generate_lunr_search(
+                    module, lunr_config.get("index_docstrings", True), template_config)
+
         elif args.output_dir:  # Generate text files
             _quit_if_exists(module, ext='.md')
             recursive_write_files(module, ext='.md', **template_config)
@@ -512,6 +589,14 @@ or similar, at your own discretion.""".format(PANDOC_CMD=textwrap.indent(_PANDOC
             sys.stdout.write(module.text(**template_config))
             # Two blank lines between two modules' texts
             sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
+
+
+_PANDOC_COMMAND = '''\
+pandoc --metadata=title:"MyProject Documentation"               \\
+       --from=markdown+abbreviations+tex_math_single_backslash  \\
+       --pdf-engine=xelatex --variable=mainfont:"DejaVu Sans"   \\
+       --toc --toc-depth=4 --output=pdf.pdf  pdf.md\
+'''
 
 
 if __name__ == "__main__":

@@ -37,6 +37,8 @@ EXAMPLE_MODULE = 'example_pkg'
 
 sys.path.insert(0, TESTS_BASEDIR)
 
+T = typing.TypeVar("T")
+
 
 @contextmanager
 def temp_dir():
@@ -242,6 +244,17 @@ class CliTest(unittest.TestCase):
             self._basic_html_assertions()
             self._check_files(exclude_patterns=['class="source"', 'Hidden'])
 
+    def test_html_with_google(self):
+        with run_html(EXAMPLE_MODULE, config='google_search_query="anything"'):
+            self._basic_html_assertions()
+            self._check_files(include_patterns=['class="gcse-search"'])
+
+    def test_html_with_lunr(self):
+        with run_html(EXAMPLE_MODULE, config='lunr_search={"fuzziness": 1}'):
+            files = self.PUBLIC_FILES + ["example_pkg/search.html", "example_pkg/index.js"]
+            self._basic_html_assertions(expected_files=files)
+            self._check_files(exclude_patterns=['class="gcse-search"'])
+
     def test_force(self):
         with run_html(EXAMPLE_MODULE):
             with redirect_streams() as (stdout, stderr):
@@ -410,6 +423,23 @@ class CliTest(unittest.TestCase):
             run('.', skip_errors=None)
         self.assertIn('ZeroDivision', cm.warning.args[0])
 
+    @unittest.skipIf(sys.version_info < (3, 7), '__future__.annotations unsupported in <Py3.7')
+    def test_resolve_typing_forwardrefs(self):
+        # GH-245
+        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_resolve_typing_forwardrefs')):
+            with redirect_streams() as (out, _err):
+                run('postponed')
+            out = out.getvalue()
+            self.assertIn('bar', out)
+            self.assertIn('baz', out)
+            self.assertIn('dt', out)
+            self.assertIn('datetime', out)
+
+            with redirect_streams() as (out, _err):
+                run('evaluated')
+            out = out.getvalue()
+            self.assertIn('Set[Bar]', out)
+
 
 class ApiTest(unittest.TestCase):
     """
@@ -492,8 +522,7 @@ class ApiTest(unittest.TestCase):
             vars_dont = 0
             but_clss_have_doc = int
 
-        with self.assertWarns(UserWarning):
-            doc = pdoc.Class('C', pdoc.Module('pdoc'), C)
+        doc = pdoc.Class('C', pdoc.Module('pdoc'), C)
         self.assertEqual(doc.doc['vars_dont'].docstring, '')
         self.assertIn('integer', doc.doc['but_clss_have_doc'].docstring)
 
@@ -823,6 +852,16 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(pdoc.Function('bug130', mod, bug130_str_annotation).params(annotate=True),
                          ['a:\N{NBSP}str'])
 
+        # typed, NewType
+        CustomType = typing.NewType('CustomType', bool)
+
+        def bug253_newtype_annotation(a: CustomType):
+            return
+
+        self.assertEqual(
+            pdoc.Function('bug253', mod, bug253_newtype_annotation).params(annotate=True),
+            ['a:\N{NBSP}CustomType'])
+
         # builtin callables with signatures in docstrings
         from itertools import repeat
         self.assertEqual(pdoc.Function('repeat', mod, repeat).params(), ['object', 'times'])
@@ -871,6 +910,8 @@ class ApiTest(unittest.TestCase):
             filename = os.path.join(path, 'module36syntax.py')
             with open(filename, 'w') as f:
                 f.write('''
+from typing import overload
+
 var: str = 'x'
 """dummy"""
 
@@ -878,15 +919,20 @@ class Foo:
     var: int = 3
     """dummy"""
 
-    def __init__(self):
-        self.var2: float = 1
-        """dummy"""
+    @overload
+    def __init__(self, var2: float):
+        pass
+
+    def __init__(self, var2):
+        self.var2: float = float(var2)
+        """dummy2"""
                 ''')
             mod = pdoc.Module(pdoc.import_module(filename))
             self.assertEqual(mod.doc['var'].type_annotation(), 'str')
             self.assertEqual(mod.doc['Foo'].doc['var'].type_annotation(), 'int')
             self.assertIsInstance(mod.doc['Foo'].doc['var2'], pdoc.Variable)
             self.assertEqual(mod.doc['Foo'].doc['var2'].type_annotation(), '')  # Won't fix
+            self.assertEqual(mod.doc['Foo'].doc['var2'].docstring, 'dummy2')
 
             self.assertIn('var: str', mod.text())
             self.assertIn('var: int', mod.text())
@@ -913,12 +959,23 @@ class Foo:
             def __init__(self):
                 """baz"""
 
+        class F(typing.Generic[T]):
+            """baz"""
+
+            def __init__(self):
+                """bar"""
+
+        class G(F[int]):
+            """foo"""
+
         mod = pdoc.Module(pdoc)
         self.assertEqual(pdoc.Class('A', mod, A).docstring, """foo""")
         self.assertEqual(pdoc.Class('B', mod, B).docstring, """foo""")
         self.assertEqual(pdoc.Class('C', mod, C).docstring, """foo\n\nbar""")
         self.assertEqual(pdoc.Class('D', mod, D).docstring, """baz\n\nbar""")
         self.assertEqual(pdoc.Class('E', mod, E).docstring, """foo\n\nbaz""")
+        self.assertEqual(pdoc.Class('F', mod, F).docstring, """baz\n\nbar""")
+        self.assertEqual(pdoc.Class('G', mod, G).docstring, """foo\n\nbar""")
 
     @ignore_warnings
     def test_Class_params(self):
@@ -936,6 +993,17 @@ class Foo:
             __signature__ = inspect.signature(lambda a, b, c=None, *, d=1, e: None)
 
         self.assertEqual(pdoc.Class('C2', mod, C2).params(), ['a', 'b', 'c=None', '*', 'd=1', 'e'])
+
+        class G(typing.Generic[T]):
+            def __init__(self, a, b, c=100):
+                pass
+
+        self.assertEqual(pdoc.Class('G', mod, G).params(), ['a', 'b', 'c=100'])
+
+        class G2(typing.Generic[T]):
+            pass
+
+        self.assertEqual(pdoc.Class('G2', mod, G2).params(), ['*args', '**kwds'])
 
     def test_url(self):
         mod = pdoc.Module(EXAMPLE_MODULE)
@@ -984,6 +1052,31 @@ class Foo:
         self.assertEqual(mod.name, 'pdoc')
         self.assertIn('Module', mod.doc)
 
+    @ignore_warnings
+    @unittest.skipIf(sys.version_info < (3, 6), 'variable type annotation unsupported in <Py3.6')
+    def test_class_members(self):
+        module = pdoc.Module(EXAMPLE_MODULE)
+
+        # GH-200
+        from enum import Enum
+
+        class Tag(Enum):
+            Char = 1
+
+            def func(self):
+                return self
+
+        cls = pdoc.Class('Tag', module, Tag)
+        self.assertIsInstance(cls.doc['Char'], pdoc.Variable)
+        self.assertIsInstance(cls.doc['func'], pdoc.Function)
+
+        # GH-210, GH-212
+        my_locals = {}
+        exec('class Employee:\n name: str', my_locals)
+        cls = pdoc.Class('Employee', module, my_locals['Employee'])
+        self.assertIsInstance(cls.doc['name'], pdoc.Variable)
+        self.assertEqual(cls.doc['name'].type_annotation(), 'str')
+
 
 class HtmlHelpersTest(unittest.TestCase):
     """
@@ -1027,7 +1120,6 @@ reference: `package.foo`
 <p>ref with underscore: <code><a href="#pdoc._x_x_">_x_x_</a></code></p>
 <pre><code>code block
 </code></pre>
-
 <p>reference: <code><a href="/package.foo.ext">package.foo</a></code></p>'''
 
         module = pdoc.Module(pdoc)
@@ -1209,6 +1301,10 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <dt><code><a>pdoc.Doc</a></code></dt>
 <dd>A class description that spans several lines.</dd>
 </dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; doctest
+...
+</code></pre>
 <h2 id="notes">Notes</h2>
 <p>Foo bar.</p>
 <h3 id="h3-title">H3 Title</h3>
@@ -1297,9 +1393,8 @@ that are relevant to the interface.</p>
 </dl>
 <h2 id="examples">Examples</h2>
 <p>Examples in doctest format.</p>
-<pre><code class="python">&gt;&gt;&gt; a = [1,2,3]
+<pre><code class="language-python-repl">&gt;&gt;&gt; a = [1,2,3]
 </code></pre>
-
 <h2 id="todos">Todos</h2>
 <ul>
 <li>For module TODOs</li>
@@ -1319,22 +1414,19 @@ line2
 fenced code works
 always
 </code></pre>
-
 <h2 id="examples">Examples</h2>
-<pre><code class="python">&gt;&gt;&gt; nbytes(100)
+<pre><code class="language-python-repl">&gt;&gt;&gt; nbytes(100)
 '100.0 bytes'
 line2
 </code></pre>
-
 <p>some text</p>
 <p>some text</p>
-<pre><code class="python">&gt;&gt;&gt; another doctest
+<pre><code class="language-python-repl">&gt;&gt;&gt; another doctest
 line1
 line2
 </code></pre>
-
 <h2 id="example">Example</h2>
-<pre><code class="python">&gt;&gt;&gt; f()
+<pre><code class="language-python-repl">&gt;&gt;&gt; f()
 Traceback (most recent call last):
     ...
 Exception: something went wrong
@@ -1387,9 +1479,8 @@ lines.</p>
         self.assertEqual(html, expected)
 
     def test_reST_include(self):
-        expected = '''<pre><code class="python">    x = 2
+        expected = '''<pre><code class="language-python">    x = 2
 </code></pre>
-
 <p>1
 x = 2
 x = 3
@@ -1434,7 +1525,6 @@ Work <a href="http://foo/">like this</a> and <a href="ftp://bar">like that</a>.<
 <p>data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D</p>
 <pre><code>http://url.com
 </code></pre>
-
 <p><a href="https://google.com">https://google.com</a>
 <a href="https://en.wikipedia.org/wiki/Orange_(software)">\
 https://en.wikipedia.org/wiki/Orange_(software)</a>

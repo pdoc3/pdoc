@@ -195,6 +195,11 @@ class Docformats:
         pdoc.Doc : A class description that
                    spans several lines.
 
+        Examples
+        --------
+        >>> doctest
+        ...
+
         Notes
         -----
         Foo bar.

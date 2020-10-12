@@ -1,3 +1,20 @@
+0.9.1  (2020-09-28)
+=====
+  - Fix circular imports and generally handling of typing annotations when
+    they are unresolvable (regression since 0.9.0).
+
+0.9.0  (2020-08-27)
+=====
+  - New offline search function using Lunr.js (see `lunr_config` config tunable).
+  - Correctly enumerate members of `Enum` and typed-only namespaces.
+  - Inspect `__init__` to obtain true/overridden class instantiation parameters.
+  - Bump Highlight.js and use its 'python-repl' annotation for doctests.
+
+0.8.5  (2020-08-27)
+=====
+  - Fix installation issue on non-UTF-8 platforms.
+  - Fix working with 'develop' installations in virtual environments.
+
 0.8.4  (2020-06-30)
 =====
   - Fix inline code interpretation inside fenced code blocks.

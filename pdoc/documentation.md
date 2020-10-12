@@ -23,12 +23,11 @@ What objects are documented?
 ----------------------------
 [public-private]: #what-objects-are-documented
 `pdoc` only extracts _public API_ documentation.[^public]
-If a module defines [`__all__`][__all__], then only
-the identifiers contained in this list are considered public.
-More generally, objects (modules, variables, functions, classes, methods)
-are only considered public in the module where they are defined
-(vs. imported from somewhere else) and only if their
-_identifiers don't begin with an underscore_ ( \_ ).[^private]
+Code objects (modules, variables, functions, classes, methods) are considered
+public in the modules where they are defined (vs. imported from somewhere else)
+as long as their _identifiers don't begin with an underscore_ ( \_ ).[^private]
+If a module defines [`__all__`][__all__], then only the identifiers contained
+in this list are considered public, regardless of where they were defined.
 
 This can be fine-tuned through [`__pdoc__` dict][__pdoc__].
 

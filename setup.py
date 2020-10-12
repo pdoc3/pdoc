@@ -16,7 +16,8 @@ if __name__ == '__main__':
         name="pdoc3",
         license="AGPL-3.0",
         description="Auto-generate API documentation for Python projects.",
-        long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
+        long_description=open(os.path.join(os.path.dirname(__file__), 'README.md'),
+                              encoding='utf-8').read(),
         long_description_content_type='text/markdown',
         url="https://pdoc3.github.io/pdoc/",
         project_urls={

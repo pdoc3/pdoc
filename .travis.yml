@@ -1,6 +1,6 @@
+os: linux
+dist: bionic
 language: python
-dist: xenial
-sudo: false
 cache:
   pip: true
 branches:
@@ -9,10 +9,10 @@ branches:
   # Tags
   - /^(\d+\.)+\d+(\.\S+)?$/
 
-matrix:
+jobs:
   fast_finish: true
   include:
-    - python: '3.5'
+    - python: '3.6'
     - python: '3.7'
     - python: '3.8'
       name: 'Lint, Coverage'

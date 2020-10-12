@@ -288,11 +288,15 @@
 
     <%include file="logo.mako"/>
 
-    % if search_query:
+    % if google_search_query:
         <div class="gcse-search" style="height: 70px"
-             data-as_oq="${' '.join(search_query.strip().split()) | h }"
+             data-as_oq="${' '.join(google_search_query.strip().split()) | h }"
              data-gaCategoryParameter="${module.refname | h}">
         </div>
+    % endif
+
+    % if lunr_search is not None:
+      <%include file="_lunr_search.inc.mako"/>
     % endif
 
     <h1>Index</h1>
@@ -379,7 +383,7 @@
   <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
   <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
   % if syntax_highlighting:
-    <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/${hljs_style}.min.css" crossorigin>
+    <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/${hljs_style}.min.css" crossorigin>
   %endif
 
   <%namespace name="css" file="css.mako" />
@@ -394,7 +398,7 @@
     </script><script async src='https://www.google-analytics.com/analytics.js'></script>
   % endif
 
-  % if search_query:
+  % if google_search_query:
     <link rel="preconnect" href="https://www.google.com">
     <script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
     <style>
@@ -408,7 +412,7 @@
   % endif
 
   % if syntax_highlighting:
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js" integrity="sha256-eOgo0OtLL4cdq7RdwRUiGKLX9XsIJ7nGhWEKbohmVAQ=" crossorigin></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
     <script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
   % endif
 
