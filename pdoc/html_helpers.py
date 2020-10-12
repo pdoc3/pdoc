@@ -70,7 +70,7 @@ def glimpse(text: str, max_length=153, *, paragraph=True,
 
 
 _md = markdown.Markdown(
-    output_format='html5',
+    output_format='html5',    # type: ignore[arg-type]
     extensions=[
         "markdown.extensions.abbr",
         "markdown.extensions.attr_list",
@@ -84,10 +84,10 @@ _md = markdown.Markdown(
     ],
     extension_configs={
         "markdown.extensions.smarty": dict(
-            smart_dashes=True,
-            smart_ellipses=True,
-            smart_quotes=False,
-            smart_angled_quotes=False,
+            smart_dashes=True,          # type: ignore[dict-item]
+            smart_ellipses=True,        # type: ignore[dict-item]
+            smart_quotes=False,         # type: ignore[dict-item]
+            smart_angled_quotes=False,  # type: ignore[dict-item]
         ),
     },
 )
@@ -414,10 +414,10 @@ def to_html(text: str, *,
     example template.
     """
     # Optionally register our math syntax processor
-    if not latex_math and _MathPattern.NAME in _md.inlinePatterns:
-        _md.inlinePatterns.deregister(_MathPattern.NAME)
-    elif latex_math and _MathPattern.NAME not in _md.inlinePatterns:
-        _md.inlinePatterns.register(_MathPattern(_MathPattern.PATTERN),
+    if not latex_math and _MathPattern.NAME in _md.inlinePatterns:         # type: ignore
+        _md.inlinePatterns.deregister(_MathPattern.NAME)                   # type: ignore
+    elif latex_math and _MathPattern.NAME not in _md.inlinePatterns:       # type: ignore
+        _md.inlinePatterns.register(_MathPattern(_MathPattern.PATTERN),    # type: ignore
                                     _MathPattern.NAME,
                                     _MathPattern.PRIORITY)
 
