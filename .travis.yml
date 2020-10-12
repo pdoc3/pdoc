@@ -22,7 +22,8 @@ jobs:
       addons:
         apt:
           packages:
-            - texlive-xetex
+            - texlive-xetex  # test_pdf_pandoc
+            - lmodern        # test_pdf_pandoc
       script:
         - find -name '*.md' | xargs .github/lint-markdown.sh
         - flake8
