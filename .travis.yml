@@ -18,11 +18,19 @@ jobs:
       name: 'Lint, Coverage'
       before_script:
         - pip install flake8 coverage mypy
+        - wget -O/tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/2.10/pandoc-2.10-1-amd64.deb && sudo dpkg -i /tmp/pandoc.deb
+      addons:
+        apt:
+          packages:
+            - texlive-xetex  # test_pdf_pandoc
+            - lmodern        # test_pdf_pandoc
+            - texlive-fonts-recommended  # test_pdf_pandoc
       script:
         - find -name '*.md' | xargs .github/lint-markdown.sh
         - flake8
         - mypy pdoc
         - time catchsegv coverage run setup.py test
+        - PDOC_TEST_PANDOC=1 python -m unittest pdoc.test.CliTest.test_pdf_pandoc
       after_success:
         - bash <(curl -s https://codecov.io/bash)
 

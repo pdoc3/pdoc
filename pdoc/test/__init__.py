@@ -6,6 +6,7 @@ import inspect
 import os
 import shutil
 import signal
+import subprocess
 import sys
 import threading
 import unittest
@@ -378,6 +379,17 @@ class CliTest(unittest.TestCase):
         pdoc_Doc_params = str(inspect.signature(pdoc.Doc.__init__)).replace('self, ', '')
         self.assertIn(pdoc_Doc_params.replace(' ', ''),
                       out.replace('>', '').replace('\n', '').replace(' ', ''))
+
+    @unittest.skipUnless('PDOC_TEST_PANDOC' in os.environ, 'PDOC_TEST_PANDOC not set/requested')
+    def test_pdf_pandoc(self):
+        with temp_dir() as path, \
+                chdir(path), \
+                redirect_streams() as (stdout, _), \
+                open('pdf.md', 'w') as f:
+            run('pdoc', pdf=None)
+            f.write(stdout.getvalue())
+            subprocess.run(pdoc.cli._PANDOC_COMMAND, shell=True, check=True)
+            self.assertTrue(os.path.exists('pdf.pdf'))
 
     def test_config(self):
         with run_html(EXAMPLE_MODULE, config='link_prefix="/foobar/"'):
