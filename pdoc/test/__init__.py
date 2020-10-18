@@ -1403,6 +1403,36 @@ that are relevant to the interface.</p>
         html = to_html(text, module=self._module, link=self._link)
         self.assertEqual(html, expected)
 
+    def test_reST(self):
+        expected = '''<p>Summary line.</p>
+<h2 id="args">Args:</h2>
+<dl>
+<dt><strong><code>arg1</code></strong> :&ensp;<code>int</code></dt>
+<dd>Text1</dd>
+<dt><strong><code>arg2</code></strong> :&ensp;<code>Optional[List[Tuple[str]]]</code></dt>
+<dd>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+ diam nonumy eirmod tempor invidunt</dd>
+<dt><strong><code>arg_arg_3</code></strong> :&ensp;<code>Dict[int, Dict[str, Any]]</code></dt>
+<dd>Y:=H^T<em>X!@#$%^&amp;&amp;</em>()_[]{}';'::</dd>
+</dl>
+<h2 id="returns">Returns:</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True. Or False. Depends</dd>
+<dd>Now with more "s"</dd>
+</dl>
+<h2 id="raises">Raises:</h2>
+<dl>
+<dt><strong><code>Exception</code></strong></dt>
+<dd>Raised occasionally</dd>
+<dt><strong><code>ZeroDivisionError</code></strong></dt>
+<dd>You know why and when</dd>
+</dl>'''
+        text = inspect.getdoc(self._docmodule.reST)
+        html = to_html(text, module=self._module, link=self._link)
+
+        self.assertEqual(html, expected)
+
     def test_doctests(self):
         expected = '''<p>Need an intro paragrapgh.</p>
 <pre><code>&gt;&gt;&gt; Then code is indented one level

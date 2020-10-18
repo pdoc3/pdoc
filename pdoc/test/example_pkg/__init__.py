@@ -298,6 +298,25 @@ class Docformats:
             Exception: something went wrong
         """
 
+    def reST(self):
+        """
+        Summary line.
+
+        :param arg1: Text1
+        :parameter arg2: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+            diam nonumy eirmod tempor invidunt
+        :arg arg_arg_3: Y:=H^T*X!@#$%^&&*()_[]{}';'::
+        :type arg1: int
+        :type arg2: Optional[List[Tuple[str]]]
+        :type arg_arg_3: Dict[int, Dict[str, Any]]
+        :return: True. Or False. Depends
+        :rtype: bool
+
+        :returns: Now with more "s"
+        :raise Exception: Raised occasionally
+        :raises ZeroDivisionError: You know why and when
+        """
+
     def reST_directives(self):
         """
         .. todo::
@@ -343,6 +362,9 @@ google = Docformats.google
 
 
 doctests = Docformats.doctests
+
+
+reST = Docformats.reST
 
 
 reST_directives = Docformats.reST_directives

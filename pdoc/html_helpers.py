@@ -266,6 +266,71 @@ class _ToMarkdown:
         return text
 
     @staticmethod
+    def reST(text: str) -> str:
+        """
+        Convert `text` in reST-style docstring format to Markdown
+        to be further converted later.
+        """
+        def reST_sections(match) -> str:
+            # E.g. for ":param arg1: Text" tag is "param", name is "arg1", and body is "Text"
+            tag, name, body = match.groups('')
+            body = textwrap.dedent(body)
+
+            type_ = None
+            nonlocal active_section
+            active_section_changed = False
+
+            if tag in ['type', 'rtype']:
+                return ''
+            elif tag in ('param', 'parameter', 'arg', 'argument', 'key', 'keyword'):
+                type_ = parameter_types.get(name, None)
+
+                if active_section != 'Args':
+                    active_section = 'Args'
+                    active_section_changed = True
+            elif tag in ('return', 'returns'):
+                if len(return_types) > 0:
+                    type_ = return_types.pop()
+
+                if active_section != 'Returns':
+                    active_section = 'Returns'
+                    active_section_changed = True
+            elif tag in ('raise', 'raises'):
+                if active_section != 'Raises':
+                    active_section = 'Raises'
+                    active_section_changed = True
+
+            if name or type_:
+                text = _ToMarkdown._deflist(*_ToMarkdown._fix_indent(name, type_, body))
+            else:
+                _, _, body = _ToMarkdown._fix_indent(name, type_, body)
+                text = f':   {body}'
+
+            if active_section_changed:
+                text = f'\n{active_section}:\n-----=\n{text}'
+            else:
+                text = f'\n{text}'
+
+            return text
+
+        regex = re.compile(r'^:(\S+)(?:\s(\S+?))?:((?:\n?(?: .*|$))+)', re.MULTILINE)
+
+        # Get all parameter and return types beforehand, to then use them when substituting
+        # the sections
+        parameter_types = {}
+        return_types = []
+        for tag, name, body in regex.findall(text):
+            if tag == 'type':
+                parameter_types[name] = body.strip()
+            elif tag == 'rtype':
+                return_types.append(body.strip())
+
+        active_section = None  # Keep track of the currently active section (e.g. Args, Returns)
+        text = regex.sub(reST_sections, text)
+
+        return text
+
+    @staticmethod
     def _admonition(match, module=None, limit_types=None):
         indent, type, value, text = match.groups()
 
@@ -406,8 +471,9 @@ def to_html(text: str, *,
             latex_math: bool = False):
     """
     Returns HTML of `text` interpreted as `docformat`. `__docformat__` is respected
-    if present, otherwise Numpydoc and Google-style docstrings are assumed,
-    as well as pure Markdown.
+    if present, otherwise it is inferred whether it's reST-style, or Numpydoc
+    and Google-style docstrings. Pure Markdown and reST directives are also assumed
+    and processed if docformat has not been specified.
 
     `module` should be the documented module (so the references can be
     resolved) and `link` is the hyperlinking function like the one in the
@@ -430,20 +496,35 @@ def to_markdown(text: str, *,
                 module: pdoc.Module = None, link: Callable[..., str] = None):
     """
     Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
-    `__docformat__` is respected
-    if present, otherwise Numpydoc and Google-style docstrings are assumed,
-    as well as pure Markdown.
+    `__docformat__` is respected if present, otherwise it is inferred whether it's
+     reST-style, or Numpydoc and Google-style docstrings. Pure Markdown and reST directives
+     are also assumed and processed if docformat has not been specified.
 
     `module` should be the documented module (so the references can be
     resolved) and `link` is the hyperlinking function like the one in the
     example template.
     """
     if not docformat:
-        docformat = str(getattr(getattr(module, 'obj', None), '__docformat__', 'numpy,google '))
+        docformat = str(getattr(getattr(module, 'obj', None), '__docformat__', ''))
+
+        # Infer docformat if it hasn't been specified
+        if docformat == '':
+            reST_tags = ['param', 'arg', 'type', 'raise', 'except', 'return', 'rtype']
+            reST_regex = fr'^:(?:{"|".join(reST_tags)}).*?:'
+            found_reST_tags = re.findall(reST_regex, text, re.MULTILINE)
+
+            # Assume reST-style docstring if any of the above specified tags is present at the beginning of a line.
+            # Could make this more robust, e.g., by checking against the amount of found google or numpy tags
+            if len(found_reST_tags) > 0:
+                docformat = 'reST '
+            else:
+                docformat = 'numpy,google '
+
         docformat, *_ = docformat.lower().split()
-    if not (set(docformat.split(',')) & {'', 'numpy', 'google'}):
+
+    if not (set(docformat.split(',')) & {'', 'numpy', 'google', 'rest'}):
         warn('__docformat__ value {!r} in module {!r} not supported. '
-             'Supported values are: numpy, google.'.format(docformat, module))
+             'Supported values are: numpy, google, reST.'.format(docformat, module))
         docformat = 'numpy,google'
 
     with _fenced_code_blocks_hidden(text) as result:
@@ -461,6 +542,9 @@ def to_markdown(text: str, *,
         # headings are incorrectly interpreted as numpy params
         if 'numpy' in docformat:
             text = _ToMarkdown.numpy(text)
+
+        if 'rest' in docformat:
+            text = _ToMarkdown.reST(text)
 
         if module and link:
             # Hyperlink markdown code spans not within markdown hyperlinks.
