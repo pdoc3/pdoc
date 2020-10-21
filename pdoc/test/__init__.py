@@ -233,8 +233,14 @@ class CliTest(unittest.TestCase):
             )
 
     def test_docformat(self):
+        def test_docformat(self):
+            with self.assertWarns(UserWarning) as cm, \
+                    run_html(EXAMPLE_MODULE, config='docformat="epytext"'):
+                self._basic_html_assertions()
+            self.assertIn('numpy', cm.warning.args[0])
+
         with self.assertWarns(UserWarning) as cm,\
-                run_html(EXAMPLE_MODULE, config='docformat="restructuredtext"'):
+                run_html(EXAMPLE_MODULE, config='docformat="epytext"'):
             self._basic_html_assertions()
         self.assertIn('numpy', cm.warning.args[0])
 
@@ -1403,36 +1409,6 @@ that are relevant to the interface.</p>
         html = to_html(text, module=self._module, link=self._link)
         self.assertEqual(html, expected)
 
-    def test_reST(self):
-        expected = '''<p>Summary line.</p>
-<h2 id="args">Args:</h2>
-<dl>
-<dt><strong><code>arg1</code></strong> :&ensp;<code>int</code></dt>
-<dd>Text1</dd>
-<dt><strong><code>arg2</code></strong> :&ensp;<code>Optional[List[Tuple[str]]]</code></dt>
-<dd>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
- diam nonumy eirmod tempor invidunt</dd>
-<dt><strong><code>arg_arg_3</code></strong> :&ensp;<code>Dict[int, Dict[str, Any]]</code></dt>
-<dd>Y:=H^T<em>X!@#$%^&amp;&amp;</em>()_[]{}';'::</dd>
-</dl>
-<h2 id="returns">Returns:</h2>
-<dl>
-<dt><code>bool</code></dt>
-<dd>True. Or False. Depends</dd>
-<dd>Now with more "s"</dd>
-</dl>
-<h2 id="raises">Raises:</h2>
-<dl>
-<dt><strong><code>Exception</code></strong></dt>
-<dd>Raised occasionally</dd>
-<dt><strong><code>ZeroDivisionError</code></strong></dt>
-<dd>You know why and when</dd>
-</dl>'''
-        text = inspect.getdoc(self._docmodule.reST)
-        html = to_html(text, module=self._module, link=self._link)
-
-        self.assertEqual(html, expected)
-
     def test_doctests(self):
         expected = '''<p>Need an intro paragrapgh.</p>
 <pre><code>&gt;&gt;&gt; Then code is indented one level
@@ -1463,6 +1439,121 @@ Exception: something went wrong
 </code></pre>'''
         text = inspect.getdoc(self._docmodule.doctests)
         html = to_html(text, module=self._module, link=self._link)
+        self.assertEqual(html, expected)
+
+    def test_reST(self):
+        expected = '''<p>Summary line.</p>
+<p>Some stuff to test like <a class="reference external" href="http://www.python.org">http://www.python.org</a> or <a class="reference external" href="http://www.python.org">link_text</a>.
+Also <em>italic</em> and <strong>bold</strong>. And lists:</p>
+<ul class="simple">
+<li><p>1</p></li>
+<li><p>2</p></li>
+</ul>
+<ol class="arabic simple">
+<li><p>Item</p></li>
+<li><p>Item</p></li>
+</ol>
+<h2 id="args">Args:</h2>
+<dl>
+<dt><strong><code>arg1</code></strong> :&ensp;<code>int</code></dt>
+<dd><p>Text1</p></dd>
+<dt><strong><code>arg2</code></strong> :&ensp;<code>Optional[List[Tuple[str]]]</code></dt>
+<dd><p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+diam nonumy eirmod tempor invidunt</p></dd>
+<dt><strong><code>arg_arg_3</code></strong> :&ensp;<code>Dict[int, Dict[str, Any]]</code></dt>
+<dd><p>Y:=H^T<em>X!&#64;#$%^&amp;&amp;</em>()_[]{}';'::{[( :param just_in_case:</p></dd>
+<dt><strong><code>another_parameter</code></strong> :&ensp;<code>str</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="vars">Vars:</h2>
+<dl>
+<dt><strong><code>x</code></strong></dt>
+<dd><p>Description of variable x</p></dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>List[bool]</code></dt>
+<dd><p>Description of variable y</p></dd>
+<dt><strong><code>z</code></strong> :&ensp;<code>str</code></dt>
+<dd><p>Descriptions can also be placed in a new line.</p>
+<p>And span multiple lines.</p></dd>
+</dl>
+<h2 id="returns">Returns:</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd><p>True. Or False. Depends</p></dd>
+</dl>
+<p>A paragraph to split the field list into two.</p>
+<h2 id="returns_1">Returns:</h2>
+<dl>
+<dd>
+<dl>
+<dt><p>Now with more &quot;s&quot;</p></dt>
+<dt>Raises:</dt>
+<dt>-----=</dt>
+<dt><strong><code>Exception</code></strong></dt>
+<dd><p>Raised occasionally</p></dd>
+</dl>
+</dd>
+<dt><strong><code>ZeroDivisionError</code></strong></dt>
+<dd><p>You know why and when</p></dd>
+</dl>
+<p>Some more tests below:</p>
+<h2 id="args_1">Args:</h2>
+<dl>
+<dt><strong><code>z</code></strong> :&ensp;<code>str</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="vars_1">Vars:</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>int</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns_2">Returns:</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>And now for some other stuff</p>
+<div class="admonition admonition-todo">
+<p class="admonition-title">TODO</p>
+<p>Create something.</p>
+</div>
+<div class="admonition admonition-example">
+<p class="admonition-title">Example</p>
+<p>Image shows something.</p>
+<img alt="https://www.debian.org/logos/openlogo-nd-100.png" src="https://www.debian.org/logos/openlogo-nd-100.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Can only nest admonitions two levels.</p>
+</div>
+</div>
+<p><img alt="https://www.debian.org/logos/openlogo-nd-100.png" src="https://www.debian.org/logos/openlogo-nd-100.png" /></p>
+<p>Now you know.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Some warning
+lines.</p>
+</div>
+<ul>
+<li><p>Describe some func in a list
+across multiple lines:</p>
+<blockquote>
+<div class="admonition admonition-deprecated-since-3-1">
+<p class="admonition-title">Deprecated since 3.1</p>
+<p>Use <cite>spam</cite> instead.</p>
+</div>
+<div class="admonition admonition-added-in-version-2-5">
+<p class="admonition-title">Added in version 2.5</p>
+<p>The <em>spam</em> parameter.</p>
+</div>
+</blockquote>
+</li>
+</ul>
+<div class="admonition caution">
+<p class="admonition-title">Caution!</p>
+<p>Don't touch this!</p>
+</div>'''  # noqa: 501
+        text = inspect.getdoc(self._docmodule.reST)
+        html = to_html(text, module=self._module, link=self._link)
+
         self.assertEqual(html, expected)
 
     def test_reST_directives(self):
@@ -1506,6 +1597,7 @@ lines.</p>
 </div>'''
         text = inspect.getdoc(self._docmodule.reST_directives)
         html = to_html(text, module=self._module, link=self._link)
+
         self.assertEqual(html, expected)
 
     def test_reST_include(self):
