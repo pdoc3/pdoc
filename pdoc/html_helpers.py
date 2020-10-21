@@ -12,6 +12,11 @@ from functools import partial, lru_cache
 from typing import Callable, Match
 from warnings import warn
 import xml.etree.ElementTree as etree
+import docutils.nodes
+import docutils.core
+import collections
+from typing import *
+
 
 import markdown
 from markdown.inlinepatterns import InlineProcessor
@@ -266,69 +271,151 @@ class _ToMarkdown:
         return text
 
     @staticmethod
+    def _reST_string_to_html(text: str) -> str:
+        """Convert reST text to html using docutils
+
+        :param text: The text to convert
+        :returns: The generated html
+        """
+        html = docutils.core.publish_parts(text, writer_name='html')['html_body']
+
+        # Remove the document tag and return
+        return html[23:-8]
+
+    @staticmethod
+    def _reST_node_to_html(node: docutils.nodes.Node,
+                          doctree: docutils.nodes.document) -> str:
+        """Not all nodes in the doctree provide their reST source or at least the
+        starting line in the reST source. This method simply copies the document
+        tree and removes all but the node to then publish it.
+
+        :node: The node to publish. Must be a child of `doctree` itself
+        :doctree: The document having `node` as a child node
+        :return: The generated html for this node
+        """
+        # Remove all but the given node from the doctree
+        children_copy = doctree.children
+        doctree.children = [doctree.children[doctree.index(node)]]
+
+        # Generate the html for this node/doctree
+        html = docutils.core.publish_from_doctree(doctree, writer_name='html5').decode('utf-8')
+
+        # Restore the doctree
+        doctree.children = children_copy
+
+        # Return only the relevant part of the html
+        return re.search(r"<div class=\"document\">(.+)<\/div>", html, re.DOTALL).group(1).strip()
+
+    @staticmethod
+    def _reST_field_list_to_markdown(field_list: Union[docutils.nodes.field_list,
+                                                       docutils.nodes.docinfo]) -> str:
+        """Processes a docutils field list and converts it to markdown.
+        Args, Vars, Returns, and Raises sections are predefined, other sections
+        will be created corresponding to their field names.
+
+        :param field_list: A docutils field list to convert. Can also be a docinfo
+            in case, e.g., only :returns: is specified without any summary text
+        :returns: The generated Markdown. However, it is not pure Markdown, as
+            the field descriptions have been processed with `docutils.process_string` - they
+            therefore are already converted to HTML
+        """
+        # Sort the field list so that types come last  - in case someone defines first the type then
+        # the parameter
+        field_list.children.sort(key=lambda field: 'type' in field[0].rawsource.split()[0])
+
+        # Predefined sections for the generated markdown
+        tags_to_section_map = {
+            ('param', 'parameter', 'arg', 'argument', 'key', 'keyword'): 'Args',
+            ('var', 'ivar', 'cvar'): 'Vars',
+            ('return', 'returns'): 'Returns',
+            ('raise', 'raises'): 'Raises'
+        }
+        sections = collections.OrderedDict([('Args', []), ('Vars', []),
+                                            ('Returns', []), ('Raises', [])])
+
+        # Process the fields
+        for field in field_list:
+            field_name = field.children[0]
+            field_body = field.children[1]
+
+            # Split the field name into its components
+            split = field_name.rawsource.split()
+            tag = split[0]
+            type_ = split[1] if len(split) == 3 else None
+            name = split[2] if len(split) == 3 else split[1] if len(split) == 2 else None
+
+            # Fill the sections
+            try:
+                section = [section for tags, section in tags_to_section_map.items() if tag in tags][0]
+            except IndexError:  # Field is not corresponding to a predefined section like Args
+                section = None
+
+            if section is not None:
+                sections[section].append({'name': name,
+                                          'type': type_,
+                                          'body': _ToMarkdown._reST_string_to_html(
+                                              field_body.rawsource)})
+            elif tag == 'rtype':
+                # Set the return type. Assumes that at most one :return: has been specified
+                try:
+                    sections['Returns'][0]['type'] = field_body.rawsource
+                except IndexError:  # Only return type is specified
+                    sections['Returns'].append({'name': None,
+                                                'type': field_body.rawsource.strip(),
+                                                'body': ''})
+            elif 'type' in tag:
+                section = 'Vars' if tag == 'vartype' else 'Args'
+                try:
+                    param_or_var = [x for x in sections[section] if x['name'] == name][0]
+                    param_or_var['type'] = field_body.rawsource.strip()
+                except IndexError:  # Only parameter (or variable) type is specified
+                    sections[section].append({'name': name,
+                                              'type': field_body.rawsource.strip(),
+                                              'body': ''})
+            elif tag == 'meta':
+                pass  # Meta fields should be excluded from the final output
+            else:
+                # Generate sections for tags not covered yet
+                section = sections.get(tag, [])
+                section.append({'name': name,
+                                'type': type_,
+                                'body': _ToMarkdown._reST_string_to_html(field_body.rawsource)})
+                sections[tag] = section
+
+        # Generate the markdown for this field list
+        markdown = []
+        for section, fields in sections.items():
+            if len(fields) > 0:  # Skip empty sections
+                markdown.append(f'{section}:\n-----=')
+
+                for field in fields:
+                    field['body'] = field['body'].replace('\n', '\n  ')  # Allow for proper indentation
+                    if field['name'] or field['type']:
+                        markdown.append(_ToMarkdown._deflist(*_ToMarkdown._fix_indent(field['name'],
+                                                                                      field['type'],
+                                                                                      field['body'])))
+                    else:  # For fields with no name or type (e.g. Returns without type specification)
+                        text = _ToMarkdown._fix_indent(field['name'], field['type'], field['body'])[2]
+                        markdown.append(f':   {text}')
+
+        return '\n'.join(markdown)
+
+    @staticmethod
     def reST(text: str) -> str:
         """
-        Convert `text` in reST-style docstring format to Markdown
-        to be further converted later.
+        Convert `text` in reST-style docstring format to Markdown - with embedded html
+        for paragraphs and field descriptions - to be further converted later.
         """
-        def reST_sections(match) -> str:
-            # E.g. for ":param arg1: Text" tag is "param", name is "arg1", and body is "Text"
-            tag, name, body = match.groups('')
-            body = textwrap.dedent(body)
+        doctree = docutils.core.publish_doctree(text)
 
-            type_ = None
-            nonlocal active_section
-            active_section_changed = False
-
-            if tag in ['type', 'rtype']:
-                return ''
-            elif tag in ('param', 'parameter', 'arg', 'argument', 'key', 'keyword'):
-                type_ = parameter_types.get(name, None)
-
-                if active_section != 'Args':
-                    active_section = 'Args'
-                    active_section_changed = True
-            elif tag in ('return', 'returns'):
-                if len(return_types) > 0:
-                    type_ = return_types.pop()
-
-                if active_section != 'Returns':
-                    active_section = 'Returns'
-                    active_section_changed = True
-            elif tag in ('raise', 'raises'):
-                if active_section != 'Raises':
-                    active_section = 'Raises'
-                    active_section_changed = True
-
-            if name or type_:
-                text = _ToMarkdown._deflist(*_ToMarkdown._fix_indent(name, type_, body))
+        generated_markdown = []
+        for section in doctree:
+            if section.tagname in ('field_list', 'docinfo'):
+                generated_markdown.append(_ToMarkdown._reST_field_list_to_markdown(section))
             else:
-                _, _, body = _ToMarkdown._fix_indent(name, type_, body)
-                text = f':   {body}'
+                generated_markdown.append(_ToMarkdown._reST_node_to_html(section, doctree))
 
-            if active_section_changed:
-                text = f'\n{active_section}:\n-----=\n{text}'
-            else:
-                text = f'\n{text}'
-
-            return text
-
-        regex = re.compile(r'^:(\S+)(?:\s(\S+?))?:((?:\n?(?: .*|$))+)', re.MULTILINE)
-
-        # Get all parameter and return types beforehand, to then use them when substituting
-        # the sections
-        parameter_types = {}
-        return_types = []
-        for tag, name, body in regex.findall(text):
-            if tag == 'type':
-                parameter_types[name] = body.strip()
-            elif tag == 'rtype':
-                return_types.append(body.strip())
-
-        active_section = None  # Keep track of the currently active section (e.g. Args, Returns)
-        text = regex.sub(reST_sections, text)
-
-        return text
+        return '\n'.join(generated_markdown)
 
     @staticmethod
     def _admonition(match, module=None, limit_types=None):
@@ -509,41 +596,40 @@ def to_markdown(text: str, *,
 
         # Infer docformat if it hasn't been specified
         if docformat == '':
-            reST_tags = ['param', 'arg', 'type', 'raise', 'except', 'return', 'rtype']
+            reST_tags = ['param ', 'arg ', 'type ', 'raise ', 'except ', 'return', 'rtype']
             reST_regex = fr'^:(?:{"|".join(reST_tags)}).*?:'
             found_reST_tags = re.findall(reST_regex, text, re.MULTILINE)
 
             # Assume reST-style docstring if any of the above specified tags is present at the beginning of a line.
             # Could make this more robust, e.g., by checking against the amount of found google or numpy tags
-            if len(found_reST_tags) > 0:
-                docformat = 'reST '
-            else:
-                docformat = 'numpy,google '
+            docformat = 'restructuredtext ' if len(found_reST_tags) > 0 else 'numpy,google '
 
         docformat, *_ = docformat.lower().split()
 
-    if not (set(docformat.split(',')) & {'', 'numpy', 'google', 'rest'}):
+    if not (set(docformat.split(',')) & {'', 'numpy', 'google', 'restructuredtext'}):
         warn('__docformat__ value {!r} in module {!r} not supported. '
-             'Supported values are: numpy, google, reST.'.format(docformat, module))
+             'Supported values are: numpy, google, restructuredtext.'.format(docformat, module))
         docformat = 'numpy,google'
 
     with _fenced_code_blocks_hidden(text) as result:
         text = result[0]
 
-        text = _ToMarkdown.admonitions(text, module)
+        if 'restructuredtext' not in docformat:  # Will be handled by docutils
+            text = _ToMarkdown.admonitions(text, module)
 
         if 'google' in docformat:
             text = _ToMarkdown.google(text)
 
         text = _ToMarkdown.doctests(text)
-        text = _ToMarkdown.raw_urls(text)
+        if 'restructuredtext' not in docformat:  # Will be handled by docutils
+            text = _ToMarkdown.raw_urls(text)
 
         # If doing both, do numpy after google, otherwise google-style's
         # headings are incorrectly interpreted as numpy params
         if 'numpy' in docformat:
             text = _ToMarkdown.numpy(text)
 
-        if 'rest' in docformat:
+        if 'restructuredtext' in docformat:
             text = _ToMarkdown.reST(text)
 
         if module and link:
