@@ -233,12 +233,6 @@ class CliTest(unittest.TestCase):
             )
 
     def test_docformat(self):
-        def test_docformat(self):
-            with self.assertWarns(UserWarning) as cm, \
-                    run_html(EXAMPLE_MODULE, config='docformat="epytext"'):
-                self._basic_html_assertions()
-            self.assertIn('numpy', cm.warning.args[0])
-
         with self.assertWarns(UserWarning) as cm,\
                 run_html(EXAMPLE_MODULE, config='docformat="epytext"'):
             self._basic_html_assertions()
