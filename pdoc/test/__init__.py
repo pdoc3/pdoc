@@ -233,6 +233,12 @@ class CliTest(unittest.TestCase):
             )
 
     def test_docformat(self):
+        def test_docformat(self):
+            with self.assertWarns(UserWarning) as cm, \
+                    run_html(EXAMPLE_MODULE, config='docformat="epytext"'):
+                self._basic_html_assertions()
+            self.assertIn('numpy', cm.warning.args[0])
+
         with self.assertWarns(UserWarning) as cm,\
                 run_html(EXAMPLE_MODULE, config='docformat="epytext"'):
             self._basic_html_assertions()
@@ -1544,7 +1550,7 @@ across multiple lines:</p>
 <div class="admonition caution">
 <p class="admonition-title">Caution!</p>
 <p>Don't touch this!</p>
-</div>'''
+</div>'''  # noqa: 501
         text = inspect.getdoc(self._docmodule.reST)
         html = to_html(text, module=self._module, link=self._link)
 

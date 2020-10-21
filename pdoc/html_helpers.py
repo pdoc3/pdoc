@@ -15,7 +15,7 @@ import xml.etree.ElementTree as etree
 import docutils.nodes
 import docutils.core
 import collections
-from typing import *
+from typing import Union
 
 
 import markdown
@@ -284,7 +284,7 @@ class _ToMarkdown:
 
     @staticmethod
     def _reST_node_to_html(node: docutils.nodes.Node,
-                          doctree: docutils.nodes.document) -> str:
+                           doctree: docutils.nodes.document) -> str:
         """Not all nodes in the doctree provide their reST source or at least the
         starting line in the reST source. This method simply copies the document
         tree and removes all but the node to then publish it.
@@ -346,7 +346,8 @@ class _ToMarkdown:
 
             # Fill the sections
             try:
-                section = [section for tags, section in tags_to_section_map.items() if tag in tags][0]
+                section = [section for tags, section in tags_to_section_map.items()
+                           if tag in tags][0]
             except IndexError:  # Field is not corresponding to a predefined section like Args
                 section = None
 
@@ -389,13 +390,15 @@ class _ToMarkdown:
                 markdown.append(f'{section}:\n-----=')
 
                 for field in fields:
-                    field['body'] = field['body'].replace('\n', '\n  ')  # Allow for proper indentation
+                    field['body'] = field['body'].replace('\n', '\n  ')  # For proper indentation
                     if field['name'] or field['type']:
-                        markdown.append(_ToMarkdown._deflist(*_ToMarkdown._fix_indent(field['name'],
-                                                                                      field['type'],
-                                                                                      field['body'])))
-                    else:  # For fields with no name or type (e.g. Returns without type specification)
-                        text = _ToMarkdown._fix_indent(field['name'], field['type'], field['body'])[2]
+                        markdown.append(
+                            _ToMarkdown._deflist(*_ToMarkdown._fix_indent(field['name'],
+                                                                          field['type'],
+                                                                          field['body'])))
+                    else:  # For fields with no name or type (e.g. Returns without type spec)
+                        text = _ToMarkdown._fix_indent(
+                            field['name'], field['type'], field['body'])[2]
                         markdown.append(f':   {text}')
 
         return '\n'.join(markdown)
@@ -600,8 +603,9 @@ def to_markdown(text: str, *,
             reST_regex = fr'^:(?:{"|".join(reST_tags)}).*?:'
             found_reST_tags = re.findall(reST_regex, text, re.MULTILINE)
 
-            # Assume reST-style docstring if any of the above specified tags is present at the beginning of a line.
-            # Could make this more robust, e.g., by checking against the amount of found google or numpy tags
+            # Assume reST-style docstring if any of the above specified tags is present at the
+            # beginning of a line.  Could make this more robust, e.g., by checking against the
+            # amount of found google or numpy tags
             docformat = 'restructuredtext ' if len(found_reST_tags) > 0 else 'numpy,google '
 
         docformat, *_ = docformat.lower().split()
