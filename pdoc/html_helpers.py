@@ -14,8 +14,8 @@ from warnings import warn
 import xml.etree.ElementTree as etree
 import docutils.nodes
 import docutils.core
-import collections
-from typing import Union
+from collections import OrderedDict
+from typing import Union, List, Dict, Optional
 
 
 import markdown
@@ -304,7 +304,15 @@ class _ToMarkdown:
         doctree.children = children_copy
 
         # Return only the relevant part of the html
-        return re.search(r"<div class=\"document\">(.+)<\/div>", html, re.DOTALL).group(1).strip()
+        match = re.search(r'<div class="document">(.+)</div>', html, re.DOTALL)
+
+        if match is not None:
+            return match.group(1).strip()
+        else:
+            # The generated HTML from docutils.publish_from_doctree() should always contain a
+            # div with class "document" in which all generated content is located. However, in case
+            # it doesn't, it's probably empty so return an empty string
+            return ''
 
     @staticmethod
     def _reST_field_list_to_markdown(field_list: Union[docutils.nodes.field_list,
@@ -330,8 +338,8 @@ class _ToMarkdown:
             ('return', 'returns'): 'Returns',
             ('raise', 'raises'): 'Raises'
         }
-        sections = collections.OrderedDict([('Args', []), ('Vars', []),
-                                            ('Returns', []), ('Raises', [])])
+        sections: OrderedDict[str, List[Dict[str, Optional[str]]]] = OrderedDict(
+            [('Args', []), ('Vars', []), ('Returns', []), ('Raises', [])])
 
         # Process the fields
         for field in field_list:
@@ -346,8 +354,8 @@ class _ToMarkdown:
 
             # Fill the sections
             try:
-                section = [section for tags, section in tags_to_section_map.items()
-                           if tag in tags][0]
+                section: Optional[str] = [section for tags, section in tags_to_section_map.items()
+                                          if tag in tags][0]
             except IndexError:  # Field is not corresponding to a predefined section like Args
                 section = None
 
@@ -377,11 +385,11 @@ class _ToMarkdown:
                 pass  # Meta fields should be excluded from the final output
             else:
                 # Generate sections for tags not covered yet
-                section = sections.get(tag, [])
-                section.append({'name': name,
-                                'type': type_,
-                                'body': _ToMarkdown._reST_string_to_html(field_body.rawsource)})
-                sections[tag] = section
+                new_section = sections.get(tag, [])
+                new_section.append({'name': name,
+                                    'type': type_,
+                                    'body': _ToMarkdown._reST_string_to_html(field_body.rawsource)})
+                sections[tag] = new_section
 
         # Generate the markdown for this field list
         markdown = []
