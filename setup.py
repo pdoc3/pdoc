@@ -2,8 +2,8 @@ import os
 import sys
 from setuptools import setup, find_packages
 
-if sys.version_info < (3, 5):
-    sys.exit('ERROR: pdoc requires Python 3.5+')
+if sys.version_info < (3, 6):
+    sys.exit('ERROR: pdoc requires Python 3.6+')
 
 
 def _discover_tests():
@@ -58,5 +58,5 @@ if __name__ == '__main__':
             'write_to': os.path.join('pdoc', '_version.py'),
         },
         test_suite="setup._discover_tests",
-        python_requires='>= 3.5',
+        python_requires='>= 3.6',
     )
