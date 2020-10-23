@@ -117,7 +117,7 @@ def _get_config(**kwargs):
                   | {'module', 'modules', 'http_server', 'external_links', 'search_query'})
     invalid_keys = {k: v for k, v in kwargs.items() if k not in known_keys}
     if invalid_keys:
-        warn('Unknown configuration variables (not in config.mako): {}'.format(invalid_keys))
+        warn(f'Unknown configuration variables (not in config.mako): {invalid_keys}')
     config.update(kwargs)
 
     if 'search_query' in config:
@@ -140,9 +140,10 @@ def _render_template(template_name, **kwargs):
         t = tpl_lookup.get_template(template_name)
     except TopLevelLookupException:
         raise OSError(
-            "No template found at any of: {}".format(
-                ', '.join(path.join(p, template_name.lstrip("/"))
-                          for p in tpl_lookup.directories)))
+            "No template found at any of: "
+            f"{', '.join(path.join(p, template_name.lstrip('/')) for p in tpl_lookup.directories)}"
+        )
+
     try:
         return t.render(**config).strip()
     except Exception:
@@ -213,8 +214,7 @@ def import_module(module: Union[str, ModuleType],
             try:
                 module = importlib.import_module(module_path)
             except Exception as e:
-                raise ImportError('Error importing {!r}: {}: {}'
-                                  .format(module, e.__class__.__name__, e))
+                raise ImportError(f'Error importing {module!r}: {e.__class__.__name__}: {e}')
 
     assert inspect.ismodule(module)
     # If this is pdoc itself, return without reloading. Otherwise later
@@ -258,7 +258,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             _ = inspect.findsource(doc_obj.obj)
             tree = ast.parse(doc_obj.source)  # type: ignore
         except (OSError, TypeError, SyntaxError) as exc:
-            warn("Couldn't read PEP-224 variable docstrings from {!r}: {}".format(doc_obj, exc))
+            warn(f"Couldn't read PEP-224 variable docstrings from {doc_obj!r}: {exc}")
             return {}, {}
 
         if isinstance(doc_obj, Class):
@@ -475,7 +475,7 @@ class Doc:
         """
 
     def __repr__(self):
-        return '<{} {!r}>'.format(self.__class__.__name__, self.refname)
+        return f'<{self.__class__.__name__} {self.refname!r}>'
 
     @property  # type: ignore
     @lru_cache()
@@ -623,8 +623,8 @@ class Module(Doc):
                 try:
                     public_objs.append((name, getattr(self.obj, name)))
                 except AttributeError:
-                    warn("Module {!r} doesn't contain identifier `{}` "
-                         "exported in `__all__`".format(self.module, name))
+                    warn(f"Module {self.module!r} doesn't contain identifier `{name}` "
+                         "exported in `__all__`")
         else:
             def is_from_this_module(obj):
                 mod = inspect.getmodule(inspect.unwrap(obj))
@@ -678,7 +678,7 @@ class Module(Doc):
                     continue
 
                 assert self.refname == self.name
-                fullname = "%s.%s" % (self.name, root)
+                fullname = f"{self.name}.{root}"
                 try:
                     m = Module(import_module(fullname),
                                docfilter=docfilter, supermodule=self,
@@ -747,15 +747,15 @@ class Module(Doc):
                 if docstring is None:
                     warn('Setting `__pdoc__[key] = None` is deprecated; '
                          'use `__pdoc__[key] = False` '
-                         '(key: {!r}, module: {!r}).'.format(name, self.name))
+                         f'(key: {name!r}, module: {self.name!r}).')
 
                 if name in self._skipped_submodules:
                     continue
 
                 if (not name.endswith('.__init__') and
                         name not in self.doc and refname not in self._context):
-                    warn('__pdoc__-overriden key {!r} does not exist '
-                         'in module {!r}'.format(name, self.name))
+                    warn(f'__pdoc__-overriden key {name!r} does not exist '
+                         f'in module {self.name!r}')
 
                 obj = self.find_ident(name)
                 cls = getattr(obj, 'cls', None)
@@ -776,7 +776,7 @@ class Module(Doc):
                 continue
             if not isinstance(docstring, str):
                 raise ValueError('__pdoc__ dict values must be strings;'
-                                 '__pdoc__[{!r}] is of type {}'.format(name, type(docstring)))
+                                 f'__pdoc__[{name!r}] is of type {type(docstring)}')
             dobj.docstring = inspect.cleandoc(docstring)
 
         # Now after docstrings are set correctly, continue the
@@ -1015,7 +1015,7 @@ class Class(Doc):
                 if isinstance(c.__dict__[name], staticmethod):
                     return staticmethod
                 return None
-        raise RuntimeError("{}.{} not found".format(cls, name))
+        raise RuntimeError(f"{cls}.{name} not found")
 
     @property
     def refname(self) -> str:
@@ -1278,7 +1278,7 @@ class Function(Doc):
         else:
             # Don't warn on variables. The annotation just isn't available.
             if not isinstance(self, Variable):
-                warn("Error handling return annotation for {!r}".format(self), stacklevel=3)
+                warn(f"Error handling return annotation for {self!r}", stacklevel=3)
 
         if annot is inspect.Parameter.empty or not annot:
             return ''

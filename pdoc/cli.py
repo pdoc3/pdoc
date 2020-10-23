@@ -129,8 +129,8 @@ DEFAULT_HOST, DEFAULT_PORT = 'localhost', 8080
 def _check_host_port(s):
     if s and ':' not in s:
         raise argparse.ArgumentTypeError(
-            "'{}' doesn't match '[HOST]:[PORT]'. "
-            "Specify `--http :` to use default hostname and port.".format(s))
+            f"'{s}' doesn't match '[HOST]:[PORT]'. "
+            "Specify `--http :` to use default hostname and port.")
     return s
 
 
@@ -141,7 +141,7 @@ aa(
     metavar='HOST:PORT',
     help="When set, pdoc will run as an HTTP server providing documentation "
          "for specified modules. If you just want to use the default hostname "
-         "and port ({}:{}), set the parameter to :.".format(DEFAULT_HOST, DEFAULT_PORT),
+         f"and port ({DEFAULT_HOST}:{DEFAULT_PORT}), set the parameter to :.",
 )
 aa(
     "--skip-errors",
@@ -212,14 +212,14 @@ class _WebDoc(BaseHTTPRequestHandler):
             import_path = self.path[:-4].lstrip("/")
             resolved = self.resolve_ext(import_path)
             if resolved is None:  # Try to generate the HTML...
-                print("Generating HTML for %s on the fly..." % import_path, file=sys.stderr)
+                print(f"Generating HTML for {import_path} on the fly...", file=sys.stderr)
                 try:
                     out = pdoc.html(import_path.split(".")[0], **self.template_config)
                 except Exception as e:
-                    print('Error generating docs: {}'.format(e), file=sys.stderr)
+                    print(f'Error generating docs: {e}', file=sys.stderr)
                     # All hope is lost.
                     code = 404
-                    out = "External identifier <code>%s</code> not found." % import_path
+                    out = f"External identifier <code>{import_path}</code> not found."
             else:
                 return self.redirect(resolved)
         # Redirect '/pdoc' to '/pdoc/' so that relative links work
@@ -236,8 +236,8 @@ class _WebDoc(BaseHTTPRequestHandler):
                 import traceback
                 from html import escape
                 code = 404
-                out = "Error importing module <code>{}</code>:\n\n<pre>{}</pre>".format(
-                    self.import_path_from_req_url, escape(traceback.format_exc()))
+                out = f"Error importing module <code>{self.import_path_from_req_url}</code>:"
+                f"\n\n<pre>{escape(traceback.format_exc())}</pre>"
                 out = out.replace('\n', '<br>')
 
         self.send_response(code)
@@ -282,7 +282,7 @@ class _WebDoc(BaseHTTPRequestHandler):
             p = path.join(*parts[0:i])
             realp = exists(p)
             if realp is not None:
-                return "/%s#%s" % (realp.lstrip("/"), import_path)
+                return f"/{realp.lstrip('/')}#{import_path}"
         return None
 
     @property
@@ -312,8 +312,7 @@ def _quit_if_exists(m: pdoc.Module, ext: str):
 
     for pth in paths:
         if path.lexists(pth):
-            print("File '%s' already exists. Delete it, or run with --force" % pth,
-                  file=sys.stderr)
+            print(f"File '{pth}' already exists. Delete it, or run with --force", file=sys.stderr)
             sys.exit(1)
 
 
@@ -362,7 +361,7 @@ def _print_pdf(modules, **kwargs):
 
 
 def _warn_deprecated(option, alternative='', use_config_mako=False):
-    msg = 'Program option `{}` is deprecated.'.format(option)
+    msg = f'Program option `{option}` is deprecated.'
     if alternative:
         msg += ' Use `' + alternative + '`'
         if use_config_mako:
@@ -475,8 +474,7 @@ def main(_args=None):
 
     if args.template_dir is not None:
         if not path.isdir(args.template_dir):
-            print('Error: Template dir {!r} is not a directory'.format(args.template_dir),
-                  file=sys.stderr)
+            print(f'Error: Template dir {args.template_dir!r} is not a directory', file=sys.stderr)
             sys.exit(1)
         pdoc.tpl_lookup.directories.insert(0, args.template_dir)
 
@@ -515,7 +513,7 @@ def main(_args=None):
 
         print('Starting pdoc server on {}:{}'.format(host, port), file=sys.stderr)
         httpd = HTTPServer((host, port), _WebDoc)
-        print("pdoc server ready at http://%s:%d" % (host, port), file=sys.stderr)
+        print(f"pdoc server ready at http://{host}:{port}", file=sys.stderr)
 
         # Allow tests to perform `pdoc.cli._httpd.shutdown()`
         global _httpd

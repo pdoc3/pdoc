@@ -458,7 +458,7 @@ class ApiTest(unittest.TestCase):
             for module, (name_suffix, submodules) in modules.items():
                 with self.subTest(module=module):
                     m = pdoc.Module(module)
-                    self.assertEqual(repr(m), "<Module '{}'>".format(m.obj.__name__))
+                    self.assertEqual(repr(m), f"<Module '{m.obj.__name__}'>")
                     self.assertEqual(m.name, EXAMPLE_MODULE + name_suffix)
                     self.assertEqual(sorted(m.name for m in m.submodules()),
                                      [EXAMPLE_MODULE + '.' + m for m in submodules])
@@ -828,7 +828,7 @@ class ApiTest(unittest.TestCase):
 
         # typed, linked
         def link(dobj):
-            return '<a href="{}">{}</a>'.format(dobj.url(relative_to=mod), dobj.qualname)
+            return f'<a href="{dobj.url(relative_to=mod)}">{dobj.qualname}</a>'
 
         self.assertEqual(func.params(annotate=True, link=link),
                          ['a:\N{NBSP}int', '*b',
@@ -1166,7 +1166,7 @@ pdoc
 '''
 
         def link(dobj):
-            return '<a>{}</a>'.format(dobj.qualname)
+            return f'<a>{dobj.qualname}</a>'
 
         html = to_html(text, module=pdoc.Module(pdoc), link=link)
         self.assertEqual(html, expected)
@@ -1242,7 +1242,7 @@ class Docformats(unittest.TestCase):
 
     @staticmethod
     def _link(dobj, *args, **kwargs):
-        return '<a>{}</a>'.format(dobj.refname)
+        return f'<a>{dobj.refname}</a>'
 
     def test_numpy(self):
         expected = '''<p>Summary line.</p>
