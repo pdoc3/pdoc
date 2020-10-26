@@ -6,6 +6,7 @@ import inspect
 import os
 import shutil
 import signal
+import subprocess
 import sys
 import threading
 import unittest
@@ -379,6 +380,17 @@ class CliTest(unittest.TestCase):
         self.assertIn(pdoc_Doc_params.replace(' ', ''),
                       out.replace('>', '').replace('\n', '').replace(' ', ''))
 
+    @unittest.skipUnless('PDOC_TEST_PANDOC' in os.environ, 'PDOC_TEST_PANDOC not set/requested')
+    def test_pdf_pandoc(self):
+        with temp_dir() as path, \
+                chdir(path), \
+                redirect_streams() as (stdout, _), \
+                open('pdf.md', 'w') as f:
+            run('pdoc', pdf=None)
+            f.write(stdout.getvalue())
+            subprocess.run(pdoc.cli._PANDOC_COMMAND, shell=True, check=True)
+            self.assertTrue(os.path.exists('pdf.pdf'))
+
     def test_config(self):
         with run_html(EXAMPLE_MODULE, config='link_prefix="/foobar/"'):
             self._basic_html_assertions()
@@ -411,7 +423,7 @@ class CliTest(unittest.TestCase):
             run('.', skip_errors=None)
         self.assertIn('ZeroDivision', cm.warning.args[0])
 
-    @unittest.skipIf(sys.version_info < (3, 6), 'variable annotation unsupported in <Py3.6')
+    @unittest.skipIf(sys.version_info < (3, 7), '__future__.annotations unsupported in <Py3.7')
     def test_resolve_typing_forwardrefs(self):
         # GH-245
         with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_resolve_typing_forwardrefs')):
@@ -510,8 +522,7 @@ class ApiTest(unittest.TestCase):
             vars_dont = 0
             but_clss_have_doc = int
 
-        with self.assertWarns(UserWarning):
-            doc = pdoc.Class('C', pdoc.Module('pdoc'), C)
+        doc = pdoc.Class('C', pdoc.Module('pdoc'), C)
         self.assertEqual(doc.doc['vars_dont'].docstring, '')
         self.assertIn('integer', doc.doc['but_clss_have_doc'].docstring)
 
@@ -841,6 +852,16 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(pdoc.Function('bug130', mod, bug130_str_annotation).params(annotate=True),
                          ['a:\N{NBSP}str'])
 
+        # typed, NewType
+        CustomType = typing.NewType('CustomType', bool)
+
+        def bug253_newtype_annotation(a: CustomType):
+            return
+
+        self.assertEqual(
+            pdoc.Function('bug253', mod, bug253_newtype_annotation).params(annotate=True),
+            ['a:\N{NBSP}CustomType'])
+
         # builtin callables with signatures in docstrings
         from itertools import repeat
         self.assertEqual(pdoc.Function('repeat', mod, repeat).params(), ['object', 'times'])
@@ -889,6 +910,8 @@ class ApiTest(unittest.TestCase):
             filename = os.path.join(path, 'module36syntax.py')
             with open(filename, 'w') as f:
                 f.write('''
+from typing import overload
+
 var: str = 'x'
 """dummy"""
 
@@ -896,15 +919,20 @@ class Foo:
     var: int = 3
     """dummy"""
 
-    def __init__(self):
-        self.var2: float = 1
-        """dummy"""
+    @overload
+    def __init__(self, var2: float):
+        pass
+
+    def __init__(self, var2):
+        self.var2: float = float(var2)
+        """dummy2"""
                 ''')
             mod = pdoc.Module(pdoc.import_module(filename))
             self.assertEqual(mod.doc['var'].type_annotation(), 'str')
             self.assertEqual(mod.doc['Foo'].doc['var'].type_annotation(), 'int')
             self.assertIsInstance(mod.doc['Foo'].doc['var2'], pdoc.Variable)
             self.assertEqual(mod.doc['Foo'].doc['var2'].type_annotation(), '')  # Won't fix
+            self.assertEqual(mod.doc['Foo'].doc['var2'].docstring, 'dummy2')
 
             self.assertIn('var: str', mod.text())
             self.assertIn('var: int', mod.text())
@@ -1092,7 +1120,6 @@ reference: `package.foo`
 <p>ref with underscore: <code><a href="#pdoc._x_x_">_x_x_</a></code></p>
 <pre><code>code block
 </code></pre>
-
 <p>reference: <code><a href="/package.foo.ext">package.foo</a></code></p>'''
 
         module = pdoc.Module(pdoc)
@@ -1274,6 +1301,10 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <dt><code><a>pdoc.Doc</a></code></dt>
 <dd>A class description that spans several lines.</dd>
 </dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; doctest
+...
+</code></pre>
 <h2 id="notes">Notes</h2>
 <p>Foo bar.</p>
 <h3 id="h3-title">H3 Title</h3>
@@ -1362,9 +1393,8 @@ that are relevant to the interface.</p>
 </dl>
 <h2 id="examples">Examples</h2>
 <p>Examples in doctest format.</p>
-<pre><code class="python-repl">&gt;&gt;&gt; a = [1,2,3]
+<pre><code class="language-python-repl">&gt;&gt;&gt; a = [1,2,3]
 </code></pre>
-
 <h2 id="todos">Todos</h2>
 <ul>
 <li>For module TODOs</li>
@@ -1384,22 +1414,19 @@ line2
 fenced code works
 always
 </code></pre>
-
 <h2 id="examples">Examples</h2>
-<pre><code class="python-repl">&gt;&gt;&gt; nbytes(100)
+<pre><code class="language-python-repl">&gt;&gt;&gt; nbytes(100)
 '100.0 bytes'
 line2
 </code></pre>
-
 <p>some text</p>
 <p>some text</p>
-<pre><code class="python-repl">&gt;&gt;&gt; another doctest
+<pre><code class="language-python-repl">&gt;&gt;&gt; another doctest
 line1
 line2
 </code></pre>
-
 <h2 id="example">Example</h2>
-<pre><code class="python-repl">&gt;&gt;&gt; f()
+<pre><code class="language-python-repl">&gt;&gt;&gt; f()
 Traceback (most recent call last):
     ...
 Exception: something went wrong
@@ -1452,9 +1479,8 @@ lines.</p>
         self.assertEqual(html, expected)
 
     def test_reST_include(self):
-        expected = '''<pre><code class="python">    x = 2
+        expected = '''<pre><code class="language-python">    x = 2
 </code></pre>
-
 <p>1
 x = 2
 x = 3
@@ -1499,7 +1525,6 @@ Work <a href="http://foo/">like this</a> and <a href="ftp://bar">like that</a>.<
 <p>data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D</p>
 <pre><code>http://url.com
 </code></pre>
-
 <p><a href="https://google.com">https://google.com</a>
 <a href="https://en.wikipedia.org/wiki/Orange_(software)">\
 https://en.wikipedia.org/wiki/Orange_(software)</a>

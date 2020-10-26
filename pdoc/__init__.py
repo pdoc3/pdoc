@@ -255,7 +255,10 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
         tree = _init_tree
     else:
         try:
-            tree = ast.parse(inspect.getsource(doc_obj.obj))
+            # Maybe raise exceptions with appropriate message
+            # before using cleaned doc_obj.source
+            _ = inspect.findsource(doc_obj.obj)
+            tree = ast.parse(doc_obj.source)  # type: ignore
         except (OSError, TypeError, SyntaxError) as exc:
             # That's OK if a builtin does not a docstring. Maybe the
             # source isn't accessible. Do not emit a warning for that.
@@ -268,7 +271,8 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             tree = tree.body[0]  # ast.parse creates a dummy ast.Module wrapper
 
             # For classes, maybe add instance variables defined in __init__
-            for node in tree.body:
+            # Get the *last* __init__ node in case it is preceded by @overloads.
+            for node in reversed(tree.body):
                 if isinstance(node, ast.FunctionDef) and node.name == '__init__':
                     instance_vars, _ = _pep224_docstrings(doc_obj, _init_tree=node)
                     break
@@ -1172,6 +1176,24 @@ class Class(Doc):
         del self._super_members
 
 
+def _formatannotation(annot):
+    """
+    Format annotation, properly handling NewType types
+
+    >>> import typing
+    >>> _formatannotation(typing.NewType('MyType', str))
+    'MyType'
+    """
+    module = getattr(annot, '__module__', '')
+    is_newtype = (getattr(annot, '__qualname__', '').startswith('NewType.') and
+                  module == 'typing')
+    if is_newtype:
+        return annot.__name__
+    if module.startswith('nptyping'):  # GH-231
+        return repr(annot)
+    return inspect.formatannotation(annot)
+
+
 class Function(Doc):
     """
     Representation of documentation for a function or method.
@@ -1270,7 +1292,7 @@ class Function(Doc):
         if isinstance(annot, str):
             s = annot
         else:
-            s = inspect.formatannotation(annot)
+            s = _formatannotation(annot)
             s = re.sub(r'\b(typing\.)?ForwardRef\((?P<quot>[\"\'])(?P<str>.*?)(?P=quot)\)',
                        r'\g<str>', s)
         s = s.replace(' ', '\N{NBSP}')  # Better line breaks in html signatures
@@ -1376,7 +1398,7 @@ class Function(Doc):
 
             formatted = p.name
             if p.annotation is not EMPTY:
-                annotation = inspect.formatannotation(p.annotation).replace(' ', '\N{NBSP}')
+                annotation = _formatannotation(p.annotation).replace(' ', '\N{NBSP}')
                 # "Eval" forward-declarations (typing string literals)
                 if isinstance(p.annotation, str):
                     annotation = annotation.strip("'")
