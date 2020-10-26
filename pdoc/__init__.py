@@ -242,9 +242,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
     The second dict contains instance variables and is non-empty only in case
     `doc_obj` is a `pdoc.Class` which has `__init__` method.
     """
-    is_builtins = type(doc_obj.obj).__module__ == 'builtins'
-
-    # No variables in namespace packages.
+    # No variables in namespace packages
     if isinstance(doc_obj, Module) and doc_obj.is_namespace:
         return {}, {}
 
@@ -260,11 +258,10 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             _ = inspect.findsource(doc_obj.obj)
             tree = ast.parse(doc_obj.source)  # type: ignore
         except (OSError, TypeError, SyntaxError) as exc:
-            # That's OK if a builtin does not a docstring. Maybe the
-            # source isn't accessible. Do not emit a warning for that.
-            if not is_builtins:
+            # Don't emit a warning for builtins that don't have source available
+            is_builtin = getattr(doc_obj.obj, '__module__', None) == 'builtins'
+            if not is_builtin:
                 warn("Couldn't read PEP-224 variable docstrings from {!r}: {}".format(doc_obj, exc))
-
             return {}, {}
 
         if isinstance(doc_obj, Class):
