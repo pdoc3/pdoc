@@ -259,7 +259,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             # Don't emit a warning for builtins that don't have source available
             is_builtin = getattr(doc_obj.obj, '__module__', None) == 'builtins'
             if not is_builtin:
-                warn("Couldn't read PEP-224 variable docstrings from {!r}: {}".format(doc_obj, exc))
+                warn(f"Couldn't read PEP-224 variable docstrings from {doc_obj!r}: {exc}")
             return {}, {}
 
         if isinstance(doc_obj, Class):
@@ -393,7 +393,7 @@ def _toposort(graph: Mapping[T, Set[T]]) -> Generator[T, None, None]:
         yield from ordered
         if not ordered:
             break
-    assert not graph, "A cyclic dependency exists amongst %r" % graph
+    assert not graph, f"A cyclic dependency exists amongst {graph!r}"
 
 
 def link_inheritance(context: Context = None):
@@ -743,7 +743,7 @@ class Module(Doc):
             if docstring is True:
                 continue
 
-            refname = "%s.%s" % (self.refname, name)
+            refname = f"{self.refname}.{name}"
             if docstring in (False, None):
                 if docstring is None:
                     warn('Setting `__pdoc__[key] = None` is deprecated; '
@@ -1441,10 +1441,10 @@ class Function(Doc):
                 # See: https://github.com/pdoc3/pdoc/pull/148#discussion_r407114141
                 module_basename = self.module.name.rsplit('.', maxsplit=1)[-1]
                 if module_basename in string and module_basename not in _globals:
-                    string = re.sub(r'(?<!\.)\b{}\.\b'.format(module_basename), '', string)
+                    string = re.sub(fr'(?<!\.)\b{module_basename}\.\b', '', string)
 
                 try:
-                    exec('def {}: pass'.format(string), _globals, _locals)
+                    exec(f'def {string}: pass', _globals, _locals)
                 except SyntaxError:
                     continue
                 signature = inspect.signature(_locals[self.name])
@@ -1537,4 +1537,4 @@ class External(Doc):
         """
         `External` objects return absolute urls matching `/{name}.ext`.
         """
-        return '/%s.ext' % self.name
+        return f'/{self.name}.ext'
