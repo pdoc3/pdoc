@@ -256,7 +256,10 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             _ = inspect.findsource(doc_obj.obj)
             tree = ast.parse(doc_obj.source)  # type: ignore
         except (OSError, TypeError, SyntaxError) as exc:
-            warn(f"Couldn't read PEP-224 variable docstrings from {doc_obj!r}: {exc}")
+            # Don't emit a warning for builtins that don't have source available
+            is_builtin = getattr(doc_obj.obj, '__module__', None) == 'builtins'
+            if not is_builtin:
+                warn("Couldn't read PEP-224 variable docstrings from {!r}: {}".format(doc_obj, exc))
             return {}, {}
 
         if isinstance(doc_obj, Class):
