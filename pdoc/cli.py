@@ -460,9 +460,8 @@ def main(_args=None):
             template_config[key] = value
         except Exception:
             raise ValueError(
-                'Error evaluating --config statement "{}". '
+                f'Error evaluating --config statement "{config_str}". '
                 'Make sure string values are quoted?'
-                .format(config_str)
             )
 
     if args.html_no_source:
@@ -501,7 +500,7 @@ def main(_args=None):
                 with open(pth) as f:
                     sys.path.append(path.join(libdir, f.readline().rstrip()))
             except IOError:
-                warn('Invalid egg-link in venv: {!r}'.format(pth))
+                warn(f'Invalid egg-link in venv: {pth!r}')
 
     if args.http:
         template_config['link_prefix'] = "/"
@@ -514,7 +513,7 @@ def main(_args=None):
         host = host or DEFAULT_HOST
         port = int(port or DEFAULT_PORT)
 
-        print('Starting pdoc server on {}:{}'.format(host, port), file=sys.stderr)
+        print(f'Starting pdoc server on {host}:{port}', file=sys.stderr)
         httpd = HTTPServer((host, port), _WebDoc)
         print(f"pdoc server ready at http://{host}:{port}", file=sys.stderr)
 
@@ -543,7 +542,8 @@ def main(_args=None):
     if args.pdf:
         _print_pdf(modules, **template_config)
         import textwrap
-        print("""
+        PANDOC_CMD = textwrap.indent(_PANDOC_COMMAND, '    ')
+        print(f"""
 PDF-ready markdown written to standard output.
                               ^^^^^^^^^^^^^^^
 Convert this file to PDF using e.g. Pandoc:
@@ -568,7 +568,7 @@ or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
     wkhtmltopdf --encoding utf8 -s A4 --print-media-type pdf.html pdf.pdf
 
-or similar, at your own discretion.""".format(PANDOC_CMD=textwrap.indent(_PANDOC_COMMAND, '    ')),
+or similar, at your own discretion.""",
               file=sys.stderr)
         sys.exit(0)
 
