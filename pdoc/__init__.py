@@ -1502,8 +1502,8 @@ class Variable(Doc):
 
         self.kind = kind
         """
-        One of `var`, `property/get/set/del` with one or more of get, set, del, e.g. property/get/set for 
-        a property that can be read and set. 
+        One of `var`, `property/get/set/del` with one or more of get, set, del,
+        e.g. property/get/set for a property that can be read and set. 
         """
 
     @property
