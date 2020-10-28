@@ -987,19 +987,22 @@ class Class(Doc):
                 # in which case it is not read-only
                 # dict(inspect.getmembers(clazz))[name]
                 if isinstance(obj, property):
-                    if obj.fdel is not None or obj.fset is not None:
-                        vartype = "property"
-                    else:
-                        vartype = "ro-property"
+                    kind = "property"
+                    if obj.fget is not None:
+                        kind += "/get"
+                    if obj.fset is not None:
+                        kind += "/set"
+                    if obj.fdel is not None:
+                        kind += "/del"
                 else:
-                    vartype = "var"
+                    kind = "var"
                 self.doc[name] = Variable(
                     name, self.module,
                     docstring=(
                         var_docstrings.get(name) or
                         (inspect.isclass(obj) or _is_descriptor(obj)) and inspect.getdoc(obj)),
                     cls=self,
-                    vartype=vartype,
+                    kind=kind,
                     obj=getattr(obj, 'fget', getattr(obj, '__get__', None)),
                     instance_var=(_is_descriptor(obj) or
                                   name in getattr(self.obj, '__slots__', ())))
@@ -1475,10 +1478,10 @@ class Variable(Doc):
     Representation of a variable's documentation. This includes
     module, class, and instance variables.
     """
-    __slots__ = ('cls', 'instance_var', 'vartype')
+    __slots__ = ('cls', 'instance_var', 'kind')
 
     def __init__(self, name, module, docstring, *,
-                 obj=None, cls: Class = None, instance_var=False, vartype=None):
+                 obj=None, cls: Class = None, instance_var=False, kind=None):
         """
         Same as `pdoc.Doc`, except `cls` should be provided
         as a `pdoc.Class` object when this is a class or instance
@@ -1498,9 +1501,10 @@ class Variable(Doc):
         opposed to class variable).
         """
 
-        self.vartype = vartype
+        self.kind = kind
         """
-        One of `var`, `property`, or `property(R/O)`.
+        One of `var`, `property/get/set/del` with one or more of get, set, del, e.g. property/get/set for 
+        a property that can be read and set. 
         """
 
     @property
