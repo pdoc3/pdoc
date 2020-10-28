@@ -139,10 +139,8 @@ def _render_template(template_name, **kwargs):
     try:
         t = tpl_lookup.get_template(template_name)
     except TopLevelLookupException:
-        raise OSError(
-            "No template found at any of: "
-            f"{', '.join(path.join(p, template_name.lstrip('/')) for p in tpl_lookup.directories)}"
-        )
+        paths = [path.join(p, template_name.lstrip('/')) for p in tpl_lookup.directories]
+        raise OSError(f"No template found at any of: {', '.join(paths)}")
 
     try:
         return t.render(**config).strip()
@@ -775,7 +773,7 @@ class Module(Doc):
             if isinstance(dobj, External):
                 continue
             if not isinstance(docstring, str):
-                raise ValueError('__pdoc__ dict values must be strings;'
+                raise ValueError('__pdoc__ dict values must be strings; '
                                  f'__pdoc__[{name!r}] is of type {type(docstring)}')
             dobj.docstring = inspect.cleandoc(docstring)
 

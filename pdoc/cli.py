@@ -236,8 +236,11 @@ class _WebDoc(BaseHTTPRequestHandler):
                 import traceback
                 from html import escape
                 code = 404
-                out = f"Error importing module <code>{self.import_path_from_req_url}</code>:"
-                f"\n\n<pre>{escape(traceback.format_exc())}</pre>"
+                out = (
+                    "Error importing module "
+                    f"<code>{self.import_path_from_req_url}</code>:\n\n"
+                    f"<pre>{escape(traceback.format_exc())}</pre>"
+                )
                 out = out.replace('\n', '<br>')
 
         self.send_response(code)
