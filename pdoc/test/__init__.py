@@ -340,8 +340,7 @@ class CliTest(unittest.TestCase):
                 run(EXAMPLE_MODULE, config='show_type_annotations=False')
                 out = stdout.getvalue()
 
-            header = 'Module {}\n{:=<{}}'.format(EXAMPLE_MODULE, '',
-                                                 len('Module ') + len(EXAMPLE_MODULE))
+            header = f"Module {EXAMPLE_MODULE}\n{'':=<{len('Module ') + len(EXAMPLE_MODULE)}}"
             self.assertIn(header, out)
             for pattern in include_patterns:
                 self.assertIn(pattern, out)
@@ -356,7 +355,7 @@ class CliTest(unittest.TestCase):
                         run(*(os.path.join(EXAMPLE_MODULE, f) for f in files))
                         out = stdout.getvalue()
                     for f in files:
-                        header = 'Module {}\n'.format(os.path.splitext(f)[0])
+                        header = f'Module {os.path.splitext(f)[0]}\n'
                         self.assertIn(header, out)
 
     def test_text_identifier(self):
@@ -1126,7 +1125,7 @@ reference: `package.foo`
         module.doc['_x_x_'] = pdoc.Variable('_x_x_', module, '')
 
         def link(dobj):
-            return '<a href="{}">{}</a>'.format(dobj.url(relative_to=module), dobj.qualname)
+            return f'<a href="{dobj.url(relative_to=module)}">{dobj.qualname}</a>'
 
         html = to_html(text, module=module, link=link)
         self.assertEqual(html, expected)
@@ -1585,7 +1584,7 @@ class HttpTest(unittest.TestCase):
             with redirect_streams() as (stdout, stderr):
                 t = threading.Thread(
                     target=cli.main,
-                    args=(cli.parser.parse_args(['--http', ':%d' % port] + modules),))
+                    args=(cli.parser.parse_args(['--http', f':{port}'] + modules),))
                 t.start()
                 sleep(.1)
 
@@ -1594,7 +1593,7 @@ class HttpTest(unittest.TestCase):
                     raise AssertionError
 
                 try:
-                    yield 'http://localhost:{}/'.format(port)
+                    yield f'http://localhost:{port}/'
                 except Exception:
                     sys.__stderr__.write(stderr.getvalue())
                     sys.__stdout__.write(stdout.getvalue())
