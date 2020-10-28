@@ -985,10 +985,6 @@ class Class(Doc):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self)
             else:
-                # check if the variable is really a property and if yes,
-                # if it does have a setter or deleter
-                # in which case it is not read-only
-                # dict(inspect.getmembers(clazz))[name]
                 if isinstance(obj, property):
                     kind = "property"
                     if obj.fget is not None:
