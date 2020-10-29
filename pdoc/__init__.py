@@ -121,7 +121,7 @@ def _get_config(**kwargs):
     config.update(kwargs)
 
     if 'search_query' in config:
-        warn('Option `search_query` has been depricated, use `google_search_query` instead',
+        warn('Option `search_query` has been deprecated. Use `google_search_query` instead',
              DeprecationWarning, stacklevel=2)
         config['google_search_query'] = config['search_query']
         del config['search_query']
