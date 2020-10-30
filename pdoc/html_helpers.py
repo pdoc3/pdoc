@@ -141,7 +141,7 @@ class _ToMarkdown:
         # 'optional' ... See §4 Parameters:
         # https://numpydoc.readthedocs.io/en/latest/format.html#sections
         type_parts = re.split(r'( *(?: of | or |, *default(?:=|\b)|, *optional\b) *)', type or '')
-        type_parts[::2] = ['`{}`'.format(s) if s else s
+        type_parts[::2] = [f'`{s}`' if s else s
                            for s in type_parts[::2]]
         type = ''.join(type_parts)
 
@@ -151,10 +151,10 @@ class _ToMarkdown:
         ret = ""
         if name:
             # NOTE: Triple-backtick argument names so we skip linkifying them
-            ret += '**```{}```**'.format(name.replace(', ', '```**, **```'))
+            ret += f"**```{name.replace(', ', '```**, **```')}```**"
         if type:
-            ret += ' :&ensp;{}'.format(type) if ret else type
-        ret += '\n:   {}\n\n'.format(desc)
+            ret += f' :&ensp;{type}' if ret else type
+        ret += f'\n:   {desc}\n\n'
         return ret
 
     @staticmethod
@@ -173,9 +173,12 @@ class _ToMarkdown:
         """
         spec_with_desc, simple_list = match.groups()
         if spec_with_desc:
-            return '\n\n'.join('`{}`\n:   {}'.format(*map(str.strip, line.split(':', 1)))
-                               for line in filter(None, spec_with_desc.split('\n')))
-        return ', '.join('`{}`'.format(i) for i in simple_list.split(', '))
+            spec_desc_strings = []
+            for line in filter(None, spec_with_desc.split('\n')):
+                spec, desc = map(str.strip, line.split(':', 1))
+                spec_desc_strings.append(f'`{spec}`\n:   {desc}')
+            return '\n\n'.join(spec_desc_strings)
+        return ', '.join(f'`{i}`' for i in simple_list.split(', '))
 
     @staticmethod
     def _numpy_sections(match):
@@ -259,7 +262,7 @@ class _ToMarkdown:
                 )
             # Convert into markdown sections. End underlines with '='
             # to avoid matching and re-processing as Numpy sections.
-            return '\n{}\n-----=\n{}'.format(section, body)
+            return f'\n{section}\n-----=\n{body}'
 
         text = re.compile(r'^([A-Z]\w+):$\n'
                           r'((?:\n?(?: {2,}.*|$))+)', re.MULTILINE).sub(googledoc_sections, text)
@@ -277,13 +280,13 @@ class _ToMarkdown:
                 return _ToMarkdown._include_file(indent, value,
                                                  _ToMarkdown._directive_opts(text), module)
             except Exception as e:
-                raise RuntimeError('`.. include:: {}` error in module {!r}: {}'
-                                   .format(value, module.name, e))
+                raise RuntimeError(f'`.. include:: {value}` error in module {module.name!r}: {e}')
         if type in ('image', 'figure'):
-            return '{}![{}]({})\n'.format(
-                indent, text.translate(str.maketrans({'\n': ' ',
-                                                      '[': '\\[',
-                                                      ']': '\\]'})).strip(), value)
+            strfmt = text.translate(str.maketrans({
+                '\n': ' ',
+                '[': '\\[',
+                ']': '\\]'})).strip()
+            return f'{indent}![{strfmt}]({value})\n'
         if type == 'math':
             return _ToMarkdown.indent(indent,
                                       '\\[ ' + text.strip() + ' \\]',
@@ -306,7 +309,7 @@ class _ToMarkdown:
                 title += ':&ensp;' + value
 
         text = _ToMarkdown.indent(indent + '    ', text, clean_first=True)
-        return '{}!!! {} "{}"\n{}\n'.format(indent, type, title, text)
+        return f'{indent}!!! {type} "{title}"\n{text}\n'
 
     @staticmethod
     def admonitions(text, module, limit_types=None):
@@ -442,8 +445,8 @@ def to_markdown(text: str, *,
         docformat = str(getattr(getattr(module, 'obj', None), '__docformat__', 'numpy,google '))
         docformat, *_ = docformat.lower().split()
     if not (set(docformat.split(',')) & {'', 'numpy', 'google'}):
-        warn('__docformat__ value {!r} in module {!r} not supported. '
-             'Supported values are: numpy, google.'.format(docformat, module))
+        warn(f'__docformat__ value {docformat!r} in module {module!r} not supported. '
+             'Supported values are: numpy, google.')
         docformat = 'numpy,google'
 
     with _fenced_code_blocks_hidden(text) as result:
@@ -513,8 +516,8 @@ def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module, wra
             # XXX: Assume at least the first part of refname, i.e. the package, is correct.
             module_part = module.find_ident(refname.split('.')[0])
             if not isinstance(module_part, pdoc.External):
-                warn('Code reference `{}` in module "{}" does not match any '
-                     'documented object.'.format(refname, module.refname),
+                warn(f'Code reference `{refname}` in module "{module.refname}" does not match any '
+                     'documented object.',
                      ReferenceWarning, stacklevel=3)
         return link(dobj)
 
@@ -528,7 +531,7 @@ def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module, wra
         # would then become escaped.
         # This finds overlapping matches, https://stackoverflow.com/a/5616910/1090455
         cleaned = re.sub(r'(_(?=[^>]*?(?:<|$)))', r'\\\1', linked)
-        return '<code>{}</code>'.format(cleaned)
+        return f'<code>{cleaned}</code>'
     return linked
 
 
@@ -562,7 +565,7 @@ def format_git_link(template: str, dobj: pdoc.Doc):
         url = template.format(**locals())
         return url
     except Exception:
-        warn('format_git_link for {} failed:\n{}'.format(dobj.obj, traceback.format_exc()))
+        warn(f'format_git_link for {dobj.obj} failed:\n{traceback.format_exc()}')
         return None
 
 
@@ -577,12 +580,11 @@ def _git_head_commit():
         commit = subprocess.check_output(process_args, universal_newlines=True).strip()
         return commit
     except OSError as error:
-        warn("git executable not found on system:\n{}".format(error))
+        warn(f"git executable not found on system:\n{error}")
     except subprocess.CalledProcessError as error:
         warn(
             "Ensure pdoc is run within a git repository.\n"
-            "`{}` failed with output:\n{}"
-            .format(' '.join(process_args), error.output)
+            f"`{' '.join(process_args)}` failed with output:\n{error.output}"
         )
     return None
 
@@ -620,9 +622,8 @@ def _project_relative_path(absolute_path):
             # absolute_path is a descendant of prefix_path
             return os.path.relpath(absolute_path, prefix_path)
     raise RuntimeError(
-        "absolute path {!r} is not a descendant of the current working directory "
+        f"absolute path {absolute_path!r} is not a descendant of the current working directory "
         "or of the system's python library."
-        .format(absolute_path)
     )
 
 
