@@ -367,6 +367,14 @@ def _is_descriptor(obj):
             inspect.ismemberdescriptor(obj))
 
 
+def _unwrap_descriptor(obj):
+    if isinstance(obj, property):
+        return (getattr(obj, 'fget', False) or
+                getattr(obj, 'fset', False) or
+                getattr(obj, 'fdel', obj))
+    return getattr(obj, '__get__', obj)
+
+
 def _filter_type(type: Type[T],
                  values: Union[Iterable['Doc'], Mapping[str, 'Doc']]) -> List[T]:
     """
@@ -488,7 +496,7 @@ class Doc:
         available, an empty string.
         """
         try:
-            lines, _ = inspect.getsourcelines(self.obj)
+            lines, _ = inspect.getsourcelines(_unwrap_descriptor(self.obj))
         except (ValueError, TypeError, OSError):
             return ''
         return inspect.cleandoc(''.join(['\n'] + lines))
@@ -1002,7 +1010,7 @@ class Class(Doc):
                         (inspect.isclass(obj) or _is_descriptor(obj)) and inspect.getdoc(obj)),
                     cls=self,
                     kind=kind,
-                    obj=getattr(obj, 'fget', getattr(obj, '__get__', None)),
+                    obj=_is_descriptor(obj) and obj or None,
                     instance_var=(_is_descriptor(obj) or
                                   name in getattr(self.obj, '__slots__', ())))
 
@@ -1277,7 +1285,8 @@ class Function(Doc):
                 lambda: _get_type_hints(cast(Class, self.cls).obj)[self.name],
                 # global variables
                 lambda: _get_type_hints(not self.cls and self.module.obj)[self.name],
-                lambda: inspect.signature(self.obj).return_annotation,
+                # properties
+                lambda: inspect.signature(_unwrap_descriptor(self.obj)).return_annotation,
                 # Use raw annotation strings in unmatched forward declarations
                 lambda: cast(Class, self.cls).obj.__annotations__[self.name],
                 # Extract annotation from the docstring for C builtin function
