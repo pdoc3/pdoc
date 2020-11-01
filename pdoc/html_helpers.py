@@ -282,11 +282,11 @@ class _ToMarkdown:
             except Exception as e:
                 raise RuntimeError(f'`.. include:: {value}` error in module {module.name!r}: {e}')
         if type in ('image', 'figure'):
-            strfmt = text.translate(str.maketrans({
+            alt_text = text.translate(str.maketrans({
                 '\n': ' ',
                 '[': '\\[',
                 ']': '\\]'})).strip()
-            return f'{indent}![{strfmt}]({value})\n'
+            return f'{indent}![{alt_text}]({value})\n'
         if type == 'math':
             return _ToMarkdown.indent(indent,
                                       '\\[ ' + text.strip() + ' \\]',
