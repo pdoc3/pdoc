@@ -1,6 +1,6 @@
 #!/bin/bash
 set -eu
-IS_RELEASE="$([[ "$GITHUB_REF" == refs/tags/* ]] && echo 1)"
+IS_RELEASE="$([[ "$GITHUB_REF" == refs/tags/* ]] && echo 1 || true)"
 
 die () { echo "ERROR: $*" >&2; exit 2; }
 
@@ -20,7 +20,7 @@ mkdir -p "$BUILDROOT"
 rm -r "$BUILDROOT" 2>/dev/null || true
 pushd "$DOCROOT/.." >/dev/null
 pdoc3 --html \
-     ${IS_RELEASE+--template-dir "$DOCROOT/pdoc_template"} \
+     ${IS_RELEASE:+--template-dir "$DOCROOT/pdoc_template"} \
      --output-dir "$BUILDROOT" \
      pdoc
 popd >/dev/null
