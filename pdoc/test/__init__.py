@@ -251,17 +251,18 @@ class CliTest(unittest.TestCase):
 
     def test_lunr_search(self):
         with run_html(EXAMPLE_MODULE, config='lunr_search={"fuzziness": 1}'):
-            files = self.PUBLIC_FILES + ["example_pkg/doc-search.html", "example_pkg/index.js"]
+            files = self.PUBLIC_FILES + ["doc-search.html", "index.js"]
             self._basic_html_assertions(expected_files=files)
             self._check_files(exclude_patterns=['class="gcse-search"'])
             self._check_files(
-                include_patterns=['URLS=[\n"index.html",\n"module.html",\n"subpkg/index.html"'],
-                file_pattern='example_pkg/index.js')
-            self._check_files(include_patterns=["'doc-search.html#'"],
-                              file_pattern='example_pkg/index.html')
-            self._check_files(include_patterns=["'doc-search.html#'"],
-                              file_pattern='example_pkg/module.html')
+                include_patterns=['URLS=[\n"example_pkg/index.html",\n'
+                                  '"example_pkg/module.html",\n"example_pkg/subpkg/index.html"'],
+                file_pattern='index.js')
             self._check_files(include_patterns=["'../doc-search.html#'"],
+                              file_pattern='example_pkg/index.html')
+            self._check_files(include_patterns=["'../doc-search.html#'"],
+                              file_pattern='example_pkg/module.html')
+            self._check_files(include_patterns=["'../../doc-search.html#'"],
                               file_pattern='example_pkg/subpkg/index.html')
 
     def test_force(self):
