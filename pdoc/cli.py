@@ -401,9 +401,9 @@ def _generate_lunr_search(top_module: pdoc.Module,
 
     @lru_cache()
     def to_url_id(module):
-        url = module.url()
-        if top_module.is_package:  # Reference from subfolder if its a package
-            _, url = url.split('/', maxsplit=1)
+        url = (pdoc._URL_PACKAGE_SUFFIX.lstrip('/')
+               if module == top_module else
+               module.url(relative_to=top_module))
         if url not in url_cache:
             url_cache[url] = len(url_cache)
         return url_cache[url]
