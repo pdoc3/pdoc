@@ -423,7 +423,7 @@ def _generate_lunr_search(top_module: pdoc.Module,
         json.dump(index, f, indent=0, separators=(',', ':'))
 
     # Generate search.html
-    with _open_write_file(path.join(main_path, 'search.html')) as f:
+    with _open_write_file(path.join(main_path, 'doc-search.html')) as f:
         rendered_template = pdoc._render_template(
             '/search.mako', module=top_module, **template_config
         )
