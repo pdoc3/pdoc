@@ -59,7 +59,7 @@ for line in sys.stdin.readlines():
     while read -r line; do
         while IFS=$'\t' read -r file url; do
             [ -f "$url" ] ||
-                curl --silent --fail --retry 2 --user-agent 'Mozilla/5.0 Firefox 61' "$url" >/dev/null 2>&1 ||
+                curl --silent --fail --retry 5 --retry-delay 5 --user-agent 'Mozilla/5.0 Firefox 61' "$url" >/dev/null 2>&1 ||
                 die "broken link in $file:  $url"
         done
     done
