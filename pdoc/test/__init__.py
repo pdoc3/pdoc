@@ -19,6 +19,7 @@ from itertools import chain
 from random import randint
 from tempfile import TemporaryDirectory
 from time import sleep
+from types import ModuleType
 from unittest.mock import patch
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -34,6 +35,9 @@ from pdoc.html_helpers import (
 
 TESTS_BASEDIR = os.path.abspath(os.path.dirname(__file__) or '.')
 EXAMPLE_MODULE = 'example_pkg'
+
+EMPTY_MODULE = ModuleType('empty')
+EMPTY_MODULE.__pdoc__ = {}
 
 sys.path.insert(0, TESTS_BASEDIR)
 
@@ -607,6 +611,30 @@ class ApiTest(unittest.TestCase):
                 pdoc.link_inheritance()
             self.assertEqual(cm, [])
             self.assertNotIn('downloaded_modules', mod.doc)
+
+    @ignore_warnings
+    def test_dont_touch__pdoc__blacklisted(self):
+        class Bomb:
+            def __getattribute__(self, item):
+                raise RuntimeError
+
+        class D:
+            x = Bomb()
+            """doc"""
+            __qualname__ = 'D'
+
+        module = EMPTY_MODULE
+        D.__module__ = module.__name__  # Need to match is_from_this_module check
+        with patch.object(module, 'x', Bomb(), create=True), \
+             patch.object(module, '__pdoc__', {'x': False}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertNotIn('x', mod.doc)
+        with patch.object(module, 'D', D, create=True), \
+             patch.object(module, '__pdoc__', {'D.x': False}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertNotIn('x', mod.doc['D'].doc)
 
     def test__pdoc__invalid_value(self):
         module = pdoc.import_module(EXAMPLE_MODULE)
