@@ -12,6 +12,11 @@ from functools import partial, lru_cache
 from typing import Callable, Match
 from warnings import warn
 import xml.etree.ElementTree as etree
+import docutils.nodes
+import docutils.core
+from collections import OrderedDict
+from typing import Union, List, Dict, Optional
+
 
 import markdown
 from markdown.inlinepatterns import InlineProcessor
@@ -266,6 +271,164 @@ class _ToMarkdown:
         return text
 
     @staticmethod
+    def _reST_string_to_html(text: str) -> str:
+        """Convert reST text to html using docutils
+
+        :param text: The text to convert
+        :returns: The generated html
+        """
+        html = docutils.core.publish_parts(text, writer_name='html')['html_body']
+
+        # Remove the document tag and return
+        return html[23:-8]
+
+    @staticmethod
+    def _reST_node_to_html(node: docutils.nodes.Node,
+                           doctree: docutils.nodes.document) -> str:
+        """Not all nodes in the doctree provide their reST source or at least the
+        starting line in the reST source. This method simply copies the document
+        tree and removes all but the node to then publish it.
+
+        :node: The node to publish. Must be a child of `doctree` itself
+        :doctree: The document having `node` as a child node
+        :return: The generated html for this node
+        """
+        # Remove all but the given node from the doctree
+        children_copy = doctree.children
+        doctree.children = [doctree.children[doctree.index(node)]]
+
+        # Generate the html for this node/doctree
+        html = docutils.core.publish_from_doctree(doctree, writer_name='html5').decode('utf-8')
+
+        # Restore the doctree
+        doctree.children = children_copy
+
+        # Return only the relevant part of the html
+        match = re.search(r'<div class="document">(.+)</div>', html, re.DOTALL)
+
+        if match is not None:
+            return match.group(1).strip()
+        else:
+            # The generated HTML from docutils.publish_from_doctree() should always contain a
+            # div with class "document" in which all generated content is located. However, in case
+            # it doesn't, it's probably empty so return an empty string
+            return ''
+
+    @staticmethod
+    def _reST_field_list_to_markdown(field_list: Union[docutils.nodes.field_list,
+                                                       docutils.nodes.docinfo]) -> str:
+        """Processes a docutils field list and converts it to markdown.
+        Args, Vars, Returns, and Raises sections are predefined, other sections
+        will be created corresponding to their field names.
+
+        :param field_list: A docutils field list to convert. Can also be a docinfo
+            in case, e.g., only :returns: is specified without any summary text
+        :returns: The generated Markdown. However, it is not pure Markdown, as
+            the field descriptions have been processed with `docutils.process_string` - they
+            therefore are already converted to HTML
+        """
+        # Sort the field list so that types come last  - in case someone defines first the type then
+        # the parameter
+        field_list.children.sort(key=lambda field: 'type' in field[0].rawsource.split()[0])
+
+        # Predefined sections for the generated markdown
+        tags_to_section_map = {
+            ('param', 'parameter', 'arg', 'argument', 'key', 'keyword'): 'Args',
+            ('var', 'ivar', 'cvar'): 'Vars',
+            ('return', 'returns'): 'Returns',
+            ('raise', 'raises'): 'Raises'
+        }
+        sections: OrderedDict[str, List[Dict[str, Optional[str]]]] = OrderedDict(
+            [('Args', []), ('Vars', []), ('Returns', []), ('Raises', [])])
+
+        # Process the fields
+        for field in field_list:
+            field_name = field.children[0]
+            field_body = field.children[1]
+
+            # Split the field name into its components
+            split = field_name.rawsource.split()
+            tag = split[0]
+            type_ = split[1] if len(split) == 3 else None
+            name = split[2] if len(split) == 3 else split[1] if len(split) == 2 else None
+
+            # Fill the sections
+            try:
+                section: Optional[str] = [section for tags, section in tags_to_section_map.items()
+                                          if tag in tags][0]
+            except IndexError:  # Field is not corresponding to a predefined section like Args
+                section = None
+
+            if section is not None:
+                sections[section].append({'name': name,
+                                          'type': type_,
+                                          'body': _ToMarkdown._reST_string_to_html(
+                                              field_body.rawsource)})
+            elif tag == 'rtype':
+                # Set the return type. Assumes that at most one :return: has been specified
+                try:
+                    sections['Returns'][0]['type'] = field_body.rawsource
+                except IndexError:  # Only return type is specified
+                    sections['Returns'].append({'name': None,
+                                                'type': field_body.rawsource.strip(),
+                                                'body': ''})
+            elif 'type' in tag:
+                section = 'Vars' if tag == 'vartype' else 'Args'
+                try:
+                    param_or_var = [x for x in sections[section] if x['name'] == name][0]
+                    param_or_var['type'] = field_body.rawsource.strip()
+                except IndexError:  # Only parameter (or variable) type is specified
+                    sections[section].append({'name': name,
+                                              'type': field_body.rawsource.strip(),
+                                              'body': ''})
+            elif tag == 'meta':
+                pass  # Meta fields should be excluded from the final output
+            else:
+                # Generate sections for tags not covered yet
+                new_section = sections.get(tag, [])
+                new_section.append({'name': name,
+                                    'type': type_,
+                                    'body': _ToMarkdown._reST_string_to_html(field_body.rawsource)})
+                sections[tag] = new_section
+
+        # Generate the markdown for this field list
+        markdown = []
+        for section, fields in sections.items():
+            if len(fields) > 0:  # Skip empty sections
+                markdown.append(f'{section}:\n-----=')
+
+                for field in fields:
+                    field['body'] = field['body'].replace('\n', '\n  ')  # For proper indentation
+                    if field['name'] or field['type']:
+                        markdown.append(
+                            _ToMarkdown._deflist(*_ToMarkdown._fix_indent(field['name'],
+                                                                          field['type'],
+                                                                          field['body'])))
+                    else:  # For fields with no name or type (e.g. Returns without type spec)
+                        text = _ToMarkdown._fix_indent(
+                            field['name'], field['type'], field['body'])[2]
+                        markdown.append(f':   {text}')
+
+        return '\n'.join(markdown)
+
+    @staticmethod
+    def reST(text: str) -> str:
+        """
+        Convert `text` in reST-style docstring format to Markdown - with embedded html
+        for paragraphs and field descriptions - to be further converted later.
+        """
+        doctree = docutils.core.publish_doctree(text)
+
+        generated_markdown = []
+        for section in doctree:
+            if section.tagname in ('field_list', 'docinfo'):
+                generated_markdown.append(_ToMarkdown._reST_field_list_to_markdown(section))
+            else:
+                generated_markdown.append(_ToMarkdown._reST_node_to_html(section, doctree))
+
+        return '\n'.join(generated_markdown)
+
+    @staticmethod
     def _admonition(match, module=None, limit_types=None):
         indent, type, value, text = match.groups()
 
@@ -406,8 +569,9 @@ def to_html(text: str, *,
             latex_math: bool = False):
     """
     Returns HTML of `text` interpreted as `docformat`. `__docformat__` is respected
-    if present, otherwise Numpydoc and Google-style docstrings are assumed,
-    as well as pure Markdown.
+    if present, otherwise it is inferred whether it's reST-style, or Numpydoc
+    and Google-style docstrings. Pure Markdown and reST directives are also assumed
+    and processed if docformat has not been specified.
 
     `module` should be the documented module (so the references can be
     resolved) and `link` is the hyperlinking function like the one in the
@@ -430,37 +594,55 @@ def to_markdown(text: str, *,
                 module: pdoc.Module = None, link: Callable[..., str] = None):
     """
     Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
-    `__docformat__` is respected
-    if present, otherwise Numpydoc and Google-style docstrings are assumed,
-    as well as pure Markdown.
+    `__docformat__` is respected if present, otherwise it is inferred whether it's
+     reST-style, or Numpydoc and Google-style docstrings. Pure Markdown and reST directives
+     are also assumed and processed if docformat has not been specified.
 
     `module` should be the documented module (so the references can be
     resolved) and `link` is the hyperlinking function like the one in the
     example template.
     """
     if not docformat:
-        docformat = str(getattr(getattr(module, 'obj', None), '__docformat__', 'numpy,google '))
+        docformat = str(getattr(getattr(module, 'obj', None), '__docformat__', ''))
+
+        # Infer docformat if it hasn't been specified
+        if docformat == '':
+            reST_tags = ['param ', 'arg ', 'type ', 'raise ', 'except ', 'return', 'rtype']
+            reST_regex = fr'^:(?:{"|".join(reST_tags)}).*?:'
+            found_reST_tags = re.findall(reST_regex, text, re.MULTILINE)
+
+            # Assume reST-style docstring if any of the above specified tags is present at the
+            # beginning of a line.  Could make this more robust, e.g., by checking against the
+            # amount of found google or numpy tags
+            docformat = 'restructuredtext ' if len(found_reST_tags) > 0 else 'numpy,google '
+
         docformat, *_ = docformat.lower().split()
-    if not (set(docformat.split(',')) & {'', 'numpy', 'google'}):
+
+    if not (set(docformat.split(',')) & {'', 'numpy', 'google', 'restructuredtext'}):
         warn('__docformat__ value {!r} in module {!r} not supported. '
-             'Supported values are: numpy, google.'.format(docformat, module))
+             'Supported values are: numpy, google, restructuredtext.'.format(docformat, module))
         docformat = 'numpy,google'
 
     with _fenced_code_blocks_hidden(text) as result:
         text = result[0]
 
-        text = _ToMarkdown.admonitions(text, module)
+        if 'restructuredtext' not in docformat:  # Will be handled by docutils
+            text = _ToMarkdown.admonitions(text, module)
 
         if 'google' in docformat:
             text = _ToMarkdown.google(text)
 
         text = _ToMarkdown.doctests(text)
-        text = _ToMarkdown.raw_urls(text)
+        if 'restructuredtext' not in docformat:  # Will be handled by docutils
+            text = _ToMarkdown.raw_urls(text)
 
         # If doing both, do numpy after google, otherwise google-style's
         # headings are incorrectly interpreted as numpy params
         if 'numpy' in docformat:
             text = _ToMarkdown.numpy(text)
+
+        if 'restructuredtext' in docformat:
+            text = _ToMarkdown.reST(text)
 
         if module and link:
             # Hyperlink markdown code spans not within markdown hyperlinks.

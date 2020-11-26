@@ -298,6 +298,89 @@ class Docformats:
             Exception: something went wrong
         """
 
+    def reST(self):
+        """
+        Summary line.
+
+        Some stuff to test like http://www.python.org or `link_text <http://www.python.org>`_.
+        Also *italic* and **bold**. And lists:
+
+        * 1
+        * 2
+
+        #. Item
+        #. Item
+
+        :param arg1: Text1
+        :parameter arg2: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+            diam nonumy eirmod tempor invidunt
+        :arg arg_arg_3: Y:=H^T*X!@#$%^&&*()_[]{}';'::{[( :param just_in_case:
+        :key str another_parameter:
+        :type arg1: int
+        :type arg2: Optional[List[Tuple[str]]]
+        :type arg_arg_3: Dict[int, Dict[str, Any]]
+        :var x: Description of variable x
+        :ivar y: Description of variable y
+        :cvar str z:
+            Descriptions can also be placed in a new line.
+
+            And span multiple lines.
+        :vartype y: List[bool]
+        :return: True. Or False. Depends
+        :rtype: bool
+        :meta: This should not be displayed in the generated output document
+
+        A paragraph to split the field list into two.
+
+        :returns: Now with more "s"
+        :raise Exception: Raised occasionally
+        :raises ZeroDivisionError: You know why and when
+
+        Some more tests below:
+
+        :rtype: int
+        :vartype x: int
+        :type z: str
+
+        And now for some other stuff
+
+        .. admonition:: TODO
+
+           Create something.
+
+        .. admonition:: Example
+
+           Image shows something.
+
+           .. image:: https://www.debian.org/logos/openlogo-nd-100.png
+
+           .. note::
+              Can only nest admonitions two levels.
+
+        .. image:: https://www.debian.org/logos/openlogo-nd-100.png
+
+        Now you know.
+
+        .. warning::
+
+            Some warning
+            lines.
+
+        * Describe some func in a list
+          across multiple lines:
+
+            .. admonition:: Deprecated since 3.1
+
+                Use `spam` instead.
+
+            .. admonition:: Added in version 2.5
+
+                The *spam* parameter.
+
+        .. caution::
+            Don't touch this!
+        """
+
     def reST_directives(self):
         """
         .. todo::
@@ -343,6 +426,9 @@ google = Docformats.google
 
 
 doctests = Docformats.doctests
+
+
+reST = Docformats.reST
 
 
 reST_directives = Docformats.reST_directives

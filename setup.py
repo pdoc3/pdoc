@@ -47,6 +47,7 @@ if __name__ == '__main__':
         provides=["pdoc"],
         obsoletes=["pdoc"],
         install_requires=[
+            "docutils >= 0.16",
             "mako",
             "markdown >= 3.0",
         ],
