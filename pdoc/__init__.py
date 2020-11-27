@@ -272,7 +272,8 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             # Don't emit a warning for builtins that don't have source available
             is_builtin = getattr(doc_obj.obj, '__module__', None) == 'builtins'
             if not is_builtin:
-                warn("Couldn't read PEP-224 variable docstrings from {!r}: {}".format(doc_obj, exc))
+                warn("Couldn't read PEP-224 variable docstrings from {!r}: {}".format(doc_obj, exc),
+                     stacklevel=3 + int(isinstance(doc_obj, Class)))
             return {}, {}
 
         if isinstance(doc_obj, Class):
