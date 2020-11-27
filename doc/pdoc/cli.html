@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.1" />
+<meta name="generator" content="pdoc 0.9.2" />
 <title>pdoc.cli API documentation</title>
 <meta name="description" content="pdoc&#39;s CLI interface and helper functions." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/cli.py#L0-L596" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/cli.py#L0-L595" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">#!/usr/bin/env python3
 &#34;&#34;&#34;pdoc&#39;s CLI interface and helper functions.&#34;&#34;&#34;
@@ -410,7 +410,7 @@ def _warn_deprecated(option, alternative=&#39;&#39;, use_config_mako=False):
     warn(msg, DeprecationWarning, stacklevel=2)
 
 
-def _generate_lunr_search(top_module: pdoc.Module,
+def _generate_lunr_search(modules: List[pdoc.Module],
                           index_docstrings: bool,
                           template_config: dict):
     &#34;&#34;&#34;Generate index.js for search&#34;&#34;&#34;
@@ -441,20 +441,17 @@ def _generate_lunr_search(top_module: pdoc.Module,
     @lru_cache()
     def to_url_id(module):
         url = module.url()
-        if top_module.is_package:  # Reference from subfolder if its a package
-            _, url = url.split(&#39;/&#39;, maxsplit=1)
         if url not in url_cache:
             url_cache[url] = len(url_cache)
         return url_cache[url]
 
     index = []  # type: List[Dict]
     url_cache = {}  # type: Dict[str, int]
-    recursive_add_to_index(top_module)
-    urls = [i[0] for i in sorted(url_cache.items(), key=lambda i: i[1])]
+    for top_module in modules:
+        recursive_add_to_index(top_module)
+    urls = sorted(url_cache.keys(), key=url_cache.__getitem__)
 
-    # If top module is a package, output the index in its subfolder, else, in the output dir
-    main_path = path.join(args.output_dir,
-                          *top_module.name.split(&#39;.&#39;) if top_module.is_package else &#39;&#39;)
+    main_path = args.output_dir
     with _open_write_file(path.join(main_path, &#39;index.js&#39;)) as f:
         f.write(&#34;URLS=&#34;)
         json.dump(urls, f, indent=0, separators=(&#39;,&#39;, &#39;:&#39;))
@@ -462,10 +459,8 @@ def _generate_lunr_search(top_module: pdoc.Module,
         json.dump(index, f, indent=0, separators=(&#39;,&#39;, &#39;:&#39;))
 
     # Generate search.html
-    with _open_write_file(path.join(main_path, &#39;search.html&#39;)) as f:
-        rendered_template = pdoc._render_template(
-            &#39;/search.mako&#39;, module=top_module, **template_config
-        )
+    with _open_write_file(path.join(main_path, &#39;doc-search.html&#39;)) as f:
+        rendered_template = pdoc._render_template(&#39;/search.mako&#39;, **template_config)
         f.write(rendered_template)
 
 
@@ -580,15 +575,13 @@ def main(_args=None):
 
     if args.pdf:
         _print_pdf(modules, **template_config)
+        import textwrap
         print(&#34;&#34;&#34;
 PDF-ready markdown written to standard output.
                               ^^^^^^^^^^^^^^^
 Convert this file to PDF using e.g. Pandoc:
 
-    pandoc --metadata=title:&#34;MyProject Documentation&#34;               \\
-           --from=markdown+abbreviations+tex_math_single_backslash  \\
-           --pdf-engine=xelatex --variable=mainfont:&#34;DejaVu Sans&#34;   \\
-           --toc --toc-depth=4 --output=pdf.pdf  pdf.md
+{PANDOC_CMD}
 
 or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
@@ -608,21 +601,14 @@ or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
     wkhtmltopdf --encoding utf8 -s A4 --print-media-type pdf.html pdf.pdf
 
-or similar, at your own discretion.&#34;&#34;&#34;,
+or similar, at your own discretion.&#34;&#34;&#34;.format(PANDOC_CMD=textwrap.indent(_PANDOC_COMMAND, &#39;    &#39;)),
               file=sys.stderr)
         sys.exit(0)
-
-    lunr_config = pdoc._get_config(**template_config).get(&#39;lunr_search&#39;)
 
     for module in modules:
         if args.html:
             _quit_if_exists(module, ext=&#39;.html&#39;)
             recursive_write_files(module, ext=&#39;.html&#39;, **template_config)
-
-            if lunr_config is not None:
-                _generate_lunr_search(
-                    module, lunr_config.get(&#34;index_docstrings&#34;, True), template_config)
-
         elif args.output_dir:  # Generate text files
             _quit_if_exists(module, ext=&#39;.md&#39;)
             recursive_write_files(module, ext=&#39;.md&#39;, **template_config)
@@ -630,6 +616,19 @@ or similar, at your own discretion.&#34;&#34;&#34;,
             sys.stdout.write(module.text(**template_config))
             # Two blank lines between two modules&#39; texts
             sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
+
+    lunr_config = pdoc._get_config(**template_config).get(&#39;lunr_search&#39;)
+    if lunr_config is not None:
+        _generate_lunr_search(
+            modules, lunr_config.get(&#34;index_docstrings&#34;, True), template_config)
+
+
+_PANDOC_COMMAND = &#39;&#39;&#39;\
+pandoc --metadata=title:&#34;MyProject Documentation&#34;               \\
+       --from=markdown+abbreviations+tex_math_single_backslash  \\
+       --pdf-engine=xelatex --variable=mainfont:&#34;DejaVu Sans&#34;   \\
+       --toc --toc-depth=4 --output=pdf.pdf  pdf.md\
+&#39;&#39;&#39;
 
 
 if __name__ == &#34;__main__&#34;:
@@ -651,7 +650,7 @@ if __name__ == &#34;__main__&#34;:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/cli.py#L433-L593" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/cli.py#L428-L584" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def main(_args=None):
     &#34;&#34;&#34; Command-line entry point &#34;&#34;&#34;
@@ -764,15 +763,13 @@ if __name__ == &#34;__main__&#34;:
 
     if args.pdf:
         _print_pdf(modules, **template_config)
+        import textwrap
         print(&#34;&#34;&#34;
 PDF-ready markdown written to standard output.
                               ^^^^^^^^^^^^^^^
 Convert this file to PDF using e.g. Pandoc:
 
-    pandoc --metadata=title:&#34;MyProject Documentation&#34;               \\
-           --from=markdown+abbreviations+tex_math_single_backslash  \\
-           --pdf-engine=xelatex --variable=mainfont:&#34;DejaVu Sans&#34;   \\
-           --toc --toc-depth=4 --output=pdf.pdf  pdf.md
+{PANDOC_CMD}
 
 or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
@@ -792,28 +789,26 @@ or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
     wkhtmltopdf --encoding utf8 -s A4 --print-media-type pdf.html pdf.pdf
 
-or similar, at your own discretion.&#34;&#34;&#34;,
+or similar, at your own discretion.&#34;&#34;&#34;.format(PANDOC_CMD=textwrap.indent(_PANDOC_COMMAND, &#39;    &#39;)),
               file=sys.stderr)
         sys.exit(0)
-
-    lunr_config = pdoc._get_config(**template_config).get(&#39;lunr_search&#39;)
 
     for module in modules:
         if args.html:
             _quit_if_exists(module, ext=&#39;.html&#39;)
             recursive_write_files(module, ext=&#39;.html&#39;, **template_config)
-
-            if lunr_config is not None:
-                _generate_lunr_search(
-                    module, lunr_config.get(&#34;index_docstrings&#34;, True), template_config)
-
         elif args.output_dir:  # Generate text files
             _quit_if_exists(module, ext=&#39;.md&#39;)
             recursive_write_files(module, ext=&#39;.md&#39;, **template_config)
         else:
             sys.stdout.write(module.text(**template_config))
             # Two blank lines between two modules&#39; texts
-            sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))</code></pre>
+            sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
+
+    lunr_config = pdoc._get_config(**template_config).get(&#39;lunr_search&#39;)
+    if lunr_config is not None:
+        _generate_lunr_search(
+            modules, lunr_config.get(&#34;index_docstrings&#34;, True), template_config)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.cli.module_path"><code class="name flex">
@@ -824,7 +819,7 @@ or similar, at your own discretion.&#34;&#34;&#34;,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/cli.py#L301-L302" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/cli.py#L301-L302" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def module_path(m: pdoc.Module, ext: str):
     return path.join(args.output_dir, *re.sub(r&#39;\.html$&#39;, ext, m.url()).split(&#39;/&#39;))</code></pre>
@@ -838,7 +833,7 @@ or similar, at your own discretion.&#34;&#34;&#34;,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/cli.py#L334-L349" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/cli.py#L334-L349" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def recursive_write_files(m: pdoc.Module, ext: str, **kwargs):
     assert ext in (&#39;.html&#39;, &#39;.md&#39;)
@@ -895,7 +890,7 @@ data-gaCategoryParameter="pdoc.cli">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
 </footer>
 <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-43663477-5','auto');ga('require','cleanUrlTracker',{indexFilename:'index.html',trailingSlash:'add'});ga('require','outboundLinkTracker',{events:['click','auxclick','contextmenu']});ga('require','maxScrollTracker');ga('require','pageVisibilityTracker');ga('send','pageview');setTimeout(function(){ga('send','event','pageview','view')},15000);</script><script async src='https://www.google-analytics.com/analytics.js'></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js'></script></body>
 </html>

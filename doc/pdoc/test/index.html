@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.1" />
+<meta name="generator" content="pdoc 0.9.2" />
 <title>pdoc.test API documentation</title>
 <meta name="description" content="Unit tests for pdoc package." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L0-L1617" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L0-L1671" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 Unit tests for pdoc package.
@@ -45,7 +45,9 @@ import inspect
 import os
 import shutil
 import signal
+import subprocess
 import sys
+import typing
 import threading
 import unittest
 import warnings
@@ -57,11 +59,10 @@ from itertools import chain
 from random import randint
 from tempfile import TemporaryDirectory
 from time import sleep
+from types import ModuleType
 from unittest.mock import patch
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
-
-import typing
 
 import pdoc
 from pdoc import cli
@@ -71,9 +72,16 @@ from pdoc.html_helpers import (
 )
 
 TESTS_BASEDIR = os.path.abspath(os.path.dirname(__file__) or &#39;.&#39;)
-EXAMPLE_MODULE = &#39;example_pkg&#39;
-
 sys.path.insert(0, TESTS_BASEDIR)
+
+EXAMPLE_MODULE = &#39;example_pkg&#39;
+EXAMPLE_PDOC_MODULE = pdoc.Module(EXAMPLE_MODULE, context=pdoc.Context())
+PDOC_PDOC_MODULE = pdoc.Module(pdoc, context=pdoc.Context())
+
+EMPTY_MODULE = ModuleType(&#39;empty&#39;)
+EMPTY_MODULE.__pdoc__ = {}  # type: ignore
+with warnings.catch_warnings(record=True):
+    DUMMY_PDOC_MODULE = pdoc.Module(EMPTY_MODULE, context=pdoc.Context())
 
 T = typing.TypeVar(&#34;T&#34;)
 
@@ -282,16 +290,24 @@ class CliTest(unittest.TestCase):
             self._basic_html_assertions()
             self._check_files(exclude_patterns=[&#39;class=&#34;source&#34;&#39;, &#39;Hidden&#39;])
 
-    def test_html_with_google(self):
+    def test_google_search_query(self):
         with run_html(EXAMPLE_MODULE, config=&#39;google_search_query=&#34;anything&#34;&#39;):
             self._basic_html_assertions()
             self._check_files(include_patterns=[&#39;class=&#34;gcse-search&#34;&#39;])
 
-    def test_html_with_lunr(self):
+    def test_lunr_search(self):
         with run_html(EXAMPLE_MODULE, config=&#39;lunr_search={&#34;fuzziness&#34;: 1}&#39;):
-            files = self.PUBLIC_FILES + [&#34;example_pkg/search.html&#34;, &#34;example_pkg/index.js&#34;]
+            files = self.PUBLIC_FILES + [&#34;doc-search.html&#34;, &#34;index.js&#34;]
             self._basic_html_assertions(expected_files=files)
             self._check_files(exclude_patterns=[&#39;class=&#34;gcse-search&#34;&#39;])
+            self._check_files(include_patterns=[&#39;URLS=[\n&#34;example_pkg/index.html&#34;,\n&#34;example_pkg/&#39;],
+                              file_pattern=&#39;index.js&#39;)
+            self._check_files(include_patterns=[&#34;&#39;../doc-search.html#&#39;&#34;],
+                              file_pattern=&#39;example_pkg/index.html&#39;)
+            self._check_files(include_patterns=[&#34;&#39;../doc-search.html#&#39;&#34;],
+                              file_pattern=&#39;example_pkg/module.html&#39;)
+            self._check_files(include_patterns=[&#34;&#39;../../doc-search.html#&#39;&#34;],
+                              file_pattern=&#39;example_pkg/subpkg/index.html&#39;)
 
     def test_force(self):
         with run_html(EXAMPLE_MODULE):
@@ -418,6 +434,17 @@ class CliTest(unittest.TestCase):
         self.assertIn(pdoc_Doc_params.replace(&#39; &#39;, &#39;&#39;),
                       out.replace(&#39;&gt;&#39;, &#39;&#39;).replace(&#39;\n&#39;, &#39;&#39;).replace(&#39; &#39;, &#39;&#39;))
 
+    @unittest.skipUnless(&#39;PDOC_TEST_PANDOC&#39; in os.environ, &#39;PDOC_TEST_PANDOC not set/requested&#39;)
+    def test_pdf_pandoc(self):
+        with temp_dir() as path, \
+                chdir(path), \
+                redirect_streams() as (stdout, _), \
+                open(&#39;pdf.md&#39;, &#39;w&#39;) as f:
+            run(&#39;pdoc&#39;, pdf=None)
+            f.write(stdout.getvalue())
+            subprocess.run(pdoc.cli._PANDOC_COMMAND, shell=True, check=True)
+            self.assertTrue(os.path.exists(&#39;pdf.pdf&#39;))
+
     def test_config(self):
         with run_html(EXAMPLE_MODULE, config=&#39;link_prefix=&#34;/foobar/&#34;&#39;):
             self._basic_html_assertions()
@@ -450,7 +477,7 @@ class CliTest(unittest.TestCase):
             run(&#39;.&#39;, skip_errors=None)
         self.assertIn(&#39;ZeroDivision&#39;, cm.warning.args[0])
 
-    @unittest.skipIf(sys.version_info &lt; (3, 6), &#39;variable annotation unsupported in &lt;Py3.6&#39;)
+    @unittest.skipIf(sys.version_info &lt; (3, 7), &#39;__future__.annotations unsupported in &lt;Py3.7&#39;)
     def test_resolve_typing_forwardrefs(self):
         # GH-245
         with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, &#39;_resolve_typing_forwardrefs&#39;)):
@@ -472,7 +499,6 @@ class ApiTest(unittest.TestCase):
     &#34;&#34;&#34;
     Programmatic/API unit tests.
     &#34;&#34;&#34;
-
     def setUp(self):
         pdoc.reset()
 
@@ -492,10 +518,9 @@ class ApiTest(unittest.TestCase):
 
     def test_Module_find_class(self):
         class A:
-            __module__ = None
+            pass
 
-        assert A.__module__ is None
-        mod = pdoc.Module(pdoc)
+        mod = PDOC_PDOC_MODULE
         self.assertIsInstance(mod.find_class(pdoc.Doc), pdoc.Class)
         self.assertIsInstance(mod.find_class(A), pdoc.External)
 
@@ -524,8 +549,7 @@ class ApiTest(unittest.TestCase):
                          [EXAMPLE_MODULE + &#39;._private.module&#39;])
 
     def test_instance_var(self):
-        pdoc.reset()
-        mod = pdoc.Module(EXAMPLE_MODULE)
+        mod = EXAMPLE_PDOC_MODULE
         var = mod.doc[&#39;B&#39;].doc[&#39;instance_var&#39;]
         self.assertTrue(var.instance_var)
 
@@ -549,8 +573,7 @@ class ApiTest(unittest.TestCase):
             vars_dont = 0
             but_clss_have_doc = int
 
-        with self.assertWarns(UserWarning):
-            doc = pdoc.Class(&#39;C&#39;, pdoc.Module(&#39;pdoc&#39;), C)
+        doc = pdoc.Class(&#39;C&#39;, DUMMY_PDOC_MODULE, C)
         self.assertEqual(doc.doc[&#39;vars_dont&#39;].docstring, &#39;&#39;)
         self.assertIn(&#39;integer&#39;, doc.doc[&#39;but_clss_have_doc&#39;].docstring)
 
@@ -582,7 +605,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(cls.doc[&#39;inherited&#39;].refname, mod + &#39;.B.inherited&#39;)
 
     def test_qualname(self):
-        module = pdoc.Module(EXAMPLE_MODULE)
+        module = EXAMPLE_PDOC_MODULE
         var = module.doc[&#39;var&#39;]
         cls = module.doc[&#39;B&#39;]
         nested_cls = cls.doc[&#39;C&#39;]
@@ -627,6 +650,30 @@ class ApiTest(unittest.TestCase):
                 pdoc.link_inheritance()
             self.assertEqual(cm, [])
             self.assertNotIn(&#39;downloaded_modules&#39;, mod.doc)
+
+    @ignore_warnings
+    def test_dont_touch__pdoc__blacklisted(self):
+        class Bomb:
+            def __getattribute__(self, item):
+                raise RuntimeError
+
+        class D:
+            x = Bomb()
+            &#34;&#34;&#34;doc&#34;&#34;&#34;
+            __qualname__ = &#39;D&#39;
+
+        module = EMPTY_MODULE
+        D.__module__ = module.__name__  # Need to match is_from_this_module check
+        with patch.object(module, &#39;x&#39;, Bomb(), create=True), \
+             patch.object(module, &#39;__pdoc__&#39;, {&#39;x&#39;: False}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertNotIn(&#39;x&#39;, mod.doc)
+        with patch.object(module, &#39;D&#39;, D, create=True), \
+             patch.object(module, &#39;__pdoc__&#39;, {&#39;D.x&#39;: False}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertNotIn(&#39;x&#39;, mod.doc[&#39;D&#39;].doc)
 
     def test__pdoc__invalid_value(self):
         module = pdoc.import_module(EXAMPLE_MODULE)
@@ -712,7 +759,6 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(result.name, nonexistent)
 
         # Ref by class __init__
-        mod = pdoc.Module(pdoc)
         self.assertIs(mod.find_ident(&#39;pdoc.Doc.__init__&#39;).obj, pdoc.Doc)
 
     def test_inherits(self):
@@ -765,7 +811,7 @@ class ApiTest(unittest.TestCase):
         class E(C):
             pass
 
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         self.assertEqual([x.refname for x in pdoc.Class(&#39;A&#39;, mod, A).subclasses()],
                          [mod.find_class(C).refname])
         self.assertEqual([x.refname for x in pdoc.Class(&#39;B&#39;, mod, B).subclasses()],
@@ -815,7 +861,7 @@ class ApiTest(unittest.TestCase):
         self.assertIsInstance(module.find_ident(&#39;pdoc.Module&#39;), pdoc.External)
 
     def test_Function_params(self):
-        mod = pdoc.Module(pdoc)
+        mod = PDOC_PDOC_MODULE
         func = pdoc.Function(&#39;f&#39;, mod,
                              lambda a, _a, _b=None: None)
         self.assertEqual(func.params(), [&#39;a&#39;, &#39;_a&#39;])
@@ -880,6 +926,16 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(pdoc.Function(&#39;bug130&#39;, mod, bug130_str_annotation).params(annotate=True),
                          [&#39;a:\N{NBSP}str&#39;])
 
+        # typed, NewType
+        CustomType = typing.NewType(&#39;CustomType&#39;, bool)
+
+        def bug253_newtype_annotation(a: CustomType):
+            return
+
+        self.assertEqual(
+            pdoc.Function(&#39;bug253&#39;, mod, bug253_newtype_annotation).params(annotate=True),
+            [&#39;a:\N{NBSP}CustomType&#39;])
+
         # builtin callables with signatures in docstrings
         from itertools import repeat
         self.assertEqual(pdoc.Function(&#39;repeat&#39;, mod, repeat).params(), [&#39;object&#39;, &#39;times&#39;])
@@ -894,7 +950,7 @@ class ApiTest(unittest.TestCase):
 
     @unittest.skipIf(sys.version_info &lt; (3, 8), &#34;positional-only arguments unsupported in &lt; py3.8&#34;)
     def test_test_Function_params_python38_specific(self):
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         func = pdoc.Function(&#39;f&#39;, mod, eval(&#34;lambda a, /, b: None&#34;))
         self.assertEqual(func.params(), [&#39;a&#39;, &#39;/&#39;, &#39;b&#39;])
 
@@ -902,22 +958,18 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(func.params(), [&#39;a&#39;, &#39;/&#39;])
 
     def test_Function_return_annotation(self):
-        import typing
-
         def f() -&gt; typing.List[typing.Union[str, pdoc.Doc]]: pass
-        func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc), f)
+        func = pdoc.Function(&#39;f&#39;, DUMMY_PDOC_MODULE, f)
         self.assertEqual(func.return_annotation(), &#39;List[Union[str,\N{NBSP}pdoc.Doc]]&#39;)
 
     @ignore_warnings
     def test_Variable_type_annotation(self):
-        import typing
-
         class Foobar:
             @property
             def prop(self) -&gt; typing.Optional[int]:
                 pass
 
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         cls = pdoc.Class(&#39;Foobar&#39;, mod, Foobar)
         self.assertEqual(cls.doc[&#39;prop&#39;].type_annotation(), &#39;Union[int,\N{NBSP}NoneType]&#39;)
 
@@ -928,6 +980,8 @@ class ApiTest(unittest.TestCase):
             filename = os.path.join(path, &#39;module36syntax.py&#39;)
             with open(filename, &#39;w&#39;) as f:
                 f.write(&#39;&#39;&#39;
+from typing import overload
+
 var: str = &#39;x&#39;
 &#34;&#34;&#34;dummy&#34;&#34;&#34;
 
@@ -935,15 +989,20 @@ class Foo:
     var: int = 3
     &#34;&#34;&#34;dummy&#34;&#34;&#34;
 
-    def __init__(self):
-        self.var2: float = 1
-        &#34;&#34;&#34;dummy&#34;&#34;&#34;
+    @overload
+    def __init__(self, var2: float):
+        pass
+
+    def __init__(self, var2):
+        self.var2: float = float(var2)
+        &#34;&#34;&#34;dummy2&#34;&#34;&#34;
                 &#39;&#39;&#39;)
             mod = pdoc.Module(pdoc.import_module(filename))
             self.assertEqual(mod.doc[&#39;var&#39;].type_annotation(), &#39;str&#39;)
             self.assertEqual(mod.doc[&#39;Foo&#39;].doc[&#39;var&#39;].type_annotation(), &#39;int&#39;)
             self.assertIsInstance(mod.doc[&#39;Foo&#39;].doc[&#39;var2&#39;], pdoc.Variable)
             self.assertEqual(mod.doc[&#39;Foo&#39;].doc[&#39;var2&#39;].type_annotation(), &#39;&#39;)  # Won&#39;t fix
+            self.assertEqual(mod.doc[&#39;Foo&#39;].doc[&#39;var2&#39;].docstring, &#39;dummy2&#39;)
 
             self.assertIn(&#39;var: str&#39;, mod.text())
             self.assertIn(&#39;var: int&#39;, mod.text())
@@ -959,7 +1018,6 @@ class Foo:
 
         class C:
             &#34;&#34;&#34;foo&#34;&#34;&#34;
-
             def __init__(self):
                 &#34;&#34;&#34;bar&#34;&#34;&#34;
 
@@ -972,14 +1030,13 @@ class Foo:
 
         class F(typing.Generic[T]):
             &#34;&#34;&#34;baz&#34;&#34;&#34;
-
             def __init__(self):
                 &#34;&#34;&#34;bar&#34;&#34;&#34;
 
         class G(F[int]):
             &#34;&#34;&#34;foo&#34;&#34;&#34;
 
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         self.assertEqual(pdoc.Class(&#39;A&#39;, mod, A).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
         self.assertEqual(pdoc.Class(&#39;B&#39;, mod, B).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
         self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).docstring, &#34;&#34;&#34;foo\n\nbar&#34;&#34;&#34;)
@@ -994,7 +1051,7 @@ class Foo:
             def __init__(self, x):
                 pass
 
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).params(), [&#39;x&#39;])
         with patch.dict(mod.obj.__pdoc__, {&#39;C.__init__&#39;: False}):
             self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).params(), [])
@@ -1034,7 +1091,7 @@ class Foo:
 
     @unittest.skipIf(sys.version_info &lt; (3, 6), reason=&#34;only deterministic on CPython 3.6+&#34;)
     def test_sorting(self):
-        module = pdoc.Module(EXAMPLE_MODULE)
+        module = EXAMPLE_PDOC_MODULE
 
         sorted_variables = module.variables()
         unsorted_variables = module.variables(sort=False)
@@ -1066,7 +1123,7 @@ class Foo:
     @ignore_warnings
     @unittest.skipIf(sys.version_info &lt; (3, 6), &#39;variable type annotation unsupported in &lt;Py3.6&#39;)
     def test_class_members(self):
-        module = pdoc.Module(EXAMPLE_MODULE)
+        module = DUMMY_PDOC_MODULE
 
         # GH-200
         from enum import Enum
@@ -1131,10 +1188,9 @@ reference: `package.foo`
 &lt;p&gt;ref with underscore: &lt;code&gt;&lt;a href=&#34;#pdoc._x_x_&#34;&gt;_x_x_&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;code block
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;p&gt;reference: &lt;code&gt;&lt;a href=&#34;/package.foo.ext&#34;&gt;package.foo&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;&#39;&#39;&#39;
 
-        module = pdoc.Module(pdoc)
+        module = PDOC_PDOC_MODULE
         module.doc[&#39;_x_x_&#39;] = pdoc.Variable(&#39;_x_x_&#39;, module, &#39;&#39;)
 
         def link(dobj):
@@ -1180,11 +1236,11 @@ pdoc
         def link(dobj):
             return &#39;&lt;a&gt;{}&lt;/a&gt;&#39;.format(dobj.qualname)
 
-        html = to_html(text, module=pdoc.Module(pdoc), link=link)
+        html = to_html(text, module=PDOC_PDOC_MODULE, link=link)
         self.assertEqual(html, expected)
 
     def test_to_html_refname_warning(self):
-        mod = pdoc.Module(EXAMPLE_MODULE)
+        mod = EXAMPLE_PDOC_MODULE
 
         def f():
             &#34;&#34;&#34;Reference to some `example_pkg.nonexisting` object&#34;&#34;&#34;
@@ -1239,7 +1295,7 @@ pdoc
     def test_format_git_link(self):
         url = format_git_link(
             template=&#39;https://github.com/pdoc3/pdoc/blob/{commit}/{path}#L{start_line}-L{end_line}&#39;,
-            dobj=pdoc.Module(EXAMPLE_MODULE).find_ident(&#39;module.foo&#39;),
+            dobj=EXAMPLE_PDOC_MODULE.find_ident(&#39;module.foo&#39;),
         )
         self.assertIsInstance(url, str)
         self.assertRegex(url, r&#34;https://github.com/pdoc3/pdoc/blob/[0-9a-f]{40}&#34;
@@ -1249,7 +1305,7 @@ pdoc
 class Docformats(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._module = pdoc.Module(pdoc)
+        cls._module = PDOC_PDOC_MODULE
         cls._docmodule = pdoc.import_module(EXAMPLE_MODULE)
 
     @staticmethod
@@ -1313,6 +1369,10 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;dt&gt;&lt;code&gt;&lt;a&gt;pdoc.Doc&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;A class description that spans several lines.&lt;/dd&gt;
 &lt;/dl&gt;
+&lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; doctest
+...
+&lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id=&#34;notes&#34;&gt;Notes&lt;/h2&gt;
 &lt;p&gt;Foo bar.&lt;/p&gt;
 &lt;h3 id=&#34;h3-title&#34;&gt;H3 Title&lt;/h3&gt;
@@ -1401,9 +1461,8 @@ that are relevant to the interface.&lt;/p&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
 &lt;p&gt;Examples in doctest format.&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; a = [1,2,3]
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; a = [1,2,3]
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;h2 id=&#34;todos&#34;&gt;Todos&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;For module TODOs&lt;/li&gt;
@@ -1423,22 +1482,19 @@ line2
 fenced code works
 always
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
-&lt;pre&gt;&lt;code class=&#34;python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; nbytes(100)
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; nbytes(100)
 &#39;100.0 bytes&#39;
 line2
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;p&gt;some text&lt;/p&gt;
 &lt;p&gt;some text&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; another doctest
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; another doctest
 line1
 line2
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;h2 id=&#34;example&#34;&gt;Example&lt;/h2&gt;
-&lt;pre&gt;&lt;code class=&#34;python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; f()
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; f()
 Traceback (most recent call last):
     ...
 Exception: something went wrong
@@ -1491,9 +1547,8 @@ lines.&lt;/p&gt;
         self.assertEqual(html, expected)
 
     def test_reST_include(self):
-        expected = &#39;&#39;&#39;&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;    x = 2
+        expected = &#39;&#39;&#39;&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;    x = 2
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;p&gt;1
 x = 2
 x = 3
@@ -1506,7 +1561,7 @@ x =&lt;/p&gt;&#39;&#39;&#39;
         # Ensure includes are resolved within docstrings already,
         # e.g. for `pdoc.html_helpers.extract_toc()` to work
         self.assertIn(&#39;Command-line interface&#39;,
-                      pdoc.Module(pdoc).docstring)
+                      self._module.docstring)
 
     def test_urls(self):
         text = &#34;&#34;&#34;Beautiful Soup
@@ -1538,7 +1593,6 @@ Work &lt;a href=&#34;http://foo/&#34;&gt;like this&lt;/a&gt; and &lt;a href=&#34
 &lt;p&gt;data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;http://url.com
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;p&gt;&lt;a href=&#34;https://google.com&#34;&gt;https://google.com&lt;/a&gt;
 &lt;a href=&#34;https://en.wikipedia.org/wiki/Orange_(software)&#34;&gt;\
 https://en.wikipedia.org/wiki/Orange_(software)&lt;/a&gt;
@@ -1679,7 +1733,7 @@ if __name__ == &#39;__main__&#39;:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L48-L55" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L56-L63" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@contextmanager
 def chdir(path):
@@ -1699,7 +1753,7 @@ def chdir(path):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L86-L92" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L94-L100" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def ignore_warnings(func):
     @wraps(func)
@@ -1718,7 +1772,7 @@ def chdir(path):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L79-L83" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L87-L91" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@contextmanager
 def redirect_streams():
@@ -1735,7 +1789,7 @@ def redirect_streams():
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L58-L67" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L66-L75" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def run(*args, _check=True, **kwargs) -&gt; int:
     params = ((&#39;--&#39; + key.replace(&#39;_&#39;, &#39;-&#39;), value)
@@ -1757,7 +1811,7 @@ def redirect_streams():
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L70-L76" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L78-L84" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@contextmanager
 def run_html(*args, **kwargs):
@@ -1776,7 +1830,7 @@ def run_html(*args, **kwargs):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L42-L45" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L50-L53" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@contextmanager
 def temp_dir():
@@ -1801,13 +1855,12 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L432-L1050" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L459-L1107" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class ApiTest(unittest.TestCase):
     &#34;&#34;&#34;
     Programmatic/API unit tests.
     &#34;&#34;&#34;
-
     def setUp(self):
         pdoc.reset()
 
@@ -1827,10 +1880,9 @@ not have a method with the specified name.</p></div>
 
     def test_Module_find_class(self):
         class A:
-            __module__ = None
+            pass
 
-        assert A.__module__ is None
-        mod = pdoc.Module(pdoc)
+        mod = PDOC_PDOC_MODULE
         self.assertIsInstance(mod.find_class(pdoc.Doc), pdoc.Class)
         self.assertIsInstance(mod.find_class(A), pdoc.External)
 
@@ -1859,8 +1911,7 @@ not have a method with the specified name.</p></div>
                          [EXAMPLE_MODULE + &#39;._private.module&#39;])
 
     def test_instance_var(self):
-        pdoc.reset()
-        mod = pdoc.Module(EXAMPLE_MODULE)
+        mod = EXAMPLE_PDOC_MODULE
         var = mod.doc[&#39;B&#39;].doc[&#39;instance_var&#39;]
         self.assertTrue(var.instance_var)
 
@@ -1884,8 +1935,7 @@ not have a method with the specified name.</p></div>
             vars_dont = 0
             but_clss_have_doc = int
 
-        with self.assertWarns(UserWarning):
-            doc = pdoc.Class(&#39;C&#39;, pdoc.Module(&#39;pdoc&#39;), C)
+        doc = pdoc.Class(&#39;C&#39;, DUMMY_PDOC_MODULE, C)
         self.assertEqual(doc.doc[&#39;vars_dont&#39;].docstring, &#39;&#39;)
         self.assertIn(&#39;integer&#39;, doc.doc[&#39;but_clss_have_doc&#39;].docstring)
 
@@ -1917,7 +1967,7 @@ not have a method with the specified name.</p></div>
         self.assertEqual(cls.doc[&#39;inherited&#39;].refname, mod + &#39;.B.inherited&#39;)
 
     def test_qualname(self):
-        module = pdoc.Module(EXAMPLE_MODULE)
+        module = EXAMPLE_PDOC_MODULE
         var = module.doc[&#39;var&#39;]
         cls = module.doc[&#39;B&#39;]
         nested_cls = cls.doc[&#39;C&#39;]
@@ -1962,6 +2012,30 @@ not have a method with the specified name.</p></div>
                 pdoc.link_inheritance()
             self.assertEqual(cm, [])
             self.assertNotIn(&#39;downloaded_modules&#39;, mod.doc)
+
+    @ignore_warnings
+    def test_dont_touch__pdoc__blacklisted(self):
+        class Bomb:
+            def __getattribute__(self, item):
+                raise RuntimeError
+
+        class D:
+            x = Bomb()
+            &#34;&#34;&#34;doc&#34;&#34;&#34;
+            __qualname__ = &#39;D&#39;
+
+        module = EMPTY_MODULE
+        D.__module__ = module.__name__  # Need to match is_from_this_module check
+        with patch.object(module, &#39;x&#39;, Bomb(), create=True), \
+             patch.object(module, &#39;__pdoc__&#39;, {&#39;x&#39;: False}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertNotIn(&#39;x&#39;, mod.doc)
+        with patch.object(module, &#39;D&#39;, D, create=True), \
+             patch.object(module, &#39;__pdoc__&#39;, {&#39;D.x&#39;: False}):
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertNotIn(&#39;x&#39;, mod.doc[&#39;D&#39;].doc)
 
     def test__pdoc__invalid_value(self):
         module = pdoc.import_module(EXAMPLE_MODULE)
@@ -2047,7 +2121,6 @@ not have a method with the specified name.</p></div>
         self.assertEqual(result.name, nonexistent)
 
         # Ref by class __init__
-        mod = pdoc.Module(pdoc)
         self.assertIs(mod.find_ident(&#39;pdoc.Doc.__init__&#39;).obj, pdoc.Doc)
 
     def test_inherits(self):
@@ -2100,7 +2173,7 @@ not have a method with the specified name.</p></div>
         class E(C):
             pass
 
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         self.assertEqual([x.refname for x in pdoc.Class(&#39;A&#39;, mod, A).subclasses()],
                          [mod.find_class(C).refname])
         self.assertEqual([x.refname for x in pdoc.Class(&#39;B&#39;, mod, B).subclasses()],
@@ -2150,7 +2223,7 @@ not have a method with the specified name.</p></div>
         self.assertIsInstance(module.find_ident(&#39;pdoc.Module&#39;), pdoc.External)
 
     def test_Function_params(self):
-        mod = pdoc.Module(pdoc)
+        mod = PDOC_PDOC_MODULE
         func = pdoc.Function(&#39;f&#39;, mod,
                              lambda a, _a, _b=None: None)
         self.assertEqual(func.params(), [&#39;a&#39;, &#39;_a&#39;])
@@ -2215,6 +2288,16 @@ not have a method with the specified name.</p></div>
         self.assertEqual(pdoc.Function(&#39;bug130&#39;, mod, bug130_str_annotation).params(annotate=True),
                          [&#39;a:\N{NBSP}str&#39;])
 
+        # typed, NewType
+        CustomType = typing.NewType(&#39;CustomType&#39;, bool)
+
+        def bug253_newtype_annotation(a: CustomType):
+            return
+
+        self.assertEqual(
+            pdoc.Function(&#39;bug253&#39;, mod, bug253_newtype_annotation).params(annotate=True),
+            [&#39;a:\N{NBSP}CustomType&#39;])
+
         # builtin callables with signatures in docstrings
         from itertools import repeat
         self.assertEqual(pdoc.Function(&#39;repeat&#39;, mod, repeat).params(), [&#39;object&#39;, &#39;times&#39;])
@@ -2229,7 +2312,7 @@ not have a method with the specified name.</p></div>
 
     @unittest.skipIf(sys.version_info &lt; (3, 8), &#34;positional-only arguments unsupported in &lt; py3.8&#34;)
     def test_test_Function_params_python38_specific(self):
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         func = pdoc.Function(&#39;f&#39;, mod, eval(&#34;lambda a, /, b: None&#34;))
         self.assertEqual(func.params(), [&#39;a&#39;, &#39;/&#39;, &#39;b&#39;])
 
@@ -2237,22 +2320,18 @@ not have a method with the specified name.</p></div>
         self.assertEqual(func.params(), [&#39;a&#39;, &#39;/&#39;])
 
     def test_Function_return_annotation(self):
-        import typing
-
         def f() -&gt; typing.List[typing.Union[str, pdoc.Doc]]: pass
-        func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc), f)
+        func = pdoc.Function(&#39;f&#39;, DUMMY_PDOC_MODULE, f)
         self.assertEqual(func.return_annotation(), &#39;List[Union[str,\N{NBSP}pdoc.Doc]]&#39;)
 
     @ignore_warnings
     def test_Variable_type_annotation(self):
-        import typing
-
         class Foobar:
             @property
             def prop(self) -&gt; typing.Optional[int]:
                 pass
 
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         cls = pdoc.Class(&#39;Foobar&#39;, mod, Foobar)
         self.assertEqual(cls.doc[&#39;prop&#39;].type_annotation(), &#39;Union[int,\N{NBSP}NoneType]&#39;)
 
@@ -2263,6 +2342,8 @@ not have a method with the specified name.</p></div>
             filename = os.path.join(path, &#39;module36syntax.py&#39;)
             with open(filename, &#39;w&#39;) as f:
                 f.write(&#39;&#39;&#39;
+from typing import overload
+
 var: str = &#39;x&#39;
 &#34;&#34;&#34;dummy&#34;&#34;&#34;
 
@@ -2270,15 +2351,20 @@ class Foo:
     var: int = 3
     &#34;&#34;&#34;dummy&#34;&#34;&#34;
 
-    def __init__(self):
-        self.var2: float = 1
-        &#34;&#34;&#34;dummy&#34;&#34;&#34;
+    @overload
+    def __init__(self, var2: float):
+        pass
+
+    def __init__(self, var2):
+        self.var2: float = float(var2)
+        &#34;&#34;&#34;dummy2&#34;&#34;&#34;
                 &#39;&#39;&#39;)
             mod = pdoc.Module(pdoc.import_module(filename))
             self.assertEqual(mod.doc[&#39;var&#39;].type_annotation(), &#39;str&#39;)
             self.assertEqual(mod.doc[&#39;Foo&#39;].doc[&#39;var&#39;].type_annotation(), &#39;int&#39;)
             self.assertIsInstance(mod.doc[&#39;Foo&#39;].doc[&#39;var2&#39;], pdoc.Variable)
             self.assertEqual(mod.doc[&#39;Foo&#39;].doc[&#39;var2&#39;].type_annotation(), &#39;&#39;)  # Won&#39;t fix
+            self.assertEqual(mod.doc[&#39;Foo&#39;].doc[&#39;var2&#39;].docstring, &#39;dummy2&#39;)
 
             self.assertIn(&#39;var: str&#39;, mod.text())
             self.assertIn(&#39;var: int&#39;, mod.text())
@@ -2294,7 +2380,6 @@ class Foo:
 
         class C:
             &#34;&#34;&#34;foo&#34;&#34;&#34;
-
             def __init__(self):
                 &#34;&#34;&#34;bar&#34;&#34;&#34;
 
@@ -2307,14 +2392,13 @@ class Foo:
 
         class F(typing.Generic[T]):
             &#34;&#34;&#34;baz&#34;&#34;&#34;
-
             def __init__(self):
                 &#34;&#34;&#34;bar&#34;&#34;&#34;
 
         class G(F[int]):
             &#34;&#34;&#34;foo&#34;&#34;&#34;
 
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         self.assertEqual(pdoc.Class(&#39;A&#39;, mod, A).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
         self.assertEqual(pdoc.Class(&#39;B&#39;, mod, B).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
         self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).docstring, &#34;&#34;&#34;foo\n\nbar&#34;&#34;&#34;)
@@ -2329,7 +2413,7 @@ class Foo:
             def __init__(self, x):
                 pass
 
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).params(), [&#39;x&#39;])
         with patch.dict(mod.obj.__pdoc__, {&#39;C.__init__&#39;: False}):
             self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).params(), [])
@@ -2369,7 +2453,7 @@ class Foo:
 
     @unittest.skipIf(sys.version_info &lt; (3, 6), reason=&#34;only deterministic on CPython 3.6+&#34;)
     def test_sorting(self):
-        module = pdoc.Module(EXAMPLE_MODULE)
+        module = EXAMPLE_PDOC_MODULE
 
         sorted_variables = module.variables()
         unsorted_variables = module.variables(sort=False)
@@ -2401,7 +2485,7 @@ class Foo:
     @ignore_warnings
     @unittest.skipIf(sys.version_info &lt; (3, 6), &#39;variable type annotation unsupported in &lt;Py3.6&#39;)
     def test_class_members(self):
-        module = pdoc.Module(EXAMPLE_MODULE)
+        module = DUMMY_PDOC_MODULE
 
         # GH-200
         from enum import Enum
@@ -2437,7 +2521,7 @@ class Foo:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L437-L438" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L463-L464" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def setUp(self):
     pdoc.reset()</code></pre>
@@ -2451,7 +2535,7 @@ class Foo:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L912-L950" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L971-L1007" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@ignore_warnings
 def test_Class_docstring(self):
@@ -2464,7 +2548,6 @@ def test_Class_docstring(self):
 
     class C:
         &#34;&#34;&#34;foo&#34;&#34;&#34;
-
         def __init__(self):
             &#34;&#34;&#34;bar&#34;&#34;&#34;
 
@@ -2477,14 +2560,13 @@ def test_Class_docstring(self):
 
     class F(typing.Generic[T]):
         &#34;&#34;&#34;baz&#34;&#34;&#34;
-
         def __init__(self):
             &#34;&#34;&#34;bar&#34;&#34;&#34;
 
     class G(F[int]):
         &#34;&#34;&#34;foo&#34;&#34;&#34;
 
-    mod = pdoc.Module(pdoc)
+    mod = DUMMY_PDOC_MODULE
     self.assertEqual(pdoc.Class(&#39;A&#39;, mod, A).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
     self.assertEqual(pdoc.Class(&#39;B&#39;, mod, B).docstring, &#34;&#34;&#34;foo&#34;&#34;&#34;)
     self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).docstring, &#34;&#34;&#34;foo\n\nbar&#34;&#34;&#34;)
@@ -2502,7 +2584,7 @@ def test_Class_docstring(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L952-L978" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1009-L1035" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@ignore_warnings
 def test_Class_params(self):
@@ -2510,7 +2592,7 @@ def test_Class_params(self):
         def __init__(self, x):
             pass
 
-    mod = pdoc.Module(pdoc)
+    mod = DUMMY_PDOC_MODULE
     self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).params(), [&#39;x&#39;])
     with patch.dict(mod.obj.__pdoc__, {&#39;C.__init__&#39;: False}):
         self.assertEqual(pdoc.Class(&#39;C&#39;, mod, C).params(), [])
@@ -2541,10 +2623,10 @@ def test_Class_params(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L778-L854" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L824-L910" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_Function_params(self):
-    mod = pdoc.Module(pdoc)
+    mod = PDOC_PDOC_MODULE
     func = pdoc.Function(&#39;f&#39;, mod,
                          lambda a, _a, _b=None: None)
     self.assertEqual(func.params(), [&#39;a&#39;, &#39;_a&#39;])
@@ -2609,6 +2691,16 @@ def test_Class_params(self):
     self.assertEqual(pdoc.Function(&#39;bug130&#39;, mod, bug130_str_annotation).params(annotate=True),
                      [&#39;a:\N{NBSP}str&#39;])
 
+    # typed, NewType
+    CustomType = typing.NewType(&#39;CustomType&#39;, bool)
+
+    def bug253_newtype_annotation(a: CustomType):
+        return
+
+    self.assertEqual(
+        pdoc.Function(&#39;bug253&#39;, mod, bug253_newtype_annotation).params(annotate=True),
+        [&#39;a:\N{NBSP}CustomType&#39;])
+
     # builtin callables with signatures in docstrings
     from itertools import repeat
     self.assertEqual(pdoc.Function(&#39;repeat&#39;, mod, repeat).params(), [&#39;object&#39;, &#39;times&#39;])
@@ -2630,13 +2722,11 @@ def test_Class_params(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L865-L870" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L921-L924" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_Function_return_annotation(self):
-    import typing
-
     def f() -&gt; typing.List[typing.Union[str, pdoc.Doc]]: pass
-    func = pdoc.Function(&#39;f&#39;, pdoc.Module(pdoc), f)
+    func = pdoc.Function(&#39;f&#39;, DUMMY_PDOC_MODULE, f)
     self.assertEqual(func.return_annotation(), &#39;List[Union[str,\N{NBSP}pdoc.Doc]]&#39;)</code></pre>
 </details>
 </dd>
@@ -2648,14 +2738,13 @@ def test_Class_params(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L454-L461" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L480-L486" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_Module_find_class(self):
     class A:
-        __module__ = None
+        pass
 
-    assert A.__module__ is None
-    mod = pdoc.Module(pdoc)
+    mod = PDOC_PDOC_MODULE
     self.assertIsInstance(mod.find_class(pdoc.Doc), pdoc.Class)
     self.assertIsInstance(mod.find_class(A), pdoc.External)</code></pre>
 </details>
@@ -2668,18 +2757,16 @@ def test_Class_params(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L872-L883" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L926-L935" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@ignore_warnings
 def test_Variable_type_annotation(self):
-    import typing
-
     class Foobar:
         @property
         def prop(self) -&gt; typing.Optional[int]:
             pass
 
-    mod = pdoc.Module(pdoc)
+    mod = DUMMY_PDOC_MODULE
     cls = pdoc.Class(&#39;Foobar&#39;, mod, Foobar)
     self.assertEqual(cls.doc[&#39;prop&#39;].type_annotation(), &#39;Union[int,\N{NBSP}NoneType]&#39;)</code></pre>
 </details>
@@ -2692,7 +2779,7 @@ def test_Variable_type_annotation(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L885-L910" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L937-L969" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    @ignore_warnings
     @unittest.skipIf(sys.version_info &lt; (3, 6), &#39;variable annotation unsupported in &lt;Py3.6&#39;)
@@ -2701,6 +2788,8 @@ def test_Variable_type_annotation(self):
             filename = os.path.join(path, &#39;module36syntax.py&#39;)
             with open(filename, &#39;w&#39;) as f:
                 f.write(&#39;&#39;&#39;
+from typing import overload
+
 var: str = &#39;x&#39;
 &#34;&#34;&#34;dummy&#34;&#34;&#34;
 
@@ -2708,15 +2797,20 @@ class Foo:
     var: int = 3
     &#34;&#34;&#34;dummy&#34;&#34;&#34;
 
-    def __init__(self):
-        self.var2: float = 1
-        &#34;&#34;&#34;dummy&#34;&#34;&#34;
+    @overload
+    def __init__(self, var2: float):
+        pass
+
+    def __init__(self, var2):
+        self.var2: float = float(var2)
+        &#34;&#34;&#34;dummy2&#34;&#34;&#34;
                 &#39;&#39;&#39;)
             mod = pdoc.Module(pdoc.import_module(filename))
             self.assertEqual(mod.doc[&#39;var&#39;].type_annotation(), &#39;str&#39;)
             self.assertEqual(mod.doc[&#39;Foo&#39;].doc[&#39;var&#39;].type_annotation(), &#39;int&#39;)
             self.assertIsInstance(mod.doc[&#39;Foo&#39;].doc[&#39;var2&#39;], pdoc.Variable)
             self.assertEqual(mod.doc[&#39;Foo&#39;].doc[&#39;var2&#39;].type_annotation(), &#39;&#39;)  # Won&#39;t fix
+            self.assertEqual(mod.doc[&#39;Foo&#39;].doc[&#39;var2&#39;].docstring, &#39;dummy2&#39;)
 
             self.assertIn(&#39;var: str&#39;, mod.text())
             self.assertIn(&#39;var: int&#39;, mod.text())</code></pre>
@@ -2730,7 +2824,7 @@ class Foo:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L654-L660" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L701-L707" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test__all__(self):
     module = pdoc.import_module(EXAMPLE_MODULE + &#39;.index&#39;)
@@ -2749,7 +2843,7 @@ class Foo:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L561-L590" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L584-L613" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test__pdoc__dict(self):
     module = pdoc.import_module(EXAMPLE_MODULE)
@@ -2791,7 +2885,7 @@ class Foo:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L592-L597" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L639-L644" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test__pdoc__invalid_value(self):
     module = pdoc.import_module(EXAMPLE_MODULE)
@@ -2809,7 +2903,7 @@ class Foo:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L599-L652" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L646-L699" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test__pdoc__whitelist(self):
     module = pdoc.import_module(EXAMPLE_MODULE)
@@ -2875,7 +2969,7 @@ class Foo:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L518-L522" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L541-L545" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_builtin_methoddescriptors(self):
     import parser
@@ -2892,12 +2986,12 @@ class Foo:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1027-L1050" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1084-L1107" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@ignore_warnings
 @unittest.skipIf(sys.version_info &lt; (3, 6), &#39;variable type annotation unsupported in &lt;Py3.6&#39;)
 def test_class_members(self):
-    module = pdoc.Module(EXAMPLE_MODULE)
+    module = DUMMY_PDOC_MODULE
 
     # GH-200
     from enum import Enum
@@ -2928,15 +3022,14 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L508-L516" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L532-L539" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_class_variables_docstring_not_from_obj(self):
     class C:
         vars_dont = 0
         but_clss_have_doc = int
 
-    with self.assertWarns(UserWarning):
-        doc = pdoc.Class(&#39;C&#39;, pdoc.Module(&#39;pdoc&#39;), C)
+    doc = pdoc.Class(&#39;C&#39;, DUMMY_PDOC_MODULE, C)
     self.assertEqual(doc.doc[&#39;vars_dont&#39;].docstring, &#39;&#39;)
     self.assertIn(&#39;integer&#39;, doc.doc[&#39;but_clss_have_doc&#39;].docstring)</code></pre>
 </details>
@@ -2949,7 +3042,7 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L761-L776" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L807-L822" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_context(self):
     context = {}
@@ -2969,6 +3062,41 @@ def test_class_members(self):
     self.assertIsInstance(module.find_ident(&#39;pdoc.Module&#39;), pdoc.External)</code></pre>
 </details>
 </dd>
+<dt id="pdoc.test.ApiTest.test_dont_touch__pdoc__blacklisted"><code class="name flex">
+<span>def <span class="ident">test_dont_touch__pdoc__blacklisted</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L615-L637" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@ignore_warnings
+def test_dont_touch__pdoc__blacklisted(self):
+    class Bomb:
+        def __getattribute__(self, item):
+            raise RuntimeError
+
+    class D:
+        x = Bomb()
+        &#34;&#34;&#34;doc&#34;&#34;&#34;
+        __qualname__ = &#39;D&#39;
+
+    module = EMPTY_MODULE
+    D.__module__ = module.__name__  # Need to match is_from_this_module check
+    with patch.object(module, &#39;x&#39;, Bomb(), create=True), \
+         patch.object(module, &#39;__pdoc__&#39;, {&#39;x&#39;: False}):
+        mod = pdoc.Module(module)
+        pdoc.link_inheritance()
+        self.assertNotIn(&#39;x&#39;, mod.doc)
+    with patch.object(module, &#39;D&#39;, D, create=True), \
+         patch.object(module, &#39;__pdoc__&#39;, {&#39;D.x&#39;: False}):
+        mod = pdoc.Module(module)
+        pdoc.link_inheritance()
+        self.assertNotIn(&#39;x&#39;, mod.doc[&#39;D&#39;].doc)</code></pre>
+</details>
+</dd>
 <dt id="pdoc.test.ApiTest.test_find_ident"><code class="name flex">
 <span>def <span class="ident">test_find_ident</span></span>(<span>self)</span>
 </code></dt>
@@ -2977,7 +3105,7 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L662-L677" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L709-L723" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_find_ident(self):
     mod = pdoc.Module(EXAMPLE_MODULE)
@@ -2993,7 +3121,6 @@ def test_class_members(self):
     self.assertEqual(result.name, nonexistent)
 
     # Ref by class __init__
-    mod = pdoc.Module(pdoc)
     self.assertIs(mod.find_ident(&#39;pdoc.Doc.__init__&#39;).obj, pdoc.Doc)</code></pre>
 </details>
 </dd>
@@ -3005,7 +3132,7 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L463-L466" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L488-L491" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_import_filename(self):
     with patch.object(sys, &#39;path&#39;, [&#39;&#39;]), \
@@ -3021,7 +3148,7 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L468-L470" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L493-L495" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_imported_once(self):
     with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
@@ -3036,7 +3163,7 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L697-L704" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L743-L750" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_inherited_members(self):
     mod = pdoc.Module(EXAMPLE_MODULE)
@@ -3056,7 +3183,7 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L679-L695" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L725-L741" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_inherits(self):
     module = pdoc.Module(EXAMPLE_MODULE)
@@ -3085,11 +3212,10 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L487-L491" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L512-L515" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_instance_var(self):
-    pdoc.reset()
-    mod = pdoc.Module(EXAMPLE_MODULE)
+    mod = EXAMPLE_PDOC_MODULE
     var = mod.doc[&#39;B&#39;].doc[&#39;instance_var&#39;]
     self.assertTrue(var.instance_var)</code></pre>
 </details>
@@ -3102,7 +3228,7 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L737-L759" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L783-L805" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_link_inheritance(self):
     mod = pdoc.Module(EXAMPLE_MODULE)
@@ -3137,7 +3263,7 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L440-L452" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L466-L478" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_module(self):
     modules = {
@@ -3162,7 +3288,7 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L482-L485" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L507-L510" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_module_allsubmodules(self):
     m = pdoc.Module(EXAMPLE_MODULE + &#39;._private&#39;)
@@ -3178,7 +3304,7 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1022-L1025" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1079-L1082" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_module_init(self):
     mod = pdoc.Module(&#39;pdoc.__init__&#39;)
@@ -3194,7 +3320,7 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L472-L480" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L497-L505" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_namespace(self):
     # Test the three namespace types
@@ -3215,10 +3341,10 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L545-L559" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L568-L582" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_qualname(self):
-    module = pdoc.Module(EXAMPLE_MODULE)
+    module = EXAMPLE_PDOC_MODULE
     var = module.doc[&#39;var&#39;]
     cls = module.doc[&#39;B&#39;]
     nested_cls = cls.doc[&#39;C&#39;]
@@ -3242,7 +3368,7 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L493-L506" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L517-L530" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_readonly_value_descriptors(self):
     pdoc.reset()
@@ -3268,7 +3394,7 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L524-L543" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L547-L566" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_refname(self):
     mod = EXAMPLE_MODULE + &#39;.&#39; + &#39;subpkg&#39;
@@ -3300,11 +3426,11 @@ def test_class_members(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L996-L1020" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1053-L1077" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@unittest.skipIf(sys.version_info &lt; (3, 6), reason=&#34;only deterministic on CPython 3.6+&#34;)
 def test_sorting(self):
-    module = pdoc.Module(EXAMPLE_MODULE)
+    module = EXAMPLE_PDOC_MODULE
 
     sorted_variables = module.variables()
     unsorted_variables = module.variables(sort=False)
@@ -3337,7 +3463,7 @@ def test_sorting(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L706-L735" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L752-L781" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@ignore_warnings
 def test_subclasses(self):
@@ -3362,7 +3488,7 @@ def test_subclasses(self):
     class E(C):
         pass
 
-    mod = pdoc.Module(pdoc)
+    mod = DUMMY_PDOC_MODULE
     self.assertEqual([x.refname for x in pdoc.Class(&#39;A&#39;, mod, A).subclasses()],
                      [mod.find_class(C).refname])
     self.assertEqual([x.refname for x in pdoc.Class(&#39;B&#39;, mod, B).subclasses()],
@@ -3379,11 +3505,11 @@ def test_subclasses(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L856-L863" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L912-L919" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@unittest.skipIf(sys.version_info &lt; (3, 8), &#34;positional-only arguments unsupported in &lt; py3.8&#34;)
 def test_test_Function_params_python38_specific(self):
-    mod = pdoc.Module(pdoc)
+    mod = DUMMY_PDOC_MODULE
     func = pdoc.Function(&#39;f&#39;, mod, eval(&#34;lambda a, /, b: None&#34;))
     self.assertEqual(func.params(), [&#39;a&#39;, &#39;/&#39;, &#39;b&#39;])
 
@@ -3399,7 +3525,7 @@ def test_test_Function_params_python38_specific(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L980-L994" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1037-L1051" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_url(self):
     mod = pdoc.Module(EXAMPLE_MODULE)
@@ -3432,7 +3558,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L95-L429" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L103-L456" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class CliTest(unittest.TestCase):
     &#34;&#34;&#34;
@@ -3585,16 +3711,24 @@ not have a method with the specified name.</p></div>
             self._basic_html_assertions()
             self._check_files(exclude_patterns=[&#39;class=&#34;source&#34;&#39;, &#39;Hidden&#39;])
 
-    def test_html_with_google(self):
+    def test_google_search_query(self):
         with run_html(EXAMPLE_MODULE, config=&#39;google_search_query=&#34;anything&#34;&#39;):
             self._basic_html_assertions()
             self._check_files(include_patterns=[&#39;class=&#34;gcse-search&#34;&#39;])
 
-    def test_html_with_lunr(self):
+    def test_lunr_search(self):
         with run_html(EXAMPLE_MODULE, config=&#39;lunr_search={&#34;fuzziness&#34;: 1}&#39;):
-            files = self.PUBLIC_FILES + [&#34;example_pkg/search.html&#34;, &#34;example_pkg/index.js&#34;]
+            files = self.PUBLIC_FILES + [&#34;doc-search.html&#34;, &#34;index.js&#34;]
             self._basic_html_assertions(expected_files=files)
             self._check_files(exclude_patterns=[&#39;class=&#34;gcse-search&#34;&#39;])
+            self._check_files(include_patterns=[&#39;URLS=[\n&#34;example_pkg/index.html&#34;,\n&#34;example_pkg/&#39;],
+                              file_pattern=&#39;index.js&#39;)
+            self._check_files(include_patterns=[&#34;&#39;../doc-search.html#&#39;&#34;],
+                              file_pattern=&#39;example_pkg/index.html&#39;)
+            self._check_files(include_patterns=[&#34;&#39;../doc-search.html#&#39;&#34;],
+                              file_pattern=&#39;example_pkg/module.html&#39;)
+            self._check_files(include_patterns=[&#34;&#39;../../doc-search.html#&#39;&#34;],
+                              file_pattern=&#39;example_pkg/subpkg/index.html&#39;)
 
     def test_force(self):
         with run_html(EXAMPLE_MODULE):
@@ -3721,6 +3855,17 @@ not have a method with the specified name.</p></div>
         self.assertIn(pdoc_Doc_params.replace(&#39; &#39;, &#39;&#39;),
                       out.replace(&#39;&gt;&#39;, &#39;&#39;).replace(&#39;\n&#39;, &#39;&#39;).replace(&#39; &#39;, &#39;&#39;))
 
+    @unittest.skipUnless(&#39;PDOC_TEST_PANDOC&#39; in os.environ, &#39;PDOC_TEST_PANDOC not set/requested&#39;)
+    def test_pdf_pandoc(self):
+        with temp_dir() as path, \
+                chdir(path), \
+                redirect_streams() as (stdout, _), \
+                open(&#39;pdf.md&#39;, &#39;w&#39;) as f:
+            run(&#39;pdoc&#39;, pdf=None)
+            f.write(stdout.getvalue())
+            subprocess.run(pdoc.cli._PANDOC_COMMAND, shell=True, check=True)
+            self.assertTrue(os.path.exists(&#39;pdf.pdf&#39;))
+
     def test_config(self):
         with run_html(EXAMPLE_MODULE, config=&#39;link_prefix=&#34;/foobar/&#34;&#39;):
             self._basic_html_assertions()
@@ -3753,7 +3898,7 @@ not have a method with the specified name.</p></div>
             run(&#39;.&#39;, skip_errors=None)
         self.assertIn(&#39;ZeroDivision&#39;, cm.warning.args[0])
 
-    @unittest.skipIf(sys.version_info &lt; (3, 6), &#39;variable annotation unsupported in &lt;Py3.6&#39;)
+    @unittest.skipIf(sys.version_info &lt; (3, 7), &#39;__future__.annotations unsupported in &lt;Py3.7&#39;)
     def test_resolve_typing_forwardrefs(self):
         # GH-245
         with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, &#39;_resolve_typing_forwardrefs&#39;)):
@@ -3795,7 +3940,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L121-L122" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L129-L130" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def setUp(self):
     pdoc.reset()</code></pre>
@@ -3809,7 +3954,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L382-L385" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L409-L412" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_config(self):
     with run_html(EXAMPLE_MODULE, config=&#39;link_prefix=&#34;/foobar/&#34;&#39;):
@@ -3825,7 +3970,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L234-L238" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L242-L246" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_docformat(self):
     with self.assertWarns(UserWarning) as cm,\
@@ -3842,7 +3987,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L269-L277" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L285-L293" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_external_links(self):
     with run_html(EXAMPLE_MODULE):
@@ -3863,7 +4008,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L257-L267" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L273-L283" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_force(self):
     with run_html(EXAMPLE_MODULE):
@@ -3886,7 +4031,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L395-L400" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L422-L427" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_google_analytics(self):
     expected = [&#39;google-analytics.com&#39;]
@@ -3894,6 +4039,22 @@ not have a method with the specified name.</p></div>
         self._check_files((), exclude_patterns=expected)
     with run_html(EXAMPLE_MODULE, config=&#39;google_analytics=&#34;UA-xxxxxx-y&#34;&#39;):
         self._check_files(expected)</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.CliTest.test_google_search_query"><code class="name flex">
+<span>def <span class="ident">test_google_search_query</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L254-L257" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def test_google_search_query(self):
+    with run_html(EXAMPLE_MODULE, config=&#39;google_search_query=&#34;anything&#34;&#39;):
+        self._basic_html_assertions()
+        self._check_files(include_patterns=[&#39;class=&#34;gcse-search&#34;&#39;])</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_html"><code class="name flex">
@@ -3904,7 +4065,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L140-L207" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L148-L215" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_html(self):
     include_patterns = [
@@ -3984,7 +4145,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L215-L222" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L223-L230" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_html_identifier(self):
     for package in (&#39;&#39;, &#39;._private&#39;):
@@ -4004,7 +4165,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L209-L213" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L217-L221" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_html_multiple_files(self):
     with chdir(TESTS_BASEDIR):
@@ -4021,7 +4182,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L240-L244" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L248-L252" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_html_no_source(self):
     with self.assertWarns(DeprecationWarning),\
@@ -4038,7 +4199,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L224-L232" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L232-L240" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_html_ref_links(self):
     with run_html(EXAMPLE_MODULE, config=&#39;show_source_code=False&#39;):
@@ -4051,39 +4212,6 @@ not have a method with the specified name.</p></div>
         )</code></pre>
 </details>
 </dd>
-<dt id="pdoc.test.CliTest.test_html_with_google"><code class="name flex">
-<span>def <span class="ident">test_html_with_google</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L246-L249" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def test_html_with_google(self):
-    with run_html(EXAMPLE_MODULE, config=&#39;google_search_query=&#34;anything&#34;&#39;):
-        self._basic_html_assertions()
-        self._check_files(include_patterns=[&#39;class=&#34;gcse-search&#34;&#39;])</code></pre>
-</details>
-</dd>
-<dt id="pdoc.test.CliTest.test_html_with_lunr"><code class="name flex">
-<span>def <span class="ident">test_html_with_lunr</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L251-L255" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def test_html_with_lunr(self):
-    with run_html(EXAMPLE_MODULE, config=&#39;lunr_search={&#34;fuzziness&#34;: 1}&#39;):
-        files = self.PUBLIC_FILES + [&#34;example_pkg/search.html&#34;, &#34;example_pkg/index.js&#34;]
-        self._basic_html_assertions(expected_files=files)
-        self._check_files(exclude_patterns=[&#39;class=&#34;gcse-search&#34;&#39;])</code></pre>
-</details>
-</dd>
 <dt id="pdoc.test.CliTest.test_link_prefix"><code class="name flex">
 <span>def <span class="ident">test_link_prefix</span></span>(<span>self)</span>
 </code></dt>
@@ -4092,13 +4220,38 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L291-L295" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L307-L311" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_link_prefix(self):
     with self.assertWarns(DeprecationWarning),\
             run_html(EXAMPLE_MODULE, link_prefix=&#39;/foobar/&#39;):
         self._basic_html_assertions()
         self._check_files([&#39;/foobar/&#39; + EXAMPLE_MODULE])</code></pre>
+</details>
+</dd>
+<dt id="pdoc.test.CliTest.test_lunr_search"><code class="name flex">
+<span>def <span class="ident">test_lunr_search</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L259-L271" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def test_lunr_search(self):
+    with run_html(EXAMPLE_MODULE, config=&#39;lunr_search={&#34;fuzziness&#34;: 1}&#39;):
+        files = self.PUBLIC_FILES + [&#34;doc-search.html&#34;, &#34;index.js&#34;]
+        self._basic_html_assertions(expected_files=files)
+        self._check_files(exclude_patterns=[&#39;class=&#34;gcse-search&#34;&#39;])
+        self._check_files(include_patterns=[&#39;URLS=[\n&#34;example_pkg/index.html&#34;,\n&#34;example_pkg/&#39;],
+                          file_pattern=&#39;index.js&#39;)
+        self._check_files(include_patterns=[&#34;&#39;../doc-search.html#&#39;&#34;],
+                          file_pattern=&#39;example_pkg/index.html&#39;)
+        self._check_files(include_patterns=[&#34;&#39;../doc-search.html#&#39;&#34;],
+                          file_pattern=&#39;example_pkg/module.html&#39;)
+        self._check_files(include_patterns=[&#34;&#39;../../doc-search.html#&#39;&#34;],
+                          file_pattern=&#39;example_pkg/subpkg/index.html&#39;)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.CliTest.test_output_text"><code class="name flex">
@@ -4109,7 +4262,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L387-L393" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L414-L420" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_output_text(self):
     with temp_dir() as path, \
@@ -4128,7 +4281,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L370-L380" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L386-L396" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_pdf(self):
     with redirect_streams() as (stdout, stderr):
@@ -4143,6 +4296,28 @@ not have a method with the specified name.</p></div>
                   out.replace(&#39;&gt;&#39;, &#39;&#39;).replace(&#39;\n&#39;, &#39;&#39;).replace(&#39; &#39;, &#39;&#39;))</code></pre>
 </details>
 </dd>
+<dt id="pdoc.test.CliTest.test_pdf_pandoc"><code class="name flex">
+<span>def <span class="ident">test_pdf_pandoc</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L398-L407" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@unittest.skipUnless(&#39;PDOC_TEST_PANDOC&#39; in os.environ, &#39;PDOC_TEST_PANDOC not set/requested&#39;)
+def test_pdf_pandoc(self):
+    with temp_dir() as path, \
+            chdir(path), \
+            redirect_streams() as (stdout, _), \
+            open(&#39;pdf.md&#39;, &#39;w&#39;) as f:
+        run(&#39;pdoc&#39;, pdf=None)
+        f.write(stdout.getvalue())
+        subprocess.run(pdoc.cli._PANDOC_COMMAND, shell=True, check=True)
+        self.assertTrue(os.path.exists(&#39;pdf.pdf&#39;))</code></pre>
+</details>
+</dd>
 <dt id="pdoc.test.CliTest.test_relative_dir_path"><code class="name flex">
 <span>def <span class="ident">test_relative_dir_path</span></span>(<span>self)</span>
 </code></dt>
@@ -4151,7 +4326,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L402-L405" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L429-L432" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_relative_dir_path(self):
     with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
@@ -4167,9 +4342,9 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L414-L429" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L441-L456" class="git-link">Browse git</a>
 </summary>
-<pre><code class="python">@unittest.skipIf(sys.version_info &lt; (3, 6), &#39;variable annotation unsupported in &lt;Py3.6&#39;)
+<pre><code class="python">@unittest.skipIf(sys.version_info &lt; (3, 7), &#39;__future__.annotations unsupported in &lt;Py3.7&#39;)
 def test_resolve_typing_forwardrefs(self):
     # GH-245
     with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, &#39;_resolve_typing_forwardrefs&#39;)):
@@ -4195,7 +4370,7 @@ def test_resolve_typing_forwardrefs(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L407-L412" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L434-L439" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_skip_errors(self):
     with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, &#39;_skip_errors&#39;)),\
@@ -4213,7 +4388,7 @@ def test_resolve_typing_forwardrefs(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L279-L289" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L295-L305" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_template_dir(self):
     old_tpl_dirs = pdoc.tpl_lookup.directories.copy()
@@ -4236,7 +4411,7 @@ def test_resolve_typing_forwardrefs(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L297-L359" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L313-L375" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_text(self):
     include_patterns = [
@@ -4311,7 +4486,7 @@ def test_resolve_typing_forwardrefs(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L361-L368" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L377-L384" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_text_identifier(self):
     with redirect_streams() as (stdout, _):
@@ -4361,12 +4536,12 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1210-L1537" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1266-L1591" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Docformats(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._module = pdoc.Module(pdoc)
+        cls._module = PDOC_PDOC_MODULE
         cls._docmodule = pdoc.import_module(EXAMPLE_MODULE)
 
     @staticmethod
@@ -4430,6 +4605,10 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;dt&gt;&lt;code&gt;&lt;a&gt;pdoc.Doc&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;A class description that spans several lines.&lt;/dd&gt;
 &lt;/dl&gt;
+&lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; doctest
+...
+&lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id=&#34;notes&#34;&gt;Notes&lt;/h2&gt;
 &lt;p&gt;Foo bar.&lt;/p&gt;
 &lt;h3 id=&#34;h3-title&#34;&gt;H3 Title&lt;/h3&gt;
@@ -4518,9 +4697,8 @@ that are relevant to the interface.&lt;/p&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
 &lt;p&gt;Examples in doctest format.&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; a = [1,2,3]
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; a = [1,2,3]
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;h2 id=&#34;todos&#34;&gt;Todos&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;For module TODOs&lt;/li&gt;
@@ -4540,22 +4718,19 @@ line2
 fenced code works
 always
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
-&lt;pre&gt;&lt;code class=&#34;python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; nbytes(100)
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; nbytes(100)
 &#39;100.0 bytes&#39;
 line2
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;p&gt;some text&lt;/p&gt;
 &lt;p&gt;some text&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; another doctest
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; another doctest
 line1
 line2
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;h2 id=&#34;example&#34;&gt;Example&lt;/h2&gt;
-&lt;pre&gt;&lt;code class=&#34;python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; f()
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; f()
 Traceback (most recent call last):
     ...
 Exception: something went wrong
@@ -4608,9 +4783,8 @@ lines.&lt;/p&gt;
         self.assertEqual(html, expected)
 
     def test_reST_include(self):
-        expected = &#39;&#39;&#39;&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;    x = 2
+        expected = &#39;&#39;&#39;&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;    x = 2
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;p&gt;1
 x = 2
 x = 3
@@ -4623,7 +4797,7 @@ x =&lt;/p&gt;&#39;&#39;&#39;
         # Ensure includes are resolved within docstrings already,
         # e.g. for `pdoc.html_helpers.extract_toc()` to work
         self.assertIn(&#39;Command-line interface&#39;,
-                      pdoc.Module(pdoc).docstring)
+                      self._module.docstring)
 
     def test_urls(self):
         text = &#34;&#34;&#34;Beautiful Soup
@@ -4655,7 +4829,6 @@ Work &lt;a href=&#34;http://foo/&#34;&gt;like this&lt;/a&gt; and &lt;a href=&#34
 &lt;p&gt;data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;http://url.com
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;p&gt;&lt;a href=&#34;https://google.com&#34;&gt;https://google.com&lt;/a&gt;
 &lt;a href=&#34;https://en.wikipedia.org/wiki/Orange_(software)&#34;&gt;\
 https://en.wikipedia.org/wiki/Orange_(software)&lt;/a&gt;
@@ -4706,11 +4879,11 @@ cmd `pwd`
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1211-L1214" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1267-L1270" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@classmethod
 def setUpClass(cls):
-    cls._module = pdoc.Module(pdoc)
+    cls._module = PDOC_PDOC_MODULE
     cls._docmodule = pdoc.import_module(EXAMPLE_MODULE)</code></pre>
 </details>
 </dd>
@@ -4725,7 +4898,7 @@ def setUpClass(cls):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1376-L1409" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1435-L1465" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_doctests(self):
         expected = &#39;&#39;&#39;&lt;p&gt;Need an intro paragrapgh.&lt;/p&gt;
@@ -4738,22 +4911,19 @@ line2
 fenced code works
 always
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
-&lt;pre&gt;&lt;code class=&#34;python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; nbytes(100)
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; nbytes(100)
 &#39;100.0 bytes&#39;
 line2
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;p&gt;some text&lt;/p&gt;
 &lt;p&gt;some text&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; another doctest
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; another doctest
 line1
 line2
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;h2 id=&#34;example&#34;&gt;Example&lt;/h2&gt;
-&lt;pre&gt;&lt;code class=&#34;python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; f()
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; f()
 Traceback (most recent call last):
     ...
 Exception: something went wrong
@@ -4771,7 +4941,7 @@ Exception: something went wrong
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1528-L1537" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1582-L1591" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_fenced_code(self):
         # GH-207
@@ -4793,7 +4963,7 @@ cmd `pwd`
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1300-L1374" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1360-L1433" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_google(self):
         expected = &#39;&#39;&#39;&lt;p&gt;Summary line.
@@ -4860,9 +5030,8 @@ that are relevant to the interface.&lt;/p&gt;
 &lt;/dl&gt;
 &lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
 &lt;p&gt;Examples in doctest format.&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; a = [1,2,3]
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; a = [1,2,3]
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;h2 id=&#34;todos&#34;&gt;Todos&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;For module TODOs&lt;/li&gt;
@@ -4880,7 +5049,7 @@ that are relevant to the interface.&lt;/p&gt;
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1519-L1526" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1573-L1580" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_latex_math(self):
         expected = r&#39;&#39;&#39;&lt;p&gt;Inline equation: &lt;span&gt;&lt;span class=&#34;MathJax_Preview&#34;&gt; v_t *\frac{1}{2}* j_i + [a] &amp;lt; 3 &lt;/span&gt;&lt;script type=&#34;math/tex&#34;&gt; v_t *\frac{1}{2}* j_i + [a] &lt; 3 &lt;/script&gt;&lt;/span&gt;.&lt;/p&gt;
@@ -4900,7 +5069,7 @@ that are relevant to the interface.&lt;/p&gt;
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1220-L1283" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1276-L1343" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_numpy(self):
         expected = &#39;&#39;&#39;&lt;p&gt;Summary line.&lt;/p&gt;
@@ -4959,6 +5128,10 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 &lt;dt&gt;&lt;code&gt;&lt;a&gt;pdoc.Doc&lt;/a&gt;&lt;/code&gt;&lt;/dt&gt;
 &lt;dd&gt;A class description that spans several lines.&lt;/dd&gt;
 &lt;/dl&gt;
+&lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python-repl&#34;&gt;&amp;gt;&amp;gt;&amp;gt; doctest
+...
+&lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id=&#34;notes&#34;&gt;Notes&lt;/h2&gt;
 &lt;p&gt;Foo bar.&lt;/p&gt;
 &lt;h3 id=&#34;h3-title&#34;&gt;H3 Title&lt;/h3&gt;
@@ -4976,7 +5149,7 @@ description of &lt;code&gt;x1&lt;/code&gt;, &lt;code&gt;x2&lt;/code&gt;.&lt;/p&g
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1285-L1298" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1345-L1358" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_numpy_curly_brace_expansion(self):
         # See: https://github.com/mwaskom/seaborn/blob/66191d8a179f1bfa42f03749bc4a07e1c0c08156/seaborn/regression.py#L514  # noqa: 501
@@ -5002,7 +5175,7 @@ prefix_{x,y}_partial : str
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1411-L1452" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1467-L1508" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_reST_directives(self):
         expected = &#39;&#39;&#39;&lt;div class=&#34;admonition todo&#34;&gt;
@@ -5056,12 +5229,11 @@ lines.&lt;/p&gt;
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1454-L1470" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1510-L1525" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_reST_include(self):
-        expected = &#39;&#39;&#39;&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;    x = 2
+        expected = &#39;&#39;&#39;&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;    x = 2
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;p&gt;1
 x = 2
 x = 3
@@ -5074,7 +5246,7 @@ x =&lt;/p&gt;&#39;&#39;&#39;
         # Ensure includes are resolved within docstrings already,
         # e.g. for `pdoc.html_helpers.extract_toc()` to work
         self.assertIn(&#39;Command-line interface&#39;,
-                      pdoc.Module(pdoc).docstring)</code></pre>
+                      self._module.docstring)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.test.Docformats.test_urls"><code class="name flex">
@@ -5085,7 +5257,7 @@ x =&lt;/p&gt;&#39;&#39;&#39;
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1472-L1517" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1527-L1571" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_urls(self):
         text = &#34;&#34;&#34;Beautiful Soup
@@ -5117,7 +5289,6 @@ Work &lt;a href=&#34;http://foo/&#34;&gt;like this&lt;/a&gt; and &lt;a href=&#34
 &lt;p&gt;data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;http://url.com
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;p&gt;&lt;a href=&#34;https://google.com&#34;&gt;https://google.com&lt;/a&gt;
 &lt;a href=&#34;https://en.wikipedia.org/wiki/Orange_(software)&#34;&gt;\
 https://en.wikipedia.org/wiki/Orange_(software)&lt;/a&gt;
@@ -5149,7 +5320,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1053-L1207" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1110-L1263" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class HtmlHelpersTest(unittest.TestCase):
     &#34;&#34;&#34;
@@ -5193,10 +5364,9 @@ reference: `package.foo`
 &lt;p&gt;ref with underscore: &lt;code&gt;&lt;a href=&#34;#pdoc._x_x_&#34;&gt;_x_x_&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;code block
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;p&gt;reference: &lt;code&gt;&lt;a href=&#34;/package.foo.ext&#34;&gt;package.foo&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;&#39;&#39;&#39;
 
-        module = pdoc.Module(pdoc)
+        module = PDOC_PDOC_MODULE
         module.doc[&#39;_x_x_&#39;] = pdoc.Variable(&#39;_x_x_&#39;, module, &#39;&#39;)
 
         def link(dobj):
@@ -5242,11 +5412,11 @@ pdoc
         def link(dobj):
             return &#39;&lt;a&gt;{}&lt;/a&gt;&#39;.format(dobj.qualname)
 
-        html = to_html(text, module=pdoc.Module(pdoc), link=link)
+        html = to_html(text, module=PDOC_PDOC_MODULE, link=link)
         self.assertEqual(html, expected)
 
     def test_to_html_refname_warning(self):
-        mod = pdoc.Module(EXAMPLE_MODULE)
+        mod = EXAMPLE_PDOC_MODULE
 
         def f():
             &#34;&#34;&#34;Reference to some `example_pkg.nonexisting` object&#34;&#34;&#34;
@@ -5301,7 +5471,7 @@ pdoc
     def test_format_git_link(self):
         url = format_git_link(
             template=&#39;https://github.com/pdoc3/pdoc/blob/{commit}/{path}#L{start_line}-L{end_line}&#39;,
-            dobj=pdoc.Module(EXAMPLE_MODULE).find_ident(&#39;module.foo&#39;),
+            dobj=EXAMPLE_PDOC_MODULE.find_ident(&#39;module.foo&#39;),
         )
         self.assertIsInstance(url, str)
         self.assertRegex(url, r&#34;https://github.com/pdoc3/pdoc/blob/[0-9a-f]{40}&#34;
@@ -5321,7 +5491,7 @@ pdoc
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1159-L1196" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1215-L1252" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_extract_toc(self):
         text = &#39;&#39;&#39;xxx
@@ -5371,14 +5541,14 @@ pdoc
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1198-L1207" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1254-L1263" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@unittest.skipIf(shutil.which(&#34;git&#34;) is None or not os.path.exists(&#39;.git&#39;),
                  &#34;git not installed or we&#39;re not within git repo&#34;)
 def test_format_git_link(self):
     url = format_git_link(
         template=&#39;https://github.com/pdoc3/pdoc/blob/{commit}/{path}#L{start_line}-L{end_line}&#39;,
-        dobj=pdoc.Module(EXAMPLE_MODULE).find_ident(&#39;module.foo&#39;),
+        dobj=EXAMPLE_PDOC_MODULE.find_ident(&#39;module.foo&#39;),
     )
     self.assertIsInstance(url, str)
     self.assertRegex(url, r&#34;https://github.com/pdoc3/pdoc/blob/[0-9a-f]{40}&#34;
@@ -5393,7 +5563,7 @@ def test_format_git_link(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1071-L1075" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1128-L1132" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_glimpse(self):
     text = &#39;foo bar\n\nbaz&#39;
@@ -5410,7 +5580,7 @@ def test_format_git_link(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1058-L1063" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1115-L1120" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_minify_css(self):
     css = &#39;a { color: white; } /*comment*/ b {;}&#39;
@@ -5428,7 +5598,7 @@ def test_format_git_link(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1065-L1069" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1122-L1126" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_minify_html(self):
     html = &#39;  &lt;p&gt;   a   &lt;/p&gt;    &lt;pre&gt;    a\n    b&lt;/pre&gt;    c   \n    d   &#39;
@@ -5445,7 +5615,7 @@ def test_format_git_link(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1077-L1111" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1134-L1167" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_to_html(self):
         text = &#39;&#39;&#39;# Title
@@ -5465,10 +5635,9 @@ reference: `package.foo`
 &lt;p&gt;ref with underscore: &lt;code&gt;&lt;a href=&#34;#pdoc._x_x_&#34;&gt;_x_x_&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;code block
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;p&gt;reference: &lt;code&gt;&lt;a href=&#34;/package.foo.ext&#34;&gt;package.foo&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;&#39;&#39;&#39;
 
-        module = pdoc.Module(pdoc)
+        module = PDOC_PDOC_MODULE
         module.doc[&#39;_x_x_&#39;] = pdoc.Variable(&#39;_x_x_&#39;, module, &#39;&#39;)
 
         def link(dobj):
@@ -5492,7 +5661,7 @@ reference: `package.foo`
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1113-L1145" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1169-L1201" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">    def test_to_html_refname(self):
         text = &#39;&#39;&#39;
@@ -5525,7 +5694,7 @@ pdoc
         def link(dobj):
             return &#39;&lt;a&gt;{}&lt;/a&gt;&#39;.format(dobj.qualname)
 
-        html = to_html(text, module=pdoc.Module(pdoc), link=link)
+        html = to_html(text, module=PDOC_PDOC_MODULE, link=link)
         self.assertEqual(html, expected)</code></pre>
 </details>
 </dd>
@@ -5537,10 +5706,10 @@ pdoc
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1147-L1157" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1203-L1213" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_to_html_refname_warning(self):
-    mod = pdoc.Module(EXAMPLE_MODULE)
+    mod = EXAMPLE_PDOC_MODULE
 
     def f():
         &#34;&#34;&#34;Reference to some `example_pkg.nonexisting` object&#34;&#34;&#34;
@@ -5566,7 +5735,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1541-L1614" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1595-L1668" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class HttpTest(unittest.TestCase):
     &#34;&#34;&#34;
@@ -5657,7 +5826,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1597-L1602" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1651-L1656" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_file(self):
     with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
@@ -5675,7 +5844,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1604-L1614" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1658-L1668" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_head(self):
     with self._http([&#39;pdoc&#39;]) as url:
@@ -5698,7 +5867,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/6cfbc4fa0f09de79c51aedb435707a4dcd3b01b9/pdoc/test/__init__.py#L1581-L1595" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/test/__init__.py#L1635-L1649" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def test_http(self):
     with self._http([&#39;pdoc&#39;, os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)]) as url:
@@ -5778,6 +5947,7 @@ data-gaCategoryParameter="pdoc.test">
 <li><code><a title="pdoc.test.ApiTest.test_class_members" href="#pdoc.test.ApiTest.test_class_members">test_class_members</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_class_variables_docstring_not_from_obj" href="#pdoc.test.ApiTest.test_class_variables_docstring_not_from_obj">test_class_variables_docstring_not_from_obj</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_context" href="#pdoc.test.ApiTest.test_context">test_context</a></code></li>
+<li><code><a title="pdoc.test.ApiTest.test_dont_touch__pdoc__blacklisted" href="#pdoc.test.ApiTest.test_dont_touch__pdoc__blacklisted">test_dont_touch__pdoc__blacklisted</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_find_ident" href="#pdoc.test.ApiTest.test_find_ident">test_find_ident</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_import_filename" href="#pdoc.test.ApiTest.test_import_filename">test_import_filename</a></code></li>
 <li><code><a title="pdoc.test.ApiTest.test_imported_once" href="#pdoc.test.ApiTest.test_imported_once">test_imported_once</a></code></li>
@@ -5809,16 +5979,17 @@ data-gaCategoryParameter="pdoc.test">
 <li><code><a title="pdoc.test.CliTest.test_external_links" href="#pdoc.test.CliTest.test_external_links">test_external_links</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_force" href="#pdoc.test.CliTest.test_force">test_force</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_google_analytics" href="#pdoc.test.CliTest.test_google_analytics">test_google_analytics</a></code></li>
+<li><code><a title="pdoc.test.CliTest.test_google_search_query" href="#pdoc.test.CliTest.test_google_search_query">test_google_search_query</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html" href="#pdoc.test.CliTest.test_html">test_html</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html_identifier" href="#pdoc.test.CliTest.test_html_identifier">test_html_identifier</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html_multiple_files" href="#pdoc.test.CliTest.test_html_multiple_files">test_html_multiple_files</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html_no_source" href="#pdoc.test.CliTest.test_html_no_source">test_html_no_source</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_html_ref_links" href="#pdoc.test.CliTest.test_html_ref_links">test_html_ref_links</a></code></li>
-<li><code><a title="pdoc.test.CliTest.test_html_with_google" href="#pdoc.test.CliTest.test_html_with_google">test_html_with_google</a></code></li>
-<li><code><a title="pdoc.test.CliTest.test_html_with_lunr" href="#pdoc.test.CliTest.test_html_with_lunr">test_html_with_lunr</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_link_prefix" href="#pdoc.test.CliTest.test_link_prefix">test_link_prefix</a></code></li>
+<li><code><a title="pdoc.test.CliTest.test_lunr_search" href="#pdoc.test.CliTest.test_lunr_search">test_lunr_search</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_output_text" href="#pdoc.test.CliTest.test_output_text">test_output_text</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_pdf" href="#pdoc.test.CliTest.test_pdf">test_pdf</a></code></li>
+<li><code><a title="pdoc.test.CliTest.test_pdf_pandoc" href="#pdoc.test.CliTest.test_pdf_pandoc">test_pdf_pandoc</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_relative_dir_path" href="#pdoc.test.CliTest.test_relative_dir_path">test_relative_dir_path</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_resolve_typing_forwardrefs" href="#pdoc.test.CliTest.test_resolve_typing_forwardrefs">test_resolve_typing_forwardrefs</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_skip_errors" href="#pdoc.test.CliTest.test_skip_errors">test_skip_errors</a></code></li>
@@ -5870,7 +6041,7 @@ data-gaCategoryParameter="pdoc.test">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
 </footer>
 <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-43663477-5','auto');ga('require','cleanUrlTracker',{indexFilename:'index.html',trailingSlash:'add'});ga('require','outboundLinkTracker',{events:['click','auxclick','contextmenu']});ga('require','maxScrollTracker');ga('require','pageVisibilityTracker');ga('send','pageview');setTimeout(function(){ga('send','event','pageview','view')},15000);</script><script async src='https://www.google-analytics.com/analytics.js'></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js'></script></body>
 </html>
