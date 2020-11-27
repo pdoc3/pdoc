@@ -49,7 +49,7 @@ _UNKNOWN_MODULE = '?'
 
 T = TypeVar('T', 'Module', 'Class', 'Function', 'Variable')
 
-__pdoc__ = {}  # type: Dict[str, Union[bool, str]]
+__pdoc__: Dict[str, Union[bool, str]] = {}
 
 tpl_lookup = TemplateLookup(
     cache_args=dict(cached=True,
@@ -255,8 +255,8 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
     if isinstance(doc_obj, Module) and doc_obj.is_namespace:
         return {}, {}
 
-    vars = {}  # type: Dict[str, str]
-    instance_vars = {}  # type: Dict[str, str]
+    vars: Dict[str, str] = {}
+    instance_vars: Dict[str, str] = {}
 
     if _init_tree:
         tree = _init_tree
@@ -284,21 +284,15 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
                     instance_vars, _ = _pep224_docstrings(doc_obj, _init_tree=node)
                     break
 
-    try:
-        ast_AnnAssign = ast.AnnAssign   # type: Type
-    except AttributeError:  # Python < 3.6
-        ast_AnnAssign = type(None)
-    ast_Assignments = (ast.Assign, ast_AnnAssign)
-
     for assign_node, str_node in _pairwise(ast.iter_child_nodes(tree)):
-        if not (isinstance(assign_node, ast_Assignments) and
+        if not (isinstance(assign_node, (ast.Assign, ast.AnnAssign)) and
                 isinstance(str_node, ast.Expr) and
                 isinstance(str_node.value, ast.Str)):
             continue
 
         if isinstance(assign_node, ast.Assign) and len(assign_node.targets) == 1:
             target = assign_node.targets[0]
-        elif isinstance(assign_node, ast_AnnAssign):
+        elif isinstance(assign_node, ast.AnnAssign):
             target = assign_node.target
             # Skip the annotation. PEP 526 says:
             # > Putting the instance variable annotations together in the class
@@ -335,7 +329,7 @@ def _is_whitelisted(name: str, doc_obj: Union['Module', 'Class']):
     contained in some module's __pdoc__ with a truish value.
     """
     refname = doc_obj.refname + '.' + name
-    module = doc_obj.module
+    module: Optional[Module] = doc_obj.module
     while module:
         qualname = refname[len(module.refname) + 1:]
         if module.__pdoc__.get(qualname) or module.__pdoc__.get(refname):
@@ -351,7 +345,7 @@ def _is_blacklisted(name: str, doc_obj: Union['Module', 'Class']):
     contained in some module's __pdoc__ with value False.
     """
     refname = doc_obj.refname + '.' + name
-    module = doc_obj.module
+    module: Optional[Module] = doc_obj.module
     while module:
         qualname = refname[len(module.refname) + 1:]
         if module.__pdoc__.get(qualname) is False or module.__pdoc__.get(refname) is False:
@@ -450,7 +444,7 @@ class Doc:
     """
     __slots__ = ('module', 'name', 'obj', 'docstring', 'inherits')
 
-    def __init__(self, name, module, obj, docstring=None):
+    def __init__(self, name: str, module, obj, docstring: str = None):
         """
         Initializes a documentation object, where `name` is the public
         identifier name, `module` is a `pdoc.Module` object where raw
@@ -483,7 +477,7 @@ class Doc:
         directives resolved (i.e. content included).
         """
 
-        self.inherits = None  # type: Optional[Union[Class, Function, Variable]]
+        self.inherits: Optional[Union[Class, Function, Variable]] = None
         """
         The Doc object (Class, Function, or Variable) this object inherits from,
         if any.
@@ -621,7 +615,7 @@ class Module(Doc):
         The parent `pdoc.Module` this module is a submodule of, or `None`.
         """
 
-        self.doc = {}  # type: Dict[str, Union[Module, Class, Function, Variable]]
+        self.doc: Dict[str, Union[Module, Class, Function, Variable]] = {}
         """A mapping from identifier name to a documentation object."""
 
         self._is_inheritance_linked = False
@@ -743,7 +737,7 @@ class Module(Doc):
     __pdoc__['Module.ImportWarning'] = False
 
     @property
-    def __pdoc__(self):
+    def __pdoc__(self) -> dict:
         """This module's __pdoc__ dict, or an empty dict if none."""
         return getattr(self.obj, '__pdoc__', {})
 
@@ -957,7 +951,7 @@ class Class(Doc):
     """
     __slots__ = ('doc', '_super_members')
 
-    def __init__(self, name, module, obj, *, docstring=None):
+    def __init__(self, name: str, module: Module, obj, *, docstring: str = None):
         assert inspect.isclass(obj)
 
         if docstring is None:
@@ -968,7 +962,7 @@ class Class(Doc):
 
         super().__init__(name, module, obj, docstring=docstring)
 
-        self.doc = {}  # type: Dict[str, Union[Function, Variable]]
+        self.doc: Dict[str, Union[Function, Variable]] = {}
         """A mapping from identifier name to a `pdoc.Doc` objects."""
 
         # Annotations for filtering.
@@ -1056,7 +1050,7 @@ class Class(Doc):
         The list will contain objects of type `pdoc.Class`
         if the types are documented, and `pdoc.External` otherwise.
         """
-        classes = [self.module.find_class(c)
+        classes = [cast(Class, self.module.find_class(c))
                    for c in inspect.getmro(self.obj)
                    if c not in (self.obj, object)]
         if self in classes:
@@ -1079,7 +1073,7 @@ class Class(Doc):
         The objects in the list are of type `pdoc.Class` if available,
         and `pdoc.External` otherwise.
         """
-        return sorted(self.module.find_class(c)
+        return sorted(cast(Class, self.module.find_class(c))
                       for c in type.__subclasses__(self.obj))
 
     def params(self, *, annotate=False, link=None) -> List[str]:
@@ -1221,7 +1215,7 @@ class Function(Doc):
     """
     __slots__ = ('cls',)
 
-    def __init__(self, name, module, obj, *, cls: Class = None):
+    def __init__(self, name: str, module: Module, obj, *, cls: Class = None):
         """
         Same as `pdoc.Doc`, except `obj` must be a
         Python function object. The docstring is gathered automatically.
@@ -1492,8 +1486,8 @@ class Variable(Doc):
     """
     __slots__ = ('cls', 'instance_var')
 
-    def __init__(self, name, module, docstring, *,
-                 obj=None, cls: Class = None, instance_var=False):
+    def __init__(self, name: str, module: Module, docstring, *,
+                 obj=None, cls: Class = None, instance_var: bool = False):
         """
         Same as `pdoc.Doc`, except `cls` should be provided
         as a `pdoc.Class` object when this is a class or instance
@@ -1552,7 +1546,7 @@ class External(Doc):
         form.
         """
 
-    def __init__(self, name):
+    def __init__(self, name: str):
         """
         Initializes an external identifier with `name`, where `name`
         should be a fully qualified name.

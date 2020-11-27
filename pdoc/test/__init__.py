@@ -389,10 +389,7 @@ class CliTest(unittest.TestCase):
             err = stderr.getvalue()
         self.assertIn('pdoc3.github.io', out)
         self.assertIn('pandoc', err)
-
-        pdoc_Doc_params = str(inspect.signature(pdoc.Doc.__init__)).replace('self, ', '')
-        self.assertIn(pdoc_Doc_params.replace(' ', ''),
-                      out.replace('>', '').replace('\n', '').replace(' ', ''))
+        self.assertIn('Doc(name', out.replace('>', '').replace('\n', '').replace(' ', ''))
 
     @unittest.skipUnless('PDOC_TEST_PANDOC' in os.environ, 'PDOC_TEST_PANDOC not set/requested')
     def test_pdf_pandoc(self):
