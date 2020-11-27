@@ -66,6 +66,15 @@ if os.getenv("XDG_CONFIG_HOME"):
     tpl_lookup.directories.insert(0, path.join(os.getenv("XDG_CONFIG_HOME", ''), "pdoc"))
 
 
+# A surrogate so that the check in Module._link_inheritance()
+# "__pdoc__-overriden key {!r} does not exist" can pick the object up
+# (and not warn).
+# If you know how to keep the warning, but skip the object creation
+# altogether, please make it happen!
+class _BLACKLISTED_DUMMY:
+    pass
+
+
 class Context(dict):
     """
     The context object that maps all documented identifiers
@@ -90,7 +99,9 @@ def reset():
     _global_context.clear()
 
     # Clear LRU caches
-    for func in (_get_type_hints,):
+    for func in (_get_type_hints,
+                 _is_blacklisted,
+                 _is_whitelisted):
         func.cache_clear()
     for cls in (Doc, Module, Class, Function, Variable, External):
         for _, method in inspect.getmembers(cls):
@@ -121,7 +132,7 @@ def _get_config(**kwargs):
     config.update(kwargs)
 
     if 'search_query' in config:
-        warn('Option `search_query` has been depricated, use `google_search_query` instead',
+        warn('Option `search_query` has been deprecated. Use `google_search_query` instead',
              DeprecationWarning, stacklevel=2)
         config['google_search_query'] = config['search_query']
         del config['search_query']
@@ -259,7 +270,8 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             # Don't emit a warning for builtins that don't have source available
             is_builtin = getattr(doc_obj.obj, '__module__', None) == 'builtins'
             if not is_builtin:
-                warn(f"Couldn't read PEP-224 variable docstrings from {doc_obj!r}: {exc}")
+                warn(f"Couldn't read PEP-224 variable docstrings from {doc_obj!r}: {exc}",
+                     stacklevel=3 + int(isinstance(doc_obj, Class)))
             return {}, {}
 
         if isinstance(doc_obj, Class):
@@ -316,6 +328,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
     return vars, instance_vars
 
 
+@lru_cache()
 def _is_whitelisted(name: str, doc_obj: Union['Module', 'Class']):
     """
     Returns `True` if `name` (relative or absolute refname) is
@@ -331,6 +344,7 @@ def _is_whitelisted(name: str, doc_obj: Union['Module', 'Class']):
     return False
 
 
+@lru_cache()
 def _is_blacklisted(name: str, doc_obj: Union['Module', 'Class']):
     """
     Returns `True` if `name` (relative or absolute refname) is
@@ -622,24 +636,32 @@ class Module(Doc):
             public_objs = []
             for name in self.obj.__all__:
                 try:
-                    public_objs.append((name, getattr(self.obj, name)))
+                    obj = getattr(self.obj, name)
                 except AttributeError:
                     warn(f"Module {self.module!r} doesn't contain identifier `{name}` "
                          "exported in `__all__`")
+                if not _is_blacklisted(name, self):
+                    obj = inspect.unwrap(obj)
+                public_objs.append((name, obj))
         else:
             def is_from_this_module(obj):
                 mod = inspect.getmodule(inspect.unwrap(obj))
                 return mod is None or mod.__name__ == self.obj.__name__
 
-            public_objs = [(name, inspect.unwrap(obj))
+            public_objs = [(name, (_BLACKLISTED_DUMMY
+                                   if _is_blacklisted(name, self) else
+                                   inspect.unwrap(obj)))
                            for name, obj in inspect.getmembers(self.obj)
                            if ((_is_public(name) or _is_whitelisted(name, self)) and
-                               (is_from_this_module(obj) or name in var_docstrings))]
+                               (_is_blacklisted(name, self) or  # skips unwrapping that follows
+                                is_from_this_module(obj) or name in var_docstrings))]
             index = list(self.obj.__dict__).index
             public_objs.sort(key=lambda i: index(i[0]))
 
         for name, obj in public_objs:
-            if _is_function(obj):
+            if obj is _BLACKLISTED_DUMMY:
+                self.doc[name] = Variable(name, self, 'dummy', obj=obj)
+            elif _is_function(obj):
                 self.doc[name] = Function(name, self, obj)
             elif inspect.isclass(obj):
                 self.doc[name] = Class(name, self, obj)
@@ -953,7 +975,9 @@ class Class(Doc):
         # Use only own, non-inherited annotations (the rest will be inherited)
         annotations = getattr(self.obj, '__annotations__', {})
 
-        public_objs = [(_name, inspect.unwrap(obj))
+        public_objs = [(_name, (_BLACKLISTED_DUMMY
+                                if _is_blacklisted(_name, self) else
+                                inspect.unwrap(obj)))
                        for _name, obj in _getmembers_all(self.obj)
                        # Filter only *own* members. The rest are inherited
                        # in Class._fill_inheritance()
@@ -979,7 +1003,9 @@ class Class(Doc):
 
         # Convert the public Python objects to documentation objects.
         for name, obj in public_objs:
-            if _is_function(obj):
+            if obj is _BLACKLISTED_DUMMY:
+                self.doc[name] = Variable(name, self.module, 'dummy', obj=obj, cls=self)
+            elif _is_function(obj):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self)
             else:

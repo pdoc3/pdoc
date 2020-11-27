@@ -373,7 +373,7 @@ def _warn_deprecated(option, alternative='', use_config_mako=False):
     warn(msg, DeprecationWarning, stacklevel=2)
 
 
-def _generate_lunr_search(top_module: pdoc.Module,
+def _generate_lunr_search(modules: List[pdoc.Module],
                           index_docstrings: bool,
                           template_config: dict):
     """Generate index.js for search"""
@@ -404,20 +404,17 @@ def _generate_lunr_search(top_module: pdoc.Module,
     @lru_cache()
     def to_url_id(module):
         url = module.url()
-        if top_module.is_package:  # Reference from subfolder if its a package
-            _, url = url.split('/', maxsplit=1)
         if url not in url_cache:
             url_cache[url] = len(url_cache)
         return url_cache[url]
 
     index = []  # type: List[Dict]
     url_cache = {}  # type: Dict[str, int]
-    recursive_add_to_index(top_module)
-    urls = [i[0] for i in sorted(url_cache.items(), key=lambda i: i[1])]
+    for top_module in modules:
+        recursive_add_to_index(top_module)
+    urls = sorted(url_cache.keys(), key=url_cache.__getitem__)
 
-    # If top module is a package, output the index in its subfolder, else, in the output dir
-    main_path = path.join(args.output_dir,
-                          *top_module.name.split('.') if top_module.is_package else '')
+    main_path = args.output_dir
     with _open_write_file(path.join(main_path, 'index.js')) as f:
         f.write("URLS=")
         json.dump(urls, f, indent=0, separators=(',', ':'))
@@ -425,10 +422,8 @@ def _generate_lunr_search(top_module: pdoc.Module,
         json.dump(index, f, indent=0, separators=(',', ':'))
 
     # Generate search.html
-    with _open_write_file(path.join(main_path, 'search.html')) as f:
-        rendered_template = pdoc._render_template(
-            '/search.mako', module=top_module, **template_config
-        )
+    with _open_write_file(path.join(main_path, 'doc-search.html')) as f:
+        rendered_template = pdoc._render_template('/search.mako', **template_config)
         f.write(rendered_template)
 
 
@@ -572,17 +567,10 @@ or similar, at your own discretion.""",
               file=sys.stderr)
         sys.exit(0)
 
-    lunr_config = pdoc._get_config(**template_config).get('lunr_search')
-
     for module in modules:
         if args.html:
             _quit_if_exists(module, ext='.html')
             recursive_write_files(module, ext='.html', **template_config)
-
-            if lunr_config is not None:
-                _generate_lunr_search(
-                    module, lunr_config.get("index_docstrings", True), template_config)
-
         elif args.output_dir:  # Generate text files
             _quit_if_exists(module, ext='.md')
             recursive_write_files(module, ext='.md', **template_config)
@@ -590,6 +578,11 @@ or similar, at your own discretion.""",
             sys.stdout.write(module.text(**template_config))
             # Two blank lines between two modules' texts
             sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
+
+    lunr_config = pdoc._get_config(**template_config).get('lunr_search')
+    if lunr_config is not None:
+        _generate_lunr_search(
+            modules, lunr_config.get("index_docstrings", True), template_config)
 
 
 _PANDOC_COMMAND = '''\
