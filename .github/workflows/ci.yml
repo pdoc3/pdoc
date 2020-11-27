@@ -46,7 +46,7 @@ jobs:
         if: matrix.test-type == 'lint'
         run: |
           pip install flake8 coverage mypy
-          sudo apt install \
+          sudo apt update && sudo apt-get install \
             texlive-xetex lmodern texlive-fonts-recommended  # test_pdf_pandoc
           wget -O/tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/2.10/pandoc-2.10-1-amd64.deb && sudo dpkg -i /tmp/pandoc.deb
 
