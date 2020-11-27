@@ -128,7 +128,7 @@ def _get_config(**kwargs):
                   | {'module', 'modules', 'http_server', 'external_links', 'search_query'})
     invalid_keys = {k: v for k, v in kwargs.items() if k not in known_keys}
     if invalid_keys:
-        warn('Unknown configuration variables (not in config.mako): {}'.format(invalid_keys))
+        warn(f'Unknown configuration variables (not in config.mako): {invalid_keys}')
     config.update(kwargs)
 
     if 'search_query' in config:
@@ -150,10 +150,9 @@ def _render_template(template_name, **kwargs):
     try:
         t = tpl_lookup.get_template(template_name)
     except TopLevelLookupException:
-        raise OSError(
-            "No template found at any of: {}".format(
-                ', '.join(path.join(p, template_name.lstrip("/"))
-                          for p in tpl_lookup.directories)))
+        paths = [path.join(p, template_name.lstrip('/')) for p in tpl_lookup.directories]
+        raise OSError(f"No template found at any of: {', '.join(paths)}")
+
     try:
         return t.render(**config).strip()
     except Exception:
@@ -224,8 +223,7 @@ def import_module(module: Union[str, ModuleType],
             try:
                 module = importlib.import_module(module_path)
             except Exception as e:
-                raise ImportError('Error importing {!r}: {}: {}'
-                                  .format(module, e.__class__.__name__, e))
+                raise ImportError(f'Error importing {module!r}: {e.__class__.__name__}: {e}')
 
     assert inspect.ismodule(module)
     # If this is pdoc itself, return without reloading. Otherwise later
@@ -272,7 +270,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             # Don't emit a warning for builtins that don't have source available
             is_builtin = getattr(doc_obj.obj, '__module__', None) == 'builtins'
             if not is_builtin:
-                warn("Couldn't read PEP-224 variable docstrings from {!r}: {}".format(doc_obj, exc),
+                warn(f"Couldn't read PEP-224 variable docstrings from {doc_obj!r}: {exc}",
                      stacklevel=3 + int(isinstance(doc_obj, Class)))
             return {}, {}
 
@@ -409,7 +407,7 @@ def _toposort(graph: Mapping[T, Set[T]]) -> Generator[T, None, None]:
         yield from ordered
         if not ordered:
             break
-    assert not graph, "A cyclic dependency exists amongst %r" % graph
+    assert not graph, f"A cyclic dependency exists amongst {graph!r}"
 
 
 def link_inheritance(context: Context = None):
@@ -492,7 +490,7 @@ class Doc:
         """
 
     def __repr__(self):
-        return '<{} {!r}>'.format(self.__class__.__name__, self.refname)
+        return f'<{self.__class__.__name__} {self.refname!r}>'
 
     @property  # type: ignore
     @lru_cache()
@@ -640,8 +638,8 @@ class Module(Doc):
                 try:
                     obj = getattr(self.obj, name)
                 except AttributeError:
-                    warn("Module {!r} doesn't contain identifier `{}` "
-                         "exported in `__all__`".format(self.module, name))
+                    warn(f"Module {self.module!r} doesn't contain identifier `{name}` "
+                         "exported in `__all__`")
                 if not _is_blacklisted(name, self):
                     obj = inspect.unwrap(obj)
                 public_objs.append((name, obj))
@@ -703,7 +701,7 @@ class Module(Doc):
                     continue
 
                 assert self.refname == self.name
-                fullname = "%s.%s" % (self.name, root)
+                fullname = f"{self.name}.{root}"
                 try:
                     m = Module(import_module(fullname),
                                docfilter=docfilter, supermodule=self,
@@ -767,20 +765,20 @@ class Module(Doc):
             if docstring is True:
                 continue
 
-            refname = "%s.%s" % (self.refname, name)
+            refname = f"{self.refname}.{name}"
             if docstring in (False, None):
                 if docstring is None:
                     warn('Setting `__pdoc__[key] = None` is deprecated; '
                          'use `__pdoc__[key] = False` '
-                         '(key: {!r}, module: {!r}).'.format(name, self.name))
+                         f'(key: {name!r}, module: {self.name!r}).')
 
                 if name in self._skipped_submodules:
                     continue
 
                 if (not name.endswith('.__init__') and
                         name not in self.doc and refname not in self._context):
-                    warn('__pdoc__-overriden key {!r} does not exist '
-                         'in module {!r}'.format(name, self.name))
+                    warn(f'__pdoc__-overriden key {name!r} does not exist '
+                         f'in module {self.name!r}')
 
                 obj = self.find_ident(name)
                 cls = getattr(obj, 'cls', None)
@@ -800,8 +798,8 @@ class Module(Doc):
             if isinstance(dobj, External):
                 continue
             if not isinstance(docstring, str):
-                raise ValueError('__pdoc__ dict values must be strings;'
-                                 '__pdoc__[{!r}] is of type {}'.format(name, type(docstring)))
+                raise ValueError('__pdoc__ dict values must be strings; '
+                                 f'__pdoc__[{name!r}] is of type {type(docstring)}')
             dobj.docstring = inspect.cleandoc(docstring)
 
         # Now after docstrings are set correctly, continue the
@@ -1044,7 +1042,7 @@ class Class(Doc):
                 if isinstance(c.__dict__[name], staticmethod):
                     return staticmethod
                 return None
-        raise RuntimeError("{}.{} not found".format(cls, name))
+        raise RuntimeError(f"{cls}.{name} not found")
 
     @property
     def refname(self) -> str:
@@ -1307,7 +1305,7 @@ class Function(Doc):
         else:
             # Don't warn on variables. The annotation just isn't available.
             if not isinstance(self, Variable):
-                warn("Error handling return annotation for {!r}".format(self), stacklevel=3)
+                warn(f"Error handling return annotation for {self!r}", stacklevel=3)
 
         if annot is inspect.Parameter.empty or not annot:
             return ''
@@ -1469,10 +1467,10 @@ class Function(Doc):
                 # See: https://github.com/pdoc3/pdoc/pull/148#discussion_r407114141
                 module_basename = self.module.name.rsplit('.', maxsplit=1)[-1]
                 if module_basename in string and module_basename not in _globals:
-                    string = re.sub(r'(?<!\.)\b{}\.\b'.format(module_basename), '', string)
+                    string = re.sub(fr'(?<!\.)\b{module_basename}\.\b', '', string)
 
                 try:
-                    exec('def {}: pass'.format(string), _globals, _locals)
+                    exec(f'def {string}: pass', _globals, _locals)
                 except SyntaxError:
                     continue
                 signature = inspect.signature(_locals[self.name])
@@ -1565,4 +1563,4 @@ class External(Doc):
         """
         `External` objects return absolute urls matching `/{name}.ext`.
         """
-        return '/%s.ext' % self.name
+        return f'/{self.name}.ext'

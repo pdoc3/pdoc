@@ -355,8 +355,7 @@ class CliTest(unittest.TestCase):
                 run(EXAMPLE_MODULE, config='show_type_annotations=False')
                 out = stdout.getvalue()
 
-            header = 'Module {}\n{:=<{}}'.format(EXAMPLE_MODULE, '',
-                                                 len('Module ') + len(EXAMPLE_MODULE))
+            header = f"Module {EXAMPLE_MODULE}\n{'':=<{len('Module ') + len(EXAMPLE_MODULE)}}"
             self.assertIn(header, out)
             for pattern in include_patterns:
                 self.assertIn(pattern, out)
@@ -371,7 +370,7 @@ class CliTest(unittest.TestCase):
                         run(*(os.path.join(EXAMPLE_MODULE, f) for f in files))
                         out = stdout.getvalue()
                     for f in files:
-                        header = 'Module {}\n'.format(os.path.splitext(f)[0])
+                        header = f'Module {os.path.splitext(f)[0]}\n'
                         self.assertIn(header, out)
 
     def test_text_identifier(self):
@@ -472,7 +471,7 @@ class ApiTest(unittest.TestCase):
             for module, (name_suffix, submodules) in modules.items():
                 with self.subTest(module=module):
                     m = pdoc.Module(module)
-                    self.assertEqual(repr(m), "<Module '{}'>".format(m.obj.__name__))
+                    self.assertEqual(repr(m), f"<Module '{m.obj.__name__}'>")
                     self.assertEqual(m.name, EXAMPLE_MODULE + name_suffix)
                     self.assertEqual(sorted(m.name for m in m.submodules()),
                                      [EXAMPLE_MODULE + '.' + m for m in submodules])
@@ -863,7 +862,7 @@ class ApiTest(unittest.TestCase):
 
         # typed, linked
         def link(dobj):
-            return '<a href="{}">{}</a>'.format(dobj.url(relative_to=mod), dobj.qualname)
+            return f'<a href="{dobj.url(relative_to=mod)}">{dobj.qualname}</a>'
 
         self.assertEqual(func.params(annotate=True, link=link),
                          ['a:\N{NBSP}int', '*b',
@@ -1155,7 +1154,7 @@ reference: `package.foo`
         module.doc['_x_x_'] = pdoc.Variable('_x_x_', module, '')
 
         def link(dobj):
-            return '<a href="{}">{}</a>'.format(dobj.url(relative_to=module), dobj.qualname)
+            return f'<a href="{dobj.url(relative_to=module)}">{dobj.qualname}</a>'
 
         html = to_html(text, module=module, link=link)
         self.assertEqual(html, expected)
@@ -1195,7 +1194,7 @@ pdoc
 '''
 
         def link(dobj):
-            return '<a>{}</a>'.format(dobj.qualname)
+            return f'<a>{dobj.qualname}</a>'
 
         html = to_html(text, module=PDOC_PDOC_MODULE, link=link)
         self.assertEqual(html, expected)
@@ -1271,7 +1270,7 @@ class Docformats(unittest.TestCase):
 
     @staticmethod
     def _link(dobj, *args, **kwargs):
-        return '<a>{}</a>'.format(dobj.refname)
+        return f'<a>{dobj.refname}</a>'
 
     def test_numpy(self):
         expected = '''<p>Summary line.</p>
@@ -1614,7 +1613,7 @@ class HttpTest(unittest.TestCase):
             with redirect_streams() as (stdout, stderr):
                 t = threading.Thread(
                     target=cli.main,
-                    args=(cli.parser.parse_args(['--http', ':%d' % port] + modules),))
+                    args=(cli.parser.parse_args(['--http', f':{port}'] + modules),))
                 t.start()
                 sleep(.1)
 
@@ -1623,7 +1622,7 @@ class HttpTest(unittest.TestCase):
                     raise AssertionError
 
                 try:
-                    yield 'http://localhost:{}/'.format(port)
+                    yield f'http://localhost:{port}/'
                 except Exception:
                     sys.__stderr__.write(stderr.getvalue())
                     sys.__stdout__.write(stdout.getvalue())

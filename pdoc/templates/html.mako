@@ -11,7 +11,7 @@
         return name
     url = dobj.url(relative_to=module, link_prefix=link_prefix,
                    top_ancestor=not show_inherited_members)
-    return '<a title="{}" href="{}">{}</a>'.format(dobj.refname, url, name)
+    return f'<a title="{dobj.refname}" href="{url}">{name}</a>'
 
 
   def to_html(text):
