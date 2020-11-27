@@ -8,6 +8,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import typing
 import threading
 import unittest
 import warnings
@@ -24,8 +25,6 @@ from unittest.mock import patch
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-import typing
-
 import pdoc
 from pdoc import cli
 from pdoc.html_helpers import (
@@ -34,12 +33,16 @@ from pdoc.html_helpers import (
 )
 
 TESTS_BASEDIR = os.path.abspath(os.path.dirname(__file__) or '.')
+sys.path.insert(0, TESTS_BASEDIR)
+
 EXAMPLE_MODULE = 'example_pkg'
+EXAMPLE_PDOC_MODULE = pdoc.Module(EXAMPLE_MODULE, context=pdoc.Context())
+PDOC_PDOC_MODULE = pdoc.Module(pdoc, context=pdoc.Context())
 
 EMPTY_MODULE = ModuleType('empty')
-EMPTY_MODULE.__pdoc__ = {}
-
-sys.path.insert(0, TESTS_BASEDIR)
+EMPTY_MODULE.__pdoc__ = {}  # type: ignore
+with warnings.catch_warnings(record=True):
+    DUMMY_PDOC_MODULE = pdoc.Module(EMPTY_MODULE, context=pdoc.Context())
 
 T = typing.TypeVar("T")
 
@@ -457,7 +460,6 @@ class ApiTest(unittest.TestCase):
     """
     Programmatic/API unit tests.
     """
-
     def setUp(self):
         pdoc.reset()
 
@@ -477,10 +479,9 @@ class ApiTest(unittest.TestCase):
 
     def test_Module_find_class(self):
         class A:
-            __module__ = None
+            pass
 
-        assert A.__module__ is None
-        mod = pdoc.Module(pdoc)
+        mod = PDOC_PDOC_MODULE
         self.assertIsInstance(mod.find_class(pdoc.Doc), pdoc.Class)
         self.assertIsInstance(mod.find_class(A), pdoc.External)
 
@@ -509,8 +510,7 @@ class ApiTest(unittest.TestCase):
                          [EXAMPLE_MODULE + '._private.module'])
 
     def test_instance_var(self):
-        pdoc.reset()
-        mod = pdoc.Module(EXAMPLE_MODULE)
+        mod = EXAMPLE_PDOC_MODULE
         var = mod.doc['B'].doc['instance_var']
         self.assertTrue(var.instance_var)
 
@@ -534,7 +534,7 @@ class ApiTest(unittest.TestCase):
             vars_dont = 0
             but_clss_have_doc = int
 
-        doc = pdoc.Class('C', pdoc.Module('pdoc'), C)
+        doc = pdoc.Class('C', DUMMY_PDOC_MODULE, C)
         self.assertEqual(doc.doc['vars_dont'].docstring, '')
         self.assertIn('integer', doc.doc['but_clss_have_doc'].docstring)
 
@@ -566,7 +566,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(cls.doc['inherited'].refname, mod + '.B.inherited')
 
     def test_qualname(self):
-        module = pdoc.Module(EXAMPLE_MODULE)
+        module = EXAMPLE_PDOC_MODULE
         var = module.doc['var']
         cls = module.doc['B']
         nested_cls = cls.doc['C']
@@ -720,7 +720,6 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(result.name, nonexistent)
 
         # Ref by class __init__
-        mod = pdoc.Module(pdoc)
         self.assertIs(mod.find_ident('pdoc.Doc.__init__').obj, pdoc.Doc)
 
     def test_inherits(self):
@@ -773,7 +772,7 @@ class ApiTest(unittest.TestCase):
         class E(C):
             pass
 
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         self.assertEqual([x.refname for x in pdoc.Class('A', mod, A).subclasses()],
                          [mod.find_class(C).refname])
         self.assertEqual([x.refname for x in pdoc.Class('B', mod, B).subclasses()],
@@ -823,7 +822,7 @@ class ApiTest(unittest.TestCase):
         self.assertIsInstance(module.find_ident('pdoc.Module'), pdoc.External)
 
     def test_Function_params(self):
-        mod = pdoc.Module(pdoc)
+        mod = PDOC_PDOC_MODULE
         func = pdoc.Function('f', mod,
                              lambda a, _a, _b=None: None)
         self.assertEqual(func.params(), ['a', '_a'])
@@ -912,7 +911,7 @@ class ApiTest(unittest.TestCase):
 
     @unittest.skipIf(sys.version_info < (3, 8), "positional-only arguments unsupported in < py3.8")
     def test_test_Function_params_python38_specific(self):
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         func = pdoc.Function('f', mod, eval("lambda a, /, b: None"))
         self.assertEqual(func.params(), ['a', '/', 'b'])
 
@@ -920,22 +919,18 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(func.params(), ['a', '/'])
 
     def test_Function_return_annotation(self):
-        import typing
-
         def f() -> typing.List[typing.Union[str, pdoc.Doc]]: pass
-        func = pdoc.Function('f', pdoc.Module(pdoc), f)
+        func = pdoc.Function('f', DUMMY_PDOC_MODULE, f)
         self.assertEqual(func.return_annotation(), 'List[Union[str,\N{NBSP}pdoc.Doc]]')
 
     @ignore_warnings
     def test_Variable_type_annotation(self):
-        import typing
-
         class Foobar:
             @property
             def prop(self) -> typing.Optional[int]:
                 pass
 
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         cls = pdoc.Class('Foobar', mod, Foobar)
         self.assertEqual(cls.doc['prop'].type_annotation(), 'Union[int,\N{NBSP}NoneType]')
 
@@ -984,7 +979,6 @@ class Foo:
 
         class C:
             """foo"""
-
             def __init__(self):
                 """bar"""
 
@@ -997,14 +991,13 @@ class Foo:
 
         class F(typing.Generic[T]):
             """baz"""
-
             def __init__(self):
                 """bar"""
 
         class G(F[int]):
             """foo"""
 
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         self.assertEqual(pdoc.Class('A', mod, A).docstring, """foo""")
         self.assertEqual(pdoc.Class('B', mod, B).docstring, """foo""")
         self.assertEqual(pdoc.Class('C', mod, C).docstring, """foo\n\nbar""")
@@ -1019,7 +1012,7 @@ class Foo:
             def __init__(self, x):
                 pass
 
-        mod = pdoc.Module(pdoc)
+        mod = DUMMY_PDOC_MODULE
         self.assertEqual(pdoc.Class('C', mod, C).params(), ['x'])
         with patch.dict(mod.obj.__pdoc__, {'C.__init__': False}):
             self.assertEqual(pdoc.Class('C', mod, C).params(), [])
@@ -1059,7 +1052,7 @@ class Foo:
 
     @unittest.skipIf(sys.version_info < (3, 6), reason="only deterministic on CPython 3.6+")
     def test_sorting(self):
-        module = pdoc.Module(EXAMPLE_MODULE)
+        module = EXAMPLE_PDOC_MODULE
 
         sorted_variables = module.variables()
         unsorted_variables = module.variables(sort=False)
@@ -1091,7 +1084,7 @@ class Foo:
     @ignore_warnings
     @unittest.skipIf(sys.version_info < (3, 6), 'variable type annotation unsupported in <Py3.6')
     def test_class_members(self):
-        module = pdoc.Module(EXAMPLE_MODULE)
+        module = DUMMY_PDOC_MODULE
 
         # GH-200
         from enum import Enum
@@ -1158,7 +1151,7 @@ reference: `package.foo`
 </code></pre>
 <p>reference: <code><a href="/package.foo.ext">package.foo</a></code></p>'''
 
-        module = pdoc.Module(pdoc)
+        module = PDOC_PDOC_MODULE
         module.doc['_x_x_'] = pdoc.Variable('_x_x_', module, '')
 
         def link(dobj):
@@ -1204,11 +1197,11 @@ pdoc
         def link(dobj):
             return '<a>{}</a>'.format(dobj.qualname)
 
-        html = to_html(text, module=pdoc.Module(pdoc), link=link)
+        html = to_html(text, module=PDOC_PDOC_MODULE, link=link)
         self.assertEqual(html, expected)
 
     def test_to_html_refname_warning(self):
-        mod = pdoc.Module(EXAMPLE_MODULE)
+        mod = EXAMPLE_PDOC_MODULE
 
         def f():
             """Reference to some `example_pkg.nonexisting` object"""
@@ -1263,7 +1256,7 @@ pdoc
     def test_format_git_link(self):
         url = format_git_link(
             template='https://github.com/pdoc3/pdoc/blob/{commit}/{path}#L{start_line}-L{end_line}',
-            dobj=pdoc.Module(EXAMPLE_MODULE).find_ident('module.foo'),
+            dobj=EXAMPLE_PDOC_MODULE.find_ident('module.foo'),
         )
         self.assertIsInstance(url, str)
         self.assertRegex(url, r"https://github.com/pdoc3/pdoc/blob/[0-9a-f]{40}"
@@ -1273,7 +1266,7 @@ pdoc
 class Docformats(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._module = pdoc.Module(pdoc)
+        cls._module = PDOC_PDOC_MODULE
         cls._docmodule = pdoc.import_module(EXAMPLE_MODULE)
 
     @staticmethod
@@ -1529,7 +1522,7 @@ x =</p>'''
         # Ensure includes are resolved within docstrings already,
         # e.g. for `pdoc.html_helpers.extract_toc()` to work
         self.assertIn('Command-line interface',
-                      pdoc.Module(pdoc).docstring)
+                      self._module.docstring)
 
     def test_urls(self):
         text = """Beautiful Soup
