@@ -1,3 +1,11 @@
+0.9.2  (2020-11-25)
+=====
+  - Stop touching objects blacklisted with `__pdoc__`.
+  - Use last `__init__` to document class signature (e.g. in case of
+    `@typing.overload`).
+  - Better formatting of `nptyping` and `typing.NewType` annotations.
+  - Fix minor lunr search bugs from the previous version.
+
 0.9.1  (2020-09-28)
 =====
   - Fix circular imports and generally handling of typing annotations when
