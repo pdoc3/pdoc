@@ -934,7 +934,6 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(cls.doc['prop'].type_annotation(), 'Union[int,\N{NBSP}NoneType]')
 
     @ignore_warnings
-    @unittest.skipIf(sys.version_info < (3, 6), 'variable annotation unsupported in <Py3.6')
     def test_Variable_type_annotation_py36plus(self):
         with temp_dir() as path:
             filename = os.path.join(path, 'module36syntax.py')
@@ -1049,7 +1048,6 @@ class Foo:
         self.assertEqual(f.url(relative_to=c.module), '#example_pkg.D.overridden')
         self.assertEqual(f.url(top_ancestor=1), 'example_pkg/index.html#example_pkg.B.overridden')
 
-    @unittest.skipIf(sys.version_info < (3, 6), reason="only deterministic on CPython 3.6+")
     def test_sorting(self):
         module = EXAMPLE_PDOC_MODULE
 
@@ -1081,7 +1079,6 @@ class Foo:
         self.assertIn('Module', mod.doc)
 
     @ignore_warnings
-    @unittest.skipIf(sys.version_info < (3, 6), 'variable type annotation unsupported in <Py3.6')
     def test_class_members(self):
         module = DUMMY_PDOC_MODULE
 
