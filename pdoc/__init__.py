@@ -244,7 +244,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
                        _init_tree=None) -> Tuple[Dict[str, str],
                                                  Dict[str, str]]:
     """
-    Extracts PEP-224 docstrings for variables of `doc_obj`
+    Extracts PEP-224 and '#:' docstrings for variables of `doc_obj`
     (either a `pdoc.Module` or `pdoc.Class`).
 
     Returns a tuple of two dicts mapping variable names to their docstrings.
@@ -284,11 +284,9 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
                     instance_vars, _ = _pep224_docstrings(doc_obj, _init_tree=node)
                     break
 
-    for assign_node, str_node in _pairwise(ast.iter_child_nodes(tree)):
-        if not (isinstance(assign_node, (ast.Assign, ast.AnnAssign)) and
-                isinstance(str_node, ast.Expr) and
-                isinstance(str_node.value, ast.Str)):
-            continue
+    def get_name(assign_node):
+        target = None
+        name = None
 
         if isinstance(assign_node, ast.Assign) and len(assign_node.targets) == 1:
             target = assign_node.targets[0]
@@ -297,17 +295,27 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             # Skip the annotation. PEP 526 says:
             # > Putting the instance variable annotations together in the class
             # > makes it easier to find them, and helps a first-time reader of the code.
-        else:
+
+        if target:
+            if not _init_tree and isinstance(target, ast.Name):
+                name = target.id
+            elif (_init_tree and
+                  isinstance(target, ast.Attribute) and
+                  isinstance(target.value, ast.Name) and
+                  target.value.id == 'self'):
+                name = target.attr
+
+        return name
+
+    # For handling PEP-224 docstrings for variables
+    for assign_node, str_node in _pairwise(ast.iter_child_nodes(tree)):
+        if not (isinstance(assign_node, (ast.Assign, ast.AnnAssign)) and
+                isinstance(str_node, ast.Expr) and
+                isinstance(str_node.value, ast.Str)):
             continue
 
-        if not _init_tree and isinstance(target, ast.Name):
-            name = target.id
-        elif (_init_tree and
-              isinstance(target, ast.Attribute) and
-              isinstance(target.value, ast.Name) and
-              target.value.id == 'self'):
-            name = target.attr
-        else:
+        name = get_name(assign_node)
+        if not name:
             continue
 
         if not _is_public(name) and not _is_whitelisted(name, doc_obj):
@@ -318,6 +326,46 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             continue
 
         vars[name] = docstring
+
+    # For handling '#:' docstrings for variables
+    for assign_node in ast.iter_child_nodes(tree):
+        if not isinstance(assign_node, (ast.Assign, ast.AnnAssign)):
+            continue
+
+        name = get_name(assign_node)
+        if not name:
+            continue
+
+        if not _is_public(name) and not _is_whitelisted(name, doc_obj):
+            continue
+
+        def get_line_indentation(line):
+            # There isn't a definitive definition for tab width, but lets just be consistent.
+            line = line.replace('\t', '    ')
+            return len(line) - len(line.lstrip(' '))
+
+        if name not in vars:
+            # There wasn't a PEP-224 style docstring, so look for a '#:' style one above
+            source_lines = doc_obj.source.splitlines()  # type: ignore
+            assignment_line = source_lines[assign_node.lineno - 1]
+            assignment_line_indentation = get_line_indentation(assignment_line)
+            comment_lines = []
+            for line in reversed(source_lines[:assign_node.lineno - 1]):
+                if get_line_indentation(line) == assignment_line_indentation and \
+                        line.lstrip().startswith('#:'):
+                    comment_lines.append(line.split('#:', 1)[1])
+                else:
+                    break
+
+            # Since we went 'up' need to reverse lines to be in correct order
+            comment_lines = comment_lines[::-1]
+
+            # Finally: check for a '#:' comment at the end of the assignment line itself.
+            if '#:' in assignment_line:
+                comment_lines.append(assignment_line.rsplit('#:', 1)[-1])
+
+            if comment_lines:
+                vars[name] = '\n\n'.join(comment_lines)
 
     return vars, instance_vars
 
