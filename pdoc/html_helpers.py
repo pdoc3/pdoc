@@ -560,6 +560,11 @@ def format_git_link(template: str, dobj: pdoc.Doc):
             commit = _git_head_commit()
         abs_path = inspect.getfile(inspect.unwrap(dobj.obj))
         path = _project_relative_path(abs_path)
+
+        # Urls should always use / instead of \\
+        if os.name == 'nt':
+            path = path.replace('\\', '/')
+
         lines, start_line = inspect.getsourcelines(dobj.obj)
         end_line = start_line + len(lines) - 1
         url = template.format(**locals())
