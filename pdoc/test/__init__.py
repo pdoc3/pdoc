@@ -106,25 +106,21 @@ class CliTest(unittest.TestCase):
     """
     ALL_FILES = [
         'example_pkg',
-         os.path.join('example_pkg', 'index.html'),
-         os.path.join('example_pkg', 'index.m.html'),
-         os.path.join('example_pkg', 'module.html'),
-         os.path.join('example_pkg', '_private'),
-         os.path.join('example_pkg', '_private', 'index.html'),
-         os.path.join('example_pkg', '_private', 'module.html'),
-         os.path.join('example_pkg', 'subpkg'),
-         os.path.join('example_pkg', 'subpkg', '_private.html'),
-         os.path.join('example_pkg', 'subpkg', 'index.html'),
-         os.path.join('example_pkg', 'subpkg2'),
-         os.path.join('example_pkg', 'subpkg2', '_private.html'),
-         os.path.join('example_pkg', 'subpkg2', 'module.html'),
-         os.path.join('example_pkg', 'subpkg2', 'index.html'),
+        os.path.join('example_pkg', 'index.html'),
+        os.path.join('example_pkg', 'index.m.html'),
+        os.path.join('example_pkg', 'module.html'),
+        os.path.join('example_pkg', '_private'),
+        os.path.join('example_pkg', '_private', 'index.html'),
+        os.path.join('example_pkg', '_private', 'module.html'),
+        os.path.join('example_pkg', 'subpkg'),
+        os.path.join('example_pkg', 'subpkg', '_private.html'),
+        os.path.join('example_pkg', 'subpkg', 'index.html'),
+        os.path.join('example_pkg', 'subpkg2'),
+        os.path.join('example_pkg', 'subpkg2', '_private.html'),
+        os.path.join('example_pkg', 'subpkg2', 'module.html'),
+        os.path.join('example_pkg', 'subpkg2', 'index.html'),
     ]
     PUBLIC_FILES = [f for f in ALL_FILES if (os.path.sep + '_') not in f]
-
-    #if os.name == 'nt':
-    #    ALL_FILES = [i.replace('/', '\\') for i in ALL_FILES]
-    #    PUBLIC_FILES = [i.replace('/', '\\') for i in PUBLIC_FILES]
 
     def setUp(self):
         pdoc.reset()
@@ -203,7 +199,8 @@ class CliTest(unittest.TestCase):
         filenames_files = {
             ('module.py',): ['module.html'],
             ('module.py', 'subpkg2'): ['module.html', 'subpkg2',
-                                       os.path.join('subpkg2', 'index.html'), os.path.join('subpkg2', 'module.html')],
+                                       os.path.join('subpkg2', 'index.html'),
+                                       os.path.join('subpkg2', 'module.html')],
         }
         with chdir(TESTS_BASEDIR):
             for filenames, expected_files in filenames_files.items():
@@ -216,9 +213,11 @@ class CliTest(unittest.TestCase):
 
     def test_html_multiple_files(self):
         with chdir(TESTS_BASEDIR):
-            with run_html(os.path.join(EXAMPLE_MODULE, 'module.py'), os.path.join(EXAMPLE_MODULE, 'subpkg2')):
-                self._basic_html_assertions(
-                    ['module.html', 'subpkg2', os.path.join('subpkg2', 'index.html'), os.path.join('subpkg2', 'module.html')])
+            with run_html(os.path.join(EXAMPLE_MODULE, 'module.py'),
+                          os.path.join(EXAMPLE_MODULE, 'subpkg2')):
+                self._basic_html_assertions(['module.html', 'subpkg2',
+                                             os.path.join('subpkg2', 'index.html'),
+                                             os.path.join('subpkg2', 'module.html')])
 
     def test_html_identifier(self):
         for package in ('', '._private'):
@@ -1584,7 +1583,7 @@ cmd `pwd`
         self.assertEqual(html, expected)
 
 
-@unittest.skipIf('win' in sys.platform, "signal.SIGALRM doesn't work on Windos")
+@unittest.skipIf('win' in sys.platform, "signal.SIGALRM doesn't work on Windows")
 class HttpTest(unittest.TestCase):
     """
     Unit tests for the HTTP server functionality.
@@ -1659,6 +1658,99 @@ class HttpTest(unittest.TestCase):
                                 method='HEAD',
                                 headers={'If-None-Match': str(os.stat(pdoc.__file__).st_mtime)}))
             self.assertEqual(cm.exception.code, 304)
+
+
+class InlineVariableDocstringsTest(unittest.TestCase):
+    ''' Unit Tests for the _pep224_docstrings() function '''
+    def setUp(self):
+        self._old_dir = os.getcwd()
+        with temp_dir() as path:
+            self.temp_dir = path
+        os.mkdir(self.temp_dir)
+        os.chdir(self.temp_dir)
+
+    def tearDown(self):
+        os.chdir(self._old_dir)
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
+
+    def write_and_import_module(self, module_code):
+        module_file = 'im' + str(randint(0, 10000000)) + '.py'
+        with open(module_file, 'w') as f:
+            f.write(module_code)
+
+        self.module = pdoc.import_module(module_file)
+        return self.module
+
+    def test_multiline_pre_docstring(self):
+        module = self.write_and_import_module('''
+#: Not included
+
+#: Line 1
+#: Line 2
+MY_VAR = 2 #: Line3
+''')
+
+        name_to_docs, _ = pdoc._pep224_docstrings(pdoc.Module(module))
+        self.assertEqual(name_to_docs, {
+            'MY_VAR': 'Line 1  \nLine 2  \nLine3  '
+        })
+
+    def test_multiline_pep224_docstrings_take_precedence(self):
+        module = self.write_and_import_module('''
+#: Not included
+
+#: Line 1
+#: Line 2
+MY_VAR = 2 #: Line3
+""" I am a PEP-224 docstring """
+''')
+
+        name_to_docs, _ = pdoc._pep224_docstrings(pdoc.Module(module))
+        self.assertEqual(name_to_docs, {
+            'MY_VAR': 'I am a PEP-224 docstring'
+        })
+
+    def test_pre_def_docstring_in_class(self):
+        module = self.write_and_import_module('''
+class Bleh:
+    #: This is my var!
+    MY_VAR = 123
+''')
+        p_mod = pdoc.Module(module)
+        name_to_docs, _ = pdoc._pep224_docstrings(pdoc.Class('Bleh', p_mod, module.Bleh))
+        self.assertEqual(name_to_docs, {
+            'MY_VAR': 'This is my var!  '
+        })
+
+    def test_inline_docstring_in_class(self):
+        module = self.write_and_import_module('''
+class Bleh:
+    MY_VAR = 123 #: This is my var!
+''')
+        p_mod = pdoc.Module(module)
+        name_to_docs, _ = pdoc._pep224_docstrings(pdoc.Class('Bleh', p_mod, module.Bleh))
+        self.assertEqual(name_to_docs, {
+            'MY_VAR': 'This is my var!  '
+        })
+
+    def test_pre_def_docstring_in_class_init(self):
+        module = self.write_and_import_module('''
+class Bleh:
+    BLEH_CLASS_VAR = 12 #: BLEH's class var
+    def __init__(self):
+        #: This is my var!
+        self.MY_VAR = 123
+''')
+        p_mod = pdoc.Module(module)
+        cls_name_to_docs, instance_name_to_docs = pdoc._pep224_docstrings(pdoc.Class('Bleh',
+                                                                                     p_mod,
+                                                                                     module.Bleh))
+        self.assertEqual(instance_name_to_docs, {
+            'MY_VAR': 'This is my var!  '
+        })
+        self.assertEqual(cls_name_to_docs, {
+            'BLEH_CLASS_VAR': 'BLEH\'s class var  '
+        })
 
 
 if __name__ == '__main__':

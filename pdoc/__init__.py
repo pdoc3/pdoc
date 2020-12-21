@@ -347,17 +347,17 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             comment_lines = []
             for line in reversed(source_lines[:assign_node.lineno - 1]):
                 if get_line_indentation(line) == assignment_line_indentation and \
-                        line.lstrip().startswith('#:'):
-                    comment_lines.append(line.split('#:', 1)[1])
+                        line.lstrip().startswith('#: '):
+                    comment_lines.append(line.split('#: ', 1)[1])
                 else:
                     break
 
             # Since we went 'up' need to reverse lines to be in correct order
             comment_lines = comment_lines[::-1]
 
-            # Finally: check for a '#:' comment at the end of the assignment line itself.
-            if '#:' in assignment_line:
-                comment_lines.append(assignment_line.rsplit('#:', 1)[-1])
+            # Finally: check for a '#: ' comment at the end of the assignment line itself.
+            if '#: ' in assignment_line:
+                comment_lines.append(assignment_line.rsplit('#: ', 1)[-1])
 
             if comment_lines:
                 # Adding 2 spaces to the end of each line to ensure we keep line breaks
