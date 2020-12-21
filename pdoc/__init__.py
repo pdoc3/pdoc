@@ -244,7 +244,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
                        _init_tree=None) -> Tuple[Dict[str, str],
                                                  Dict[str, str]]:
     """
-    Extracts PEP-224 and '#:' docstrings for variables of `doc_obj`
+    Extracts PEP-224 docstrings and doc-comments (`#: ...`) for variables of `doc_obj`
     (either a `pdoc.Module` or `pdoc.Class`).
 
     Returns a tuple of two dicts mapping variable names to their docstrings.
@@ -305,6 +305,9 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
                   target.value.id == 'self'):
                 name = target.attr
 
+        if name and not _is_public(name) and not _is_whitelisted(name, doc_obj):
+            name = None
+
         return name
 
     # For handling PEP-224 docstrings for variables
@@ -316,9 +319,6 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
 
         name = get_name(assign_node)
         if not name:
-            continue
-
-        if not _is_public(name) and not _is_whitelisted(name, doc_obj):
             continue
 
         docstring = inspect.cleandoc(str_node.value.s).strip()
@@ -336,13 +336,8 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
         if not name:
             continue
 
-        if not _is_public(name) and not _is_whitelisted(name, doc_obj):
-            continue
-
         def get_line_indentation(line):
-            # There isn't a definitive definition for tab width, but lets just be consistent.
-            line = line.replace('\t', '    ')
-            return len(line) - len(line.lstrip(' '))
+            return len(line) - len(line.lstrip())
 
         if name not in vars:
             # There wasn't a PEP-224 style docstring, so look for a '#:' style one above
@@ -365,7 +360,8 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
                 comment_lines.append(assignment_line.rsplit('#:', 1)[-1])
 
             if comment_lines:
-                vars[name] = '\n\n'.join(comment_lines)
+                # Adding 2 spaces to the end of each line to ensure we keep line breaks
+                vars[name] = '\n'.join([c + '  ' for c in comment_lines])
 
     return vars, instance_vars
 
