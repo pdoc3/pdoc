@@ -1098,6 +1098,44 @@ class Foo:
         self.assertIsInstance(cls.doc['name'], pdoc.Variable)
         self.assertEqual(cls.doc['name'].type_annotation(), 'str')
 
+    def test_doc_comment_docstrings(self):
+        with temp_dir() as path:
+            filename = os.path.join(path, 'doc_comment_docstrs.py')
+            with open(filename, 'w') as f:
+                f.write('''#: Not included
+
+#: Line 1
+#: Line 2
+var1 = 1  #: Line 3
+
+#: Not included
+var2 = 1
+"""PEP-224 takes precedence"""
+
+#: This should not appear
+class C:
+    #: class var
+    class_var = 1
+
+    #: This also should not show
+    def __init__(self):
+       #: instance var
+       self.instance_var = 1
+''')
+
+            module = pdoc.import_module(filename)
+            pdoc_module = pdoc.Module(module)
+
+            cls_name_to_docs, instance_name_to_docs = pdoc._pep224_docstrings(pdoc_module)
+            self.assertEqual(cls_name_to_docs, {
+                                                'var2': 'PEP-224 takes precedence',
+                                                'var1': 'Line 1\nLine 2\nLine 3'})
+
+            pdoc_class = pdoc.Class('C', pdoc_module, module.C)
+            cls_name_to_docs, instance_name_to_docs = pdoc._pep224_docstrings(pdoc_class)
+            self.assertEqual(cls_name_to_docs, {'class_var': 'class var'})
+            self.assertEqual(instance_name_to_docs, {'instance_var': 'instance var'})
+
 
 class HtmlHelpersTest(unittest.TestCase):
     """
@@ -1658,99 +1696,6 @@ class HttpTest(unittest.TestCase):
                                 method='HEAD',
                                 headers={'If-None-Match': str(os.stat(pdoc.__file__).st_mtime)}))
             self.assertEqual(cm.exception.code, 304)
-
-
-class InlineVariableDocstringsTest(unittest.TestCase):
-    ''' Unit Tests for the _pep224_docstrings() function '''
-    def setUp(self):
-        self._old_dir = os.getcwd()
-        with temp_dir() as path:
-            self.temp_dir = path
-        os.mkdir(self.temp_dir)
-        os.chdir(self.temp_dir)
-
-    def tearDown(self):
-        os.chdir(self._old_dir)
-        shutil.rmtree(self.temp_dir, ignore_errors=True)
-
-    def write_and_import_module(self, module_code):
-        module_file = 'im' + str(randint(0, 10000000)) + '.py'
-        with open(module_file, 'w') as f:
-            f.write(module_code)
-
-        self.module = pdoc.import_module(module_file)
-        return self.module
-
-    def test_multiline_pre_docstring(self):
-        module = self.write_and_import_module('''
-#: Not included
-
-#: Line 1
-#: Line 2
-MY_VAR = 2 #: Line3
-''')
-
-        name_to_docs, _ = pdoc._pep224_docstrings(pdoc.Module(module))
-        self.assertEqual(name_to_docs, {
-            'MY_VAR': 'Line 1  \nLine 2  \nLine3  '
-        })
-
-    def test_multiline_pep224_docstrings_take_precedence(self):
-        module = self.write_and_import_module('''
-#: Not included
-
-#: Line 1
-#: Line 2
-MY_VAR = 2 #: Line3
-""" I am a PEP-224 docstring """
-''')
-
-        name_to_docs, _ = pdoc._pep224_docstrings(pdoc.Module(module))
-        self.assertEqual(name_to_docs, {
-            'MY_VAR': 'I am a PEP-224 docstring'
-        })
-
-    def test_pre_def_docstring_in_class(self):
-        module = self.write_and_import_module('''
-class Bleh:
-    #: This is my var!
-    MY_VAR = 123
-''')
-        p_mod = pdoc.Module(module)
-        name_to_docs, _ = pdoc._pep224_docstrings(pdoc.Class('Bleh', p_mod, module.Bleh))
-        self.assertEqual(name_to_docs, {
-            'MY_VAR': 'This is my var!  '
-        })
-
-    def test_inline_docstring_in_class(self):
-        module = self.write_and_import_module('''
-class Bleh:
-    MY_VAR = 123 #: This is my var!
-''')
-        p_mod = pdoc.Module(module)
-        name_to_docs, _ = pdoc._pep224_docstrings(pdoc.Class('Bleh', p_mod, module.Bleh))
-        self.assertEqual(name_to_docs, {
-            'MY_VAR': 'This is my var!  '
-        })
-
-    def test_pre_def_docstring_in_class_init(self):
-        module = self.write_and_import_module('''
-class Bleh:
-    BLEH_CLASS_VAR = 12 #: BLEH's class var
-    def __init__(self):
-        #: This is my var!
-        self.MY_VAR = 123
-''')
-        p_mod = pdoc.Module(module)
-        cls_name_to_docs, instance_name_to_docs = pdoc._pep224_docstrings(pdoc.Class('Bleh',
-                                                                                     p_mod,
-                                                                                     module.Bleh))
-        self.assertEqual(instance_name_to_docs, {
-            'MY_VAR': 'This is my var!  '
-        })
-        self.assertEqual(cls_name_to_docs, {
-            'BLEH_CLASS_VAR': 'BLEH\'s class var  '
-        })
 
 
 if __name__ == '__main__':
