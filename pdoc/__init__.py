@@ -360,8 +360,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
                 comment_lines.append(assignment_line.rsplit('#: ', 1)[-1])
 
             if comment_lines:
-                # Adding 2 spaces to the end of each line to ensure we keep line breaks
-                vars[name] = '\n'.join([c + '  ' for c in comment_lines])
+                vars[name] = '\n'.join(comment_lines)
 
     return vars, instance_vars
 
