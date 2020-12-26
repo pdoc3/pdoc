@@ -1123,18 +1123,13 @@ class C:
        self.instance_var = 1
 ''')
 
-            module = pdoc.import_module(filename)
-            pdoc_module = pdoc.Module(module)
+            mod = pdoc.Module(pdoc.import_module(filename))
 
-            cls_name_to_docs, instance_name_to_docs = pdoc._pep224_docstrings(pdoc_module)
-            self.assertEqual(cls_name_to_docs, {
-                                                'var2': 'PEP-224 takes precedence',
-                                                'var1': 'Line 1\nLine 2\nLine 3'})
-
-            pdoc_class = pdoc.Class('C', pdoc_module, module.C)
-            cls_name_to_docs, instance_name_to_docs = pdoc._pep224_docstrings(pdoc_class)
-            self.assertEqual(cls_name_to_docs, {'class_var': 'class var'})
-            self.assertEqual(instance_name_to_docs, {'instance_var': 'instance var'})
+            self.assertEqual(mod.doc['var1'].docstring, 'Line 1\nLine 2\nLine 3')
+            self.assertEqual(mod.doc['var2'].docstring, 'PEP-224 takes precedence')
+            self.assertEqual(mod.doc['C'].docstring, '')
+            self.assertEqual(mod.doc['C'].doc['class_var'].docstring, 'class var')
+            self.assertEqual(mod.doc['C'].doc['instance_var'].docstring, 'instance var')
 
 
 class HtmlHelpersTest(unittest.TestCase):
