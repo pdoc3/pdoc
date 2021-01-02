@@ -107,47 +107,26 @@ In the default HTML template, such inherited docstrings are greyed out.
 [variable docstrings]: #docstrings-for-variables
 
 Python by itself [doesn't allow docstrings attached to variables][PEP-224].
-However, `pdoc` supports docstrings attached to module (or global)
-variables, class variables, and object instance variables; all available via
-two different mechanisms: [PEP-224], and '#:' doc-comments.
+However, `pdoc` supports documenting module (or global)
+variables, class variables, and object instance variables via
+two different mechanisms: [PEP-224] and `#:` doc-comments.
 
-For example via PEP-224:
+For example:
 
 [PEP-224]: http://www.python.org/dev/peps/pep-0224
 
     module_variable = 1
-    """Docstring for module_variable."""
+    """PEP 224 docstring for module_variable."""
 
     class C:
-        class_variable = 2
-        """Docstring for class_variable."""
+        #: Documentation comment for class_variable
+        #: spanning over three lines.
+        class_variable = 2  #: Assignment line is included.
 
         def __init__(self):
+            #: Instance variable's doc-comment
             self.variable = 3
-            """Docstring for instance variable."""
-
-For example via '#:' doc-comments
-
-    #: Docstring for module_variable.
-    module_variable = 1
-
-    class C:
-        #: Docstring for class_variable.
-        class_variable = 2
-
-
-        def __init__(self):
-            #: Docstring for instance variable.
-            self.variable = 3
-
-Note that '#:' doc-comments can be both multi-line and appear on the same line after
-variable declaration.
-
-For example:
-
-    #: This is line 1 of my documentation for module_variable
-    #: This is line 2 of my documentation for module_variable
-    module_variable = 1 #: This is line 3 of my documentation for module_variable
+            """But note, PEP 224 docstrings take precedence."""
 
 While the resulting variables have no `__doc__` attribute,
 `pdoc` compensates by reading the source code (when available)
