@@ -594,17 +594,15 @@ def _git_project_root():
     """
     Return the path to project root directory or None if indeterminate.
     """
-    path = None
     for cmd in (['git', 'rev-parse', '--show-superproject-working-tree'],
                 ['git', 'rev-parse', '--show-toplevel']):
         try:
             path = subprocess.check_output(cmd, universal_newlines=True).rstrip('\r\n')
             if path:
-                break
+                return os.path.normpath(path)
         except (subprocess.CalledProcessError, OSError):
             pass
-    path = os.path.normpath(path)
-    return path
+    return None
 
 
 @lru_cache()
