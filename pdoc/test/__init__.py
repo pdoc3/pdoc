@@ -1616,7 +1616,7 @@ cmd `pwd`
         self.assertEqual(html, expected)
 
 
-@unittest.skipIf('win' in sys.platform, "signal.SIGALRM doesn't work on Windows")
+@unittest.skipIf('win' in sys.platform, "signal.SIGALRM doesn't work on Windos")
 class HttpTest(unittest.TestCase):
     """
     Unit tests for the HTTP server functionality.
