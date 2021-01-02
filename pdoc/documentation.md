@@ -107,24 +107,26 @@ In the default HTML template, such inherited docstrings are greyed out.
 [variable docstrings]: #docstrings-for-variables
 
 Python by itself [doesn't allow docstrings attached to variables][PEP-224].
-However, `pdoc` supports docstrings attached to module (or global)
-variables, class variables, and object instance variables; all in
-the same way as proposed in [PEP-224], with a docstring following the
-variable assignment.
+However, `pdoc` supports documenting module (or global)
+variables, class variables, and object instance variables via
+two different mechanisms: [PEP-224] and `#:` doc-comments.
+
 For example:
 
 [PEP-224]: http://www.python.org/dev/peps/pep-0224
 
     module_variable = 1
-    """Docstring for module_variable."""
+    """PEP 224 docstring for module_variable."""
 
     class C:
-        class_variable = 2
-        """Docstring for class_variable."""
+        #: Documentation comment for class_variable
+        #: spanning over three lines.
+        class_variable = 2  #: Assignment line is included.
 
         def __init__(self):
+            #: Instance variable's doc-comment
             self.variable = 3
-            """Docstring for instance variable."""
+            """But note, PEP 224 docstrings take precedence."""
 
 While the resulting variables have no `__doc__` attribute,
 `pdoc` compensates by reading the source code (when available)

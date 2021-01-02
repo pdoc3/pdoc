@@ -106,25 +106,21 @@ class CliTest(unittest.TestCase):
     """
     ALL_FILES = [
         'example_pkg',
-        'example_pkg/index.html',
-        'example_pkg/index.m.html',
-        'example_pkg/module.html',
-        'example_pkg/_private',
-        'example_pkg/_private/index.html',
-        'example_pkg/_private/module.html',
-        'example_pkg/subpkg',
-        'example_pkg/subpkg/_private.html',
-        'example_pkg/subpkg/index.html',
-        'example_pkg/subpkg2',
-        'example_pkg/subpkg2/_private.html',
-        'example_pkg/subpkg2/module.html',
-        'example_pkg/subpkg2/index.html',
+        os.path.join('example_pkg', 'index.html'),
+        os.path.join('example_pkg', 'index.m.html'),
+        os.path.join('example_pkg', 'module.html'),
+        os.path.join('example_pkg', '_private'),
+        os.path.join('example_pkg', '_private', 'index.html'),
+        os.path.join('example_pkg', '_private', 'module.html'),
+        os.path.join('example_pkg', 'subpkg'),
+        os.path.join('example_pkg', 'subpkg', '_private.html'),
+        os.path.join('example_pkg', 'subpkg', 'index.html'),
+        os.path.join('example_pkg', 'subpkg2'),
+        os.path.join('example_pkg', 'subpkg2', '_private.html'),
+        os.path.join('example_pkg', 'subpkg2', 'module.html'),
+        os.path.join('example_pkg', 'subpkg2', 'index.html'),
     ]
-    PUBLIC_FILES = [f for f in ALL_FILES if '/_' not in f]
-
-    if os.name == 'nt':
-        ALL_FILES = [i.replace('/', '\\') for i in ALL_FILES]
-        PUBLIC_FILES = [i.replace('/', '\\') for i in PUBLIC_FILES]
+    PUBLIC_FILES = [f for f in ALL_FILES if (os.path.sep + '_') not in f]
 
     def setUp(self):
         pdoc.reset()
@@ -190,7 +186,7 @@ class CliTest(unittest.TestCase):
             '.subpkg2': [f for f in self.PUBLIC_FILES
                          if 'subpkg2' in f or f == EXAMPLE_MODULE],
             '._private': [f for f in self.ALL_FILES
-                          if EXAMPLE_MODULE + '/_private' in f or f == EXAMPLE_MODULE],
+                          if EXAMPLE_MODULE + os.path.sep + '_private' in f or f == EXAMPLE_MODULE],
         }
         for package, expected_files in package_files.items():
             with self.subTest(package=package):
@@ -203,7 +199,8 @@ class CliTest(unittest.TestCase):
         filenames_files = {
             ('module.py',): ['module.html'],
             ('module.py', 'subpkg2'): ['module.html', 'subpkg2',
-                                       'subpkg2/index.html', 'subpkg2/module.html'],
+                                       os.path.join('subpkg2', 'index.html'),
+                                       os.path.join('subpkg2', 'module.html')],
         }
         with chdir(TESTS_BASEDIR):
             for filenames, expected_files in filenames_files.items():
@@ -216,9 +213,11 @@ class CliTest(unittest.TestCase):
 
     def test_html_multiple_files(self):
         with chdir(TESTS_BASEDIR):
-            with run_html(EXAMPLE_MODULE + '/module.py', EXAMPLE_MODULE + '/subpkg2'):
-                self._basic_html_assertions(
-                    ['module.html', 'subpkg2', 'subpkg2/index.html', 'subpkg2/module.html'])
+            with run_html(os.path.join(EXAMPLE_MODULE, 'module.py'),
+                          os.path.join(EXAMPLE_MODULE, 'subpkg2')):
+                self._basic_html_assertions(['module.html', 'subpkg2',
+                                             os.path.join('subpkg2', 'index.html'),
+                                             os.path.join('subpkg2', 'module.html')])
 
     def test_html_identifier(self):
         for package in ('', '._private'):
@@ -232,7 +231,7 @@ class CliTest(unittest.TestCase):
     def test_html_ref_links(self):
         with run_html(EXAMPLE_MODULE, config='show_source_code=False'):
             self._check_files(
-                file_pattern=EXAMPLE_MODULE + '/index.html',
+                file_pattern=os.path.join(EXAMPLE_MODULE, 'index.html'),
                 include_patterns=[
                     'href="#example_pkg.B">',
                     'href="#example_pkg.A">',
@@ -1098,6 +1097,39 @@ class Foo:
         cls = pdoc.Class('Employee', module, my_locals['Employee'])
         self.assertIsInstance(cls.doc['name'], pdoc.Variable)
         self.assertEqual(cls.doc['name'].type_annotation(), 'str')
+
+    def test_doc_comment_docstrings(self):
+        with temp_dir() as path:
+            filename = os.path.join(path, 'doc_comment_docstrs.py')
+            with open(filename, 'w') as f:
+                f.write('''#: Not included
+
+#: Line 1
+#: Line 2
+var1 = 1  #: Line 3
+
+#: Not included
+var2 = 1
+"""PEP-224 takes precedence"""
+
+#: This should not appear
+class C:
+    #: class var
+    class_var = 1
+
+    #: This also should not show
+    def __init__(self):
+       #: instance var
+       self.instance_var = 1
+''')
+
+            mod = pdoc.Module(pdoc.import_module(filename))
+
+            self.assertEqual(mod.doc['var1'].docstring, 'Line 1\nLine 2\nLine 3')
+            self.assertEqual(mod.doc['var2'].docstring, 'PEP-224 takes precedence')
+            self.assertEqual(mod.doc['C'].docstring, '')
+            self.assertEqual(mod.doc['C'].doc['class_var'].docstring, 'class var')
+            self.assertEqual(mod.doc['C'].doc['instance_var'].docstring, 'instance var')
 
 
 class HtmlHelpersTest(unittest.TestCase):

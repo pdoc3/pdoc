@@ -244,7 +244,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
                        _init_tree=None) -> Tuple[Dict[str, str],
                                                  Dict[str, str]]:
     """
-    Extracts PEP-224 docstrings for variables of `doc_obj`
+    Extracts PEP-224 docstrings and doc-comments (`#: ...`) for variables of `doc_obj`
     (either a `pdoc.Module` or `pdoc.Class`).
 
     Returns a tuple of two dicts mapping variable names to their docstrings.
@@ -284,12 +284,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
                     instance_vars, _ = _pep224_docstrings(doc_obj, _init_tree=node)
                     break
 
-    for assign_node, str_node in _pairwise(ast.iter_child_nodes(tree)):
-        if not (isinstance(assign_node, (ast.Assign, ast.AnnAssign)) and
-                isinstance(str_node, ast.Expr) and
-                isinstance(str_node.value, ast.Str)):
-            continue
-
+    def get_name(assign_node):
         if isinstance(assign_node, ast.Assign) and len(assign_node.targets) == 1:
             target = assign_node.targets[0]
         elif isinstance(assign_node, ast.AnnAssign):
@@ -298,7 +293,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             # > Putting the instance variable annotations together in the class
             # > makes it easier to find them, and helps a first-time reader of the code.
         else:
-            continue
+            return None
 
         if not _init_tree and isinstance(target, ast.Name):
             name = target.id
@@ -308,9 +303,22 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
               target.value.id == 'self'):
             name = target.attr
         else:
-            continue
+            return None
 
         if not _is_public(name) and not _is_whitelisted(name, doc_obj):
+            return None
+
+        return name
+
+    # For handling PEP-224 docstrings for variables
+    for assign_node, str_node in _pairwise(ast.iter_child_nodes(tree)):
+        if not (isinstance(assign_node, (ast.Assign, ast.AnnAssign)) and
+                isinstance(str_node, ast.Expr) and
+                isinstance(str_node.value, ast.Str)):
+            continue
+
+        name = get_name(assign_node)
+        if not name:
             continue
 
         docstring = inspect.cleandoc(str_node.value.s).strip()
@@ -318,6 +326,43 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             continue
 
         vars[name] = docstring
+
+    # For handling '#:' docstrings for variables
+    for assign_node in ast.iter_child_nodes(tree):
+        if not isinstance(assign_node, (ast.Assign, ast.AnnAssign)):
+            continue
+
+        name = get_name(assign_node)
+        if not name:
+            continue
+
+        # Already documented. PEP-224 method above takes precedence.
+        if name in vars:
+            continue
+
+        def get_indent(line):
+            return len(line) - len(line.lstrip())
+
+        source_lines = doc_obj.source.splitlines()  # type: ignore
+        assign_line = source_lines[assign_node.lineno - 1]
+        assign_indent = get_indent(assign_line)
+        comment_lines = []
+        MARKER = '#: '
+        for line in reversed(source_lines[:assign_node.lineno - 1]):
+            if get_indent(line) == assign_indent and line.lstrip().startswith(MARKER):
+                comment_lines.append(line.split(MARKER, maxsplit=1)[1])
+            else:
+                break
+
+        # Since we went 'up' need to reverse lines to be in correct order
+        comment_lines = comment_lines[::-1]
+
+        # Finally: check for a '#: ' comment at the end of the assignment line itself.
+        if MARKER in assign_line:
+            comment_lines.append(assign_line.rsplit(MARKER, maxsplit=1)[1])
+
+        if comment_lines:
+            vars[name] = '\n'.join(comment_lines)
 
     return vars, instance_vars
 
