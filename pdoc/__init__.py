@@ -285,9 +285,6 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
                     break
 
     def get_name(assign_node):
-        target = None
-        name = None
-
         if isinstance(assign_node, ast.Assign) and len(assign_node.targets) == 1:
             target = assign_node.targets[0]
         elif isinstance(assign_node, ast.AnnAssign):
@@ -295,18 +292,21 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             # Skip the annotation. PEP 526 says:
             # > Putting the instance variable annotations together in the class
             # > makes it easier to find them, and helps a first-time reader of the code.
+        else:
+            return None
 
-        if target:
-            if not _init_tree and isinstance(target, ast.Name):
-                name = target.id
-            elif (_init_tree and
-                  isinstance(target, ast.Attribute) and
-                  isinstance(target.value, ast.Name) and
-                  target.value.id == 'self'):
-                name = target.attr
+        if not _init_tree and isinstance(target, ast.Name):
+            name = target.id
+        elif (_init_tree and
+              isinstance(target, ast.Attribute) and
+              isinstance(target.value, ast.Name) and
+              target.value.id == 'self'):
+            name = target.attr
+        else:
+            return None
 
-        if name and not _is_public(name) and not _is_whitelisted(name, doc_obj):
-            name = None
+        if not _is_public(name) and not _is_whitelisted(name, doc_obj):
+            return None
 
         return name
 
@@ -336,31 +336,33 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
         if not name:
             continue
 
-        def get_line_indentation(line):
+        # Already documented. PEP-224 method above takes precedence.
+        if name in vars:
+            continue
+
+        def get_indent(line):
             return len(line) - len(line.lstrip())
 
-        if name not in vars:
-            # There wasn't a PEP-224 style docstring, so look for a '#:' style one above
-            source_lines = doc_obj.source.splitlines()  # type: ignore
-            assignment_line = source_lines[assign_node.lineno - 1]
-            assignment_line_indentation = get_line_indentation(assignment_line)
-            comment_lines = []
-            for line in reversed(source_lines[:assign_node.lineno - 1]):
-                if get_line_indentation(line) == assignment_line_indentation and \
-                        line.lstrip().startswith('#: '):
-                    comment_lines.append(line.split('#: ', 1)[1])
-                else:
-                    break
+        source_lines = doc_obj.source.splitlines()  # type: ignore
+        assign_line = source_lines[assign_node.lineno - 1]
+        assign_indent = get_indent(assign_line)
+        comment_lines = []
+        MARKER = '#: '
+        for line in reversed(source_lines[:assign_node.lineno - 1]):
+            if get_indent(line) == assign_indent and line.lstrip().startswith(MARKER):
+                comment_lines.append(line.split(MARKER, maxsplit=1)[1])
+            else:
+                break
 
-            # Since we went 'up' need to reverse lines to be in correct order
-            comment_lines = comment_lines[::-1]
+        # Since we went 'up' need to reverse lines to be in correct order
+        comment_lines = comment_lines[::-1]
 
-            # Finally: check for a '#: ' comment at the end of the assignment line itself.
-            if '#: ' in assignment_line:
-                comment_lines.append(assignment_line.rsplit('#: ', 1)[-1])
+        # Finally: check for a '#: ' comment at the end of the assignment line itself.
+        if MARKER in assign_line:
+            comment_lines.append(assign_line.rsplit(MARKER, maxsplit=1)[1])
 
-            if comment_lines:
-                vars[name] = '\n'.join(comment_lines)
+        if comment_lines:
+            vars[name] = '\n'.join(comment_lines)
 
     return vars, instance_vars
 
