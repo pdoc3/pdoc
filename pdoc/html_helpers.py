@@ -566,6 +566,7 @@ def format_git_link(template: str, dobj: pdoc.Doc):
             path = path.replace('\\', '/')
 
         lines, start_line = inspect.getsourcelines(dobj.obj)
+        start_line = start_line or 1  # GH-296
         end_line = start_line + len(lines) - 1
         url = template.format(**locals())
         return url
