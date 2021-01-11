@@ -230,6 +230,10 @@ def import_module(module: Union[str, ModuleType],
     # `isinstance(..., pdoc.Doc)` calls won't work correctly.
     if reload and not module.__name__.startswith(__name__):
         module = importlib.reload(module)
+        # We recursively reload all submodules, in case __all_ is used - cf. issue #264
+        for mod_key, mod in list(sys.modules.items()):
+            if mod_key.startswith(module.__name__):
+                importlib.reload(mod)
     return module
 
 

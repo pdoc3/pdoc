@@ -265,7 +265,7 @@ class _WebDoc(BaseHTTPRequestHandler):
         """
         return pdoc.html(self.import_path_from_req_url,
                          reload=True, http_server=True, external_links=True,
-                         skip_errors=args.skip_errors,
+                         skip_errors=self.args.skip_errors,
                          **self.template_config)
 
     def resolve_ext(self, import_path):
