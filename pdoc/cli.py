@@ -7,6 +7,7 @@ import importlib
 import inspect
 import os
 import os.path as path
+import shutil
 import json
 import re
 import sys
@@ -14,6 +15,7 @@ import warnings
 from contextlib import contextmanager
 from functools import lru_cache
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from html.parser import HTMLParser
 from typing import Dict, List, Sequence
 from warnings import warn
 
@@ -333,22 +335,62 @@ def _open_write_file(filename):
         raise
 
 
-def recursive_write_files(m: pdoc.Module, ext: str, **kwargs):
+class _html_image_path_parser(HTMLParser):
+    def __init__(self):
+        self.image_paths = []
+        super().__init__()
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'img':
+            for attr in attrs:
+                if attr[0] == 'src':
+                    if attr[1].startswith('http'):
+                        pass
+                    else:
+                        self.image_paths.append(attr[1])
+
+
+def _parse_html_image_paths(html):
+    parser = _html_image_path_parser()
+    parser.feed(html)
+    # Return the list of images. Using `set` removes duplicates.
+    return list(set(parser.image_paths))
+
+
+def _src_path(m: pdoc.Module):
+    if '__path__' in dir(m.obj):
+        return m.obj.__path__
+    else:
+        print('Is this a submodule? Get path from supermodule.')
+
+
+def recursive_write_files(m: pdoc.Module, ext: str, source_path=None, **kwargs):
     assert ext in ('.html', '.md')
     filepath = module_path(m, ext=ext)
 
     dirpath = path.dirname(filepath)
     if not os.access(dirpath, os.R_OK):
         os.makedirs(dirpath)
-
     with _open_write_file(filepath) as f:
         if ext == '.html':
             f.write(m.html(**kwargs))
         elif ext == '.md':
             f.write(m.text(**kwargs))
+    # Find local images in html code.
+    image_src_paths = _parse_html_image_paths(m.html(**kwargs))
+    # Retrieve local path to module. This is passed on from the supermodule
+    # for submodules.
+    if source_path is None:
+        source_path = _src_path(m)[0]
+    # Copy images
+    for image in image_src_paths:
+        imgsrc = path.join(source_path, image)
+        imgdest = path.join(dirpath, image)
+        os.makedirs(path.dirname(imgdest), exist_ok=True)
+        shutil.copy(imgsrc, imgdest)
 
     for submodule in m.submodules():
-        recursive_write_files(submodule, ext=ext, **kwargs)
+        recursive_write_files(submodule, ext=ext, source_path=_src_path(m)[0], **kwargs)
 
 
 def _flatten_submodules(modules: Sequence[pdoc.Module]):

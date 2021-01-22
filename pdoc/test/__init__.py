@@ -1503,8 +1503,11 @@ Exception: something went wrong
 <p>Can only nest admonitions two levels.</p>
 </div>
 </div>
-<p><img alt="" src="https://www.debian.org/logos/openlogo-nd-100.png"></p>
 <p>Now you know.</p>
+<p>Remote image:</p>
+<p><img alt="" src="https://www.debian.org/logos/openlogo-nd-100.png"></p>
+<p>Local image:</p>
+<p><img alt="" src="./images/local_image.png"></p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Some warning

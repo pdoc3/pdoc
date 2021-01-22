@@ -313,9 +313,15 @@ class Docformats:
            .. note::
               Can only nest admonitions two levels.
 
+        Now you know.
+
+        Remote image:
+
         .. image:: https://www.debian.org/logos/openlogo-nd-100.png
 
-        Now you know.
+        Local image:
+
+        .. image:: ./images/local_image.png
 
         .. warning::
 
