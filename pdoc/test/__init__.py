@@ -1507,9 +1507,9 @@ Exception: something went wrong
 <p>Remote image:</p>
 <p><img alt="" src="https://www.debian.org/logos/openlogo-nd-100.png"></p>
 <p>Local image png format (should be a cropped Debian logo):</p>
-<p><img alt="Alternative text. Local image file shows a cropped debian logo." src="./images/local_logo.png"></p>
+<p><img alt="" src="./images/local_logo.png"></p>
 <p>Local image jpg format (should be a cropped Debian logo):</p>
-<p><img alt="Alternative text. Local image file shows a cropped debian logo." src="./images/local_logo.jpg"></p>
+<p><img alt="" src="./images/local_logo.jpg"></p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Some warning

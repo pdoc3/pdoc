@@ -224,7 +224,9 @@ class _WebDoc(BaseHTTPRequestHandler):
             else:
                 return self.redirect(resolved)
         # Deal with images
-        elif self.path.endswith(".png") or self.path.endswith(".jpg") or self.path.endswith(".jpeg"):
+        elif (self.path.endswith(".png") or
+                self.path.endswith(".jpg") or
+                self.path.endswith(".jpeg")):
             self.send_response(200)
             content_type = 'image/png' if self.path.endswith(".png") else 'image/jpeg'
             self.send_header('Content-type', content_type)

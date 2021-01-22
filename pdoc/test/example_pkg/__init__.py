@@ -322,14 +322,10 @@ class Docformats:
         Local image png format (should be a cropped Debian logo):
 
         .. image:: ./images/local_logo.png
-
-            Alternative text. Local image file shows a cropped debian logo.
         
         Local image jpg format (should be a cropped Debian logo):
 
         .. image:: ./images/local_logo.jpg
-
-            Alternative text. Local image file shows a cropped debian logo.
  
         .. warning::
 
