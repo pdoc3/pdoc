@@ -187,6 +187,7 @@ class _WebDoc(BaseHTTPRequestHandler):
 
         importlib.invalidate_caches()
         code = 200
+        isimage = False
         if self.path == "/":
             modules = [pdoc.import_module(module, reload=True)
                        for module in self.args.modules]
@@ -222,7 +223,15 @@ class _WebDoc(BaseHTTPRequestHandler):
                     out = f"External identifier <code>{import_path}</code> not found."
             else:
                 return self.redirect(resolved)
-        # Redirect '/pdoc' to '/pdoc/' so that relative links work
+        # Deal with images
+        elif self.path.endswith(".png") or self.path.endswith(".jpg") or self.path.endswith(".jpeg"):
+            self.send_response(200)
+            content_type = 'image/png' if self.path.endswith(".png") else 'image/jpeg'
+            self.send_header('Content-type', content_type)
+            self.end_headers()
+            with open(self.path[1:], "rb") as fout:
+                self.wfile.write(fout.read())
+            isimage = True
         # (results in '/pdoc/cli.html' instead of 'cli.html')
         elif not self.path.endswith(('/', '.html')):
             return self.redirect(self.path + '/')
@@ -243,10 +252,11 @@ class _WebDoc(BaseHTTPRequestHandler):
                 )
                 out = out.replace('\n', '<br>')
 
-        self.send_response(code)
-        self.send_header("Content-type", "text/html; charset=utf-8")
-        self.end_headers()
-        self.echo(out)
+        if not isimage:
+            self.send_response(code)
+            self.send_header("Content-type", "text/html; charset=utf-8")
+            self.end_headers()
+            self.echo(out)
 
     def redirect(self, location):
         self.send_response(302)

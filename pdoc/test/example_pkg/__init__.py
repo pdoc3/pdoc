@@ -313,10 +313,24 @@ class Docformats:
            .. note::
               Can only nest admonitions two levels.
 
-        .. image:: https://www.debian.org/logos/openlogo-nd-100.png
-
         Now you know.
 
+        Remote image:
+
+        .. image:: https://www.debian.org/logos/openlogo-nd-100.png
+
+        Local image png format (should be a cropped Debian logo):
+
+        .. image:: ./images/local_logo.png
+
+            Alternative text. Local image file shows a cropped debian logo.
+        
+        Local image jpg format (should be a cropped Debian logo):
+
+        .. image:: ./images/local_logo.jpg
+
+            Alternative text. Local image file shows a cropped debian logo.
+ 
         .. warning::
 
             Some warning
