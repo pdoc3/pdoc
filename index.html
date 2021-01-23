@@ -25,7 +25,7 @@
     <link rel="icon" type="image/png" href="logo.png" sizes="512x512" itemprop="image logo">
     <link rel="canonical home" href="https://pdoc3.github.io/pdoc/" itemprop="url">
 
-    <link href="https://en.wikipedia.org/wiki/Pdoc" itemprop="sameAs">
+    <link href="https://www.google.com/search?kgmid=/g/11g_rlj66_" itemprop="sameAs">
     <link href="https://github.com/pdoc3/pdoc" itemprop="sameAs">
     <link href="https://pypi.org/project/pdoc3/" itemprop="sameAs">
     <link itemprop="license" href="https://www.gnu.org/licenses/agpl-3.0.html">
@@ -44,7 +44,7 @@
     <div class="container">
         <div class="level">
             <div class="level-left">
-                <div class="image is-128x128" style="margin-right:3em"><img alt="" src="logo.png"></div>
+                <div class="image is-128x128" style="margin-right:3em"><img alt="" src="logo.png" width="128" height="128"></div>
                 <div>
                     <h1 class="title is-1">
                         pdoc
@@ -187,6 +187,7 @@
                     <input class="input is-large is-dark" readonly value="pip3 install pdoc3"
                            style="background:#ffd; cursor:pointer; caret-color:transparent; font-family:monospace;"
                            onclick="getSelection().removeAllRanges(); this.select();"
+                           aria-label="command line to install"
                            data-ga-on="click,auxclick,contextmenu" data-ga-event-action="select" data-ga-event-category="cmdline">
                     <span class="icon is-left has-text-grey" ><i class="fa fa-dollar-sign"></i></span>
                     <span class="icon is-right has-text-grey"><i class="fa fa-download"></i></span>
@@ -231,6 +232,7 @@
                     <input class="input is-large is-dark" readonly disabled value="pdoc --html pdoc"
                            style="cursor:default; caret-color:transparent; font-family:monospace; pointer-events:none; user-select:none;"
                            tabindex="-1"
+                           aria-label="command line to run"
                            data-ga-on="click" data-ga-event-action="select" data-ga-event-category="pdoc line">
                     <span class="icon is-left has-text-grey" ><i class="fa fa-dollar-sign"></i></span>
                 </div>
