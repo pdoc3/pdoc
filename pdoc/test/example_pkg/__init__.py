@@ -18,7 +18,14 @@ __pdoc__ = {}
 
 def foo(env=os.environ):
     """Doesn't leak environ"""
-    pass
+
+
+def object_as_arg_default(*args, a=object(), **kwargs):
+    """Html-encodes angle brackets in params"""
+
+
+def _private_function():
+    """Private function, should only appear if whitelisted"""
 
 
 class A:
@@ -31,6 +38,21 @@ class A:
 
     def inherited(self):  # Inherited in B
         """A.inherited docstring"""
+
+    def __call__(self):
+        """A.__call__ docstring. Only shown when whitelisted"""
+
+
+non_callable_routine = staticmethod(lambda x: 2)  # Not interpreted as Function; skipped
+
+
+class ReadOnlyValueDescriptor:
+    """Read-only value descriptor"""
+
+    def __get__(self, instance, instance_type=None):
+        if instance is not None:
+            return instance.var ** 2
+        return self
 
 
 class B(A, int):
@@ -46,10 +68,18 @@ class B(A, int):
     var = 3
     """B.var docstring"""
 
+    ro_value_descriptor = ReadOnlyValueDescriptor()
+    """ro_value_descriptor docstring"""
+
+    ro_value_descriptor_no_doc = ReadOnlyValueDescriptor()   # no doc-string
+
     def __init__(self, x, y, z, w):
         """`__init__` docstring"""
         self.instance_var = None
         """instance var docstring"""
+
+        self._private_instance_var = None
+        """This should be private (hidden) despite PEP 224 docstring"""
 
     def f(self, a: int, b: int = 1, *args, c: str = 'c', **kwargs):
         """B.f docstring"""
@@ -126,17 +156,16 @@ class Docformats:
             Description of num
         *args, **kwargs
             Passed on.
+        complex : Union[Set[pdoc.Doc, Function], pdoc]
+            The `List[Doc]`s of the new signal.
 
         Returns
         -------
         output : pdoc.Doc
             The output array
-        foo
-
-        Returns
-        -------
-        pdoc.Doc
+        List[pdoc.Doc]
             The output array
+        foo
 
         Raises
         ------
@@ -163,6 +192,13 @@ class Docformats:
         --------
         pdoc.text : Function a with its description.
         scipy.random.norm : Random variates, PDFs, etc.
+        pdoc.Doc : A class description that
+                   spans several lines.
+
+        Examples
+        --------
+        >>> doctest
+        ...
 
         Notes
         -----
@@ -181,6 +217,7 @@ class Docformats:
         Args:
             arg1 (str, optional): Text1
             arg2 (List[str], optional, default=10): Text2
+            data (array-like object): foo
 
         Args:
           arg1 (int): Description of arg1
@@ -198,6 +235,13 @@ class Docformats:
             issue_10: description didn't work across multiple lines
                 if only a single item was listed. `inspect.cleandoc()`
                 somehow stripped the required extra indentation.
+
+        Returns:
+            A very special number
+            which is the answer of everything.
+
+        Returns:
+            Dict[int, pdoc.Doc]: Description.
 
         Raises:
             AttributeError: The ``Raises`` section is a list of all exceptions
@@ -224,17 +268,34 @@ class Docformats:
         Need an intro paragrapgh.
 
             >>> Then code is indented one level
+            line1
+            line2
 
         Alternatively
         ```
+        >>> doctest
         fenced code works
+        always
         ```
 
         Examples:
             >>> nbytes(100)
             '100.0 bytes'
+            line2
 
-            >>> asdf
+            some text
+
+        some text
+
+        >>> another doctest
+        line1
+        line2
+
+        Example:
+            >>> f()
+            Traceback (most recent call last):
+                ...
+            Exception: something went wrong
         """
 
     def reST_directives(self):

@@ -3,6 +3,9 @@
 %>
 
 <%def name="mobile()" filter="minify_css">
+  :root {
+    --highlight-color: #fe9;
+  }
   .flex {
     display: flex !important;
   }
@@ -19,6 +22,18 @@
     padding: 30px;
     overflow: hidden;
   }
+    #sidebar > *:last-child {
+      margin-bottom: 2cm;
+    }
+
+  % if lunr_search is not None:
+  #lunr-search {
+    width: 100%;
+    font-size: 1em;
+    padding: 6px 9px 5px 9px;
+    border: 1px solid silver;
+  }
+  % endif
 
   .http-server-breadcrumbs {
     font-size: 130%;
@@ -57,6 +72,15 @@
   h4 {
     margin: 0;
     font-size: 105%;
+  }
+  h1:target,
+  h2:target,
+  h3:target,
+  h4:target,
+  h5:target,
+  h6:target {
+    background: var(--highlight-color);
+    padding: .2em 0;
   }
 
   a {
@@ -129,10 +153,8 @@
       padding: 0;
     }
     #index h4 {
+      margin-top: .6em;
       font-weight: bold;
-    }
-    #index h4 + ul {
-      margin-bottom:.6em;
     }
     /* Make TOC lists have 2+ columns when viewport is wide enough.
        Assuming ~20-character identifiers and ~30% wide sidebar. */
@@ -168,6 +190,9 @@
       .name:hover {
         background: #e0e0e0;
       }
+      dt:target .name {
+        background: var(--highlight-color);
+      }
       .name > span:first-child {
         white-space: nowrap;
       }
@@ -196,14 +221,22 @@
       background: inherit;  /* Don't grey-back parameters */
     }
 
-    .source summary {
+    .source summary,
+    .git-link-div {
       color: #666;
       text-align: right;
       font-weight: 400;
       font-size: .8em;
       text-transform: uppercase;
-      cursor: pointer;
     }
+      .source summary > * {
+        white-space: nowrap;
+        cursor: pointer;
+      }
+      .git-link {
+        color: inherit;
+        margin-left: 1em;
+      }
     .source pre {
       max-height: 500px;
       overflow: auto;
@@ -232,6 +265,9 @@
 
   img {
     max-width: 100%;
+  }
+  td {
+    padding: 0 .5em;
   }
 
   .admonition {
@@ -268,6 +304,10 @@
   @media screen and (min-width: 700px) {
     #sidebar {
       width: 30%;
+      height: 100vh;
+      overflow: auto;
+      position: sticky;
+      top: 0;
     }
     #content {
       width: 70%;

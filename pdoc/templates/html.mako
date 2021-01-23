@@ -2,31 +2,48 @@
   import os
 
   import pdoc
-  from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html
+  from pdoc.html_helpers import extract_toc, glimpse, to_html as _to_html, format_git_link
 
 
-  def link(d, name=None, fmt='{}'):
-    name = fmt.format(name or d.qualname + ('()' if isinstance(d, pdoc.Function) else ''))
-    if not isinstance(d, pdoc.Doc) or isinstance(d, pdoc.External) and not external_links:
+  def link(dobj: pdoc.Doc, name=None):
+    name = name or dobj.qualname + ('()' if isinstance(dobj, pdoc.Function) else '')
+    if isinstance(dobj, pdoc.External) and not external_links:
         return name
-    url = d.url(relative_to=module, link_prefix=link_prefix,
-                top_ancestor=not show_inherited_members)
-    return '<a title="{}" href="{}">{}</a>'.format(d.refname, url, name)
+    url = dobj.url(relative_to=module, link_prefix=link_prefix,
+                   top_ancestor=not show_inherited_members)
+    return f'<a title="{dobj.refname}" href="{url}">{name}</a>'
 
 
   def to_html(text):
-    return _to_html(text, module=module, link=link, latex_math=latex_math)
+    return _to_html(text, docformat=docformat, module=module, link=link, latex_math=latex_math)
+
+
+  def get_annotation(bound_method, sep=':'):
+    annot = show_type_annotations and bound_method(link=link) or ''
+    if annot:
+        annot = ' ' + sep + '\N{NBSP}' + annot
+    return annot
 %>
 
 <%def name="ident(name)"><span class="ident">${name}</span></%def>
 
 <%def name="show_source(d)">
-    % if show_source_code and d.source and d.obj is not getattr(d.inherits, 'obj', None):
-        <details class="source">
-            <summary>Source code</summary>
-            <pre><code class="python">${d.source | h}</code></pre>
-        </details>
+  % if (show_source_code or git_link_template) and d.source and d.obj is not getattr(d.inherits, 'obj', None):
+    <% git_link = format_git_link(git_link_template, d) %>
+    % if show_source_code:
+      <details class="source">
+        <summary>
+            <span>Expand source code</span>
+            % if git_link:
+              <a href="${git_link}" class="git-link">Browse git</a>
+            %endif
+        </summary>
+        <pre><code class="python">${d.source | h}</code></pre>
+      </details>
+    % elif git_link:
+      <div class="git-link-div"><a href="${git_link}" class="git-link">Browse git</a></div>
     %endif
+  %endif
 </%def>
 
 <%def name="show_desc(d, short=False)">
@@ -44,7 +61,7 @@
           % endif
       </p>
   % endif
-  <section class="desc${inherits}">${docstring | to_html}</section>
+  <div class="desc${inherits}">${docstring | to_html}</div>
   % if not isinstance(d, pdoc.Module):
   ${show_source(d)}
   % endif
@@ -90,11 +107,9 @@
     <dt id="${f.refname}"><code class="name flex">
         <%
             params = ', '.join(f.params(annotate=show_type_annotations, link=link))
-            returns = show_type_annotations and f.return_annotation(link=link) or ''
-            if returns:
-                returns = ' ->\N{NBSP}' + returns
+            return_type = get_annotation(f.return_annotation, '\N{non-breaking hyphen}>')
         %>
-        <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${params})${returns}</span>
+        <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${params})${return_type}</span>
     </code></dt>
     <dd>${show_desc(f)}</dd>
   </%def>
@@ -110,7 +125,9 @@
       % endfor
     </nav>
   % endif
-  <h1 class="title">${'Namespace' if module.is_namespace else 'Module'} <code>${module.name}</code></h1>
+  <h1 class="title">${'Namespace' if module.is_namespace else  \
+                      'Package' if module.is_package and not module.supermodule else \
+                      'Module'} <code>${module.name}</code></h1>
   </header>
 
   <section id="section-intro">
@@ -135,7 +152,8 @@
     <h2 class="section-title" id="header-variables">Global variables</h2>
     <dl>
     % for v in variables:
-      <dt id="${v.refname}"><code class="name">var ${ident(v.name)}</code></dt>
+      <% return_type = get_annotation(v.type_annotation) %>
+      <dt id="${v.refname}"><code class="name">var ${ident(v.name)}${return_type}</code></dt>
       <dd>${show_desc(v)}</dd>
     % endfor
     </dl>
@@ -197,7 +215,8 @@
           <h3>Class variables</h3>
           <dl>
           % for v in class_vars:
-              <dt id="${v.refname}"><code class="name">var ${ident(v.name)}</code></dt>
+              <% return_type = get_annotation(v.type_annotation) %>
+              <dt id="${v.refname}"><code class="name">var ${ident(v.name)}${return_type}</code></dt>
               <dd>${show_desc(v)}</dd>
           % endfor
           </dl>
@@ -214,7 +233,8 @@
           <h3>Instance variables</h3>
           <dl>
           % for v in inst_vars:
-              <dt id="${v.refname}"><code class="name">var ${ident(v.name)}</code></dt>
+              <% return_type = get_annotation(v.type_annotation) %>
+              <dt id="${v.refname}"><code class="name">var ${ident(v.name)}${return_type}</code></dt>
               <dd>${show_desc(v)}</dd>
           % endfor
           </dl>
@@ -267,6 +287,17 @@
   <nav id="sidebar">
 
     <%include file="logo.mako"/>
+
+    % if google_search_query:
+        <div class="gcse-search" style="height: 70px"
+             data-as_oq="${' '.join(google_search_query.strip().split()) | h }"
+             data-gaCategoryParameter="${module.refname | h}">
+        </div>
+    % endif
+
+    % if lunr_search is not None:
+      <%include file="_lunr_search.inc.mako"/>
+    % endif
 
     <h1>Index</h1>
     ${extract_toc(module.docstring) if extract_module_toc_into_sidebar else ''}
@@ -349,10 +380,10 @@
     <meta name="description" content="${module.docstring | glimpse, trim, h}" />
   % endif
 
-  <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
-  <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+  <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+  <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
   % if syntax_highlighting:
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/${hljs_style}.min.css" rel="stylesheet">
+    <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/${hljs_style}.min.css" crossorigin>
   %endif
 
   <%namespace name="css" file="css.mako" />
@@ -367,8 +398,22 @@
     </script><script async src='https://www.google-analytics.com/analytics.js'></script>
   % endif
 
+  % if google_search_query:
+    <link rel="preconnect" href="https://www.google.com">
+    <script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
+    <style>
+        .gsc-control-cse {padding:0 !important;margin-top:1em}
+        body.gsc-overflow-hidden #sidebar {overflow: visible;}
+    </style>
+  % endif
+
   % if latex_math:
-    <script async src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS_CHTML'></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+  % endif
+
+  % if syntax_highlighting:
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+    <script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
   % endif
 
   <%include file="head.mako"/>
@@ -391,11 +436,6 @@
     <%include file="credits.mako"/>
     <p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> ${pdoc.__version__}</a>.</p>
 </footer>
-
-% if syntax_highlighting:
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-    <script>hljs.initHighlightingOnLoad()</script>
-% endif
 
 % if http_server and module:  ## Auto-reload on file change in dev mode
     <script>

@@ -60,4 +60,4 @@ If you're new to proposing changes on GitHub, help yourself to an
 See [NumPy's development workflow] for inspiration.
 
 [appropriate guide]: https://gist.github.com/Chaser324/ce0505fbed06b947d962
-[NumPy's development workflow]: https://docs.scipy.org/doc/numpy/dev/gitwash/development_workflow.html
+[NumPy's development workflow]: https://numpy.org/doc/stable/dev/development_workflow.html

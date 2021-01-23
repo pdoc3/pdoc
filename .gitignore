@@ -7,8 +7,9 @@ build
 pdoc/_version.py
 
 venv
+.venv
 htmlcov
 .coverage
 .*_cache/*
 
-*.html
+html/*

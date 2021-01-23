@@ -15,14 +15,19 @@
     <%
         returns = show_type_annotations and func.return_annotation() or ''
         if returns:
-            returns = ' -> ' + returns
+            returns = ' \N{non-breaking hyphen}> ' + returns
     %>
 `${func.name}(${", ".join(func.params(annotate=show_type_annotations))})${returns}`
 ${func.docstring | deflist}
 </%def>
 
 <%def name="variable(var)" buffered="True">
-`${var.name}`
+    <%
+        annot = show_type_annotations and var.type_annotation() or ''
+        if annot:
+            annot = ': ' + annot
+    %>
+`${var.name}${annot}`
 ${var.docstring | deflist}
 </%def>
 
@@ -84,9 +89,9 @@ ${function(m) | indent}
 ## Start the output logic for an entire module.
 
 <%
-  variables = module.variables()
-  classes = module.classes()
-  functions = module.functions()
+  variables = module.variables(sort=sort_identifiers)
+  classes = module.classes(sort=sort_identifiers)
+  functions = module.functions(sort=sort_identifiers)
   submodules = module.submodules()
   heading = 'Namespace' if module.is_namespace else 'Module'
 %>

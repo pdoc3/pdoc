@@ -12,17 +12,24 @@ variables is found by examining objects' abstract syntax trees.
 [docstrings]: https://docs.python.org/3/glossary.html#term-docstring
 
 [^execution]:
-    Documented modules are executed in order to provide `__doc__`
-    attributes. Any non-fenced global code in imported modules will
-    affect the current environment.
+    Documented modules are _executed_ in order to provide `__doc__`
+    attributes. Any [non-fenced] global code in imported modules will
+    _affect the current runtime environment_.
+
+[non-fenced]: https://stackoverflow.com/questions/19578308/what-is-the-benefit-of-using-main-method-in-python/19578335#19578335
 
 
 What objects are documented?
 ----------------------------
+[public-private]: #what-objects-are-documented
 `pdoc` only extracts _public API_ documentation.[^public]
-All objects (modules, functions, classes, variables) are only
-considered public if their _identifiers don't begin with an
-underscore_ ( \_ ).[^private]
+Code objects (modules, variables, functions, classes, methods) are considered
+public in the modules where they are defined (vs. imported from somewhere else)
+as long as their _identifiers don't begin with an underscore_ ( \_ ).[^private]
+If a module defines [`__all__`][__all__], then only the identifiers contained
+in this list are considered public, regardless of where they were defined.
+
+This can be fine-tuned through [`__pdoc__` dict][__pdoc__].
 
 [^public]:
     Here, public API refers to the API that is made available
@@ -36,17 +43,7 @@ underscore_ ( \_ ).[^private]
 
 [a common convention]: https://docs.python.org/3/tutorial/classes.html#private-variables
 
-In addition, if a module defines [`__all__`][__all__], then only
-the identifiers contained in this list will be considered public.
-Otherwise, a module's global identifiers are considered public
-only if they don't begin with an underscore and are defined
-in this exact module (i.e. not imported from somewhere else).
-
 [__all__]: https://docs.python.org/3/tutorial/modules.html#importing-from-a-package
-
-By transitivity, sub-objects of non-public objects
-(e.g. submodules of non-public modules, methods of non-public classes etc.)
-are not public and thus not documented.
 
 
 Where does `pdoc` get documentation from?
@@ -78,6 +75,7 @@ by introducing syntax for docstrings for variables.
 
 
 ### Docstrings inheritance
+[docstrings inheritance]: #docstrings-inheritance
 
 `pdoc` considers methods' docstrings inherited from superclass methods',
 following the normal class inheritance patterns.
@@ -99,33 +97,36 @@ Consider the following code example:
 
 In Python, the docstring for `B.test` doesn't exist, even though a
 docstring was defined for `A.test`.
-When `pdoc` generates documentation for the code such as above,
+Contrary, when `pdoc` generates documentation for code such as above,
 it will automatically attach the docstring for `A.test` to
-`B.test` if `B.test` does not define its own docstring.
+`B.test` if the latter doesn't define its own.
 In the default HTML template, such inherited docstrings are greyed out.
 
 
 ### Docstrings for variables
+[variable docstrings]: #docstrings-for-variables
 
 Python by itself [doesn't allow docstrings attached to variables][PEP-224].
-However, `pdoc` supports docstrings attached to module (or global)
-variables, class variables, and object instance variables; all in
-the same way as proposed in [PEP-224], with a docstring following the
-variable assignment.
+However, `pdoc` supports documenting module (or global)
+variables, class variables, and object instance variables via
+two different mechanisms: [PEP-224] and `#:` doc-comments.
+
 For example:
 
 [PEP-224]: http://www.python.org/dev/peps/pep-0224
 
     module_variable = 1
-    """Docstring for module_variable."""
+    """PEP 224 docstring for module_variable."""
 
     class C:
-        class_variable = 2
-        """Docstring for class_variable."""
+        #: Documentation comment for class_variable
+        #: spanning over three lines.
+        class_variable = 2  #: Assignment line is included.
 
         def __init__(self):
+            #: Instance variable's doc-comment
             self.variable = 3
-            """Docstring for instance variable."""
+            """But note, PEP 224 docstrings take precedence."""
 
 While the resulting variables have no `__doc__` attribute,
 `pdoc` compensates by reading the source code (when available)
@@ -133,28 +134,32 @@ and parsing the syntax tree.
 
 By convention, variables defined in a class' `__init__` method
 and attached to `self` are considered and documented as
-instance variables.
+_instance_ variables.
 
-Class and instance variables can also [inherit docstrings].
-
-[inherit docstrings]: #docstrings-inheritance
+Class and instance variables can also [inherit docstrings][docstrings inheritance].
 
 
 Overriding docstrings with `__pdoc__`
 -------------------------------------
-Docstrings for objects can be disabled or overridden with a special
+[__pdoc__]: #overriding-docstrings-with-__pdoc__
+Docstrings for objects can be disabled, overridden, or whitelisted with a special
 module-level dictionary `__pdoc__`. The _keys_
 should be string identifiers within the scope of the module or,
 alternatively, fully-qualified reference names. E.g. for instance
 variable `self.variable` of class `C`, its module-level identifier is
-`'C.variable'`.
+`'C.variable'`, and `some_package.module.C.variable` its refname.
 
 If `__pdoc__[key] = False`, then `key` (and its members) will be
 **excluded from the documentation** of the module.
 
-Alternatively, the _values_ of `__pdoc__` should be the overriding docstrings.
-This particular feature is useful when there's no feasible way of
-attaching a docstring to something. A good example of this is a
+Conversely, if `__pdoc__[key] = True`, then `key` (and its public members) will be
+**included in the documentation** of the module. This can be used to
+include documentation of [private objects][public-private],
+including special functions such as `__call__`, which are ignored by default.
+
+Alternatively, the _values_ of `__pdoc__` can be the **overriding docstrings**.
+This feature is useful when there's no feasible way of
+attaching a docstring to something. A good example is a
 [namedtuple](https://docs.python.org/3/library/collections.html#collections.namedtuple):
 
     __pdoc__ = {}
@@ -175,11 +180,12 @@ attaching a docstring to something. A good example of this is a
 
 Supported docstring formats
 ---------------------------
+[docstring-formats]: #supported-docstring-formats
 Currently, pure Markdown (with [extensions]), [numpydoc],
 and [Google-style] docstrings formats are supported,
 along with some [reST directives].
 
-Additionally, if `latex_math` [template config] option is enabled,
+Additionally, if `latex_math` [template config][custom templates] option is enabled,
 LaTeX math syntax is supported when placed between
 [recognized delimiters]: `\(...\)` for inline equations and
 `\[...\]` or `$$...$$` for block equations. Note, you need to escape
@@ -190,17 +196,17 @@ or, alternatively, use [raw string literals].
 [extensions]: https://python-markdown.github.io/extensions/#officially-supported-extensions
 [numpydoc]: https://numpydoc.readthedocs.io/
 [Google-style]: http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
-[reST directives]: #supported-rest-directives
-[template config]: #custom-templates
-[recognized delimiters]: http://docs.mathjax.org/en/latest/tex.html#tex-and-latex-math-delimiters
+[recognized delimiters]: https://docs.mathjax.org/en/latest/input/tex/delimiters.html
 [raw string literals]: https://www.journaldev.com/23598/python-raw-string
 
 
 ### Supported reST directives
+[reST directives]: #supported-rest-directives
 
 The following reST directives should work:
 
-* specific and generic [admonitions],
+* specific and generic [admonitions] (attention, caution, danger,
+  error, hint, important, note, tip, warning, admonition),
 * [`.. image::`][image] or `.. figure::` (without options),
 * [`.. include::`][include], with support for the options:
   `:start-line:`, `:end-line:`, `:start-after:` and `:end-before:`.
@@ -218,12 +224,15 @@ The following reST directives should work:
 
 Linking to other identifiers
 ----------------------------
+[cross-linking]: #linking-to-other-identifiers
 In your documentation, you may refer to other identifiers in
 your modules. When exporting to HTML, linking is automatically
 done whenever you surround an identifier with [backticks] ( \` ).
-The identifier name must be fully qualified, for example
+Unless within the current module,
+the identifier name must be fully qualified, for example
 <code>\`pdoc.Doc.docstring\`</code> is correct (and will link to
-`pdoc.Doc.docstring`) while <code>\`Doc.docstring\`</code> is _not_.
+`pdoc.Doc.docstring`) while <code>\`Doc.docstring\`</code>
+only works within `pdoc` module.
 
 [backticks]: https://en.wikipedia.org/wiki/Grave_accent#Use_in_programming
 
@@ -238,6 +247,13 @@ in subdirectory 'build' of the current directory, using the default
 HTML template, run:
 
     $ pdoc --html --output-dir build my_package
+
+If you want to omit the source code preview, run:
+
+    $ pdoc --html --config show_source_code=False my_package
+
+Find additional template configuration tunables in [custom templates]
+section below.
 
 To run a local HTTP server while developing your package or writing
 docstrings for it, run:
@@ -256,6 +272,10 @@ variable [`PYTHONWARNINGS`][PYTHONWARNINGS] before running pdoc:
 For brief usage instructions, type:
 
     $ pdoc --help
+
+Even more usage examples can be found in the [FAQ].
+
+[FAQ]: https://github.com/pdoc3/pdoc/issues?q=is%3Aissue+label%3Aquestion
 
 
 Programmatic usage
@@ -299,6 +319,7 @@ Alternatively, use the [runnable script][cmd] included with this package.
 
 Custom templates
 ----------------
+[custom templates]: #custom-templates
 To override the built-in HTML/CSS and plain text templates, copy
 the relevant templates from `pdoc/templates` directory into a directory
 of your choosing and edit them. When you run [pdoc command][cmd]
@@ -332,10 +353,10 @@ modified templates into the `directories` list of the
 
 Compatibility
 -------------
-`pdoc` requires Python 3.5+.
+`pdoc` requires Python 3.6+.
 The last version to support Python 2.x is [pdoc3 0.3.x].
 
-[pdoc3 0.3.x]: https://pypi.org/project/pdoc3/0.3.11/
+[pdoc3 0.3.x]: https://pypi.org/project/pdoc3/0.3.13/
 
 
 Contributing

@@ -1,3 +1,138 @@
+0.9.2  (2020-11-25)
+=====
+  - Stop touching objects blacklisted with `__pdoc__`.
+  - Use last `__init__` to document class signature (e.g. in case of
+    `@typing.overload`).
+  - Better formatting of `nptyping` and `typing.NewType` annotations.
+  - Fix minor lunr search bugs from the previous version.
+
+0.9.1  (2020-09-28)
+=====
+  - Fix circular imports and generally handling of typing annotations when
+    they are unresolvable (regression since 0.9.0).
+
+0.9.0  (2020-08-27)
+=====
+  - New offline search function using Lunr.js (see `lunr_config` config tunable).
+  - Correctly enumerate members of `Enum` and typed-only namespaces.
+  - Inspect `__init__` to obtain true/overridden class instantiation parameters.
+  - Bump Highlight.js and use its 'python-repl' annotation for doctests.
+
+0.8.5  (2020-08-27)
+=====
+  - Fix installation issue on non-UTF-8 platforms.
+  - Fix working with 'develop' installations in virtual environments.
+
+0.8.4  (2020-06-30)
+=====
+  - Fix inline code interpretation inside fenced code blocks.
+
+0.8.3  (2020-06-27)
+=====
+  - Fix extracting TOC with interleaved doctests in fenced code blocks,
+    regression since 0.8.2.
+
+0.8.2  (2020-06-26)
+=====
+  - Enhancements:
+    - New CLI switch `--skip-errors` for skipping invalid/broken modules with
+      a warning instead of raising an error.
+    - CSS tweak to highlight :target-ed section.
+    - Paths to generated files (with `--output-dir`) are now printed to stdout.
+    - Support for `__docformat__` from PEP 258.
+    - Support for Python 3.8 positional-only arguments.
+  - Bugfixes:
+    - Better handle raw URLs and some markdown links.
+    - Consistently use `sort_identifiers` and variable type annotations in
+      markdown and PDF templates.
+    - Don't warn about missing key for `__pdoc__`-skipped submodules.
+    - Fix git path comparison and normalize `.. include::` paths on Windos.
+    - Fix sidebar scrollbar visible thrugh search results overlay.
+    - Avoid extracting doctest comments into HTML sidebar TOC.
+    - Support Google-style docstring multi-line Returns statement containing
+      description only.
+    - Support hyphens in Google-style docstring argument types.
+    - Fix hyperlinks for type annotations with spaces.
+  - Other:
+    - Bump HTML template CDN resources.
+    - Use non-breaking hyphen in return annotation arrow.
+    - Multi-line func/class signature in PDF template.
+    - Other minor docs improvements.
+
+0.8.1  (2020-04-16)
+=====
+  - New search widget (config tunable `search_query`) using Google CSE.
+  - Support type annotations for variables (third time's the charm).
+  - Fix crash on `Module.is_namespace` given a dyunamic/generated module.
+
+0.8.0  (2020-04-15)
+=====
+  - New features:
+    - Whitelisting `_private` members with `__pdoc__[key] = True`.
+    - Support function signatures (and annotations) for Python built-in/C extension types.
+    - Show type annotations also for variables (some; no instance variables).
+    - Consult `__docformat__` variable in the documented module (PEP 258).
+    - Skip traversal of `__pdoc__`-ignored package/directory.
+    - HTML sidebar (index) now has a separate scrollbar.
+  - Changes:
+    - Improved reference linking in more complex type expressions.
+    - `show_type_annotations` config tunable is now set by default.
+  - Fixes:
+    - Fix crash when some `class.__module__` is None.
+    - Avoid URL manipulation inside code blocks.
+    - Improved doctests and googledoc docformat.
+
+0.7.5  (2020-02-27)
+=====
+  - Fix docstrings for class variables inherited from object/builtins values.
+  - Fix: In HTML output, never link function parameter names to
+    outer-scope identifiers.
+  - Fix regression with relative directory paths introduced in 0.7.3.
+
+0.7.4  (2020-01-17)
+=====
+  - Fix regression introduced in 0.7.0: Hide private instance variables even
+    when they have PEP 224 docstrings.
+
+0.7.3  (2020-01-17)
+=====
+  - Sort subclasses for cross-platform consistency.
+  - Support brace-expanded parameters in docstrings (e.g. `{x,y}_partial`).
+  - Fixes:
+    - Document compiled/bytecode modules.
+    - Fix exception when `__pdoc__`-hiding docstrings for inherited members.
+    - Determine class instantiation parameters by reading the signature
+      of class itself, not of its `__init__`.
+    - Prevent trailing single quote in string (i.e. forward-declared)
+      type annotations.
+    - Fix backtick references following fenced code blocks.
+    - Allow wrapped lines in "See Also" numpydoc section.
+
+0.7.2  (2019-11-13)
+=====
+  - Fix regression bug introduced in v0.7.1.
+
+0.7.1  (2019-10-03)
+=====
+  - Fix regression bug introduced with HTML-escaping function parameters
+    default values in v0.6.4.
+
+0.7.0  (2019-09-26)
+=====
+  - Better handling of descriptors.
+  - "Browse git" link pointing to e.g. GitHub added to documented identifiers
+    in HTML template. Controlled with new `git_link_template` config tunable.
+
+0.6.4  (2019-09-26)
+=====
+  - New template tunable `syntax_highlighting=True` that controls whether
+    Highlight.js is included even if `show_source_code=False`.
+  - Fix `pdoc.Class.mro()` for types extending types with the same name.
+  - Support initializing `pdoc.Module` from module string.
+  - HTML-escape function parameter defaults so that objects' reprs don't
+    break HTML.
+  - Other small bug fixes.
+
 0.6.3  (2019-07-03)
 =====
   - New support for LaTeX math syntax (using new config tunable `latex_math=True`).

@@ -3,9 +3,11 @@
 pdoc
 ====
 
-[![Build Status](https://img.shields.io/travis/pdoc3/pdoc.svg?style=for-the-badge)](https://travis-ci.org/pdoc3/pdoc)
+[![Build Status](https://img.shields.io/github/workflow/status/pdoc3/pdoc/CI?style=for-the-badge)](https://github.com/pdoc3/pdoc/actions)
 [![Code Coverage](https://img.shields.io/codecov/c/gh/pdoc3/pdoc.svg?style=for-the-badge)](https://codecov.io/gh/pdoc3/pdoc)
-[![pdoc3 on PyPI](https://img.shields.io/pypi/v/pdoc3.svg?style=for-the-badge)](https://pypi.org/project/pdoc3)
+[![pdoc3 on PyPI](https://img.shields.io/pypi/v/pdoc3.svg?color=blue&style=for-the-badge)](https://pypi.org/project/pdoc3)
+[![package downloads](https://img.shields.io/pypi/dm/pdoc3.svg?color=skyblue&style=for-the-badge)](https://pypi.org/project/pdoc3)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/kernc?color=pink&style=for-the-badge)](https://github.com/sponsors/kernc)
 
 Auto-generate API documentation for Python projects.
 
@@ -36,15 +38,33 @@ Features
 --------
 * Simple usage. Generate sensible API (+ prose) documentation without any
   special configuration.
-* Support for common docstrings formats (Markdown, numpydoc, Google-style docstrings),
-  LaTeX math, and some reST directives.
-* Support for PEP 484 type annotations.
-* pdoc respects `__all__` when present.
-* Inheritance used as applicable for inferring docstrings for class members.
-* Support for documenting module, class, and instance variables by traversing ASTs.
-* Automatic cross-linking of referenced identifiers in HTML and PDF.
-* Overriding docstrings with special module-level `__pdoc__` dictionary.
-* Built-in development web server for near-instant preview of rendered docstrings.
+* Support for common [docstrings formats] (Markdown, numpydoc, Google-style docstrings),
+  LaTeX math, and some [reST directives].
+* Support for [PEP 484] and [PEP 526] type annotations.
+* pdoc respects [`__all__`] when present.
+* Docstrings for overridden class members are [inherited] if unspecified.
+* Support for documenting module, class, and instance [_variables_] by traversing ASTs.
+* Automatic [cross-linking] of referenced identifiers.
+* Overriding docstrings generation with special module-level [`__pdoc__` dictionary].
+* Easily extended and [customized templates].
+* Built-in [development web server] for near-instant preview of rendered docstrings.
 
 The above features are explained in more detail in pdoc's [documentation]
-(which was generated with pdoc).
+(generated with pdoc).
+
+[docstrings formats]: https://pdoc3.github.io/pdoc/doc/pdoc/#supported-docstring-formats
+[reST directives]: https://pdoc3.github.io/pdoc/doc/pdoc/#supported-rest-directives
+[PEP 484]: https://www.python.org/dev/peps/pep-0484/
+[PEP 526]: https://www.python.org/dev/peps/pep-0526/
+[`__all__`]: https://pdoc3.github.io/pdoc/doc/pdoc/#what-objects-are-documented
+[inherited]: https://pdoc3.github.io/pdoc/doc/pdoc/#docstrings-inheritance
+[_variables_]: https://pdoc3.github.io/pdoc/doc/pdoc/#docstrings-for-variables
+[cross-linking]: https://pdoc3.github.io/pdoc/doc/pdoc/#linking-to-other-identifiers
+[`__pdoc__` dictionary]: https://pdoc3.github.io/pdoc/doc/pdoc/#overriding-docstrings-with-__pdoc__
+[customized templates]: https://pdoc3.github.io/pdoc/doc/pdoc/#custom-templates
+[development web server]: https://pdoc3.github.io/pdoc/doc/pdoc/#command-line-interface
+
+
+Development
+-----------
+Check [CONTRIBUTING.md](CONTRIBUTING.md) for hacking details.

@@ -2,15 +2,19 @@
 """pdoc's CLI interface and helper functions."""
 
 import argparse
+import ast
 import importlib
 import inspect
 import os
 import os.path as path
+import json
 import re
 import sys
 import warnings
+from contextlib import contextmanager
+from functools import lru_cache
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from typing import Sequence
+from typing import Dict, List, Sequence
 from warnings import warn
 
 import pdoc
@@ -130,8 +134,8 @@ DEFAULT_HOST, DEFAULT_PORT = 'localhost', 8080
 def _check_host_port(s):
     if s and ':' not in s:
         raise argparse.ArgumentTypeError(
-            "'{}' doesn't match '[HOST]:[PORT]'. "
-            "Specify `--http :` to use default hostname and port.".format(s))
+            f"'{s}' doesn't match '[HOST]:[PORT]'. "
+            "Specify `--http :` to use default hostname and port.")
     return s
 
 
@@ -142,13 +146,18 @@ aa(
     metavar='HOST:PORT',
     help="When set, pdoc will run as an HTTP server providing documentation "
          "for specified modules. If you just want to use the default hostname "
-         "and port ({}:{}), set the parameter to :.".format(DEFAULT_HOST, DEFAULT_PORT),
+         f"and port ({DEFAULT_HOST}:{DEFAULT_PORT}), set the parameter to :.",
+)
+aa(
+    "--skip-errors",
+    action="store_true",
+    help="Upon unimportable modules, warn instead of raising."
 )
 
 args = argparse.Namespace()
 
 
-class WebDoc(BaseHTTPRequestHandler):
+class _WebDoc(BaseHTTPRequestHandler):
     args = None  # Set before server instantiated
     template_config = None
 
@@ -208,14 +217,14 @@ class WebDoc(BaseHTTPRequestHandler):
             import_path = self.path[:-4].lstrip("/")
             resolved = self.resolve_ext(import_path)
             if resolved is None:  # Try to generate the HTML...
-                print("Generating HTML for %s on the fly..." % import_path, file=sys.stderr)
+                print(f"Generating HTML for {import_path} on the fly...", file=sys.stderr)
                 try:
                     out = pdoc.html(import_path.split(".")[0], **self.template_config)
                 except Exception as e:
-                    print('Error generating docs: {}'.format(e), file=sys.stderr)
+                    print(f'Error generating docs: {e}', file=sys.stderr)
                     # All hope is lost.
                     code = 404
-                    out = "External identifier <code>%s</code> not found." % import_path
+                    out = f"External identifier <code>{import_path}</code> not found."
             else:
                 return self.redirect(resolved)
         # Redirect '/pdoc' to '/pdoc/' so that relative links work
@@ -228,9 +237,16 @@ class WebDoc(BaseHTTPRequestHandler):
         else:
             try:
                 out = self.html()
-            except ImportError:
+            except Exception:
+                import traceback
+                from html import escape
                 code = 404
-                out = "Module <code>%s</code> not found." % self.import_path_from_req_url
+                out = (
+                    "Error importing module "
+                    f"<code>{self.import_path_from_req_url}</code>:\n\n"
+                    f"<pre>{escape(traceback.format_exc())}</pre>"
+                )
+                out = out.replace('\n', '<br>')
 
         self.send_response(code)
         self.send_header("Content-type", "text/html; charset=utf-8")
@@ -254,6 +270,7 @@ class WebDoc(BaseHTTPRequestHandler):
         """
         return pdoc.html(self.import_path_from_req_url,
                          reload=True, http_server=True, external_links=True,
+                         skip_errors=self.args.skip_errors,
                          **self.template_config)
 
     def resolve_ext(self, import_path):
@@ -273,7 +290,7 @@ class WebDoc(BaseHTTPRequestHandler):
             p = path.join(*parts[0:i])
             realp = exists(p)
             if realp is not None:
-                return "/%s#%s" % (realp.lstrip("/"), import_path)
+                return f"/{realp.lstrip('/')}#{import_path}"
         return None
 
     @property
@@ -311,29 +328,36 @@ def _quit_if_module_exists(m: pdoc.Module, ext: str):
         _quit_if_file_exists(pth)
 
 
-def write_files(m: pdoc.Module, ext: str, **kwargs):
-    assert ext in ('.html', '.md')
-    f = module_path(m, ext=ext)
-
-    dirpath = path.dirname(f)
-    if not os.access(dirpath, os.R_OK):
-        os.makedirs(dirpath)
-
+@contextmanager
+def _open_write_file(filename):
     try:
-        with open(f, 'w+', encoding='utf-8') as w:
-            if ext == '.html':
-                w.write(m.html(**kwargs))
-            elif ext == '.md':
-                w.write(m.text(**kwargs))
+        with open(filename, 'w', encoding='utf-8') as f:
+            yield f
+            print(filename)  # print created file path to stdout
     except Exception:
         try:
-            os.unlink(f)
+            os.unlink(filename)
         except Exception:
             pass
         raise
 
+
+def recursive_write_files(m: pdoc.Module, ext: str, **kwargs):
+    assert ext in ('.html', '.md')
+    filepath = module_path(m, ext=ext)
+
+    dirpath = path.dirname(filepath)
+    if not os.access(dirpath, os.R_OK):
+        os.makedirs(dirpath)
+
+    with _open_write_file(filepath) as f:
+        if ext == '.html':
+            f.write(m.html(**kwargs))
+        elif ext == '.md':
+            f.write(m.text(**kwargs))
+
     for submodule in m.submodules():
-        write_files(submodule, ext=ext, **kwargs)
+        recursive_write_files(submodule, ext=ext, **kwargs)
 
 
 def _flatten_submodules(modules: Sequence[pdoc.Module]):
@@ -343,19 +367,73 @@ def _flatten_submodules(modules: Sequence[pdoc.Module]):
             yield from _flatten_submodules((submodule,))
 
 
-def print_pdf(modules, **kwargs):
+def _print_pdf(modules, **kwargs):
     modules = list(_flatten_submodules(modules))
     print(pdoc._render_template('/pdf.mako', modules=modules, **kwargs))
 
 
 def _warn_deprecated(option, alternative='', use_config_mako=False):
-    msg = 'Program option `{}` is deprecated.'.format(option)
+    msg = f'Program option `{option}` is deprecated.'
     if alternative:
         msg += ' Use `' + alternative + '`'
         if use_config_mako:
             msg += ' or override config.mako template'
         msg += '.'
     warn(msg, DeprecationWarning, stacklevel=2)
+
+
+def _generate_lunr_search(modules: List[pdoc.Module],
+                          index_docstrings: bool,
+                          template_config: dict):
+    """Generate index.js for search"""
+
+    def trim_docstring(docstring):
+        return re.sub(r'''
+            \s+|                   # whitespace sequences
+            \s+[-=~]{3,}\s+|       # title underlines
+            ^[ \t]*[`~]{3,}\w*$|   # code blocks
+            \s*[`#*]+\s*|          # common markdown chars
+            \s*([^\w\d_>])\1\s*|   # sequences of punct of the same kind
+            \s*</?\w*[^>]*>\s*     # simple HTML tags
+        ''', ' ', docstring, flags=re.VERBOSE | re.MULTILINE)
+
+    def recursive_add_to_index(dobj):
+        info = {
+            'ref': dobj.refname,
+            'url': to_url_id(dobj.module),
+        }
+        if index_docstrings:
+            info['doc'] = trim_docstring(dobj.docstring)
+        if isinstance(dobj, pdoc.Function):
+            info['func'] = 1
+        index.append(info)
+        for member_dobj in getattr(dobj, 'doc', {}).values():
+            recursive_add_to_index(member_dobj)
+
+    @lru_cache()
+    def to_url_id(module):
+        url = module.url()
+        if url not in url_cache:
+            url_cache[url] = len(url_cache)
+        return url_cache[url]
+
+    index = []  # type: List[Dict]
+    url_cache = {}  # type: Dict[str, int]
+    for top_module in modules:
+        recursive_add_to_index(top_module)
+    urls = sorted(url_cache.keys(), key=url_cache.__getitem__)
+
+    main_path = args.output_dir
+    with _open_write_file(path.join(main_path, 'index.js')) as f:
+        f.write("URLS=")
+        json.dump(urls, f, indent=0, separators=(',', ':'))
+        f.write(";\nINDEX=")
+        json.dump(index, f, indent=0, separators=(',', ':'))
+
+    # Generate search.html
+    with _open_write_file(path.join(main_path, 'doc-search.html')) as f:
+        rendered_template = pdoc._render_template('/search.mako', **template_config)
+        f.write(rendered_template)
 
 
 def main(_args=None):
@@ -378,12 +456,18 @@ def main(_args=None):
         _warn_deprecated('--overwrite', '--force')
         args.force = args.overwrite
 
-    try:
-        template_config = {opt.split('=', 1)[0]: eval(opt.split('=', 1)[1], {})
-                           for opt in args.config}
-    except Exception as e:
-        raise RuntimeError('Error evaluating config values {}: {}\n'
-                           'Make sure string values are quoted?'.format(args.config, e))
+    template_config = {}
+    for config_str in args.config:
+        try:
+            key, value = config_str.split('=', 1)
+            value = ast.literal_eval(value)
+            template_config[key] = value
+        except Exception:
+            raise ValueError(
+                f'Error evaluating --config statement "{config_str}". '
+                'Make sure string values are quoted?'
+            )
+
     if args.html_no_source:
         _warn_deprecated('--html-no-source', '-c show_source_code=False', True)
         template_config['show_source_code'] = False
@@ -396,8 +480,7 @@ def main(_args=None):
 
     if args.template_dir is not None:
         if not path.isdir(args.template_dir):
-            print('Error: Template dir {!r} is not a directory'.format(args.template_dir),
-                  file=sys.stderr)
+            print(f'Error: Template dir {args.template_dir!r} is not a directory', file=sys.stderr)
             sys.exit(1)
         pdoc.tpl_lookup.directories.insert(0, args.template_dir)
 
@@ -410,23 +493,33 @@ def main(_args=None):
     except KeyError:
         pass  # pdoc was not invoked while in a virtual environment
     else:
+        from glob import glob
         from distutils.sysconfig import get_python_lib
-        sys.path.append(get_python_lib(prefix=venv_dir))
+        libdir = get_python_lib(prefix=venv_dir)
+        sys.path.append(libdir)
+        # Resolve egg-links from `setup.py develop` or `pip install -e`
+        # XXX: Welcome a more canonical approach
+        for pth in glob(path.join(libdir, '*.egg-link')):
+            try:
+                with open(pth) as f:
+                    sys.path.append(path.join(libdir, f.readline().rstrip()))
+            except IOError:
+                warn(f'Invalid egg-link in venv: {pth!r}')
 
     if args.http:
         template_config['link_prefix'] = "/"
 
         # Run the HTTP server.
-        WebDoc.args = args  # Pass params to HTTPServer xP
-        WebDoc.template_config = template_config
+        _WebDoc.args = args  # Pass params to HTTPServer xP
+        _WebDoc.template_config = template_config
 
         host, _, port = args.http.partition(':')
         host = host or DEFAULT_HOST
         port = int(port or DEFAULT_PORT)
 
-        print('Starting pdoc server on {}:{}'.format(host, port), file=sys.stderr)
-        httpd = HTTPServer((host, port), WebDoc)
-        print("pdoc server ready at http://%s:%d" % (host, port), file=sys.stderr)
+        print(f'Starting pdoc server on {host}:{port}', file=sys.stderr)
+        httpd = HTTPServer((host, port), _WebDoc)
+        print(f"pdoc server ready at http://{host}:{port}", file=sys.stderr)
 
         # Allow tests to perform `pdoc.cli._httpd.shutdown()`
         global _httpd
@@ -445,21 +538,21 @@ def main(_args=None):
                        isinstance(obj, pdoc.Class) and f in obj.doc
                        for f in _filters)
 
-    modules = [pdoc.Module(module, docfilter=docfilter)
+    modules = [pdoc.Module(module, docfilter=docfilter,
+                           skip_errors=args.skip_errors)
                for module in args.modules]
     pdoc.link_inheritance()
 
     if args.pdf:
-        print_pdf(modules, **template_config)
-        print("""
+        _print_pdf(modules, **template_config)
+        import textwrap
+        PANDOC_CMD = textwrap.indent(_PANDOC_COMMAND, '    ')
+        print(f"""
 PDF-ready markdown written to standard output.
                               ^^^^^^^^^^^^^^^
 Convert this file to PDF using e.g. Pandoc:
 
-    pandoc --metadata=title:"MyProject Documentation"             \\
-           --toc --toc-depth=4 --from=markdown+abbreviations      \\
-           --pdf-engine=xelatex --variable=mainfont:"DejaVu Sans" \\
-           --output=pdf.pdf pdf.md
+{PANDOC_CMD}
 
 or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
@@ -477,7 +570,7 @@ or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
     chromium --headless --disable-gpu --print-to-pdf=pdf.pdf pdf.html
 
-    wkhtmltopdf -s A4 --print-media-type pdf.html pdf.pdf
+    wkhtmltopdf --encoding utf8 -s A4 --print-media-type pdf.html pdf.pdf
 
 or similar, at your own discretion.""",
               file=sys.stderr)
@@ -486,10 +579,10 @@ or similar, at your own discretion.""",
     for module in modules:
         if args.html:
             _quit_if_module_exists(module, ext='.html')
-            write_files(module, ext='.html', html_index=args.html_index, **template_config)
+            recursive_write_files(module, ext='.html', html_index=args.html_index, **template_config)
         elif args.output_dir:  # Generate text files
             _quit_if_module_exists(module, ext='.md')
-            write_files(module, ext='.md', **template_config)
+            recursive_write_files(module, ext='.md', **template_config)
         else:
             sys.stdout.write(module.text(**template_config))
             # Two blank lines between two modules' texts
@@ -514,6 +607,18 @@ or similar, at your own discretion.""",
             except Exception:
                 pass
             raise
+    lunr_config = pdoc._get_config(**template_config).get('lunr_search')
+    if lunr_config is not None:
+        _generate_lunr_search(
+            modules, lunr_config.get("index_docstrings", True), template_config)
+
+
+_PANDOC_COMMAND = '''\
+pandoc --metadata=title:"MyProject Documentation"               \\
+       --from=markdown+abbreviations+tex_math_single_backslash  \\
+       --pdf-engine=xelatex --variable=mainfont:"DejaVu Sans"   \\
+       --toc --toc-depth=4 --output=pdf.pdf  pdf.md\
+'''
 
 
 if __name__ == "__main__":
