@@ -16,6 +16,7 @@ from functools import lru_cache
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Dict, List, Sequence
 from warnings import warn
+import mimetypes
 
 import pdoc
 
@@ -187,7 +188,15 @@ class _WebDoc(BaseHTTPRequestHandler):
 
         importlib.invalidate_caches()
         code = 200
-        isimage = False
+        
+        # Find out if path points to image. Mime type is None for a path that
+        # does not point to a known type.
+        mtype = mimetypes.guess_type(self.path)[0]
+        if type(mtype) is str:
+            is_image = mtype.startswith('image/')
+        else:
+            is_image = False
+
         if self.path == "/":
             modules = [pdoc.import_module(module, reload=True)
                        for module in self.args.modules]
@@ -224,16 +233,13 @@ class _WebDoc(BaseHTTPRequestHandler):
             else:
                 return self.redirect(resolved)
         # Deal with images
-        elif (self.path.endswith(".png") or
-                self.path.endswith(".jpg") or
-                self.path.endswith(".jpeg")):
+        elif is_image:
             self.send_response(200)
-            content_type = 'image/png' if self.path.endswith(".png") else 'image/jpeg'
-            self.send_header('Content-type', content_type)
+            self.send_header('Content-type', mtype)
             self.end_headers()
             with open(self.path[1:], "rb") as fout:
                 self.wfile.write(fout.read())
-            isimage = True
+        # Redirect '/pdoc' to '/pdoc/' so that relative links work
         # (results in '/pdoc/cli.html' instead of 'cli.html')
         elif not self.path.endswith(('/', '.html')):
             return self.redirect(self.path + '/')
@@ -254,7 +260,7 @@ class _WebDoc(BaseHTTPRequestHandler):
                 )
                 out = out.replace('\n', '<br>')
 
-        if not isimage:
+        if not is_image:
             self.send_response(code)
             self.send_header("Content-type", "text/html; charset=utf-8")
             self.end_headers()
