@@ -319,14 +319,10 @@ class Docformats:
 
         .. image:: https://www.debian.org/logos/openlogo-nd-100.png
 
-        Local image png format (should be a cropped Debian logo):
+        Local image:
 
         .. image:: ./images/local_logo.png
         
-        Local image jpg format (should be a cropped Debian logo):
-
-        .. image:: ./images/local_logo.jpg
- 
         .. warning::
 
             Some warning
