@@ -13,7 +13,7 @@ import sys
 import warnings
 from contextlib import contextmanager
 from functools import lru_cache
-from http.server import BaseHTTPRequestHandler, HTTPServer, SimpleHTTPRequestHandler
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 from typing import Dict, List, Sequence
 from warnings import warn
 import mimetypes
@@ -188,7 +188,7 @@ class _WebDoc(SimpleHTTPRequestHandler):
 
         importlib.invalidate_caches()
         code = 200
-        
+ 
         # Find out if path points to image. Mime type is None for a path that
         # does not point to a known type.
         mtype = mimetypes.guess_type(self.path)[0]
