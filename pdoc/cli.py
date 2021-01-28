@@ -13,7 +13,7 @@ import sys
 import warnings
 from contextlib import contextmanager
 from functools import lru_cache
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer, SimpleHTTPRequestHandler
 from typing import Dict, List, Sequence
 from warnings import warn
 import mimetypes
@@ -153,7 +153,7 @@ aa(
 args = argparse.Namespace()
 
 
-class _WebDoc(BaseHTTPRequestHandler):
+class _WebDoc(SimpleHTTPRequestHandler):
     args = None  # Set before server instantiated
     template_config = None
 
@@ -234,11 +234,7 @@ class _WebDoc(BaseHTTPRequestHandler):
                 return self.redirect(resolved)
         # Deal with images
         elif is_image:
-            self.send_response(200)
-            self.send_header('Content-type', mtype)
-            self.end_headers()
-            with open(self.path[1:], "rb") as fout:
-                self.wfile.write(fout.read())
+            return SimpleHTTPRequestHandler.do_GET(self)
         # Redirect '/pdoc' to '/pdoc/' so that relative links work
         # (results in '/pdoc/cli.html' instead of 'cli.html')
         elif not self.path.endswith(('/', '.html')):

@@ -1507,7 +1507,7 @@ Exception: something went wrong
 <p>Remote image:</p>
 <p><img alt="" src="https://www.debian.org/logos/openlogo-nd-100.png"></p>
 <p>Local image:</p>
-<p><img alt="" src="./images/local_logo.png"></p>
+<p><img alt="" src="./images/local_image.png"></p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Some warning
