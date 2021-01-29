@@ -322,7 +322,7 @@ class Docformats:
         Local image:
 
         .. image:: ./images/local_image.png
-        
+
         .. warning::
 
             Some warning
