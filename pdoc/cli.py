@@ -256,11 +256,10 @@ class _WebDoc(SimpleHTTPRequestHandler):
                 )
                 out = out.replace('\n', '<br>')
 
-        if not is_image:
-            self.send_response(code)
-            self.send_header("Content-type", "text/html; charset=utf-8")
-            self.end_headers()
-            self.echo(out)
+        self.send_response(code)
+        self.send_header("Content-type", "text/html; charset=utf-8")
+        self.end_headers()
+        self.echo(out)
 
     def redirect(self, location):
         self.send_response(302)
