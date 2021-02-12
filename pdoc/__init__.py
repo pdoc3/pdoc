@@ -1144,8 +1144,8 @@ class Class(Doc):
                          sort=True) -> List[T]:
         result = [obj for obj in _filter_type(type, self.doc)
                   if (include_inherited or not obj.inherits)
-                     and filter_func(obj)
-                     and obj.docstring != "__pdoc__dummy"]
+                  and filter_func(obj)
+                  and obj.docstring != "__pdoc__dummy"]
         return sorted(result) if sort else result
 
     def class_variables(self, include_inherited=True, sort=True) -> List['Variable']:
