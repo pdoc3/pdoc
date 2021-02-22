@@ -72,6 +72,7 @@ if os.getenv("XDG_CONFIG_HOME"):
 # If you know how to keep the warning, but skip the object creation
 # altogether, please make it happen!
 class _BLACKLISTED_DUMMY:
+    """dummy"""
     pass
 
 
@@ -703,7 +704,7 @@ class Module(Doc):
 
         for name, obj in public_objs:
             if obj is _BLACKLISTED_DUMMY:
-                self.doc[name] = Variable(name, self, '__pdoc__dummy', obj=obj)
+                self.doc[name] = Variable(name, self, 'dummy', obj=obj)
             elif _is_function(obj):
                 self.doc[name] = Function(name, self, obj)
             elif inspect.isclass(obj):
@@ -1047,7 +1048,7 @@ class Class(Doc):
         # Convert the public Python objects to documentation objects.
         for name, obj in public_objs:
             if obj is _BLACKLISTED_DUMMY:
-                self.doc[name] = Variable(name, self.module, '__pdoc__dummy', obj=obj, cls=self)
+                self.doc[name] = Variable(name, self.module, 'dummy', obj=obj, cls=self)
             elif _is_function(obj):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self)
@@ -1145,7 +1146,7 @@ class Class(Doc):
         result = [obj for obj in _filter_type(type, self.doc)
                   if (include_inherited or not obj.inherits)
                   and filter_func(obj)
-                  and obj.docstring != "__pdoc__dummy"]
+                  and obj.obj is not _BLACKLISTED_DUMMY]
         return sorted(result) if sort else result
 
     def class_variables(self, include_inherited=True, sort=True) -> List['Variable']:
