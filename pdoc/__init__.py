@@ -708,6 +708,10 @@ class Module(Doc):
                 self.doc[name] = Function(name, self, obj)
             elif inspect.isclass(obj):
                 self.doc[name] = Class(name, self, obj)
+            elif inspect.ismodule(obj):
+                self.doc[name] = Module(
+                    obj, docfilter=docfilter, supermodule=self,
+                    context=context, skip_errors=skip_errors)
             elif name in var_docstrings:
                 self.doc[name] = Variable(name, self, var_docstrings[name], obj=obj)
 
