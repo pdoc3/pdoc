@@ -708,10 +708,6 @@ class Module(Doc):
                 self.doc[name] = Function(name, self, obj)
             elif inspect.isclass(obj):
                 self.doc[name] = Class(name, self, obj)
-            elif inspect.ismodule(obj):
-                self.doc[name] = Module(
-                    obj, docfilter=docfilter, supermodule=self,
-                    context=context, skip_errors=skip_errors)
             elif name in var_docstrings:
                 self.doc[name] = Variable(name, self, var_docstrings[name], obj=obj)
 
@@ -765,6 +761,24 @@ class Module(Doc):
                 if m.is_namespace and not m.doc:
                     del self.doc[root]
                     self._context.pop(m.refname)
+        elif hasattr(self.obj, '__all__'):
+            # Python extension modules don't get recognized by `is_package` because they have no
+            # "__path__" attribute. We treat them here separately. We support submodules of
+            # extension modules only if they are explicitly exposed via the "__all__" attribute
+            # because otherwise it's hard to distinguish proper submodules from re-exports (i.e.,
+            # the function  `is_from_this_module` doesn't work on submodules).
+            for name, obj in public_objs:
+                if inspect.ismodule(obj) and not hasattr(obj, '__file__') and name not in self.doc:
+                    try:
+                        m = Module(
+                            obj, docfilter=docfilter, supermodule=self,
+                            context=self._context, skip_errors=skip_errors)
+                    except Exception as ex:
+                        if skip_errors:
+                            warn(str(ex), Module.ImportWarning)
+                            continue
+                        raise
+                    self.doc[name] = m
 
         # Apply docfilter
         if docfilter:
