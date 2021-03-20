@@ -1240,6 +1240,31 @@ class Class(Doc):
         del self._super_members
 
 
+class PdocOptional(typing.Generic[T]):
+    """
+    Dummy type functioning as a `typing.Optional[T]` but which does not
+    immediately get expanded to a `typing.Union[T, None]`.
+    """
+    pass
+
+
+def _replace_union_by_optional(annot):
+    """
+    Replaces all nodes of the form Union[T, None] and Union[None, T] by PdocOptional[T].
+    """
+    if hasattr(annot, '__args__'):
+        annot = annot.copy_with(tuple(
+            _replace_union_by_optional(arg) for arg in annot.__args__))
+    if getattr(annot, '__origin__', None) is typing.Union:
+        args = annot.__args__
+        if len(args) == 2:
+            if args[0] is type(None):
+                annot = PdocOptional[args[1]]
+            elif args[1] is type(None):
+                annot = PdocOptional[args[0]]
+    return annot
+
+
 def _formatannotation(annot):
     """
     Format annotation, properly handling NewType types
@@ -1247,6 +1272,8 @@ def _formatannotation(annot):
     >>> import typing
     >>> _formatannotation(typing.NewType('MyType', str))
     'MyType'
+    >>> _formatannotation(typing.Mapping[str, typing.Optional[int]])
+    'Mapping[str, Optional[int]]'
     """
     module = getattr(annot, '__module__', '')
     is_newtype = (getattr(annot, '__qualname__', '').startswith('NewType.') and
@@ -1255,7 +1282,12 @@ def _formatannotation(annot):
         return annot.__name__
     if module.startswith('nptyping'):  # GH-231
         return repr(annot)
-    return inspect.formatannotation(annot)
+    annot = _replace_union_by_optional(annot)
+    s = inspect.formatannotation(annot)
+    s = re.sub(r'\w+\.PdocOptional\[', r'Optional[', s)
+    s = re.sub(r'\btyping\.', r'', s)
+    s = re.sub(r'\bNoneType\b', r'None', s)
+    return s
 
 
 class Function(Doc):
@@ -1357,7 +1389,7 @@ class Function(Doc):
             s = annot
         else:
             s = _formatannotation(annot)
-            s = re.sub(r'\b(typing\.)?ForwardRef\((?P<quot>[\"\'])(?P<str>.*?)(?P=quot)\)',
+            s = re.sub(r'\bForwardRef\((?P<quot>[\"\'])(?P<str>.*?)(?P=quot)\)',
                        r'\g<str>', s)
         s = s.replace(' ', '\N{NBSP}')  # Better line breaks in html signatures
 
