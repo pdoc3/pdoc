@@ -22,9 +22,9 @@ from copy import copy
 from functools import lru_cache, reduce, partial
 from itertools import tee, groupby
 from types import ModuleType
-from typing import (
-    cast, Any, Callable, Dict, Generator, Iterable, List, Mapping, Optional, Set, Tuple,
-    Type, TypeVar, Union,
+from typing import (  # noqa: F401
+    cast, Any, Callable, Dict, Generator, Iterable, List, Mapping, NewType,
+    Optional, Set, Tuple, Type, TypeVar, Union,
 )
 from warnings import warn
 
@@ -1242,20 +1242,43 @@ class Class(Doc):
 
 def _formatannotation(annot):
     """
-    Format annotation, properly handling NewType types
+    Format typing annotation with better handling of `typing.NewType`,
+    `typing.Optional`, `nptyping.NDArray` and other types.
 
-    >>> import typing
-    >>> _formatannotation(typing.NewType('MyType', str))
+    # >>> import typing
+    >>> _formatannotation(NewType('MyType', str))
     'MyType'
+    >>> _formatannotation(Optional[Tuple[Optional[int], None]])
+    'Optional[Tuple[Optional[int], None]]'
     """
-    module = getattr(annot, '__module__', '')
-    is_newtype = (getattr(annot, '__qualname__', '').startswith('NewType.') and
-                  module == 'typing')
-    if is_newtype:
-        return annot.__name__
-    if module.startswith('nptyping'):  # GH-231
-        return repr(annot)
-    return inspect.formatannotation(annot)
+    class force_repr(str):
+        __repr__ = str.__str__
+
+    def maybe_replace_reprs(a):
+        # NoneType -> None
+        if a is type(None):  # noqa: E721
+            return force_repr('None')
+        # Union[T, None] -> Optional[T]
+        if (getattr(a, '__origin__', None) is typing.Union and
+                len(a.__args__) == 2 and
+                a.__args__[1] is type(None)):  # noqa: E721
+            t = inspect.formatannotation(maybe_replace_reprs(a.__args__[0]))
+            return force_repr(f'Optional[{t}]')
+        # typing.NewType('T', foo) -> T
+        module = getattr(a, '__module__', '')
+        if module == 'typing' and getattr(a, '__qualname__', '').startswith('NewType.'):
+            return force_repr(a.__name__)
+        # nptyping.types._ndarray.NDArray -> NDArray[(Any,), Int[64]]  # GH-231
+        if module.startswith('nptyping.'):
+            return force_repr(repr(a))
+        # Recurse into args
+        try:
+            a = a.copy_with(tuple([maybe_replace_reprs(arg) for arg in a.__args__]))
+        except Exception:
+            pass  # Not a typing._GenericAlias
+        return a
+
+    return str(inspect.formatannotation(maybe_replace_reprs(annot)))
 
 
 class Function(Doc):

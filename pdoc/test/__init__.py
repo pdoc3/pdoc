@@ -1,6 +1,7 @@
 """
 Unit tests for pdoc package.
 """
+import doctest
 import enum
 import inspect
 import os
@@ -124,6 +125,10 @@ class CliTest(unittest.TestCase):
 
     def setUp(self):
         pdoc.reset()
+
+    def test_project_doctests(self):
+        doctests = doctest.testmod(pdoc)
+        assert not doctests.failed and doctests.attempted, doctests
 
     def _basic_html_assertions(self, expected_files=PUBLIC_FILES):
         # Output directory tree layout is as expected
@@ -927,7 +932,7 @@ class ApiTest(unittest.TestCase):
 
         mod = DUMMY_PDOC_MODULE
         cls = pdoc.Class('Foobar', mod, Foobar)
-        self.assertEqual(cls.doc['prop'].type_annotation(), 'Union[int,\N{NBSP}NoneType]')
+        self.assertEqual(cls.doc['prop'].type_annotation(), 'Optional[int]')
 
     @ignore_warnings
     def test_Variable_type_annotation_py36plus(self):
