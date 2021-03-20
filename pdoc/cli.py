@@ -408,8 +408,8 @@ def _generate_lunr_search(modules: List[pdoc.Module],
             url_cache[url] = len(url_cache)
         return url_cache[url]
 
-    index = []  # type: List[Dict]
-    url_cache = {}  # type: Dict[str, int]
+    index: List[Dict] = []
+    url_cache: Dict[str, int] = {}
     for top_module in modules:
         recursive_add_to_index(top_module)
     urls = sorted(url_cache.keys(), key=url_cache.__getitem__)
