@@ -19,7 +19,7 @@ import sys
 import typing
 from contextlib import contextmanager
 from copy import copy
-from functools import lru_cache, reduce, partial
+from functools import lru_cache, reduce, partial, wraps
 from itertools import tee, groupby
 from types import ModuleType
 from typing import (  # noqa: F401
@@ -1240,12 +1240,25 @@ class Class(Doc):
         del self._super_members
 
 
+def maybe_lru_cache(func):
+    cached_func = lru_cache()(func)
+
+    @wraps(func)
+    def wrapper(*args):
+        try:
+            return cached_func(*args)
+        except TypeError:
+            return func(*args)
+
+    return wrapper
+
+
+@maybe_lru_cache
 def _formatannotation(annot):
     """
     Format typing annotation with better handling of `typing.NewType`,
     `typing.Optional`, `nptyping.NDArray` and other types.
 
-    # >>> import typing
     >>> _formatannotation(NewType('MyType', str))
     'MyType'
     >>> _formatannotation(Optional[Tuple[Optional[int], None]])
