@@ -1258,9 +1258,9 @@ def _replace_union_by_optional(annot):
     if getattr(annot, '__origin__', None) is typing.Union:
         args = annot.__args__
         if len(args) == 2:
-            if args[0] is type(None):
+            if isinstance(args[0], type(None)):
                 annot = PdocOptional[args[1]]
-            elif args[1] is type(None):
+            elif isinstance(args[1], type(None)):
                 annot = PdocOptional[args[0]]
     return annot
 
