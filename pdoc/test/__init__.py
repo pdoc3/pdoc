@@ -126,6 +126,7 @@ class CliTest(unittest.TestCase):
     def setUp(self):
         pdoc.reset()
 
+    @unittest.skipIf(sys.version_info < (3, 7), 'pdoc._formatannotation fails on Py3.6')
     def test_project_doctests(self):
         doctests = doctest.testmod(pdoc)
         assert not doctests.failed and doctests.attempted, doctests
