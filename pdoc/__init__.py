@@ -1274,8 +1274,9 @@ def _formatannotation(annot):
         # Union[T, None] -> Optional[T]
         if (getattr(a, '__origin__', None) is typing.Union and
                 len(a.__args__) == 2 and
-                a.__args__[1] is type(None)):  # noqa: E721
-            t = inspect.formatannotation(maybe_replace_reprs(a.__args__[0]))
+                type(None) in a.__args__):
+            t = inspect.formatannotation(
+                maybe_replace_reprs(next(filter(None, a.__args__))))
             return force_repr(f'Optional[{t}]')
         # typing.NewType('T', foo) -> T
         module = getattr(a, '__module__', '')
@@ -1285,10 +1286,8 @@ def _formatannotation(annot):
         if module.startswith('nptyping.'):
             return force_repr(repr(a))
         # Recurse into args
-        try:
+        if hasattr(a, 'copy_with') and hasattr(a, '__args__'):
             a = a.copy_with(tuple([maybe_replace_reprs(arg) for arg in a.__args__]))
-        except Exception:
-            pass  # Not a typing._GenericAlias
         return a
 
     return str(inspect.formatannotation(maybe_replace_reprs(annot)))
@@ -1393,7 +1392,7 @@ class Function(Doc):
             s = annot
         else:
             s = _formatannotation(annot)
-            s = re.sub(r'\b(typing\.)?ForwardRef\((?P<quot>[\"\'])(?P<str>.*?)(?P=quot)\)',
+            s = re.sub(r'\bForwardRef\((?P<quot>[\"\'])(?P<str>.*?)(?P=quot)\)',
                        r'\g<str>', s)
         s = s.replace(' ', '\N{NBSP}')  # Better line breaks in html signatures
 
