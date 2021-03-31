@@ -432,7 +432,9 @@ def main(_args=None):
     global args
     args = _args or parser.parse_args()
 
-    warnings.simplefilter("once", DeprecationWarning)
+    # If warnings not externally managed, show deprecation warnings
+    if not sys.warnoptions:
+        warnings.simplefilter("once", DeprecationWarning)
 
     if args.close_stdin:
         sys.stdin.close()
