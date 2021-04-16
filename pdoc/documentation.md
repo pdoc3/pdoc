@@ -312,7 +312,7 @@ For example:
 
 .. tip::
     To add custom properties that can be accessible from the template,
-    `pdoc.Class.obj` points to the underlying type object with which additional
+    `pdoc.Class.obj` points to the underlying `type` object with which additional
     properties can be added. `Module` and `Function` likewise.
 
 When documenting a single module, you might find
