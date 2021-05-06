@@ -581,10 +581,11 @@ or similar, at your own discretion.""",
             # Two blank lines between two modules' texts
             sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
 
-    lunr_config = pdoc._get_config(**template_config).get('lunr_search')
-    if lunr_config is not None:
-        _generate_lunr_search(
-            modules, lunr_config.get("index_docstrings", True), template_config)
+    if args.html:
+        lunr_config = pdoc._get_config(**template_config).get('lunr_search')
+        if lunr_config is not None:
+            _generate_lunr_search(
+                modules, lunr_config.get("index_docstrings", True), template_config)
 
 
 _PANDOC_COMMAND = '''\

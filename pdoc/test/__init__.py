@@ -274,6 +274,10 @@ class CliTest(unittest.TestCase):
                               file_pattern='example_pkg/module.html')
             self._check_files(include_patterns=["'../../doc-search.html#'"],
                               file_pattern='example_pkg/subpkg/index.html')
+        # Only build lunr search when --html
+        with redirect_streams() as (_, stderr):
+            run(EXAMPLE_MODULE,  config='lunr_search={"fuzziness": 1}')
+            self.assertFalse(stderr.read())
 
     def test_force(self):
         with run_html(EXAMPLE_MODULE):
