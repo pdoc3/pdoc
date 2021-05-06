@@ -680,12 +680,12 @@ class Module(Doc):
             for name in self.obj.__all__:
                 try:
                     obj = getattr(self.obj, name)
+                    if not _is_blacklisted(name, self):
+                        obj = inspect.unwrap(obj)
+                    public_objs.append((name, obj))
                 except AttributeError:
                     warn(f"Module {self.module!r} doesn't contain identifier `{name}` "
                          "exported in `__all__`")
-                if not _is_blacklisted(name, self):
-                    obj = inspect.unwrap(obj)
-                public_objs.append((name, obj))
         else:
             def is_from_this_module(obj):
                 mod = inspect.getmodule(inspect.unwrap(obj))
