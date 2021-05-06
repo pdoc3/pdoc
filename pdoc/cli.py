@@ -13,9 +13,10 @@ import sys
 import warnings
 from contextlib import contextmanager
 from functools import lru_cache
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 from typing import Dict, List, Sequence
 from warnings import warn
+import mimetypes
 
 import pdoc
 
@@ -152,7 +153,7 @@ aa(
 args = argparse.Namespace()
 
 
-class _WebDoc(BaseHTTPRequestHandler):
+class _WebDoc(SimpleHTTPRequestHandler):
     args = None  # Set before server instantiated
     template_config = None
 
@@ -187,6 +188,15 @@ class _WebDoc(BaseHTTPRequestHandler):
 
         importlib.invalidate_caches()
         code = 200
+ 
+        # Find out if path points to image. Mime type is None for a path that
+        # does not point to a known type.
+        mtype = mimetypes.guess_type(self.path)[0]
+        if type(mtype) is str:
+            is_image = mtype.startswith('image/')
+        else:
+            is_image = False
+
         if self.path == "/":
             modules = [pdoc.import_module(module, reload=True)
                        for module in self.args.modules]
@@ -222,6 +232,9 @@ class _WebDoc(BaseHTTPRequestHandler):
                     out = f"External identifier <code>{import_path}</code> not found."
             else:
                 return self.redirect(resolved)
+        # Deal with images
+        elif is_image:
+            return SimpleHTTPRequestHandler.do_GET(self)
         # Redirect '/pdoc' to '/pdoc/' so that relative links work
         # (results in '/pdoc/cli.html' instead of 'cli.html')
         elif not self.path.endswith(('/', '.html')):
