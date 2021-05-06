@@ -64,7 +64,7 @@ def chdir(path):
         os.chdir(old)
 
 
-def run(*args, _check=True, **kwargs) -> int:
+def run(*args, **kwargs) -> int:
     params = (('--' + key.replace('_', '-'), value)
               for key, value in kwargs.items())
     params = list(filter(None, chain.from_iterable(params)))  # type: ignore
@@ -278,7 +278,7 @@ class CliTest(unittest.TestCase):
     def test_force(self):
         with run_html(EXAMPLE_MODULE):
             with redirect_streams() as (stdout, stderr):
-                returncode = run(EXAMPLE_MODULE, _check=False, html=None, output_dir=os.getcwd())
+                returncode = run(EXAMPLE_MODULE, html=None, output_dir=os.getcwd())
                 self.assertNotEqual(returncode, 0)
                 self.assertNotEqual(stderr.getvalue(), '')
 
