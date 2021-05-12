@@ -33,10 +33,12 @@
     # Enable syntax highlighting for code/source blocks by including Highlight.js
     syntax_highlighting = True
 
-    # Set the style keyword such as 'atom-one-light' or 'github-gist'
+    # Set the style keywords such as 'atom-one-light' or 'github-gist'
     #     Options: https://github.com/highlightjs/highlight.js/tree/master/src/styles
     #     Demo: https://highlightjs.org/static/demo/
-    hljs_style = 'github'
+    #
+    # The first one is for "light mode" the second is for "dark mode".
+    hljs_style_tuple = ('github', 'atom-one-dark') 
 
     # If set, insert Google Analytics tracking code. Value is GA
     # tracking id (UA-XXXXXX-Y).
@@ -61,4 +63,11 @@
     # Note: in Python docstrings, either all backslashes need to be escaped (\\)
     # or you need to use raw r-strings.
     latex_math = False
+
+    # CSS Theming is done via templates and the full selection of base themes can
+    # be located in the default template directory - ../site-packages/pdoc/templates/themes/
+    # This way you can simply enter the name of the theme you wish to be used for your
+    # docs. You can also include a custom theme by filling out the `custom.mako` file and
+    # entering `custom` in the below setting.
+    css_theme = 'default'
 %>

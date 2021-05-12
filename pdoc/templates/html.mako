@@ -11,7 +11,7 @@
         return name
     url = dobj.url(relative_to=module, link_prefix=link_prefix,
                    top_ancestor=not show_inherited_members)
-    return f'<a title="{dobj.refname}" href="{url}">{name}</a>'
+    return '<a title="{}" href="{}">{}</a>'.format(dobj.refname, url, name)
 
 
   def to_html(text):
@@ -285,7 +285,16 @@
   supermodule = module.supermodule
   %>
   <nav id="sidebar">
+    <div id="dark-mode-toggle" onclick="toggleDarkMode()">
+      <svg class="dm-icon-off" viewBox="0 0 16 16">
+        <path d="M7 0h2v2H7zM12.88 1.637l1.414 1.415-1.415 1.413-1.414-1.414zM14 7h2v2h-2zM12.95 14.433l-1.415-1.414 1.414-1.414 1.415 1.413zM7 14h2v2H7zM2.98 14.363L1.566 12.95l1.415-1.414 1.414 1.415zM0 7h2v2H0zM3.05 1.707L4.465 3.12 3.05 4.535 1.636 3.121z" />
+        <path d="M8 4C5.8 4 4 5.8 4 8s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4z" />
+      </svg>
 
+      <svg class="dm-icon-on" viewBox="0 0 16 16">
+        <path d="M6,0C2.5,0.9,0,4.1,0,7.9C0,12.4,3.6,16,8.1,16c3.8,0,6.9-2.5,7.9-6C9.9,11.7,4.3,6.1,6,0z"></path>
+      </svg>
+    </div>
     <%include file="logo.mako"/>
 
     % if google_search_query:
@@ -383,13 +392,87 @@
   <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
   <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
   % if syntax_highlighting:
-    <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/${hljs_style}.min.css" crossorigin>
+    <link id="hljs" rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/${hljs_style_tuple[0]}.min.css" crossorigin>
   %endif
 
-  <%namespace name="css" file="css.mako" />
-  <style>${css.mobile()}</style>
-  <style media="screen and (min-width: 700px)">${css.desktop()}</style>
-  <style media="print">${css.print()}</style>
+
+  <%namespace name="css" file="css.mako"/>
+  <style id="css-theme">${css.load_theme()}</style>
+  <script>
+    const html = document.querySelector("html");
+    const isDarkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const changeHLJS = (style) => {
+      const hljsStyle = document.querySelector("#hljs");
+      const styleURL = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/" + style + ".min.css";
+      hljsStyle.href = styleURL;
+    }
+
+    const loadedTheme = window.localStorage.getItem("theme");
+    if (loadedTheme) {
+      html.dataset.theme = loadedTheme;
+
+      if (loadedTheme == "theme-dark") {
+        changeHLJS(`${hljs_style_tuple[1]}`);
+      } else {
+        changeHLJS(`${hljs_style_tuple[0]}`);
+      }
+    }
+
+    const onSystemThemeChange = (event) => {
+      const iconOff = document.querySelector(".dm-icon-off");
+      const iconOn = document.querySelector(".dm-icon-on");
+      if (event.matches) {
+        html.dataset.theme = "theme-dark";
+        iconOff.classList.add("hidden");
+        iconOn.classList.remove("hidden");
+        changeHLJS(`${hljs_style_tuple[1]}`);
+        window.localStorage.setItem("theme", "theme-dark");
+      } else {
+        html.dataset.theme = "theme-light";
+        iconOff.classList.remove("hidden");
+        iconOn.classList.add("hidden");
+        changeHLJS(`${hljs_style_tuple[0]}`);
+        window.localStorage.setItem("theme", "theme-light");
+      }
+    };
+
+    isDarkQuery.addEventListener("change", onSystemThemeChange);
+    window.addEventListener("DOMContentLoaded", () => {
+      const iconOff = document.querySelector(".dm-icon-off");
+      const iconOn = document.querySelector(".dm-icon-on");
+
+      if (isDarkQuery.matches || loadedTheme == "theme-dark") {
+        iconOff.classList.add("hidden");
+        iconOn.classList.remove("hidden");
+        changeHLJS(`${hljs_style_tuple[1]}`);
+      } 
+      if ((!isDarkQuery.matches || loadedTheme == "theme-light") || !loadedTheme) {
+        iconOff.classList.remove("hidden");
+        iconOn.classList.add("hidden");
+        changeHLJS(`${hljs_style_tuple[0]}`);
+      }
+    });
+
+    const toggleDarkMode = () => {
+      const iconOff = document.querySelector(".dm-icon-off");
+      const iconOn = document.querySelector(".dm-icon-on");
+
+      if (html.dataset.theme == "theme-dark") {
+        html.dataset.theme = "theme-light";
+        iconOff.classList.remove("hidden");
+        iconOn.classList.add("hidden");
+        changeHLJS(`${hljs_style_tuple[0]}`);
+        window.localStorage.setItem("theme", "theme-light");
+      } else {
+        html.dataset.theme = "theme-dark";
+        iconOff.classList.add("hidden");
+        iconOn.classList.remove("hidden");
+        changeHLJS(`${hljs_style_tuple[1]}`);
+        window.localStorage.setItem("theme", "theme-dark");
+      }
+    };
+  </script>
 
   % if google_analytics:
     <script>
@@ -434,7 +517,7 @@
 
 <footer id="footer">
     <%include file="credits.mako"/>
-    <p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> ${pdoc.__version__}</a>.</p>
+    <p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> ${pdoc.__version__}</a>.</p>
 </footer>
 
 % if http_server and module:  ## Auto-reload on file change in dev mode

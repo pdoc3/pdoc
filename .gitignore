@@ -5,6 +5,7 @@ build
 *.py[cod]
 
 pdoc/_version.py
+.python-version
 
 venv
 .venv
@@ -13,3 +14,4 @@ htmlcov
 .*_cache/*
 
 html/*
+.eggs/
