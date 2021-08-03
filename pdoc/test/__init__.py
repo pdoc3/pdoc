@@ -902,6 +902,14 @@ class ApiTest(unittest.TestCase):
             pdoc.Function('bug253', mod, bug253_newtype_annotation).params(annotate=True),
             ['a:\N{NBSP}CustomType'])
 
+        # typing.Callable bug
+        def f(a: typing.Callable):
+            return
+
+        self.assertEqual(
+            pdoc.Function('f', mod, f).params(annotate=True),
+            ['a:\N{NBSP}Callable'])
+
         # builtin callables with signatures in docstrings
         from itertools import repeat
         self.assertEqual(pdoc.Function('repeat', mod, repeat).params(), ['object', 'times'])

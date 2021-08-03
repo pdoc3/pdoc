@@ -1285,8 +1285,11 @@ def _formatannotation(annot):
         # nptyping.types._ndarray.NDArray -> NDArray[(Any,), Int[64]]  # GH-231
         if module.startswith('nptyping.'):
             return force_repr(repr(a))
-        # Recurse into args
+        # Recurse into typing.Callable/etc. args
         if hasattr(a, 'copy_with') and hasattr(a, '__args__'):
+            if a is typing.Callable:
+                # Bug on Python < 3.9, https://bugs.python.org/issue42195
+                return a
             a = a.copy_with(tuple([maybe_replace_reprs(arg) for arg in a.__args__]))
         return a
 
