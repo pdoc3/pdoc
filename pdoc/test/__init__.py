@@ -232,7 +232,7 @@ class CliTest(unittest.TestCase):
                 with run_html(EXAMPLE_MODULE + package, filter='A',
                               config='show_source_code=False'):
                     self._check_files(['A'], ['CONST', 'B docstring'])
-        self.assertIn('__pdoc__', cm.warning.args[0])
+        self.assertIn('Code reference `example_pkg.B`', cm.warning.args[0])
 
     def test_html_ref_links(self):
         with run_html(EXAMPLE_MODULE, config='show_source_code=False'):
@@ -589,12 +589,14 @@ class ApiTest(unittest.TestCase):
     def test__pdoc__dict(self):
         module = pdoc.import_module(EXAMPLE_MODULE)
         with patch.object(module, '__pdoc__', {'B': False}):
+            pdoc.reset()
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
             self.assertIn('A', mod.doc)
             self.assertNotIn('B', mod.doc)
 
         with patch.object(module, '__pdoc__', {'B.f': False}):
+            pdoc.reset()
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
             self.assertIn('B', mod.doc)
@@ -603,13 +605,23 @@ class ApiTest(unittest.TestCase):
 
         # GH-125: https://github.com/pdoc3/pdoc/issues/125
         with patch.object(module, '__pdoc__', {'B.inherited': False}):
+            pdoc.reset()
             mod = pdoc.Module(module)
             pdoc.link_inheritance()
             self.assertNotIn('inherited', mod.doc['B'].doc)
 
+        # Ensure "overridden key doesn't exist" warning is raised
+        with patch.object(module, '__pdoc__', {'xxx': False}):
+            pdoc.reset()
+            mod = pdoc.Module(module)
+            with self.assertWarns(UserWarning) as cm:
+                pdoc.link_inheritance()
+            self.assertIn("'xxx' does not exist", cm.warning.args[0])
+
         # GH-99: https://github.com/pdoc3/pdoc/issues/99
         module = pdoc.import_module(EXAMPLE_MODULE + '._exclude_dir')
         with patch.object(module, '__pdoc__', {'downloaded_modules': False}, create=True):
+            pdoc.reset()
             mod = pdoc.Module(module)
             # GH-206: https://github.com/pdoc3/pdoc/issues/206
             with warnings.catch_warnings(record=True) as cm:
@@ -792,10 +804,6 @@ class ApiTest(unittest.TestCase):
             pdoc.link_inheritance()
         self.assertFalse(w)
 
-        mod._is_inheritance_linked = False
-        with self.assertWarns(UserWarning):
-            pdoc.link_inheritance()
-
         # Test inheritance across modules
         pdoc.reset()
         mod = pdoc.Module(EXAMPLE_MODULE + '._test_linking')
@@ -810,7 +818,7 @@ class ApiTest(unittest.TestCase):
         self.assertNotEqual(b.inherits, a)
 
     def test_context(self):
-        context = {}
+        context = pdoc.Context()
         pdoc.Module(pdoc, context=context)
         self.assertIn('pdoc', context)
         self.assertIn('pdoc.cli', context)
@@ -916,7 +924,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(pdoc.Function('slice', mod, slice).params(), ['start', 'stop', 'step'])
 
         class get_sample(repeat):
-            """ get_sample(self: pdoc.int, pos: int) -> Tuple[int, float] """
+            """ get_sample(self: int, pos: int) -> Tuple[int, float] """
         self.assertEqual(pdoc.Function('get_sample', mod, get_sample).params(annotate=True),
                          ['self:\xa0int', 'pos:\xa0int'])
         self.assertEqual(pdoc.Function('get_sample', mod, get_sample).return_annotation(),

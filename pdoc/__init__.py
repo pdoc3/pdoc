@@ -66,15 +66,6 @@ if os.getenv("XDG_CONFIG_HOME"):
     tpl_lookup.directories.insert(0, path.join(os.getenv("XDG_CONFIG_HOME", ''), "pdoc"))
 
 
-# A surrogate so that the check in Module._link_inheritance()
-# "__pdoc__-overriden key {!r} does not exist" can pick the object up
-# (and not warn).
-# If you know how to keep the warning, but skip the object creation
-# altogether, please make it happen!
-class _BLACKLISTED_DUMMY:
-    pass
-
-
 class Context(dict):
     """
     The context object that maps all documented identifiers
@@ -88,6 +79,13 @@ class Context(dict):
     a global context object will be used.
     """
     __pdoc__['Context.__init__'] = False
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # A surrogate so that the check in Module._link_inheritance()
+        # "__pdoc__-overriden key {!r} does not exist" can see the object
+        # (and not warn).
+        self.blacklisted = getattr(args[0], 'blacklisted', set()) if args else set()
 
 
 _global_context = Context()
@@ -658,6 +656,8 @@ class Module(Doc):
         A lookup table for ALL doc objects of all modules that share this context,
         mainly used in `Module.find_ident()`.
         """
+        assert isinstance(self._context, Context), \
+            'pdoc.Module(context=) should be a pdoc.Context instance'
 
         self.supermodule = supermodule
         """
@@ -675,8 +675,8 @@ class Module(Doc):
         var_docstrings, _ = _pep224_docstrings(self)
 
         # Populate self.doc with this module's public members
+        public_objs = []
         if hasattr(self.obj, '__all__'):
-            public_objs = []
             for name in self.obj.__all__:
                 try:
                     obj = getattr(self.obj, name)
@@ -691,20 +691,25 @@ class Module(Doc):
                 mod = inspect.getmodule(inspect.unwrap(obj))
                 return mod is None or mod.__name__ == self.obj.__name__
 
-            public_objs = [(name, (_BLACKLISTED_DUMMY
-                                   if _is_blacklisted(name, self) else
-                                   inspect.unwrap(obj)))
-                           for name, obj in inspect.getmembers(self.obj)
-                           if ((_is_public(name) or _is_whitelisted(name, self)) and
-                               (_is_blacklisted(name, self) or  # skips unwrapping that follows
-                                is_from_this_module(obj) or name in var_docstrings))]
+            for name, obj in inspect.getmembers(self.obj):
+                if ((_is_public(name) or
+                     _is_whitelisted(name, self)) and
+                        (_is_blacklisted(name, self) or  # skips unwrapping that follows
+                         is_from_this_module(obj) or
+                         name in var_docstrings)):
+
+                    if _is_blacklisted(name, self):
+                        self._context.blacklisted.add(f'{self.refname}.{name}')
+                        continue
+
+                    obj = inspect.unwrap(obj)
+                    public_objs.append((name, obj))
+
             index = list(self.obj.__dict__).index
             public_objs.sort(key=lambda i: index(i[0]))
 
         for name, obj in public_objs:
-            if obj is _BLACKLISTED_DUMMY:
-                self.doc[name] = Variable(name, self, 'dummy', obj=obj)
-            elif _is_function(obj):
+            if _is_function(obj):
                 self.doc[name] = Function(name, self, obj)
             elif inspect.isclass(obj):
                 self.doc[name] = Class(name, self, obj)
@@ -819,7 +824,9 @@ class Module(Doc):
                     continue
 
                 if (not name.endswith('.__init__') and
-                        name not in self.doc and refname not in self._context):
+                        name not in self.doc and
+                        refname not in self._context and
+                        refname not in self._context.blacklisted):
                     warn(f'__pdoc__-overriden key {name!r} does not exist '
                          f'in module {self.name!r}')
 
@@ -1018,14 +1025,21 @@ class Class(Doc):
         # Use only own, non-inherited annotations (the rest will be inherited)
         annotations = getattr(self.obj, '__annotations__', {})
 
-        public_objs = [(_name, (_BLACKLISTED_DUMMY
-                                if _is_blacklisted(_name, self) else
-                                inspect.unwrap(obj)))
-                       for _name, obj in _getmembers_all(self.obj)
-                       # Filter only *own* members. The rest are inherited
-                       # in Class._fill_inheritance()
-                       if (_name in self.obj.__dict__ or _name in annotations)
-                       and (_is_public(_name) or _is_whitelisted(_name, self))]
+        public_objs = []
+        for _name, obj in _getmembers_all(self.obj):
+            # Filter only *own* members. The rest are inherited
+            # in Class._fill_inheritance()
+            if ((_name in self.obj.__dict__ or
+                 _name in annotations) and
+                    (_is_public(_name) or
+                     _is_whitelisted(_name, self))):
+
+                if _is_blacklisted(_name, self):
+                    self.module._context.blacklisted.add(f'{self.refname}.{_name}')
+                    continue
+
+                obj = inspect.unwrap(obj)
+                public_objs.append((_name, obj))
 
         def definition_order_index(
                 name,
@@ -1046,9 +1060,7 @@ class Class(Doc):
 
         # Convert the public Python objects to documentation objects.
         for name, obj in public_objs:
-            if obj is _BLACKLISTED_DUMMY:
-                self.doc[name] = Variable(name, self.module, 'dummy', obj=obj, cls=self)
-            elif _is_function(obj):
+            if _is_function(obj):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self)
             else:
