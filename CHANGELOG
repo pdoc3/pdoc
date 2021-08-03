@@ -1,3 +1,12 @@
+0.10.0  (2021-08-03)
+======
+  - Python 3.6+ required.
+  - New support for variable doc-comments (directly above variable definition
+    or on the same line; starting with '#:').
+  - Improved formatting of typing annotations.
+  - Respect `PYTHONWARNINGS` environment variable.
+  - Various other small bugs and fixes.
+
 0.9.2  (2020-11-25)
 =====
   - Stop touching objects blacklisted with `__pdoc__`.
