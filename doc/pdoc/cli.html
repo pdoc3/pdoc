@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.2" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>pdoc.cli API documentation</title>
 <meta name="description" content="pdoc&#39;s CLI interface and helper functions." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/cli.py#L0-L595" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/cli.py#L1-L600" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">#!/usr/bin/env python3
 &#34;&#34;&#34;pdoc&#39;s CLI interface and helper functions.&#34;&#34;&#34;
@@ -66,7 +66,7 @@ aa = parser.add_argument
 mode_aa = parser.add_mutually_exclusive_group().add_argument
 
 aa(
-    &#39;--version&#39;, action=&#39;version&#39;, version=&#39;%(prog)s &#39; + pdoc.__version__)
+    &#39;--version&#39;, action=&#39;version&#39;, version=f&#39;%(prog)s {pdoc.__version__}&#39;)
 aa(
     &#34;modules&#34;,
     type=str,
@@ -168,8 +168,8 @@ DEFAULT_HOST, DEFAULT_PORT = &#39;localhost&#39;, 8080
 def _check_host_port(s):
     if s and &#39;:&#39; not in s:
         raise argparse.ArgumentTypeError(
-            &#34;&#39;{}&#39; doesn&#39;t match &#39;[HOST]:[PORT]&#39;. &#34;
-            &#34;Specify `--http :` to use default hostname and port.&#34;.format(s))
+            f&#34;&#39;{s}&#39; doesn&#39;t match &#39;[HOST]:[PORT]&#39;. &#34;
+            &#34;Specify `--http :` to use default hostname and port.&#34;)
     return s
 
 
@@ -180,7 +180,7 @@ aa(
     metavar=&#39;HOST:PORT&#39;,
     help=&#34;When set, pdoc will run as an HTTP server providing documentation &#34;
          &#34;for specified modules. If you just want to use the default hostname &#34;
-         &#34;and port ({}:{}), set the parameter to :.&#34;.format(DEFAULT_HOST, DEFAULT_PORT),
+         f&#34;and port ({DEFAULT_HOST}:{DEFAULT_PORT}), set the parameter to :.&#34;,
 )
 aa(
     &#34;--skip-errors&#34;,
@@ -251,14 +251,14 @@ class _WebDoc(BaseHTTPRequestHandler):
             import_path = self.path[:-4].lstrip(&#34;/&#34;)
             resolved = self.resolve_ext(import_path)
             if resolved is None:  # Try to generate the HTML...
-                print(&#34;Generating HTML for %s on the fly...&#34; % import_path, file=sys.stderr)
+                print(f&#34;Generating HTML for {import_path} on the fly...&#34;, file=sys.stderr)
                 try:
                     out = pdoc.html(import_path.split(&#34;.&#34;)[0], **self.template_config)
                 except Exception as e:
-                    print(&#39;Error generating docs: {}&#39;.format(e), file=sys.stderr)
+                    print(f&#39;Error generating docs: {e}&#39;, file=sys.stderr)
                     # All hope is lost.
                     code = 404
-                    out = &#34;External identifier &lt;code&gt;%s&lt;/code&gt; not found.&#34; % import_path
+                    out = f&#34;External identifier &lt;code&gt;{import_path}&lt;/code&gt; not found.&#34;
             else:
                 return self.redirect(resolved)
         # Redirect &#39;/pdoc&#39; to &#39;/pdoc/&#39; so that relative links work
@@ -275,8 +275,11 @@ class _WebDoc(BaseHTTPRequestHandler):
                 import traceback
                 from html import escape
                 code = 404
-                out = &#34;Error importing module &lt;code&gt;{}&lt;/code&gt;:\n\n&lt;pre&gt;{}&lt;/pre&gt;&#34;.format(
-                    self.import_path_from_req_url, escape(traceback.format_exc()))
+                out = (
+                    &#34;Error importing module &#34;
+                    f&#34;&lt;code&gt;{self.import_path_from_req_url}&lt;/code&gt;:\n\n&#34;
+                    f&#34;&lt;pre&gt;{escape(traceback.format_exc())}&lt;/pre&gt;&#34;
+                )
                 out = out.replace(&#39;\n&#39;, &#39;&lt;br&gt;&#39;)
 
         self.send_response(code)
@@ -301,7 +304,7 @@ class _WebDoc(BaseHTTPRequestHandler):
         &#34;&#34;&#34;
         return pdoc.html(self.import_path_from_req_url,
                          reload=True, http_server=True, external_links=True,
-                         skip_errors=args.skip_errors,
+                         skip_errors=self.args.skip_errors,
                          **self.template_config)
 
     def resolve_ext(self, import_path):
@@ -321,7 +324,7 @@ class _WebDoc(BaseHTTPRequestHandler):
             p = path.join(*parts[0:i])
             realp = exists(p)
             if realp is not None:
-                return &#34;/%s#%s&#34; % (realp.lstrip(&#34;/&#34;), import_path)
+                return f&#34;/{realp.lstrip(&#39;/&#39;)}#{import_path}&#34;
         return None
 
     @property
@@ -351,8 +354,7 @@ def _quit_if_exists(m: pdoc.Module, ext: str):
 
     for pth in paths:
         if path.lexists(pth):
-            print(&#34;File &#39;%s&#39; already exists. Delete it, or run with --force&#34; % pth,
-                  file=sys.stderr)
+            print(f&#34;File &#39;{pth}&#39; already exists. Delete it, or run with --force&#34;, file=sys.stderr)
             sys.exit(1)
 
 
@@ -401,9 +403,9 @@ def _print_pdf(modules, **kwargs):
 
 
 def _warn_deprecated(option, alternative=&#39;&#39;, use_config_mako=False):
-    msg = &#39;Program option `{}` is deprecated.&#39;.format(option)
+    msg = f&#39;Program option `{option}` is deprecated.&#39;
     if alternative:
-        msg += &#39; Use `&#39; + alternative + &#39;`&#39;
+        msg += f&#39; Use `{alternative}`&#39;
         if use_config_mako:
             msg += &#39; or override config.mako template&#39;
         msg += &#39;.&#39;
@@ -445,8 +447,8 @@ def _generate_lunr_search(modules: List[pdoc.Module],
             url_cache[url] = len(url_cache)
         return url_cache[url]
 
-    index = []  # type: List[Dict]
-    url_cache = {}  # type: Dict[str, int]
+    index: List[Dict] = []
+    url_cache: Dict[str, int] = {}
     for top_module in modules:
         recursive_add_to_index(top_module)
     urls = sorted(url_cache.keys(), key=url_cache.__getitem__)
@@ -469,7 +471,9 @@ def main(_args=None):
     global args
     args = _args or parser.parse_args()
 
-    warnings.simplefilter(&#34;once&#34;, DeprecationWarning)
+    # If warnings not externally managed, show deprecation warnings
+    if not sys.warnoptions:
+        warnings.simplefilter(&#34;once&#34;, DeprecationWarning)
 
     if args.close_stdin:
         sys.stdin.close()
@@ -492,9 +496,8 @@ def main(_args=None):
             template_config[key] = value
         except Exception:
             raise ValueError(
-                &#39;Error evaluating --config statement &#34;{}&#34;. &#39;
+                f&#39;Error evaluating --config statement &#34;{config_str}&#34;. &#39;
                 &#39;Make sure string values are quoted?&#39;
-                .format(config_str)
             )
 
     if args.html_no_source:
@@ -509,8 +512,7 @@ def main(_args=None):
 
     if args.template_dir is not None:
         if not path.isdir(args.template_dir):
-            print(&#39;Error: Template dir {!r} is not a directory&#39;.format(args.template_dir),
-                  file=sys.stderr)
+            print(f&#39;Error: Template dir {args.template_dir!r} is not a directory&#39;, file=sys.stderr)
             sys.exit(1)
         pdoc.tpl_lookup.directories.insert(0, args.template_dir)
 
@@ -534,7 +536,7 @@ def main(_args=None):
                 with open(pth) as f:
                     sys.path.append(path.join(libdir, f.readline().rstrip()))
             except IOError:
-                warn(&#39;Invalid egg-link in venv: {!r}&#39;.format(pth))
+                warn(f&#39;Invalid egg-link in venv: {pth!r}&#39;)
 
     if args.http:
         template_config[&#39;link_prefix&#39;] = &#34;/&#34;
@@ -547,9 +549,9 @@ def main(_args=None):
         host = host or DEFAULT_HOST
         port = int(port or DEFAULT_PORT)
 
-        print(&#39;Starting pdoc server on {}:{}&#39;.format(host, port), file=sys.stderr)
+        print(f&#39;Starting pdoc server on {host}:{port}&#39;, file=sys.stderr)
         httpd = HTTPServer((host, port), _WebDoc)
-        print(&#34;pdoc server ready at http://%s:%d&#34; % (host, port), file=sys.stderr)
+        print(f&#34;pdoc server ready at http://{host}:{port}&#34;, file=sys.stderr)
 
         # Allow tests to perform `pdoc.cli._httpd.shutdown()`
         global _httpd
@@ -576,7 +578,8 @@ def main(_args=None):
     if args.pdf:
         _print_pdf(modules, **template_config)
         import textwrap
-        print(&#34;&#34;&#34;
+        PANDOC_CMD = textwrap.indent(_PANDOC_COMMAND, &#39;    &#39;)
+        print(f&#34;&#34;&#34;
 PDF-ready markdown written to standard output.
                               ^^^^^^^^^^^^^^^
 Convert this file to PDF using e.g. Pandoc:
@@ -601,7 +604,7 @@ or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
     wkhtmltopdf --encoding utf8 -s A4 --print-media-type pdf.html pdf.pdf
 
-or similar, at your own discretion.&#34;&#34;&#34;.format(PANDOC_CMD=textwrap.indent(_PANDOC_COMMAND, &#39;    &#39;)),
+or similar, at your own discretion.&#34;&#34;&#34;,
               file=sys.stderr)
         sys.exit(0)
 
@@ -617,10 +620,11 @@ or similar, at your own discretion.&#34;&#34;&#34;.format(PANDOC_CMD=textwrap.in
             # Two blank lines between two modules&#39; texts
             sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
 
-    lunr_config = pdoc._get_config(**template_config).get(&#39;lunr_search&#39;)
-    if lunr_config is not None:
-        _generate_lunr_search(
-            modules, lunr_config.get(&#34;index_docstrings&#34;, True), template_config)
+    if args.html:
+        lunr_config = pdoc._get_config(**template_config).get(&#39;lunr_search&#39;)
+        if lunr_config is not None:
+            _generate_lunr_search(
+                modules, lunr_config.get(&#34;index_docstrings&#34;, True), template_config)
 
 
 _PANDOC_COMMAND = &#39;&#39;&#39;\
@@ -650,14 +654,16 @@ if __name__ == &#34;__main__&#34;:
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/cli.py#L428-L584" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/cli.py#L430-L588" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def main(_args=None):
     &#34;&#34;&#34; Command-line entry point &#34;&#34;&#34;
     global args
     args = _args or parser.parse_args()
 
-    warnings.simplefilter(&#34;once&#34;, DeprecationWarning)
+    # If warnings not externally managed, show deprecation warnings
+    if not sys.warnoptions:
+        warnings.simplefilter(&#34;once&#34;, DeprecationWarning)
 
     if args.close_stdin:
         sys.stdin.close()
@@ -680,9 +686,8 @@ if __name__ == &#34;__main__&#34;:
             template_config[key] = value
         except Exception:
             raise ValueError(
-                &#39;Error evaluating --config statement &#34;{}&#34;. &#39;
+                f&#39;Error evaluating --config statement &#34;{config_str}&#34;. &#39;
                 &#39;Make sure string values are quoted?&#39;
-                .format(config_str)
             )
 
     if args.html_no_source:
@@ -697,8 +702,7 @@ if __name__ == &#34;__main__&#34;:
 
     if args.template_dir is not None:
         if not path.isdir(args.template_dir):
-            print(&#39;Error: Template dir {!r} is not a directory&#39;.format(args.template_dir),
-                  file=sys.stderr)
+            print(f&#39;Error: Template dir {args.template_dir!r} is not a directory&#39;, file=sys.stderr)
             sys.exit(1)
         pdoc.tpl_lookup.directories.insert(0, args.template_dir)
 
@@ -722,7 +726,7 @@ if __name__ == &#34;__main__&#34;:
                 with open(pth) as f:
                     sys.path.append(path.join(libdir, f.readline().rstrip()))
             except IOError:
-                warn(&#39;Invalid egg-link in venv: {!r}&#39;.format(pth))
+                warn(f&#39;Invalid egg-link in venv: {pth!r}&#39;)
 
     if args.http:
         template_config[&#39;link_prefix&#39;] = &#34;/&#34;
@@ -735,9 +739,9 @@ if __name__ == &#34;__main__&#34;:
         host = host or DEFAULT_HOST
         port = int(port or DEFAULT_PORT)
 
-        print(&#39;Starting pdoc server on {}:{}&#39;.format(host, port), file=sys.stderr)
+        print(f&#39;Starting pdoc server on {host}:{port}&#39;, file=sys.stderr)
         httpd = HTTPServer((host, port), _WebDoc)
-        print(&#34;pdoc server ready at http://%s:%d&#34; % (host, port), file=sys.stderr)
+        print(f&#34;pdoc server ready at http://{host}:{port}&#34;, file=sys.stderr)
 
         # Allow tests to perform `pdoc.cli._httpd.shutdown()`
         global _httpd
@@ -764,7 +768,8 @@ if __name__ == &#34;__main__&#34;:
     if args.pdf:
         _print_pdf(modules, **template_config)
         import textwrap
-        print(&#34;&#34;&#34;
+        PANDOC_CMD = textwrap.indent(_PANDOC_COMMAND, &#39;    &#39;)
+        print(f&#34;&#34;&#34;
 PDF-ready markdown written to standard output.
                               ^^^^^^^^^^^^^^^
 Convert this file to PDF using e.g. Pandoc:
@@ -789,7 +794,7 @@ or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
     wkhtmltopdf --encoding utf8 -s A4 --print-media-type pdf.html pdf.pdf
 
-or similar, at your own discretion.&#34;&#34;&#34;.format(PANDOC_CMD=textwrap.indent(_PANDOC_COMMAND, &#39;    &#39;)),
+or similar, at your own discretion.&#34;&#34;&#34;,
               file=sys.stderr)
         sys.exit(0)
 
@@ -805,10 +810,11 @@ or similar, at your own discretion.&#34;&#34;&#34;.format(PANDOC_CMD=textwrap.in
             # Two blank lines between two modules&#39; texts
             sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
 
-    lunr_config = pdoc._get_config(**template_config).get(&#39;lunr_search&#39;)
-    if lunr_config is not None:
-        _generate_lunr_search(
-            modules, lunr_config.get(&#34;index_docstrings&#34;, True), template_config)</code></pre>
+    if args.html:
+        lunr_config = pdoc._get_config(**template_config).get(&#39;lunr_search&#39;)
+        if lunr_config is not None:
+            _generate_lunr_search(
+                modules, lunr_config.get(&#34;index_docstrings&#34;, True), template_config)</code></pre>
 </details>
 </dd>
 <dt id="pdoc.cli.module_path"><code class="name flex">
@@ -819,7 +825,7 @@ or similar, at your own discretion.&#34;&#34;&#34;.format(PANDOC_CMD=textwrap.in
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/cli.py#L301-L302" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/cli.py#L304-L305" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def module_path(m: pdoc.Module, ext: str):
     return path.join(args.output_dir, *re.sub(r&#39;\.html$&#39;, ext, m.url()).split(&#39;/&#39;))</code></pre>
@@ -833,7 +839,7 @@ or similar, at your own discretion.&#34;&#34;&#34;.format(PANDOC_CMD=textwrap.in
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/cli.py#L334-L349" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/cli.py#L336-L351" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def recursive_write_files(m: pdoc.Module, ext: str, **kwargs):
     assert ext in (&#39;.html&#39;, &#39;.md&#39;)
@@ -890,7 +896,7 @@ data-gaCategoryParameter="pdoc.cli">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-43663477-5','auto');ga('require','cleanUrlTracker',{indexFilename:'index.html',trailingSlash:'add'});ga('require','outboundLinkTracker',{events:['click','auxclick','contextmenu']});ga('require','maxScrollTracker');ga('require','pageVisibilityTracker');ga('send','pageview');setTimeout(function(){ga('send','event','pageview','view')},15000);</script><script async src='https://www.google-analytics.com/analytics.js'></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js'></script></body>
 </html>

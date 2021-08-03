@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.2" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>pdoc.html_helpers API documentation</title>
 <meta name="description" content="Helper functions for HTML output." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/html_helpers.py#L0-L638" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L1-L644" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 Helper functions for HTML output.
@@ -123,10 +123,10 @@ _md = markdown.Markdown(
     ],
     extension_configs={
         &#34;markdown.extensions.smarty&#34;: dict(
-            smart_dashes=True,          # type: ignore[dict-item]
-            smart_ellipses=True,        # type: ignore[dict-item]
-            smart_quotes=False,         # type: ignore[dict-item]
-            smart_angled_quotes=False,  # type: ignore[dict-item]
+            smart_dashes=True,
+            smart_ellipses=True,
+            smart_quotes=False,
+            smart_angled_quotes=False,
         ),
     },
 )
@@ -137,7 +137,7 @@ def _fenced_code_blocks_hidden(text):
     def hide(text):
         def replace(match):
             orig = match.group()
-            new = &#39;@&#39; + str(hash(orig)) + &#39;@&#39;
+            new = f&#39;@{hash(orig)}@&#39;
             hidden[new] = orig
             return new
 
@@ -180,7 +180,7 @@ class _ToMarkdown:
         # &#39;optional&#39; ... See §4 Parameters:
         # https://numpydoc.readthedocs.io/en/latest/format.html#sections
         type_parts = re.split(r&#39;( *(?: of | or |, *default(?:=|\b)|, *optional\b) *)&#39;, type or &#39;&#39;)
-        type_parts[::2] = [&#39;`{}`&#39;.format(s) if s else s
+        type_parts[::2] = [f&#39;`{s}`&#39; if s else s
                            for s in type_parts[::2]]
         type = &#39;&#39;.join(type_parts)
 
@@ -190,10 +190,10 @@ class _ToMarkdown:
         ret = &#34;&#34;
         if name:
             # NOTE: Triple-backtick argument names so we skip linkifying them
-            ret += &#39;**```{}```**&#39;.format(name.replace(&#39;, &#39;, &#39;```**, **```&#39;))
+            ret += f&#34;**```{name.replace(&#39;, &#39;, &#39;```**, **```&#39;)}```**&#34;
         if type:
-            ret += &#39; :&amp;ensp;{}&#39;.format(type) if ret else type
-        ret += &#39;\n:   {}\n\n&#39;.format(desc)
+            ret += f&#39; :&amp;ensp;{type}&#39; if ret else type
+        ret += f&#39;\n:   {desc}\n\n&#39;
         return ret
 
     @staticmethod
@@ -212,9 +212,12 @@ class _ToMarkdown:
         &#34;&#34;&#34;
         spec_with_desc, simple_list = match.groups()
         if spec_with_desc:
-            return &#39;\n\n&#39;.join(&#39;`{}`\n:   {}&#39;.format(*map(str.strip, line.split(&#39;:&#39;, 1)))
-                               for line in filter(None, spec_with_desc.split(&#39;\n&#39;)))
-        return &#39;, &#39;.join(&#39;`{}`&#39;.format(i) for i in simple_list.split(&#39;, &#39;))
+            spec_desc_strings = []
+            for line in filter(None, spec_with_desc.split(&#39;\n&#39;)):
+                spec, desc = map(str.strip, line.split(&#39;:&#39;, 1))
+                spec_desc_strings.append(f&#39;`{spec}`\n:   {desc}&#39;)
+            return &#39;\n\n&#39;.join(spec_desc_strings)
+        return &#39;, &#39;.join(f&#39;`{i}`&#39; for i in simple_list.split(&#39;, &#39;))
 
     @staticmethod
     def _numpy_sections(match):
@@ -241,7 +244,7 @@ class _ToMarkdown:
                           r&#39;(?: ?: (?P&lt;type&gt;.*))?(?&lt;!\.)$&#39;
                           r&#39;(?P&lt;desc&gt;(?:\n(?: {4}.*|$))*)&#39;,
                           _ToMarkdown._numpy_params, body, flags=re.MULTILINE)
-        return section + &#39;\n-----\n&#39; + body
+        return f&#39;{section}\n-----\n{body}&#39;
 
     @staticmethod
     def numpy(text):
@@ -268,7 +271,7 @@ class _ToMarkdown:
     def indent(indent, text, *, clean_first=False):
         if clean_first:
             text = inspect.cleandoc(text)
-        return re.sub(r&#39;\n&#39;, &#39;\n&#39; + indent, indent + text.rstrip())
+        return re.sub(r&#39;\n&#39;, f&#39;\n{indent}&#39;, indent + text.rstrip())
 
     @staticmethod
     def google(text):
@@ -287,18 +290,18 @@ class _ToMarkdown:
                     r&#39;^([\w*]+)(?: \(([\w.,=\[\] -]+)\))?: &#39;
                     r&#39;((?:.*)(?:\n(?: {2,}.*|$))*)&#39;, re.MULTILINE).sub(
                     lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups())),
-                    inspect.cleandoc(&#39;\n&#39; + body)
+                    inspect.cleandoc(f&#39;\n{body}&#39;)
                 )
             elif section in (&#39;Returns&#39;, &#39;Yields&#39;, &#39;Raises&#39;, &#39;Warns&#39;):
                 body = re.compile(
                     r&#39;^()([\w.,\[\] ]+): &#39;
                     r&#39;((?:.*)(?:\n(?: {2,}.*|$))*)&#39;, re.MULTILINE).sub(
                     lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups())),
-                    inspect.cleandoc(&#39;\n&#39; + body)
+                    inspect.cleandoc(f&#39;\n{body}&#39;)
                 )
             # Convert into markdown sections. End underlines with &#39;=&#39;
             # to avoid matching and re-processing as Numpy sections.
-            return &#39;\n{}\n-----=\n{}&#39;.format(section, body)
+            return f&#39;\n{section}\n-----=\n{body}&#39;
 
         text = re.compile(r&#39;^([A-Z]\w+):$\n&#39;
                           r&#39;((?:\n?(?: {2,}.*|$))+)&#39;, re.MULTILINE).sub(googledoc_sections, text)
@@ -316,36 +319,36 @@ class _ToMarkdown:
                 return _ToMarkdown._include_file(indent, value,
                                                  _ToMarkdown._directive_opts(text), module)
             except Exception as e:
-                raise RuntimeError(&#39;`.. include:: {}` error in module {!r}: {}&#39;
-                                   .format(value, module.name, e))
+                raise RuntimeError(f&#39;`.. include:: {value}` error in module {module.name!r}: {e}&#39;)
         if type in (&#39;image&#39;, &#39;figure&#39;):
-            return &#39;{}![{}]({})\n&#39;.format(
-                indent, text.translate(str.maketrans({&#39;\n&#39;: &#39; &#39;,
-                                                      &#39;[&#39;: &#39;\\[&#39;,
-                                                      &#39;]&#39;: &#39;\\]&#39;})).strip(), value)
+            alt_text = text.translate(str.maketrans({
+                &#39;\n&#39;: &#39; &#39;,
+                &#39;[&#39;: &#39;\\[&#39;,
+                &#39;]&#39;: &#39;\\]&#39;})).strip()
+            return f&#39;{indent}![{alt_text}]({value})\n&#39;
         if type == &#39;math&#39;:
             return _ToMarkdown.indent(indent,
-                                      &#39;\\[ &#39; + text.strip() + &#39; \\]&#39;,
+                                      f&#39;\\[ {text.strip()} \\]&#39;,
                                       clean_first=True)
 
         if type == &#39;versionchanged&#39;:
-            title = &#39;Changed in version:&amp;ensp;&#39; + value
+            title = f&#39;Changed in version:&amp;ensp;{value}&#39;
         elif type == &#39;versionadded&#39;:
-            title = &#39;Added in version:&amp;ensp;&#39; + value
+            title = f&#39;Added in version:&amp;ensp;{value}&#39;
         elif type == &#39;deprecated&#39; and value:
-            title = &#39;Deprecated since version:&amp;ensp;&#39; + value
+            title = f&#39;Deprecated since version:&amp;ensp;{value}&#39;
         elif type == &#39;admonition&#39;:
             title = value
         elif type.lower() == &#39;todo&#39;:
             title = &#39;TODO&#39;
-            text = value + &#39; &#39; + text
+            text = f&#39;{value} {text}&#39;
         else:
             title = type.capitalize()
             if value:
-                title += &#39;:&amp;ensp;&#39; + value
+                title += f&#39;:&amp;ensp;{value}&#39;
 
         text = _ToMarkdown.indent(indent + &#39;    &#39;, text, clean_first=True)
-        return &#39;{}!!! {} &#34;{}&#34;\n{}\n&#39;.format(indent, type, title, text)
+        return f&#39;{indent}!!! {type} &#34;{title}&#34;\n{text}\n&#39;
 
     @staticmethod
     def admonitions(text, module, limit_types=None):
@@ -396,7 +399,7 @@ class _ToMarkdown:
         doctest blocks so they render as Python code.
         &#34;&#34;&#34;
         text = _ToMarkdown.DOCTESTS_RE.sub(
-            lambda match: &#39;```python-repl\n&#39; + match.group() + &#39;\n```\n&#39;, text)
+            lambda match: f&#39;```python-repl\n{match.group()}\n```\n&#39;, text)
         return text
 
     @staticmethod
@@ -418,7 +421,7 @@ class _ToMarkdown:
             )&#34;&#34;&#34;, re.VERBOSE)
 
         text = pattern.sub(
-            lambda m: (&#39;&lt;&#39; + m.group(&#39;url&#39;) + &#39;&gt;&#39;) if m.group(&#39;url&#39;) else m.group(), text)
+            lambda m: (f&#39;&lt;{m.group(&#34;url&#34;)}&gt;&#39;) if m.group(&#39;url&#39;) else m.group(), text)
         return text
 
 
@@ -431,7 +434,7 @@ class _MathPattern(InlineProcessor):
         for value, is_block in zip(m.groups(), (False, True, True)):
             if value:
                 break
-        script = etree.Element(&#39;script&#39;, type=&#39;math/tex&#39; + (&#39;; mode=display&#39; if is_block else &#39;&#39;))
+        script = etree.Element(&#39;script&#39;, type=f&#34;math/tex{&#39;; mode=display&#39; if is_block else &#39;&#39;}&#34;)
         preview = etree.Element(&#39;span&#39;, {&#39;class&#39;: &#39;MathJax_Preview&#39;})
         preview.text = script.text = AtomicString(value)
         wrapper = etree.Element(&#39;span&#39;)
@@ -453,10 +456,10 @@ def to_html(text: str, *,
     example template.
     &#34;&#34;&#34;
     # Optionally register our math syntax processor
-    if not latex_math and _MathPattern.NAME in _md.inlinePatterns:         # type: ignore
-        _md.inlinePatterns.deregister(_MathPattern.NAME)                   # type: ignore
-    elif latex_math and _MathPattern.NAME not in _md.inlinePatterns:       # type: ignore
-        _md.inlinePatterns.register(_MathPattern(_MathPattern.PATTERN),    # type: ignore
+    if not latex_math and _MathPattern.NAME in _md.inlinePatterns:
+        _md.inlinePatterns.deregister(_MathPattern.NAME)
+    elif latex_math and _MathPattern.NAME not in _md.inlinePatterns:
+        _md.inlinePatterns.register(_MathPattern(_MathPattern.PATTERN),
                                     _MathPattern.NAME,
                                     _MathPattern.PRIORITY)
 
@@ -481,8 +484,8 @@ def to_markdown(text: str, *,
         docformat = str(getattr(getattr(module, &#39;obj&#39;, None), &#39;__docformat__&#39;, &#39;numpy,google &#39;))
         docformat, *_ = docformat.lower().split()
     if not (set(docformat.split(&#39;,&#39;)) &amp; {&#39;&#39;, &#39;numpy&#39;, &#39;google&#39;}):
-        warn(&#39;__docformat__ value {!r} in module {!r} not supported. &#39;
-             &#39;Supported values are: numpy, google.&#39;.format(docformat, module))
+        warn(f&#39;__docformat__ value {docformat!r} in module {module!r} not supported. &#39;
+             &#39;Supported values are: numpy, google.&#39;)
         docformat = &#39;numpy,google&#39;
 
     with _fenced_code_blocks_hidden(text) as result:
@@ -552,8 +555,8 @@ def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module, wra
             # XXX: Assume at least the first part of refname, i.e. the package, is correct.
             module_part = module.find_ident(refname.split(&#39;.&#39;)[0])
             if not isinstance(module_part, pdoc.External):
-                warn(&#39;Code reference `{}` in module &#34;{}&#34; does not match any &#39;
-                     &#39;documented object.&#39;.format(refname, module.refname),
+                warn(f&#39;Code reference `{refname}` in module &#34;{module.refname}&#34; does not match any &#39;
+                     &#39;documented object.&#39;,
                      ReferenceWarning, stacklevel=3)
         return link(dobj)
 
@@ -567,7 +570,7 @@ def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module, wra
         # would then become escaped.
         # This finds overlapping matches, https://stackoverflow.com/a/5616910/1090455
         cleaned = re.sub(r&#39;(_(?=[^&gt;]*?(?:&lt;|$)))&#39;, r&#39;\\\1&#39;, linked)
-        return &#39;&lt;code&gt;{}&lt;/code&gt;&#39;.format(cleaned)
+        return f&#39;&lt;code&gt;{cleaned}&lt;/code&gt;&#39;
     return linked
 
 
@@ -578,7 +581,7 @@ def extract_toc(text: str):
     with _fenced_code_blocks_hidden(text) as result:
         result[0] = _ToMarkdown.DOCTESTS_RE.sub(&#39;&#39;, result[0])
     text = result[0]
-    toc, _ = _md.reset().convert(&#39;[TOC]\n\n@CUT@\n\n&#39; + text).split(&#39;@CUT@&#39;, 1)
+    toc, _ = _md.reset().convert(f&#39;[TOC]\n\n@CUT@\n\n{text}&#39;).split(&#39;@CUT@&#39;, 1)
     if toc.endswith(&#39;&lt;p&gt;&#39;):  # CUT was put into its own paragraph
         toc = toc[:-3].rstrip()
     return toc
@@ -596,12 +599,18 @@ def format_git_link(template: str, dobj: pdoc.Doc):
             commit = _git_head_commit()
         abs_path = inspect.getfile(inspect.unwrap(dobj.obj))
         path = _project_relative_path(abs_path)
+
+        # Urls should always use / instead of \\
+        if os.name == &#39;nt&#39;:
+            path = path.replace(&#39;\\&#39;, &#39;/&#39;)
+
         lines, start_line = inspect.getsourcelines(dobj.obj)
+        start_line = start_line or 1  # GH-296
         end_line = start_line + len(lines) - 1
         url = template.format(**locals())
         return url
     except Exception:
-        warn(&#39;format_git_link for {} failed:\n{}&#39;.format(dobj.obj, traceback.format_exc()))
+        warn(f&#39;format_git_link for {dobj.obj} failed:\n{traceback.format_exc()}&#39;)
         return None
 
 
@@ -616,12 +625,11 @@ def _git_head_commit():
         commit = subprocess.check_output(process_args, universal_newlines=True).strip()
         return commit
     except OSError as error:
-        warn(&#34;git executable not found on system:\n{}&#34;.format(error))
+        warn(f&#34;git executable not found on system:\n{error}&#34;)
     except subprocess.CalledProcessError as error:
         warn(
             &#34;Ensure pdoc is run within a git repository.\n&#34;
-            &#34;`{}` failed with output:\n{}&#34;
-            .format(&#39; &#39;.join(process_args), error.output)
+            f&#34;`{&#39; &#39;.join(process_args)}` failed with output:\n{error.output}&#34;
         )
     return None
 
@@ -631,17 +639,15 @@ def _git_project_root():
     &#34;&#34;&#34;
     Return the path to project root directory or None if indeterminate.
     &#34;&#34;&#34;
-    path = None
     for cmd in ([&#39;git&#39;, &#39;rev-parse&#39;, &#39;--show-superproject-working-tree&#39;],
                 [&#39;git&#39;, &#39;rev-parse&#39;, &#39;--show-toplevel&#39;]):
         try:
             path = subprocess.check_output(cmd, universal_newlines=True).rstrip(&#39;\r\n&#39;)
             if path:
-                break
+                return os.path.normpath(path)
         except (subprocess.CalledProcessError, OSError):
             pass
-    path = os.path.normpath(path)
-    return path
+    return None
 
 
 @lru_cache()
@@ -659,9 +665,8 @@ def _project_relative_path(absolute_path):
             # absolute_path is a descendant of prefix_path
             return os.path.relpath(absolute_path, prefix_path)
     raise RuntimeError(
-        &#34;absolute path {!r} is not a descendant of the current working directory &#34;
+        f&#34;absolute path {absolute_path!r} is not a descendant of the current working directory &#34;
         &#34;or of the system&#39;s python library.&#34;
-        .format(absolute_path)
     )
 
 
@@ -693,7 +698,7 @@ def _str_template_fields(template):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/html_helpers.py#L535-L545" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L538-L548" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def extract_toc(text: str):
     &#34;&#34;&#34;
@@ -702,7 +707,7 @@ def _str_template_fields(template):
     with _fenced_code_blocks_hidden(text) as result:
         result[0] = _ToMarkdown.DOCTESTS_RE.sub(&#39;&#39;, result[0])
     text = result[0]
-    toc, _ = _md.reset().convert(&#39;[TOC]\n\n@CUT@\n\n&#39; + text).split(&#39;@CUT@&#39;, 1)
+    toc, _ = _md.reset().convert(f&#39;[TOC]\n\n@CUT@\n\n{text}&#39;).split(&#39;@CUT@&#39;, 1)
     if toc.endswith(&#39;&lt;p&gt;&#39;):  # CUT was put into its own paragraph
         toc = toc[:-3].rstrip()
     return toc</code></pre>
@@ -717,7 +722,7 @@ from <code>dobj</code> and the working environment.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/html_helpers.py#L548-L566" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L551-L575" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def format_git_link(template: str, dobj: pdoc.Doc):
     &#34;&#34;&#34;
@@ -731,12 +736,18 @@ from <code>dobj</code> and the working environment.</p></div>
             commit = _git_head_commit()
         abs_path = inspect.getfile(inspect.unwrap(dobj.obj))
         path = _project_relative_path(abs_path)
+
+        # Urls should always use / instead of \\
+        if os.name == &#39;nt&#39;:
+            path = path.replace(&#39;\\&#39;, &#39;/&#39;)
+
         lines, start_line = inspect.getsourcelines(dobj.obj)
+        start_line = start_line or 1  # GH-296
         end_line = start_line + len(lines) - 1
         url = template.format(**locals())
         return url
     except Exception:
-        warn(&#39;format_git_link for {} failed:\n{}&#39;.format(dobj.obj, traceback.format_exc()))
+        warn(f&#39;format_git_link for {dobj.obj} failed:\n{traceback.format_exc()}&#39;)
         return None</code></pre>
 </details>
 </dd>
@@ -750,7 +761,7 @@ but never longer than <code>max_length</code> characters.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/html_helpers.py#L48-L69" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L48-L69" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def glimpse(text: str, max_length=153, *, paragraph=True,
             _split_paragraph=partial(re.compile(r&#39;\s*\n\s*\n\s*&#39;).split, maxsplit=1),
@@ -784,7 +795,7 @@ but never longer than <code>max_length</code> characters.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/html_helpers.py#L23-L31" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L23-L31" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@lru_cache()
 def minify_css(css: str,
@@ -806,7 +817,7 @@ def minify_css(css: str,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/html_helpers.py#L34-L45" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L34-L45" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def minify_html(html: str,
                 _minify=partial(
@@ -835,7 +846,7 @@ example template.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/html_helpers.py#L403-L425" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L406-L428" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def to_html(text: str, *,
             docformat: str = None,
@@ -851,10 +862,10 @@ example template.</p></div>
     example template.
     &#34;&#34;&#34;
     # Optionally register our math syntax processor
-    if not latex_math and _MathPattern.NAME in _md.inlinePatterns:         # type: ignore
-        _md.inlinePatterns.deregister(_MathPattern.NAME)                   # type: ignore
-    elif latex_math and _MathPattern.NAME not in _md.inlinePatterns:       # type: ignore
-        _md.inlinePatterns.register(_MathPattern(_MathPattern.PATTERN),    # type: ignore
+    if not latex_math and _MathPattern.NAME in _md.inlinePatterns:
+        _md.inlinePatterns.deregister(_MathPattern.NAME)
+    elif latex_math and _MathPattern.NAME not in _md.inlinePatterns:
+        _md.inlinePatterns.register(_MathPattern(_MathPattern.PATTERN),
                                     _MathPattern.NAME,
                                     _MathPattern.PRIORITY)
 
@@ -876,7 +887,7 @@ example template.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/html_helpers.py#L428-L481" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L431-L484" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def to_markdown(text: str, *,
                 docformat: str = None,
@@ -895,8 +906,8 @@ example template.</p></div>
         docformat = str(getattr(getattr(module, &#39;obj&#39;, None), &#39;__docformat__&#39;, &#39;numpy,google &#39;))
         docformat, *_ = docformat.lower().split()
     if not (set(docformat.split(&#39;,&#39;)) &amp; {&#39;&#39;, &#39;numpy&#39;, &#39;google&#39;}):
-        warn(&#39;__docformat__ value {!r} in module {!r} not supported. &#39;
-             &#39;Supported values are: numpy, google.&#39;.format(docformat, module))
+        warn(f&#39;__docformat__ value {docformat!r} in module {module!r} not supported. &#39;
+             &#39;Supported values are: numpy, google.&#39;)
         docformat = &#39;numpy,google&#39;
 
     with _fenced_code_blocks_hidden(text) as result:
@@ -950,7 +961,7 @@ doesn't match any documented objects.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/0658ff01d8e218fcf67ee3f313bef6875c75f0ae/pdoc/html_helpers.py#L484-L490" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L487-L493" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class ReferenceWarning(UserWarning):
     &#34;&#34;&#34;
@@ -1014,7 +1025,7 @@ data-gaCategoryParameter="pdoc.html_helpers">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-43663477-5','auto');ga('require','cleanUrlTracker',{indexFilename:'index.html',trailingSlash:'add'});ga('require','outboundLinkTracker',{events:['click','auxclick','contextmenu']});ga('require','maxScrollTracker');ga('require','pageVisibilityTracker');ga('send','pageview');setTimeout(function(){ga('send','event','pageview','view')},15000);</script><script async src='https://www.google-analytics.com/analytics.js'></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js'></script></body>
 </html>
