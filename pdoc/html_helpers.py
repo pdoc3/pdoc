@@ -98,7 +98,7 @@ def _fenced_code_blocks_hidden(text):
     def hide(text):
         def replace(match):
             orig = match.group()
-            new = '@' + str(hash(orig)) + '@'
+            new = f'@{hash(orig)}@'
             hidden[new] = orig
             return new
 
@@ -205,7 +205,7 @@ class _ToMarkdown:
                           r'(?: ?: (?P<type>.*))?(?<!\.)$'
                           r'(?P<desc>(?:\n(?: {4}.*|$))*)',
                           _ToMarkdown._numpy_params, body, flags=re.MULTILINE)
-        return section + '\n-----\n' + body
+        return f'{section}\n-----\n{body}'
 
     @staticmethod
     def numpy(text):
@@ -232,7 +232,7 @@ class _ToMarkdown:
     def indent(indent, text, *, clean_first=False):
         if clean_first:
             text = inspect.cleandoc(text)
-        return re.sub(r'\n', '\n' + indent, indent + text.rstrip())
+        return re.sub(r'\n', f'\n{indent}', indent + text.rstrip())
 
     @staticmethod
     def google(text):
@@ -251,14 +251,14 @@ class _ToMarkdown:
                     r'^([\w*]+)(?: \(([\w.,=\[\] -]+)\))?: '
                     r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub(
                     lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups())),
-                    inspect.cleandoc('\n' + body)
+                    inspect.cleandoc(f'\n{body}')
                 )
             elif section in ('Returns', 'Yields', 'Raises', 'Warns'):
                 body = re.compile(
                     r'^()([\w.,\[\] ]+): '
                     r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub(
                     lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups())),
-                    inspect.cleandoc('\n' + body)
+                    inspect.cleandoc(f'\n{body}')
                 )
             # Convert into markdown sections. End underlines with '='
             # to avoid matching and re-processing as Numpy sections.
@@ -289,24 +289,24 @@ class _ToMarkdown:
             return f'{indent}![{alt_text}]({value})\n'
         if type == 'math':
             return _ToMarkdown.indent(indent,
-                                      '\\[ ' + text.strip() + ' \\]',
+                                      f'\\[ {text.strip()} \\]',
                                       clean_first=True)
 
         if type == 'versionchanged':
-            title = 'Changed in version:&ensp;' + value
+            title = f'Changed in version:&ensp;{value}'
         elif type == 'versionadded':
-            title = 'Added in version:&ensp;' + value
+            title = f'Added in version:&ensp;{value}'
         elif type == 'deprecated' and value:
-            title = 'Deprecated since version:&ensp;' + value
+            title = f'Deprecated since version:&ensp;{value}'
         elif type == 'admonition':
             title = value
         elif type.lower() == 'todo':
             title = 'TODO'
-            text = value + ' ' + text
+            text = f'{value} {text}'
         else:
             title = type.capitalize()
             if value:
-                title += ':&ensp;' + value
+                title += f':&ensp;{value}'
 
         text = _ToMarkdown.indent(indent + '    ', text, clean_first=True)
         return f'{indent}!!! {type} "{title}"\n{text}\n'
@@ -360,7 +360,7 @@ class _ToMarkdown:
         doctest blocks so they render as Python code.
         """
         text = _ToMarkdown.DOCTESTS_RE.sub(
-            lambda match: '```python-repl\n' + match.group() + '\n```\n', text)
+            lambda match: f'```python-repl\n{match.group()}\n```\n', text)
         return text
 
     @staticmethod
@@ -382,7 +382,7 @@ class _ToMarkdown:
             )""", re.VERBOSE)
 
         text = pattern.sub(
-            lambda m: ('<' + m.group('url') + '>') if m.group('url') else m.group(), text)
+            lambda m: (f'<{m.group("url")}>') if m.group('url') else m.group(), text)
         return text
 
 
@@ -395,7 +395,7 @@ class _MathPattern(InlineProcessor):
         for value, is_block in zip(m.groups(), (False, True, True)):
             if value:
                 break
-        script = etree.Element('script', type='math/tex' + ('; mode=display' if is_block else ''))
+        script = etree.Element('script', type=f"math/tex{'; mode=display' if is_block else ''}")
         preview = etree.Element('span', {'class': 'MathJax_Preview'})
         preview.text = script.text = AtomicString(value)
         wrapper = etree.Element('span')
@@ -542,7 +542,7 @@ def extract_toc(text: str):
     with _fenced_code_blocks_hidden(text) as result:
         result[0] = _ToMarkdown.DOCTESTS_RE.sub('', result[0])
     text = result[0]
-    toc, _ = _md.reset().convert('[TOC]\n\n@CUT@\n\n' + text).split('@CUT@', 1)
+    toc, _ = _md.reset().convert(f'[TOC]\n\n@CUT@\n\n{text}').split('@CUT@', 1)
     if toc.endswith('<p>'):  # CUT was put into its own paragraph
         toc = toc[:-3].rstrip()
     return toc

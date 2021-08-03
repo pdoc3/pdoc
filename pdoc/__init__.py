@@ -375,7 +375,7 @@ def _is_whitelisted(name: str, doc_obj: Union['Module', 'Class']):
     Returns `True` if `name` (relative or absolute refname) is
     contained in some module's __pdoc__ with a truish value.
     """
-    refname = doc_obj.refname + '.' + name
+    refname = f'{doc_obj.refname}.{name}'
     module: Optional[Module] = doc_obj.module
     while module:
         qualname = refname[len(module.refname) + 1:]
@@ -391,7 +391,7 @@ def _is_blacklisted(name: str, doc_obj: Union['Module', 'Class']):
     Returns `True` if `name` (relative or absolute refname) is
     contained in some module's __pdoc__ with value False.
     """
-    refname = doc_obj.refname + '.' + name
+    refname = f'{doc_obj.refname}.{name}'
     module: Optional[Module] = doc_obj.module
     while module:
         qualname = refname[len(module.refname) + 1:]
@@ -587,7 +587,7 @@ class Doc:
             return link_prefix + self._url()
 
         if self.module.name == relative_to.name:
-            return '#' + self.refname
+            return f'#{self.refname}'
 
         # Otherwise, compute relative path from current module to link target
         url = os.path.relpath(self._url(), relative_to.url()).replace(path.sep, '/')
@@ -597,7 +597,7 @@ class Doc:
         return url
 
     def _url(self):
-        return self.module._url() + '#' + self.refname
+        return f'{self.module._url()}#{self.refname}'
 
     def _inherits_top(self):
         """
@@ -910,7 +910,7 @@ class Module(Doc):
         # XXX: Is this corrent? Does it always match
         # `Class.module.name + Class.qualname`?. Especially now?
         # If not, see what was here before.
-        return self.find_ident((cls.__module__ or _UNKNOWN_MODULE) + '.' + cls.__qualname__)
+        return self.find_ident(f'{cls.__module__ or _UNKNOWN_MODULE}.{cls.__qualname__}')
 
     def find_ident(self, name: str) -> Doc:
         """
@@ -929,7 +929,7 @@ class Module(Doc):
 
         return (self.doc.get(_name) or
                 self._context.get(_name) or
-                self._context.get(self.name + '.' + _name) or
+                self._context.get(f'{self.name}.{_name}') or
                 External(name))
 
     def _filter_doc_objs(self, type: Type[T], sort=True) -> List[T]:
@@ -1014,7 +1014,7 @@ class Class(Doc):
             init_doc = inspect.getdoc(obj.__init__) or ''
             if init_doc == object.__init__.__doc__:
                 init_doc = ''
-            docstring = ((inspect.getdoc(obj) or '') + '\n\n' + init_doc).strip()
+            docstring = f'{inspect.getdoc(obj) or ""}\n\n{init_doc}'.strip()
 
         super().__init__(name, module, obj, docstring=docstring)
 
@@ -1101,7 +1101,7 @@ class Class(Doc):
 
     @property
     def refname(self) -> str:
-        return self.module.name + '.' + self.qualname
+        return f'{self.module.name}.{self.qualname}'
 
     def mro(self, only_documented=False) -> List['Class']:
         """
@@ -1464,7 +1464,7 @@ class Function(Doc):
                 if isinstance(value, enum.Enum):
                     replacement = str(value)
                 elif inspect.isclass(value):
-                    replacement = (value.__module__ or _UNKNOWN_MODULE) + '.' + value.__qualname__
+                    replacement = f'{value.__module__ or _UNKNOWN_MODULE}.{value.__qualname__}'
                 elif ' at 0x' in repr(value):
                     replacement = re.sub(r' at 0x\w+', '', repr(value))
 
@@ -1518,16 +1518,16 @@ class Function(Doc):
                     annotation = annotation.strip("'")
                 if link:
                     annotation = re.sub(r'[\w\.]+', _linkify, annotation)
-                formatted += ':\N{NBSP}' + annotation
+                formatted += f':\N{NBSP}{annotation}'
             if p.default is not EMPTY:
                 if p.annotation is not EMPTY:
-                    formatted += '\N{NBSP}=\N{NBSP}' + repr(p.default)
+                    formatted += f'\N{NBSP}=\N{NBSP}{repr(p.default)}'
                 else:
-                    formatted += '=' + repr(p.default)
+                    formatted += f'={repr(p.default)}'
             if p.kind == p.VAR_POSITIONAL:
-                formatted = '*' + formatted
+                formatted = f'*{formatted}'
             elif p.kind == p.VAR_KEYWORD:
-                formatted = '**' + formatted
+                formatted = f'**{formatted}'
 
             params.append(formatted)
 
@@ -1575,7 +1575,7 @@ class Function(Doc):
 
     @property
     def refname(self) -> str:
-        return (self.cls.refname if self.cls else self.module.refname) + '.' + self.name
+        return f'{self.cls.refname if self.cls else self.module.refname}.{self.name}'
 
 
 class Variable(Doc):
@@ -1609,12 +1609,12 @@ class Variable(Doc):
     @property
     def qualname(self) -> str:
         if self.cls:
-            return self.cls.qualname + '.' + self.name
+            return f'{self.cls.qualname}.{self.name}'
         return self.name
 
     @property
     def refname(self) -> str:
-        return (self.cls.refname if self.cls else self.module.refname) + '.' + self.name
+        return f'{self.cls.refname if self.cls else self.module.refname}.{self.name}'
 
     def type_annotation(self, *, link=None) -> str:
         """Formatted variable type annotation or empty string if none."""

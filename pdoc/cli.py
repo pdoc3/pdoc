@@ -27,7 +27,7 @@ aa = parser.add_argument
 mode_aa = parser.add_mutually_exclusive_group().add_argument
 
 aa(
-    '--version', action='version', version='%(prog)s ' + pdoc.__version__)
+    '--version', action='version', version=f'%(prog)s {pdoc.__version__}')
 aa(
     "modules",
     type=str,
@@ -366,7 +366,7 @@ def _print_pdf(modules, **kwargs):
 def _warn_deprecated(option, alternative='', use_config_mako=False):
     msg = f'Program option `{option}` is deprecated.'
     if alternative:
-        msg += ' Use `' + alternative + '`'
+        msg += f' Use `{alternative}`'
         if use_config_mako:
             msg += ' or override config.mako template'
         msg += '.'
