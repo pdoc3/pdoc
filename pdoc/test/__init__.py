@@ -22,7 +22,8 @@ from random import randint
 from tempfile import TemporaryDirectory
 from time import sleep
 from types import ModuleType
-from unittest.mock import patch
+from unittest import expectedFailure
+from unittest.mock import Mock, patch
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -350,6 +351,8 @@ class CliTest(unittest.TestCase):
             'B.p docstring',
             'C',
             'B.overridden docstring',
+            'function_mock',
+            'coroutine_mock',
         ]
         exclude_patterns = [
             '_private',
@@ -1156,6 +1159,11 @@ class C:
             self.assertEqual(mod.doc['C'].docstring, '')
             self.assertEqual(mod.doc['C'].doc['class_var'].docstring, 'class var')
             self.assertEqual(mod.doc['C'].doc['instance_var'].docstring, 'instance var')
+
+    @expectedFailure
+    def test_mock_signature_error(self):
+        # GH-350 -- throws `TypeError: 'Mock' object is not subscriptable`:
+        self.assertIsInstance(inspect.signature(Mock(spec=lambda x: x)), inspect.Signature)
 
 
 class HtmlHelpersTest(unittest.TestCase):
