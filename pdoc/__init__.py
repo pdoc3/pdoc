@@ -987,7 +987,7 @@ def _getmembers_all(obj: type) -> List[Tuple[str, Any]]:
     for name in names:
         try:
             value = getattr(obj, name)
-        except AttributeError:
+        except (AttributeError, NotImplementedError):
             for base in mro:
                 if name in base.__dict__:
                     value = base.__dict__[name]
