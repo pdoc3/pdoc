@@ -1043,16 +1043,20 @@ class Foo:
 
         self.assertEqual(pdoc.Class('C2', mod, C2).params(), ['a', 'b', 'c=None', '*', 'd=1', 'e'])
 
-        class G(typing.Generic[T]):
+        class ClassWithNew:
+            def __new__(self, arg):
+                pass
+
+        class G(ClassWithNew):
             def __init__(self, a, b, c=100):
                 pass
 
         self.assertEqual(pdoc.Class('G', mod, G).params(), ['a', 'b', 'c=100'])
 
-        class G2(typing.Generic[T]):
+        class G2(ClassWithNew):
             pass
 
-        self.assertEqual(pdoc.Class('G2', mod, G2).params(), ['*args', '**kwds'])
+        self.assertEqual(pdoc.Class('G2', mod, G2).params(), ['arg'])
 
     def test_url(self):
         mod = pdoc.Module(EXAMPLE_MODULE)
