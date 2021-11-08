@@ -20,15 +20,17 @@ Auto-generate API documentation for Python projects.
 
 Installation
 ------------
-
-    $ pip install pdoc3
-
+```bash
+$ pip install pdoc3
+```
 
 Usage
 -----
 Pdoc will accept a Python module file, package directory or an import path.
 
-    $ pdoc your_project
+```bash
+$ pdoc <your_project>
+```
 
 See `pdoc --help` for more command-line switches and the [documentation]
 for more usage examples.
