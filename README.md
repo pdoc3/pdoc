@@ -3,11 +3,11 @@
 pdoc
 ====
 
-[![Build Status](https://img.shields.io/github/workflow/status/pdoc3/pdoc/CI?style=for-the-badge)](https://github.com/pdoc3/pdoc/actions)
-[![Code Coverage](https://img.shields.io/codecov/c/gh/pdoc3/pdoc.svg?style=for-the-badge)](https://codecov.io/gh/pdoc3/pdoc)
-[![pdoc3 on PyPI](https://img.shields.io/pypi/v/pdoc3.svg?color=blue&style=for-the-badge)](https://pypi.org/project/pdoc3)
-[![package downloads](https://img.shields.io/pypi/dm/pdoc3.svg?color=skyblue&style=for-the-badge)](https://pypi.org/project/pdoc3)
-[![GitHub Sponsors](https://img.shields.io/github/sponsors/kernc?color=pink&style=for-the-badge)](https://github.com/sponsors/kernc)
+[![Build Status](https://img.shields.io/github/workflow/status/pdoc3/pdoc/CI?style=plastic)](https://github.com/pdoc3/pdoc/actions)
+[![Code Coverage](https://img.shields.io/codecov/c/gh/pdoc3/pdoc.svg?style=plastic)](https://codecov.io/gh/pdoc3/pdoc)
+[![pdoc3 on PyPI](https://img.shields.io/pypi/v/pdoc3.svg?color=blue&style=plastic)](https://pypi.org/project/pdoc3)
+[![package downloads](https://img.shields.io/pypi/dm/pdoc3.svg?color=skyblue&style=plastic)](https://pypi.org/project/pdoc3)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/kernc?color=pink&style=plastic)](https://github.com/sponsors/kernc)
 
 Auto-generate API documentation for Python projects.
 
