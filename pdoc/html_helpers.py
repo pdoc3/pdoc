@@ -99,8 +99,8 @@ def _fenced_code_blocks_hidden(text):
         def replace(match):
             orig = match.group()
 
-            # Remove a trailing blank line before the closing ```, which might
-            # have been added while processing `.. include::` directives.
+            # Remove a trailing blank line before the closing ```, which was
+            # added if the code block came in via `.. include::` directive.
             orig = orig.replace("\n\n```", "\n```")
 
             new = f'@{hash(orig)}@'
