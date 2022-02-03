@@ -326,7 +326,7 @@ class _ToMarkdown:
         See: https://python-markdown.github.io/extensions/admonition/
         """
         substitute = partial(re.compile(r'^(?P<indent> *)\.\. ?(\w+)::(?: *(.*))?'
-                                        r'((?:\n(?:(?P=indent) +.*| *$))*[^\n|\r|\r\n])*',
+                                        r'((?:\n(?:(?P=indent) +.*| *$))*[^\r\n])*',
                                         re.MULTILINE).sub,
                              partial(_ToMarkdown._admonition, module=module,
                                      limit_types=limit_types))
