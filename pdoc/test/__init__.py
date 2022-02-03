@@ -1568,7 +1568,22 @@ lines.</p>
 <p>1
 x = 2
 x = 3
-x =</p>'''
+x =</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hello</td>
+<td>World</td>
+</tr>
+</tbody>
+</table>
+<p>Remaining.</p>'''
         mod = pdoc.Module(pdoc.import_module(
             os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_reST_include', 'test.py')))
         html = to_html(mod.docstring, module=mod)

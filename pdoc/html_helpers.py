@@ -275,6 +275,9 @@ class _ToMarkdown:
         if limit_types and type not in limit_types:
             return match.group(0)
 
+        if text is None:
+            text = ""
+
         if type == 'include' and module:
             try:
                 return _ToMarkdown._include_file(indent, value,
@@ -323,7 +326,8 @@ class _ToMarkdown:
         See: https://python-markdown.github.io/extensions/admonition/
         """
         substitute = partial(re.compile(r'^(?P<indent> *)\.\. ?(\w+)::(?: *(.*))?'
-                                        r'((?:\n(?:(?P=indent) +.*| *$))*)', re.MULTILINE).sub,
+                                        r'((?:\n(?:(?P=indent) +.*| *$))*[^\r\n])*',
+                                        re.MULTILINE).sub,
                              partial(_ToMarkdown._admonition, module=module,
                                      limit_types=limit_types))
         # Apply twice for nested (e.g. image inside warning)
