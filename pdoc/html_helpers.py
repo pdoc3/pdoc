@@ -98,11 +98,6 @@ def _fenced_code_blocks_hidden(text):
     def hide(text):
         def replace(match):
             orig = match.group()
-
-            # Remove a trailing blank line before the closing ```, which was
-            # added if the code block came in via `.. include::` directive.
-            orig = orig.replace("\n\n```", "\n```")
-
             new = f'@{hash(orig)}@'
             hidden[new] = orig
             return new
@@ -282,17 +277,10 @@ class _ToMarkdown:
 
         if type == 'include' and module:
             try:
-                included_file = _ToMarkdown._include_file(
-                    indent, value, _ToMarkdown._directive_opts(text), module
-                )
+                return _ToMarkdown._include_file(indent, value,
+                                                 _ToMarkdown._directive_opts(text), module)
             except Exception as e:
                 raise RuntimeError(f'`.. include:: {value}` error in module {module.name!r}: {e}')
-
-            # Any trailing whitespace in the included file will have been
-            # trimmed out in the above. To avoid the included file from merging
-            # into the rest of the docstring, manually add a linebreak here.
-            # Ref issue 384 - https://github.com/pdoc3/pdoc/issues/384
-            return f"{included_file}\n"
         if type in ('image', 'figure'):
             alt_text = text.translate(str.maketrans({
                 '\n': ' ',
