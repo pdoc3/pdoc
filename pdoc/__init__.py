@@ -950,6 +950,19 @@ class Module(Doc):
         """
         return self._filter_doc_objs(Class, sort)
 
+    def all_classes(self, sort=True) -> List['Class']:
+        """
+        Returns all documented classes in the module even the ones defined
+        in other classes.
+        """
+        stack = self.classes(sort)[::-1]
+        results = []
+        while stack:
+            c = stack.pop()
+            results.append(c)
+            stack.extend(c.classes(sort=sort)[::-1])
+        return results
+
     def functions(self, sort=True) -> List['Function']:
         """
         Returns all documented module-level functions in the module,
@@ -1005,9 +1018,9 @@ class Class(Doc):
     """
     Representation of a class' documentation.
     """
-    __slots__ = ('doc', '_super_members')
+    __slots__ = ('doc', 'cls', '_super_members')
 
-    def __init__(self, name: str, module: Module, obj, *, docstring: str = None):
+    def __init__(self, name: str, module: Module, obj, *, docstring: str = None, cls: 'Class' = None):
         assert inspect.isclass(obj)
 
         if docstring is None:
@@ -1017,6 +1030,12 @@ class Class(Doc):
             docstring = f'{inspect.getdoc(obj) or ""}\n\n{init_doc}'.strip()
 
         super().__init__(name, module, obj, docstring=docstring)
+        
+        self.cls = cls
+        """
+        The `pdoc.Class` object if this class is defined in a class. If not,
+        this is None.
+        """        
 
         self.doc: Dict[str, Union[Function, Variable]] = {}
         """A mapping from identifier name to a `pdoc.Doc` objects."""
@@ -1063,6 +1082,14 @@ class Class(Doc):
             if _is_function(obj):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self)
+            elif inspect.isclass(obj):
+                self.doc[name] = Class(
+                    self.name + "." + name,
+                    self.module,
+                    obj,
+                    cls=self,
+                    docstring=inspect.getdoc(obj)
+                )
             else:
                 self.doc[name] = Variable(
                     name, self.module,
@@ -1157,6 +1184,14 @@ class Class(Doc):
         result = [obj for obj in _filter_type(type, self.doc)
                   if (include_inherited or not obj.inherits) and filter_func(obj)]
         return sorted(result) if sort else result
+    
+    def classes(self, include_inherited=False, sort=False):
+        """Returns the classes nested in this class."""
+        return self._filter_doc_objs(
+            Class,
+            include_inherited=include_inherited,
+            sort=sort
+        )
 
     def class_variables(self, include_inherited=True, sort=True) -> List['Variable']:
         """
