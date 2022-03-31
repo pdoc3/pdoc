@@ -13,3 +13,4 @@ htmlcov
 .*_cache/*
 
 html/*
+/.mypy_cache/
