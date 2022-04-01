@@ -1241,7 +1241,7 @@ class Class(Doc):
                        for k, g in groupby((i.inherits
                                             for i in self.doc.values() if i.inherits),
                                            key=lambda i: i.cls)),
-                      key=lambda x, _mro_index=self.mro().index: _mro_index(x[0])) # type: ignore
+                      key=lambda x, _mro_index=self.mro().index: _mro_index(x[0]))  # type: ignore
 
     def _fill_inheritance(self):
         """
