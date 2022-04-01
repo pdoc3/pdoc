@@ -1037,7 +1037,7 @@ class Class(Doc):
         this is None.
         """        
 
-        self.doc: Dict[str, Union[Function, Variable]] = {}
+        self.doc: Dict[str, Union[Function, Variable, Class]] = {}
         """A mapping from identifier name to a `pdoc.Doc` objects."""
 
         # Annotations for filtering.
@@ -1239,8 +1239,8 @@ class Class(Doc):
         return sorted(((cast(Class, k), sorted(g))
                        for k, g in groupby((i.inherits
                                             for i in self.doc.values() if i.inherits),
-                                           key=lambda i: i.cls)),                   # type: ignore
-                      key=lambda x, _mro_index=self.mro().index: _mro_index(x[0]))  # type: ignore
+                                           key=lambda i: i.cls)),
+                      key=lambda x, _mro_index=self.mro().index: _mro_index(x[0])) # type: ignore
 
     def _fill_inheritance(self):
         """
