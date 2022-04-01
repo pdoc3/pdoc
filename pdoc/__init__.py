@@ -1020,7 +1020,8 @@ class Class(Doc):
     """
     __slots__ = ('doc', 'cls', '_super_members')
 
-    def __init__(self, name: str, module: Module, obj, *, docstring: str = None, cls: 'Class' = None):
+    def __init__(self, name: str, module: Module, obj, *, docstring: str = None,
+                 cls: 'Class' = None):
         assert inspect.isclass(obj)
 
         if docstring is None:
@@ -1030,12 +1031,12 @@ class Class(Doc):
             docstring = f'{inspect.getdoc(obj) or ""}\n\n{init_doc}'.strip()
 
         super().__init__(name, module, obj, docstring=docstring)
-        
+
         self.cls = cls
         """
         The `pdoc.Class` object if this class is defined in a class. If not,
         this is None.
-        """        
+        """
 
         self.doc: Dict[str, Union[Function, Variable, Class]] = {}
         """A mapping from identifier name to a `pdoc.Doc` objects."""
@@ -1184,7 +1185,7 @@ class Class(Doc):
         result = [obj for obj in _filter_type(type, self.doc)
                   if (include_inherited or not obj.inherits) and filter_func(obj)]
         return sorted(result) if sort else result
-    
+
     def classes(self, include_inherited=False, sort=False):
         """Returns the classes nested in this class."""
         return self._filter_doc_objs(
