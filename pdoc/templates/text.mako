@@ -12,21 +12,21 @@
 </%def>
 
 <%def name="function(func)" buffered="True">
-    <%
+<%
         returns = show_type_annotations and func.return_annotation() or ''
         if returns:
             returns = ' \N{non-breaking hyphen}> ' + returns
-    %>
+%>
 `${func.name}(${", ".join(func.params(annotate=show_type_annotations))})${returns}`
 ${func.docstring | deflist}
 </%def>
 
 <%def name="variable(var)" buffered="True">
-    <%
+<%
         annot = show_type_annotations and var.type_annotation() or ''
         if annot:
             annot = ': ' + annot
-    %>
+%>
 `${var.name}${annot}`
 ${var.docstring | deflist}
 </%def>
