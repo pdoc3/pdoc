@@ -1088,8 +1088,7 @@ class Class(Doc):
                     self.name + "." + name,
                     self.module,
                     obj,
-                    cls=self,
-                    docstring=inspect.getdoc(obj)
+                    cls=self
                 )
             else:
                 self.doc[name] = Variable(
