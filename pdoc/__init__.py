@@ -943,19 +943,19 @@ class Module(Doc):
         """
         return self._filter_doc_objs(Variable, sort)
 
-    def classes(self, sort=True) -> List['Class']:
+    def _classes(self, sort=True) -> List['Class']:
         """
         Returns all documented module-level classes in the module,
         optionally sorted alphabetically, as a list of `pdoc.Class`.
         """
         return self._filter_doc_objs(Class, sort)
 
-    def all_classes(self, sort=True) -> List['Class']:
+    def classes(self, sort=True) -> List['Class']:
         """
-        Returns all documented classes in the module even the ones defined
-        in other classes.
+        Returns all documented classes in the module and all their
+        nested classes.
         """
-        stack = self.classes(sort)[::-1]
+        stack = self._classes(sort)[::-1]
         results = []
         while stack:
             c = stack.pop()
