@@ -3,6 +3,7 @@ Unit tests for pdoc package.
 """
 import doctest
 import enum
+import importlib
 import inspect
 import os
 import shutil
@@ -1025,6 +1026,41 @@ class Foo:
         self.assertEqual(pdoc.Class('E', mod, E).docstring, """foo\n\nbaz""")
         self.assertEqual(pdoc.Class('F', mod, F).docstring, """baz\n\nbar""")
         self.assertEqual(pdoc.Class('G', mod, G).docstring, """foo\n\nbar""")
+
+    def test_nested_classes(self):
+        m_name = 'M'
+        m_spec = importlib.util.spec_from_loader(m_name, loader=None)
+        m_module = importlib.util.module_from_spec(m_spec)
+        code = '''
+class A:
+    """Class A documentation"""
+    class B:
+        """ Class A.B documentation"""
+        class C:
+            """ Class A.B.C documentation"""
+            pass
+'''
+        exec(code, m_module.__dict__)
+
+        A = m_module.A
+        B = A.B
+        C = B.C
+
+        sys.modules[m_name] = m_module
+
+        try:
+            mod = pdoc.Module('M', context=pdoc.Context())
+            print([c.qualname for c in mod.classes()])
+            self.assertEqual([c.qualname for c in mod.classes()], ['A', 'A.B', 'A.B.C'])
+            self.assertEqual([c.qualname for c in pdoc.Class('A', mod, A).classes()], ['A.B'])
+            self.assertEqual([c.qualname for c in pdoc.Class('B', mod, B).classes()], ['A.B.C'])
+            self.assertEqual([c.qualname for c in pdoc.Class('C', mod, C).classes()], [])
+
+            self.assertEqual(pdoc.Class('A', mod, A).docstring, "Class A documentation")
+            self.assertEqual(pdoc.Class('B', mod, B).docstring, "Class A.B documentation")
+            self.assertEqual(pdoc.Class('C', mod, C).docstring, "Class A.B.C documentation")
+        finally:
+            del sys.modules[m_name]
 
     @ignore_warnings
     def test_Class_params(self):
