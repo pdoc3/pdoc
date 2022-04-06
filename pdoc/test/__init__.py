@@ -1050,7 +1050,6 @@ class A:
 
         try:
             mod = pdoc.Module('M', context=pdoc.Context())
-            print([c.qualname for c in mod.classes()])
             self.assertEqual([c.qualname for c in mod.classes()], ['A', 'A.B', 'A.B.C'])
             self.assertEqual([c.qualname for c in pdoc.Class('A', mod, A).classes()], ['A.B'])
             self.assertEqual([c.qualname for c in pdoc.Class('B', mod, B).classes()], ['A.B.C'])
