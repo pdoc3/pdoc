@@ -712,7 +712,15 @@ class Module(Doc):
             if _is_function(obj):
                 self.doc[name] = Function(name, self, obj)
             elif inspect.isclass(obj):
-                self.doc[name] = Class(name, self, obj)
+                cl = Class(name, self, obj)
+                self.doc[name] = cl
+                # Also add all nested classes of the class just found to the
+                # module context, otherwise some classes will be recognized
+                # as "External" even though they were correctly recognized
+                # as "Class" during an earlier scanning process
+                # (=> Module.find_ident()).
+                for ncl in cl.all_nested_classes():
+                    self.doc[f'{name}.{ncl.name}'] = ncl
             elif name in var_docstrings:
                 self.doc[name] = Variable(name, self, var_docstrings[name], obj=obj)
 
@@ -955,12 +963,10 @@ class Module(Doc):
         Returns all documented classes in the module and all their
         nested classes.
         """
-        stack = self._classes(sort)[::-1]
         results = []
-        while stack:
-            c = stack.pop()
+        for c in self._classes(sort)[::-1]:
             results.append(c)
-            stack.extend(c.classes(sort=sort)[::-1])
+            results += c.all_nested_classes()
         return results
 
     def functions(self, sort=True) -> List['Function']:
@@ -1229,6 +1235,19 @@ class Class(Doc):
         return self._filter_doc_objs(
             Function, include_inherited, lambda dobj: not dobj.is_method,
             sort)
+
+    def all_nested_classes(self, include_inherited=True, sort=True) -> List['Class']:
+        """
+        Returns an optionally-sorted list of `pdoc.Class` objects that
+        represent this class' nested classes.
+        """
+        stack = self.classes(sort)[::-1]
+        results = []
+        while stack:
+            c = stack.pop()
+            results.append(c)
+            stack.extend(c.classes(sort=sort)[::-1])
+        return results
 
     def inherited_members(self) -> List[Tuple['Class', List[Doc]]]:
         """
