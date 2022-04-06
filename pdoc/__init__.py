@@ -719,8 +719,8 @@ class Module(Doc):
                 # as "External" even though they were correctly recognized
                 # as "Class" during an earlier scanning process
                 # (=> Module.find_ident()).
-                for ncl in cl.all_nested_classes():
-                    self.doc[f'{name}.{ncl.name}'] = ncl
+                for ncl in cl._nested_classes():
+                    self.doc[ncl.name] = ncl
             elif name in var_docstrings:
                 self.doc[name] = Variable(name, self, var_docstrings[name], obj=obj)
 
@@ -1225,7 +1225,7 @@ class Class(Doc):
             Function, include_inherited, lambda dobj: not dobj.is_method,
             sort)
 
-    def all_nested_classes(self, include_inherited=True, sort=True) -> List['Class']:
+    def _nested_classes(self, include_inherited=True, sort=True) -> List['Class']:
         """
         Returns an optionally-sorted list of `pdoc.Class` objects that
         represent this class' nested classes.

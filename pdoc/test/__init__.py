@@ -1034,11 +1034,21 @@ class Foo:
         code = '''
 class A:
     """Class A documentation"""
+    x: str
     class B:
         """ Class A.B documentation"""
         class C:
             """ Class A.B.C documentation"""
             pass
+        class D(A.B.C):
+            """ Class A.B.D documentation"""
+            pass
+    class E(A.B):
+        """ Class A.E documentation"""
+        pass
+class F(A):
+    """ Class F documentation"""
+    pass
 '''
         exec(code, m_module.__dict__)
 
