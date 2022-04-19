@@ -1044,7 +1044,7 @@ class A:
 class D(A):
     pass
 
-class E(A.B.C):
+class E(A.B):
     pass
 '''
         exec(code, m_module.__dict__)
@@ -1058,25 +1058,39 @@ class E(A.B.C):
         sys.modules[m_name] = m_module
 
         try:
-            mod = pdoc.Module('M', context=pdoc.Context())
-            self.assertEqual([c.qualname for c in mod.classes()], ['A', 'A.B', 'A.B.C', 'D', 'E'])
-            self.assertEqual([c.qualname for c in pdoc.Class('A', mod, A).classes()], ['A.B'])
-            self.assertEqual([c.qualname for c in pdoc.Class('B', mod, B).classes()], ['A.B.C'])
-            self.assertEqual([c.qualname for c in pdoc.Class('C', mod, C).classes()], [])
+            mod = pdoc.Module('M')
+            pdoc.link_inheritance()
 
-            self.assertEqual(pdoc.Class('A', mod, A).docstring, "Class A documentation")
-            self.assertEqual(pdoc.Class('B', mod, B).docstring, "Class A.B documentation")
-            self.assertEqual(pdoc.Class('C', mod, C).docstring, "Class A.B.C documentation")
+            pdoc_A = mod.find_ident('A')
+            pdoc_B = mod.find_ident('A.B')
+            pdoc_C = mod.find_ident('A.B.C')
+            pdoc_D = mod.find_ident('D')
+            pdoc_E = mod.find_ident('E')
+
+            self.assertEqual([c.qualname for c in mod.classes()], ['A', 'A.B', 'A.B.C', 'D', 'E'])
+            self.assertEqual([c.qualname for c in pdoc_A.classes()], ['A.B'])
+            self.assertEqual([c.qualname for c in pdoc_B.classes()], ['A.B.C'])
+            self.assertEqual([c.qualname for c in pdoc_C.classes()], [])
+
+            self.assertEqual(pdoc_A.docstring, "Class A documentation")
+            self.assertEqual(pdoc_B.docstring, "Class A.B documentation")
+            self.assertEqual(pdoc_C.docstring, "Class A.B.C documentation")
 
             # D inherits doc from A
-            self.assertEqual([c.qualname for c in pdoc.Class('D', mod, D).mro()], ['A'])
-            self.assertEqual(pdoc.Class('D', mod, D).docstring, "Class A documentation")
+            self.assertEqual([c.qualname for c in pdoc_D.mro()], ['A'])
+            self.assertEqual(pdoc_D.docstring, "Class A documentation")
+            self.assertEqual([c.qualname for c in pdoc_D.classes(include_inherited=False)], [])
+            self.assertEqual([c.qualname for c in pdoc_D.classes(debug=True)], ['A.B', 'A.B.C'])
 
             # E inherits doc from A.B.C
-            self.assertEqual([c.qualname for c in pdoc.Class('E', mod, E).mro()], ['A.B.C'])
+            self.assertEqual([c.qualname for c in pdoc_E.mro()], ['A.B.C'])
             self.assertEqual(pdoc.Class('E', mod, E).docstring, "Class A.B.C documentation")
+            self.assertEqual([c.qualname for c in pdoc_E.classes(include_inherited=False)], [])
+            self.assertEqual([c.qualname for c in pdoc_E.classes()], ['E.C'])
         finally:
             del sys.modules[m_name]
+
+        self.assertFalse(True)
 
     @ignore_warnings
     def test_Class_params(self):
