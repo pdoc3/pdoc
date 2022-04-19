@@ -1181,7 +1181,7 @@ class Class(Doc):
         return sorted(result) if sort else result
 
     def classes(self, include_inherited=True, sort=True):
-        """Returns the classes nested in this class."""
+        """Returns the classes immediately nested in this class."""
         return self._filter_doc_objs(
             Class,
             include_inherited=include_inherited,

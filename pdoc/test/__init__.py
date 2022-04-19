@@ -1049,12 +1049,6 @@ class E(A.B):
 '''
         exec(code, m_module.__dict__)
 
-        A = m_module.A
-        B = A.B
-        C = B.C
-        D = m_module.D
-        E = m_module.E
-
         sys.modules[m_name] = m_module
 
         try:
@@ -1080,17 +1074,15 @@ class E(A.B):
             self.assertEqual([c.qualname for c in pdoc_D.mro()], ['A'])
             self.assertEqual(pdoc_D.docstring, "Class A documentation")
             self.assertEqual([c.qualname for c in pdoc_D.classes(include_inherited=False)], [])
-            self.assertEqual([c.qualname for c in pdoc_D.classes(debug=True)], ['A.B', 'A.B.C'])
+            self.assertEqual([c.qualname for c in pdoc_D.classes()], ['A.B'])
 
-            # E inherits doc from A.B.C
-            self.assertEqual([c.qualname for c in pdoc_E.mro()], ['A.B.C'])
-            self.assertEqual(pdoc.Class('E', mod, E).docstring, "Class A.B.C documentation")
+            # E inherits doc from A.B
+            self.assertEqual([c.qualname for c in pdoc_E.mro()], ['A.B'])
+            self.assertEqual(pdoc_E.docstring, "Class A.B documentation")
             self.assertEqual([c.qualname for c in pdoc_E.classes(include_inherited=False)], [])
-            self.assertEqual([c.qualname for c in pdoc_E.classes()], ['E.C'])
+            self.assertEqual([c.qualname for c in pdoc_E.classes()], ['A.B.C'])
         finally:
             del sys.modules[m_name]
-
-        self.assertFalse(True)
 
     @ignore_warnings
     def test_Class_params(self):
