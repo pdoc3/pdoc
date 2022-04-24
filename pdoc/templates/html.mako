@@ -301,6 +301,13 @@
 
     <h1>Index</h1>
     ${extract_toc(module.docstring) if extract_module_toc_into_sidebar else ''}
+    % if len(static_content):
+    <ul id="static">
+    % for name, filename in static_content.items():
+      <li><h3><a href="${filename}">${name}</a></h3>
+    % endfor
+    </ul>
+    % endif
     <ul id="index">
     % if supermodule:
     <li><h3>Super-module</h3>
