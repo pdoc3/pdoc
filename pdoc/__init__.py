@@ -268,7 +268,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             # before using cleaned doc_obj.source
             _ = inspect.findsource(doc_obj.obj)
             tree = ast.parse(doc_obj.source)  # type: ignore
-        except (OSError, TypeError, SyntaxError) as exc:
+        except (OSError, TypeError, SyntaxError, UnicodeDecodeError) as exc:
             # Don't emit a warning for builtins that don't have source available
             is_builtin = getattr(doc_obj.obj, '__module__', None) == 'builtins'
             if not is_builtin:
