@@ -622,9 +622,9 @@ def _project_relative_path(absolute_path):
     Assumes the project's path is either the current working directory or
     Python library installation.
     """
-    from distutils.sysconfig import get_python_lib
+    from sysconfig import get_path
     for prefix_path in (_git_project_root() or os.getcwd(),
-                        get_python_lib()):
+                        get_path("platlib")):
         common_path = os.path.commonpath([prefix_path, absolute_path])
         if os.path.samefile(common_path, prefix_path):
             # absolute_path is a descendant of prefix_path
