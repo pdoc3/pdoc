@@ -727,6 +727,9 @@ class Module(Doc):
                 """
                 from os.path import isdir, join
                 for pth in paths:
+                    if pth.startswith("__editable__."):
+                        # See https://github.com/pypa/pip/issues/11380
+                        continue
                     for file in os.listdir(pth):
                         if file.startswith(('.', '__pycache__', '__init__.py')):
                             continue
