@@ -533,7 +533,7 @@ class Doc:
     def __repr__(self):
         return f'<{self.__class__.__name__} {self.refname!r}>'
 
-    @property  # type: ignore
+    @property
     @lru_cache()
     def source(self) -> str:
         """
