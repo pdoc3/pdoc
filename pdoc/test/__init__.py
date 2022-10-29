@@ -126,7 +126,8 @@ class CliTest(unittest.TestCase):
     def setUp(self):
         pdoc.reset()
 
-    @unittest.skipIf(sys.version_info < (3, 7), 'pdoc._formatannotation fails on Py3.6')
+    @unittest.skipIf(sys.version_info < (3, 10),
+                     'HACK: _formatannotation() changed return value in Py3.10')
     def test_project_doctests(self):
         doctests = doctest.testmod(pdoc)
         assert not doctests.failed and doctests.attempted, doctests
@@ -185,8 +186,12 @@ class CliTest(unittest.TestCase):
             '<object ',
             ' class="ident">_private',
             ' class="ident">_Private',
-            'non_callable_routine',
         ]
+        if sys.version_info >= (3, 10):
+            include_patterns.append('non_callable_routine')
+        else:
+            exclude_patterns.append('non_callable_routine')
+
         package_files = {
             '': self.PUBLIC_FILES,
             '.subpkg2': [f for f in self.PUBLIC_FILES
@@ -356,8 +361,11 @@ class CliTest(unittest.TestCase):
             '_Private',
             'subprocess',
             'Hidden',
-            'non_callable_routine',
         ]
+        if sys.version_info >= (3, 10):
+            include_patterns.append('non_callable_routine')
+        else:
+            exclude_patterns.append('non_callable_routine')
 
         with self.subTest(package=EXAMPLE_MODULE):
             with redirect_streams() as (stdout, _):
@@ -543,8 +551,9 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(doc.doc['vars_dont'].docstring, '')
         self.assertIn('integer', doc.doc['but_clss_have_doc'].docstring)
 
+    @unittest.skipIf(sys.version_info >= (3, 10), 'No builtin module "parser" in Py3.10')
     def test_builtin_methoddescriptors(self):
-        import parser
+        import parser  # TODO: replace with another public binary builtin
         with self.assertWarns(UserWarning):
             c = pdoc.Class('STType', pdoc.Module(parser), parser.STType)
         self.assertIsInstance(c.doc['compile'], pdoc.Function)
@@ -906,9 +915,13 @@ class ApiTest(unittest.TestCase):
         def bug253_newtype_annotation(a: CustomType):
             return
 
+        expected = CustomType.__name__
+        if sys.version_info > (3, 10):
+            expected = f'{__name__}.{CustomType.__name__}'
+
         self.assertEqual(
             pdoc.Function('bug253', mod, bug253_newtype_annotation).params(annotate=True),
-            ['a:\N{NBSP}CustomType'])
+            [f'a:\N{NBSP}{expected}'])
 
         # typing.Callable bug
         def f(a: typing.Callable):

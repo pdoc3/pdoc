@@ -1275,7 +1275,7 @@ def _formatannotation(annot):
     `typing.Optional`, `nptyping.NDArray` and other types.
 
     >>> _formatannotation(NewType('MyType', str))
-    'MyType'
+    'pdoc.MyType'
     >>> _formatannotation(Optional[Tuple[Optional[int], None]])
     'Optional[Tuple[Optional[int], None]]'
     """
