@@ -2,8 +2,7 @@
 
 pdoc
 ====
-
-[![Build Status](https://img.shields.io/github/workflow/status/pdoc3/pdoc/CI?style=for-the-badge)](https://github.com/pdoc3/pdoc/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/pdoc3/pdoc/ci.yml?branch=master&style=for-the-badge)](https://github.com/pdoc3/pdoc/actions)
 [![Code Coverage](https://img.shields.io/codecov/c/gh/pdoc3/pdoc.svg?style=for-the-badge)](https://codecov.io/gh/pdoc3/pdoc)
 [![pdoc3 on PyPI](https://img.shields.io/pypi/v/pdoc3.svg?color=blue&style=for-the-badge)](https://pypi.org/project/pdoc3)
 [![package downloads](https://img.shields.io/pypi/dm/pdoc3.svg?color=skyblue&style=for-the-badge)](https://pypi.org/project/pdoc3)
