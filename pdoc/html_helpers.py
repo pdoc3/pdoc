@@ -409,8 +409,10 @@ class _MathPattern(InlineProcessor):
 
 def to_html(text: str, *,
             docformat: str = None,
-            module: pdoc.Module = None, link: Callable[..., str] = None,
-            latex_math: bool = False):
+            module: pdoc.Module = None,
+            link: Callable[..., str] = None,
+            latex_math: bool = False,
+            md_extensions: dict = None):
     """
     Returns HTML of `text` interpreted as `docformat`. `__docformat__` is respected
     if present, otherwise Numpydoc and Google-style docstrings are assumed,
@@ -427,6 +429,10 @@ def to_html(text: str, *,
         _md.inlinePatterns.register(_MathPattern(_MathPattern.PATTERN),
                                     _MathPattern.NAME,
                                     _MathPattern.PRIORITY)
+
+    # Optionally register additional markdown extensions
+    if md_extensions is not None:
+        _md.registerExtensions(**md_extensions)
 
     md = to_markdown(text, docformat=docformat, module=module, link=link)
     return _md.reset().convert(md)

@@ -15,7 +15,7 @@
 
 
   def to_html(text):
-    return _to_html(text, docformat=docformat, module=module, link=link, latex_math=latex_math)
+    return _to_html(text, docformat=docformat, module=module, link=link, latex_math=latex_math, md_extensions=md_extensions)
 
 
   def get_annotation(bound_method, sep=':'):
