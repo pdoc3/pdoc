@@ -433,10 +433,10 @@ class CliTest(unittest.TestCase):
                                              for file in self.PUBLIC_FILES])
 
     def test_google_analytics(self):
-        expected = ['google-analytics.com']
+        expected = ['googletagmanager.com']
         with run_html(EXAMPLE_MODULE):
             self._check_files((), exclude_patterns=expected)
-        with run_html(EXAMPLE_MODULE, config='google_analytics="UA-xxxxxx-y"'):
+        with run_html(EXAMPLE_MODULE, config='google_analytics="G-xxxxxxxxxx"'):
             self._check_files(expected)
 
     def test_relative_dir_path(self):

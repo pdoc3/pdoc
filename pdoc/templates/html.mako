@@ -392,10 +392,13 @@
   <style media="print">${css.print()}</style>
 
   % if google_analytics:
+    <script async src="https://www.googletagmanager.com/gtag/js?id=${google_analytics}"></script>
     <script>
-    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-    ga('create', '${google_analytics}', 'auto'); ga('send', 'pageview');
-    </script><script async src='https://www.google-analytics.com/analytics.js'></script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '${google_analytics}');
+    </script>
   % endif
 
   % if google_search_query:
