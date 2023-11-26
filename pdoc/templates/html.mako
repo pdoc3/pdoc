@@ -99,7 +99,7 @@
   <%
   variables = module.variables(sort=sort_identifiers)
   classes = module.classes(sort=sort_identifiers)
-  enums = module.enums(sort=False)
+  enums = module.enums(sort=sort_identifiers)
   functions = module.functions(sort=sort_identifiers)
   submodules = module.submodules()
   %>
