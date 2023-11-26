@@ -963,7 +963,7 @@ class Module(Doc):
         optionally sorted alphabetically, as a list of `pdoc.Class`.
         """
         enums = list(filter(lambda v: type(v) is EnumClass, self.doc.values()))
-        return sorted(enums) if sort is True else enums
+        return sorted(enums, key=lambda x: x.value) if sort is True else enums
 
     def functions(self, sort=True) -> List['Function']:
         """
@@ -1085,7 +1085,7 @@ class Class(Doc):
                         var_docstrings.get(name) or
                         (inspect.isclass(obj) or _is_descriptor(obj)) and inspect.getdoc(obj)),
                     cls=self,
-                    obj=obj,
+                    obj=getattr(obj, 'fget', getattr(obj, '__get__', None)) or obj,
                     instance_var=(_is_descriptor(obj) or
                                   name in getattr(self.obj, '__slots__', ())))
 
