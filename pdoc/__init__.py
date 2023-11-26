@@ -421,14 +421,14 @@ def _is_descriptor(obj):
             inspect.ismemberdescriptor(obj))
 
 
-def _filter_type(type: Type[T],
+def _filter_type(instance_type: Type[T],
                  values: Union[Iterable['Doc'], Mapping[str, 'Doc']]) -> List[T]:
     """
-    Return a list of values from `values` of type `type`.
+    Return a list of values from `values` of type `instance_type`.
     """
     if isinstance(values, dict):
         values = values.values()
-    return [i for i in values if isinstance(i, type)]
+    return [i for i in values if type(i) is instance_type]
 
 
 def _toposort(graph: Mapping[T, Set[T]]) -> Generator[T, None, None]:
