@@ -957,12 +957,13 @@ class Module(Doc):
         """
         return self._filter_doc_objs(Class, sort)
     
-    def enums(self) -> List['EnumClass']:
+    def enums(self, sort=True) -> List['EnumClass']:
         """
         Returns all documented module-level enums in the module,
         optionally sorted alphabetically, as a list of `pdoc.Class`.
         """
-        return list(filter(lambda _, v: type(v) is EnumClass, self.doc.items()))
+        enums = list(filter(lambda _, v: type(v) is EnumClass, self.doc.items()))
+        return sorted(enums) if sort is True else enums
 
     def functions(self, sort=True) -> List['Function']:
         """
