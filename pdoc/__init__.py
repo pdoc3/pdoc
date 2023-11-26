@@ -963,7 +963,7 @@ class Module(Doc):
         optionally sorted alphabetically, as a list of `pdoc.Class`.
         """
         enums = list(filter(lambda v: type(v) is EnumClass, self.doc.values()))
-        return sorted(enums, key=lambda x: x.value) if sort is True else enums
+        return sorted(enums, key=lambda x: x.obj.value) if sort is True else enums
 
     def functions(self, sort=True) -> List['Function']:
         """
