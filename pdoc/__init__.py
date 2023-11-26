@@ -1186,17 +1186,32 @@ class Class(Doc):
         represent this class' methods.
         """
         return self._filter_doc_objs(
-            Function, include_inherited, lambda dobj: dobj.is_method,
+            Function, include_inherited, lambda dobj: dobj.is_instance_method,
             sort)
 
-    def functions(self, include_inherited=True, sort=True) -> List['Function']:
+    def static_methods(self, include_inherited=True, sort=True) -> List['Function']:
         """
         Returns an optionally-sorted list of `pdoc.Function` objects that
-        represent this class' static functions.
+        represent this class' static methods.
         """
         return self._filter_doc_objs(
-            Function, include_inherited, lambda dobj: not dobj.is_method,
-            sort)
+            Function,
+            include_inherited,
+            lambda dobj: Class._method_type(dobj.cls.obj, dobj.name) == staticmethod,
+            sort
+        )
+
+    def class_methods(self, include_inherited=True, sort=True) -> List['Function']:
+        """
+        Returns an optionally-sorted list of `pdoc.Function` objects that
+        represent this class' class methods.
+        """
+        return self._filter_doc_objs(
+            Function,
+            include_inherited,
+            lambda dobj: Class._method_type(dobj.cls.obj, dobj.name) == classmethod,
+            sort
+        )
 
     def inherited_members(self) -> List[Tuple['Class', List[Doc]]]:
         """
@@ -1338,7 +1353,7 @@ class Function(Doc):
         """
 
     @property
-    def is_method(self) -> bool:
+    def is_instance_method(self) -> bool:
         """
         Whether this function is a normal bound method.
 
@@ -1349,9 +1364,9 @@ class Function(Doc):
 
     @property
     def method(self):
-        warn('`Function.method` is deprecated. Use: `Function.is_method`', DeprecationWarning,
+        warn('`Function.method` is deprecated. Use: `Function.is_instance_method`', DeprecationWarning,
              stacklevel=2)
-        return self.is_method
+        return self.is_instance_method
 
     __pdoc__['Function.method'] = False
 

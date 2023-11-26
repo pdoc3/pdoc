@@ -178,7 +178,8 @@
     % for c in classes:
       <%
       class_vars = c.class_variables(show_inherited_members, sort=sort_identifiers)
-      smethods = c.functions(show_inherited_members, sort=sort_identifiers)
+      smethods = c.static_methods(show_inherited_members, sort=sort_identifiers)
+      cmethods = c.class_methods(show_inherited_members, sort=sort_identifiers)
       inst_vars = c.instance_variables(show_inherited_members, sort=sort_identifiers)
       methods = c.methods(show_inherited_members, sort=sort_identifiers)
       mro = c.mro()
@@ -225,6 +226,14 @@
           <h3>Static methods</h3>
           <dl>
           % for f in smethods:
+              ${show_func(f)}
+          % endfor
+          </dl>
+      % endif
+      % if cmethods:
+          <h3>Class methods</h3>
+          <dl>
+          % for f in cmethods:
               ${show_func(f)}
           % endfor
           </dl>
@@ -339,7 +348,11 @@
         <li>
         <h4><code>${link(c)}</code></h4>
         <%
-            members = c.functions(sort=sort_identifiers) + c.methods(sort=sort_identifiers)
+            members = (
+              c.static_methods(sort=sort_identifiers) 
+              + c.class_methods(sort=sort_identifiers)
+              + c.methods(sort=sort_identifiers)
+            )
             if list_class_variables_in_index:
                 members += (c.instance_variables(sort=sort_identifiers) +
                             c.class_variables(sort=sort_identifiers))

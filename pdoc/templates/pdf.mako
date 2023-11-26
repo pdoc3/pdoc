@@ -128,7 +128,7 @@ ${classdef(cls)}
 ${cls.docstring | to_md, subh}
 <%
     class_vars = cls.class_variables(show_inherited_members, sort=sort_identifiers)
-    static_methods = cls.functions(show_inherited_members, sort=sort_identifiers)
+    static_methods = cls.static_methods(show_inherited_members, sort=sort_identifiers)
     inst_vars = cls.instance_variables(show_inherited_members, sort=sort_identifiers)
     methods = cls.methods(show_inherited_members, sort=sort_identifiers)
     mro = cls.mro()
