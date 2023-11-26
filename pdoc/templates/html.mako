@@ -310,6 +310,7 @@
   <%
   variables = module.variables(sort=sort_identifiers)
   classes = module.classes(sort=sort_identifiers)
+  enums = module.enums(sort=sort_identifiers)
   functions = module.functions(sort=sort_identifiers)
   submodules = module.submodules()
   supermodule = module.supermodule
@@ -359,6 +360,18 @@
     % if functions:
     <li><h3><a href="#header-functions">Functions</a></h3>
       ${show_column_list(functions)}
+    </li>
+    % endif
+
+    % if enums:
+    <li><h3><a href="#header-classes">Enums</a></h3>
+      <ul>
+      % for e in enums:
+        <li>
+        <h4><code>${link(e)}</code></h4>
+        </li>
+      % endfor
+      </ul>
     </li>
     % endif
 
