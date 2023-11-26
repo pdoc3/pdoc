@@ -169,15 +169,22 @@
       <%
       definitions = e.class_variables(show_inherited_members, sort=sort_identifiers)
       %>
+
+      <dt id="${e.refname}"><code class="flex name class">
+          <span>enum ${ident(e.name)}</span>
+      </code></dt>
+
+      <dd>${show_desc(e)}
+
       % if definitions:
           <dl>
-          % for v in class_vars:
-              <% return_type = get_annotation(v.type_annotation) %>
-              <dt id="${v.refname}"><code class="name">${ident(v.name)}${return_type}</code></dt>
+          % for v in definitions:
+              <dt id="${v.refname}"><code class="name">${ident(v.name)} = ${v.obj.value}</code></dt>
               <dd>${show_desc(v)}</dd>
           % endfor
           </dl>
       % endif
+      </dd>
     % endfor
     </dl>
     % endif
