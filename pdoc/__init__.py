@@ -1085,7 +1085,7 @@ class Class(Doc):
                         var_docstrings.get(name) or
                         (inspect.isclass(obj) or _is_descriptor(obj)) and inspect.getdoc(obj)),
                     cls=self,
-                    obj=obj,
+                    obj=getattr(obj, 'fget', getattr(obj, '__get__', None)) or obj,
                     instance_var=(_is_descriptor(obj) or
                                   name in getattr(self.obj, '__slots__', ())))
 
