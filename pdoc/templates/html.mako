@@ -167,7 +167,7 @@
     <dl>
     % for e in enums:
       <%
-      definitions = e.class_variables(show_inherited_members, sort=sort_identifiers)
+      definitions = e.class_variables(show_inherited_members, sort=False)
       %>
 
       <dt id="${e.refname}"><code class="flex name class">
