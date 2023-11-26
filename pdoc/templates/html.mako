@@ -99,6 +99,7 @@
   <%
   variables = module.variables(sort=sort_identifiers)
   classes = module.classes(sort=sort_identifiers)
+  enums = module.enums(sort=sort_identifiers)
   functions = module.functions(sort=sort_identifiers)
   submodules = module.submodules()
   %>
@@ -155,6 +156,28 @@
       <% return_type = get_annotation(v.type_annotation) %>
       <dt id="${v.refname}"><code class="name">var ${ident(v.name)}${return_type}</code></dt>
       <dd>${show_desc(v)}</dd>
+    % endfor
+    </dl>
+    % endif
+  </section>
+
+  <section>
+    % if enums:
+    <h2 class="section-title" id="header-functions">Enums</h2>
+    <dl>
+    % for e in enums:
+      <%
+      definitions = c.class_variables(show_inherited_members, sort=sort_identifiers)
+      %>
+      % if definitions:
+          <dl>
+          % for v in class_vars:
+              <% return_type = get_annotation(v.type_annotation) %>
+              <dt id="${v.refname}"><code class="name">${ident(v.name)}${return_type}</code></dt>
+              <dd>${show_desc(v)}</dd>
+          % endfor
+          </dl>
+      % endif
     % endfor
     </dl>
     % endif

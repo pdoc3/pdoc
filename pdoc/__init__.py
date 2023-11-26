@@ -19,6 +19,7 @@ import sys
 import typing
 from contextlib import contextmanager
 from copy import copy
+from enum import Enum
 from functools import lru_cache, reduce, partial, wraps
 from itertools import tee, groupby
 from types import ModuleType
@@ -47,7 +48,7 @@ _URL_PACKAGE_SUFFIX = '/index.html'
 # type.__module__ can be None by the Python spec. In those cases, use this value
 _UNKNOWN_MODULE = '?'
 
-T = TypeVar('T', 'Module', 'Class', 'Function', 'Variable')
+T = TypeVar('T', 'Module', 'Class', 'EnumClass', 'Function', 'Variable')
 
 __pdoc__: Dict[str, Union[bool, str]] = {}
 
@@ -664,7 +665,7 @@ class Module(Doc):
         The parent `pdoc.Module` this module is a submodule of, or `None`.
         """
 
-        self.doc: Dict[str, Union[Module, Class, Function, Variable]] = {}
+        self.doc: Dict[str, Union[Module, Class, EnumClass, Function, Variable]] = {}
         """A mapping from identifier name to a documentation object."""
 
         self._is_inheritance_linked = False
@@ -712,7 +713,10 @@ class Module(Doc):
             if _is_function(obj):
                 self.doc[name] = Function(name, self, obj)
             elif inspect.isclass(obj):
-                self.doc[name] = Class(name, self, obj)
+                if issubclass(obj, Enum):
+                    self.doc[name] = EnumClass(name, self, obj)
+                else:
+                    self.doc[name] = Class(name, self, obj)
             elif name in var_docstrings:
                 self.doc[name] = Variable(name, self, var_docstrings[name], obj=obj)
 
@@ -952,6 +956,13 @@ class Module(Doc):
         optionally sorted alphabetically, as a list of `pdoc.Class`.
         """
         return self._filter_doc_objs(Class, sort)
+    
+    def enums(self) -> List['EnumClass']:
+        """
+        Returns all documented module-level enums in the module,
+        optionally sorted alphabetically, as a list of `pdoc.Class`.
+        """
+        return list(filter(lambda _, v: type(v) is EnumClass, self.doc.items()))
 
     def functions(self, sort=True) -> List['Function']:
         """
@@ -1254,6 +1265,11 @@ class Class(Doc):
                 dobj.docstring = parent_dobj.docstring
         del self._super_members
 
+
+class EnumClass(Class):
+    """
+    Representation of an Enum class' documentation.
+    """
 
 def maybe_lru_cache(func):
     cached_func = lru_cache()(func)
