@@ -420,14 +420,14 @@ def _is_descriptor(obj):
             inspect.ismemberdescriptor(obj))
 
 
-def _filter_type(type: Type[T],
+def _filter_type(instance_type: Type[T],
                  values: Union[Iterable['Doc'], Mapping[str, 'Doc']]) -> List[T]:
     """
-    Return a list of values from `values` of type `type`.
+    Return a list of values from `values` of type `instance_type`.
     """
     if isinstance(values, dict):
         values = values.values()
-    return [i for i in values if isinstance(i, type)]
+    return [i for i in values if type(i) is instance_type]
 
 
 def _toposort(graph: Mapping[T, Set[T]]) -> Generator[T, None, None]:
@@ -514,7 +514,7 @@ class Doc:
         The raw python object.
         """
 
-        docstring = (docstring or inspect.getdoc(obj) or '').strip()
+        docstring = (docstring or '').strip()
         if '.. include::' in docstring:
             from pdoc.html_helpers import _ToMarkdown
             docstring = _ToMarkdown.admonitions(docstring, self.module, ('include',))
@@ -712,7 +712,10 @@ class Module(Doc):
             if _is_function(obj):
                 self.doc[name] = Function(name, self, obj)
             elif inspect.isclass(obj):
-                self.doc[name] = Class(name, self, obj)
+                if getattr(obj, '__pydantic_complete__', None):
+                    self.doc[name] = ModelClass(name, self, obj)
+                else:
+                    self.doc[name] = Class(name, self, obj)
             elif name in var_docstrings:
                 self.doc[name] = Variable(name, self, var_docstrings[name], obj=obj)
 
@@ -952,6 +955,14 @@ class Module(Doc):
         optionally sorted alphabetically, as a list of `pdoc.Class`.
         """
         return self._filter_doc_objs(Class, sort)
+    
+    def models(self, sort=True) -> List['ModelClass']:
+        """
+        Returns all documented module-level Models in the module,
+        optionally sorted alphabetically, as a list of `pdoc.Class`.
+        """
+        models = list(filter(lambda v: type(v) is ModelClass, self.doc.values()))
+        return sorted(models) if sort is True else models
 
     def functions(self, sort=True) -> List['Function']:
         """
@@ -1069,11 +1080,9 @@ class Class(Doc):
             else:
                 self.doc[name] = Variable(
                     name, self.module,
-                    docstring=(
-                        var_docstrings.get(name) or
-                        (inspect.isclass(obj) or _is_descriptor(obj)) and inspect.getdoc(obj)),
+                    docstring=var_docstrings.get(name) or "",
                     cls=self,
-                    obj=getattr(obj, 'fget', getattr(obj, '__get__', None)),
+                    obj=getattr(obj, 'fget', getattr(obj, '__get__', None)) or obj,
                     instance_var=(_is_descriptor(obj) or
                                   name in getattr(self.obj, '__slots__', ())))
 
@@ -1253,6 +1262,47 @@ class Class(Doc):
                 dobj.inherits = parent_dobj
                 dobj.docstring = parent_dobj.docstring
         del self._super_members
+
+
+class ModelClass(Class):
+    """
+    Representation of a Model, e.g. dataclass or Pydantic Model, class' documentation.
+    """
+
+    @property
+    def init_signature(self) -> str:
+        """
+        Return the Model's `__init__` signature.
+        """
+        return ",<br>".join(str(inspect.signature(self.obj)).split(",")) if len(str(inspect.signature(self.obj))) > 80 else str(inspect.signature(self.obj))
+    
+    @property
+    def instance_methods(self) -> List['Function']:
+        """
+        The list of instance methods.
+        """
+        return list(filter(lambda x: x.name not in {"model_post_init"}, self.methods(sort=False)))
+
+    
+    @property
+    def fields(self) -> List['Variable']:
+        """
+        Returns an optionally-sorted list of `pdoc.Variable` objects that
+        represent this class' class variables.
+        """
+        return list(
+            map(
+                lambda item: Variable(
+                    item,
+                    self.module,
+                    self.doc[item].docstring if item in self.doc else "",
+                    cls=self,
+                    obj=self.obj,
+                    instance_var=False
+                ),
+                self.obj.model_fields
+            )
+        )
 
 
 def maybe_lru_cache(func):

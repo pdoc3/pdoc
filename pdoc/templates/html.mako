@@ -46,7 +46,7 @@
   %endif
 </%def>
 
-<%def name="show_desc(d, short=False)">
+<%def name="show_desc(d, short=False, code=True)">
   <%
   inherits = ' inherited' if d.inherits else ''
   docstring = glimpse(d.docstring) if short or inherits else d.docstring
@@ -62,7 +62,7 @@
       </p>
   % endif
   <div class="desc${inherits}">${docstring | to_html}</div>
-  % if not isinstance(d, pdoc.Module):
+  % if code and not isinstance(d, pdoc.Module):
   ${show_source(d)}
   % endif
 </%def>
@@ -98,6 +98,7 @@
 <%def name="show_module(module)">
   <%
   variables = module.variables(sort=sort_identifiers)
+  models = module.models(sort=sort_identifiers)
   classes = module.classes(sort=sort_identifiers)
   functions = module.functions(sort=sort_identifiers)
   submodules = module.submodules()
@@ -166,6 +167,90 @@
     <dl>
     % for f in functions:
       ${show_func(f)}
+    % endfor
+    </dl>
+    % endif
+  </section>
+
+  <section>
+    % if models:
+    <h2 class="section-title" id="header-classes">Models</h2>
+    <dl>
+    % for c in models:
+      <%
+      smethods = c.functions(show_inherited_members, sort=sort_identifiers)
+      inst_vars = c.instance_variables(show_inherited_members, sort=sort_identifiers)
+      mro = c.mro()
+      subclasses = c.subclasses()
+      %>
+      <dt id="${c.refname}"><code class="flex name class">
+          <span>model ${ident(c.name)}</span>
+          <span>(</span><span>${c.init_signature})</span>
+      </code></dt>
+
+      <dd>${c.obj.__doc__ if c.obj.__doc__ is not None else ''}
+
+      % if c.fields:
+          <h3>Fields</h3>
+          <dl>
+          % for v in c.fields:
+              <%
+                return_type = get_annotation(v.type_annotation)
+              %>
+              <dt id="${v.refname}"><code class="name">${ident(v.name)}${return_type}</code></dt>
+              <dd>${show_desc(v, code=False)}</dd>
+          % endfor
+          </dl>
+      % endif
+      % if smethods:
+          <h3>Static methods</h3>
+          <dl>
+          % for f in smethods:
+              ${show_func(f)}
+          % endfor
+          </dl>
+      % endif
+      % if inst_vars:
+          <h3>Instance variables</h3>
+          <dl>
+          % for v in inst_vars:
+              <% return_type = get_annotation(v.type_annotation) %>
+              <dt id="${v.refname}"><code class="name">var ${ident(v.name)}${return_type}</code></dt>
+              <dd>${show_desc(v)}</dd>
+          % endfor
+          </dl>
+      % endif
+      % if c.instance_methods:
+          <h3>Methods</h3>
+          <dl>
+          % for f in c.instance_methods:
+              ${show_func(f)}
+          % endfor
+          </dl>
+      % endif
+
+      % if not show_inherited_members:
+          <%
+              members = c.inherited_members()
+          %>
+          % if members:
+              <h3>Inherited members</h3>
+              <ul class="hlist">
+              % for cls, mems in members:
+                  <li><code><b>${link(cls)}</b></code>:
+                      <ul class="hlist">
+                          % for m in mems:
+                              <li><code>${link(m, name=m.name)}</code></li>
+                          % endfor
+                      </ul>
+
+                  </li>
+              % endfor
+              </ul>
+          % endif
+      % endif
+
+      </dd>
     % endfor
     </dl>
     % endif
@@ -279,6 +364,7 @@
 <%def name="module_index(module)">
   <%
   variables = module.variables(sort=sort_identifiers)
+  models = module.models(sort=sort_identifiers)
   classes = module.classes(sort=sort_identifiers)
   functions = module.functions(sort=sort_identifiers)
   submodules = module.submodules()
@@ -329,6 +415,12 @@
     % if functions:
     <li><h3><a href="#header-functions">Functions</a></h3>
       ${show_column_list(functions)}
+    </li>
+    % endif
+
+    % if models:
+    <li><h3><a href="#header-models">Models</a></h3>
+      ${show_column_list(models)}
     </li>
     % endif
 
