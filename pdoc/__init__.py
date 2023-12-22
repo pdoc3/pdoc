@@ -1567,7 +1567,7 @@ class Function(Doc):
 
                 try:
                     exec(f'def {string}: pass', _globals, _locals)
-                except SyntaxError:
+                except Exception:
                     continue
                 signature = inspect.signature(_locals[self.name])
                 if cleanup_docstring and len(strings) == 1:
