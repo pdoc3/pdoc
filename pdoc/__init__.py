@@ -323,7 +323,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
         if not name:
             continue
 
-        docstring = inspect.cleandoc(str_node.value.s).strip()
+        docstring = inspect.cleandoc(str_node.value).strip()
         if not docstring:
             continue
 
