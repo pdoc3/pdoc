@@ -505,8 +505,12 @@ def main(_args=None):
         pass  # pdoc was not invoked while in a virtual environment
     else:
         from glob import glob
-        from distutils.sysconfig import get_python_lib
-        libdir = get_python_lib(prefix=venv_dir)
+        if sys.version_info >= (3, 11):
+            from sysconfig import get_path
+            libdir = get_path("platlib")
+        else:
+            from distutils.sysconfig import get_python_lib
+            libdir = get_python_lib(prefix=venv_dir)
         sys.path.append(libdir)
         # Resolve egg-links from `setup.py develop` or `pip install -e`
         # XXX: Welcome a more canonical approach

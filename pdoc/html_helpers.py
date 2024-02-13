@@ -4,6 +4,7 @@ Helper functions for HTML output.
 import inspect
 import os
 import re
+import sys
 import subprocess
 import textwrap
 import traceback
@@ -624,9 +625,13 @@ def _project_relative_path(absolute_path):
     Assumes the project's path is either the current working directory or
     Python library installation.
     """
-    from distutils.sysconfig import get_python_lib
-    for prefix_path in (_git_project_root() or os.getcwd(),
-                        get_python_lib()):
+    if sys.version_info >= (3, 11):
+        from sysconfig import get_path
+        libdir = get_path("platlib")
+    else:
+        from distutils.sysconfig import get_python_lib
+        libdir = get_python_lib()
+    for prefix_path in (_git_project_root() or os.getcwd(), libdir):
         common_path = os.path.commonpath([prefix_path, absolute_path])
         if os.path.samefile(common_path, prefix_path):
             # absolute_path is a descendant of prefix_path
