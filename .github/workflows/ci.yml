@@ -2,36 +2,36 @@ name: CI
 on:
   push: { branches: [master] }
   pull_request: { branches: [master] }
-  schedule: [ cron: '12 2 * * 6' ]  # Every Saturday, 02:12
+  schedule: [ cron: '12 2 6 * *' ]
 
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        python-version: [3.7, 3.8, '3.10']
+        python-version: [3.11, '>=3']
         include:
-          - python-version: 3.9
+          - python-version: 3.11
             test-type: lint
-          - python-version: 3.9
+          - python-version: 3.11
             test-type: docs
 
     steps:
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         name: Set up caches
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-py${{ matrix.python-version }}
 
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 3
       - name: Fetch tags
