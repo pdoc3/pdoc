@@ -33,7 +33,7 @@ jobs:
           pip install flake8 coverage mypy types-Markdown
           sudo apt update && sudo apt-get install \
             texlive-xetex lmodern texlive-fonts-recommended  # test_pdf_pandoc
-          wget -O/tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/2.10/pandoc-2.10-1-amd64.deb && sudo dpkg -i /tmp/pandoc.deb
+          wget -O/tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/3.1.12.2/pandoc-3.1.12.2-1-amd64.deb && sudo dpkg -i /tmp/pandoc.deb
 
       - run: find -name '*.md' | xargs .github/lint-markdown.sh
       - run: flake8 pdoc setup.py
@@ -42,6 +42,10 @@ jobs:
       - run: bash <(curl -s https://codecov.io/bash)
       - run: coverage report
       - run: PDOC_TEST_PANDOC=1 time python -m unittest -v pdoc.test.CliTest.test_pdf_pandoc
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Pdoc Documentation.pdf
+          path: /tmp/pdoc.pdf
 
   docs:
     runs-on: ubuntu-latest
