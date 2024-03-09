@@ -316,14 +316,14 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
     for assign_node, str_node in _pairwise(ast.iter_child_nodes(tree)):
         if not (isinstance(assign_node, (ast.Assign, ast.AnnAssign)) and
                 isinstance(str_node, ast.Expr) and
-                isinstance(str_node.value, ast.Str)):
+                isinstance(str_node.value, ast.Constant)):
             continue
 
         name = get_name(assign_node)
         if not name:
             continue
 
-        docstring = inspect.cleandoc(str_node.value.s).strip()
+        docstring = inspect.cleandoc(str_node.value.value).strip()
         if not docstring:
             continue
 
