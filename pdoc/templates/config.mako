@@ -61,4 +61,7 @@
     # Note: in Python docstrings, either all backslashes need to be escaped (\\)
     # or you need to use raw r-strings.
     latex_math = False
+
+    # Register additional markdown extensions. See: https://python-markdown.github.io/extensions/admonition/
+    md_extensions = {'extensions': [], 'configs': {}}
 %>
