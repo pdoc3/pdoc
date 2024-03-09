@@ -8,7 +8,7 @@ pdoc
 [![package downloads](https://img.shields.io/pypi/dm/pdoc3.svg?color=skyblue&style=for-the-badge)](https://pypi.org/project/pdoc3)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/kernc?color=pink&style=for-the-badge)](https://github.com/sponsors/kernc)
 
-Auto-generate API documentation for Python projects.
+Auto-generate API documentation for Python 3+ projects.
 
 [**Project website**](https://pdoc3.github.io/pdoc/)
 
