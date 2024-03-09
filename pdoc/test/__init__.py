@@ -417,7 +417,7 @@ class CliTest(unittest.TestCase):
             run('pdoc', pdf=None)
             f.write(stdout.getvalue())
             subprocess.run(pdoc.cli._PANDOC_COMMAND, shell=True, check=True)
-            self.assertTrue(os.path.exists('pdf.pdf'))
+            self.assertTrue(os.path.exists('/tmp/pdoc.pdf'))
 
     def test_config(self):
         with run_html(EXAMPLE_MODULE, config='link_prefix="/foobar/"'):

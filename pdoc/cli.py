@@ -593,7 +593,7 @@ _PANDOC_COMMAND = '''\
 pandoc --metadata=title:"MyProject Documentation"               \\
        --from=markdown+abbreviations+tex_math_single_backslash  \\
        --pdf-engine=xelatex --variable=mainfont:"DejaVu Sans"   \\
-       --toc --toc-depth=4 --output=pdf.pdf  pdf.md\
+       --toc --toc-depth=4 --output=/tmp/pdoc.pdf  pdf.md
 '''
 
 
