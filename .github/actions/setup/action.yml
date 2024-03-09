@@ -1,0 +1,21 @@
+name: 'Default Checkout'
+description: 'checkout & setup'
+inputs:
+  python-version:
+    description: 'Python version'
+    required: true
+    default: '>=3'
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+    - uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/pip
+          ~\AppData\Local\pip\Cache
+          ~/Library/Caches/pip
+        key: ${{ runner.os }}-py${{ inputs.python-version }}
