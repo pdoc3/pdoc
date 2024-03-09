@@ -36,7 +36,7 @@ jobs:
           wget -O/tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/2.10/pandoc-2.10-1-amd64.deb && sudo dpkg -i /tmp/pandoc.deb
 
       - run: find -name '*.md' | xargs .github/lint-markdown.sh
-      - run: flake8
+      - run: flake8 pdoc setup.py
       - run: mypy -p pdoc
       - run: time coverage run -m unittest -v pdoc.test
       - run: bash <(curl -s https://codecov.io/bash)
