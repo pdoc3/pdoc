@@ -70,10 +70,10 @@ def run(*args, **kwargs) -> int:
     params = list(filter(None, chain.from_iterable(params)))  # type: ignore
     _args = cli.parser.parse_args([*params, *args])           # type: ignore
     try:
-        returncode = cli.main(_args)
-        return returncode or 0
+        cli.main(_args)
+        return 0
     except SystemExit as e:
-        return e.code
+        return bool(e.code)
 
 
 @contextmanager
@@ -953,7 +953,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(func.params(), ['a', '/'])
 
     def test_Function_return_annotation(self):
-        def f() -> typing.List[typing.Union[str, pdoc.Doc]]: pass
+        def f() -> typing.List[typing.Union[str, pdoc.Doc]]: return []
         func = pdoc.Function('f', DUMMY_PDOC_MODULE, f)
         self.assertEqual(func.return_annotation(), 'List[Union[str,\N{NBSP}pdoc.Doc]]')
 

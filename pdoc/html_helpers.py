@@ -9,7 +9,7 @@ import textwrap
 import traceback
 from contextlib import contextmanager
 from functools import partial, lru_cache
-from typing import Callable, Match
+from typing import Callable, Match, Optional
 from warnings import warn
 import xml.etree.ElementTree as etree
 
@@ -408,8 +408,9 @@ class _MathPattern(InlineProcessor):
 
 
 def to_html(text: str, *,
-            docformat: str = None,
-            module: pdoc.Module = None, link: Callable[..., str] = None,
+            docformat: Optional[str] = None,
+            module: Optional[pdoc.Module] = None,
+            link: Optional[Callable[..., str]] = None,
             latex_math: bool = False):
     """
     Returns HTML of `text` interpreted as `docformat`. `__docformat__` is respected
@@ -433,8 +434,9 @@ def to_html(text: str, *,
 
 
 def to_markdown(text: str, *,
-                docformat: str = None,
-                module: pdoc.Module = None, link: Callable[..., str] = None):
+                docformat: Optional[str] = None,
+                module: Optional[pdoc.Module] = None,
+                link: Optional[Callable[..., str]] = None):
     """
     Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
     `__docformat__` is respected
