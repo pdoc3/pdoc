@@ -712,7 +712,15 @@ class Module(Doc):
             if _is_function(obj):
                 self.doc[name] = Function(name, self, obj)
             elif inspect.isclass(obj):
-                self.doc[name] = Class(name, self, obj)
+                cl = Class(name, self, obj)
+                self.doc[name] = cl
+                # Also add all nested classes of the class just found to the
+                # module context, otherwise some classes will be recognized
+                # as "External" even though they were correctly recognized
+                # as "Class" during an earlier scanning process
+                # (=> Module.find_ident()).
+                for ncl in cl._nested_classes():
+                    self.doc[ncl.name] = ncl
             elif name in var_docstrings:
                 self.doc[name] = Variable(name, self, var_docstrings[name], obj=obj)
 
@@ -948,7 +956,7 @@ class Module(Doc):
 
     def classes(self, sort=True) -> List['Class']:
         """
-        Returns all documented module-level classes in the module,
+        Returns all documented classes in the module,
         optionally sorted alphabetically, as a list of `pdoc.Class`.
         """
         return self._filter_doc_objs(Class, sort)
@@ -1008,9 +1016,10 @@ class Class(Doc):
     """
     Representation of a class' documentation.
     """
-    __slots__ = ('doc', '_super_members')
+    __slots__ = ('doc', 'cls', '_super_members')
 
-    def __init__(self, name: str, module: Module, obj, *, docstring: str = None):
+    def __init__(self, name: str, module: Module, obj, *, docstring: str = None,
+                 cls: 'Class' = None):
         assert inspect.isclass(obj)
 
         if docstring is None:
@@ -1021,7 +1030,13 @@ class Class(Doc):
 
         super().__init__(name, module, obj, docstring=docstring)
 
-        self.doc: Dict[str, Union[Function, Variable]] = {}
+        self.cls = cls
+        """
+        The `pdoc.Class` object if this class is defined in a class. If not,
+        this is None.
+        """
+
+        self.doc: Dict[str, Union[Function, Variable, Class]] = {}
         """A mapping from identifier name to a `pdoc.Doc` objects."""
 
         # Annotations for filtering.
@@ -1066,6 +1081,13 @@ class Class(Doc):
             if _is_function(obj):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self)
+            elif inspect.isclass(obj):
+                self.doc[name] = Class(
+                    self.name + "." + name,
+                    self.module,
+                    obj,
+                    cls=self
+                )
             else:
                 self.doc[name] = Variable(
                     name, self.module,
@@ -1161,6 +1183,14 @@ class Class(Doc):
                   if (include_inherited or not obj.inherits) and filter_func(obj)]
         return sorted(result) if sort else result
 
+    def classes(self, include_inherited=True, sort=True):
+        """Returns the classes immediately nested in this class."""
+        return self._filter_doc_objs(
+            Class,
+            include_inherited=include_inherited,
+            sort=sort
+        )
+
     def class_variables(self, include_inherited=True, sort=True) -> List['Variable']:
         """
         Returns an optionally-sorted list of `pdoc.Variable` objects that
@@ -1198,6 +1228,19 @@ class Class(Doc):
             Function, include_inherited, lambda dobj: not dobj.is_method,
             sort)
 
+    def _nested_classes(self, include_inherited=True, sort=True) -> List['Class']:
+        """
+        Returns an optionally-sorted list of `pdoc.Class` objects that
+        represent this class' nested classes.
+        """
+        stack = self.classes(sort)[::-1]
+        results = []
+        while stack:
+            c = stack.pop()
+            results.append(c)
+            stack.extend(c.classes(sort=sort)[::-1])
+        return results
+
     def inherited_members(self) -> List[Tuple['Class', List[Doc]]]:
         """
         Returns all inherited members as a list of tuples
@@ -1207,7 +1250,7 @@ class Class(Doc):
         return sorted(((cast(Class, k), sorted(g))
                        for k, g in groupby((i.inherits
                                             for i in self.doc.values() if i.inherits),
-                                           key=lambda i: i.cls)),                   # type: ignore
+                                           key=lambda i: i.cls)),
                       key=lambda x, _mro_index=self.mro().index: _mro_index(x[0]))  # type: ignore
 
     def _fill_inheritance(self):
