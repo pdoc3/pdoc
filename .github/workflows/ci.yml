@@ -2,72 +2,61 @@ name: CI
 on:
   push: { branches: [master] }
   pull_request: { branches: [master] }
-  schedule: [ cron: '12 2 * * 6' ]  # Every Saturday, 02:12
+  schedule: [ cron: '12 2 6 * *' ]
 
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-18.04
-
-    strategy:
-      matrix:
-        python-version: [3.6, 3.7]
-        include:
-          - python-version: 3.8
-            test-type: lint
-          - python-version: 3.8
-            test-type: docs
-
+  test-matrix:
+    runs-on: ubuntu-latest
     steps:
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '>=3'
 
-      - uses: actions/cache@v2
-        name: Set up caches
+      - run: pip install -U pip setuptools wheel && pip install -U .
+      - run: time python -m unittest -v pdoc.test
+
+  lint-test-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-py${{ matrix.python-version }}
-
-      - name: Checkout repo
-        uses: actions/checkout@v2
+          fetch-depth: 2  # For codecov
+      - uses: ./.github/actions/setup
         with:
-          fetch-depth: 3
-      - name: Fetch tags
-        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          python-version: 3.11
 
-      - name: Install dependencies
-        run: |
-          pip install -U pip setuptools wheel
-          pip install -U .
+      - run: pip install -U pip setuptools wheel && pip install -U .
 
       - name: Install lint dependencies
-        if: matrix.test-type == 'lint'
         run: |
           pip install flake8 coverage mypy types-Markdown
           sudo apt update && sudo apt-get install \
             texlive-xetex lmodern texlive-fonts-recommended  # test_pdf_pandoc
-          wget -O/tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/2.10/pandoc-2.10-1-amd64.deb && sudo dpkg -i /tmp/pandoc.deb
+          wget -O/tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/3.1.12.2/pandoc-3.1.12.2-1-amd64.deb && sudo dpkg -i /tmp/pandoc.deb
 
-      - name: Install docs dependencies
-        if: matrix.test-type == 'docs'
-        run: pip install -e .
+      - run: find -name '*.md' | xargs .github/lint-markdown.sh
+      - run: flake8 pdoc setup.py
+      - run: mypy -p pdoc
+      - run: time coverage run -m unittest -v pdoc.test
+      - run: bash <(curl -s https://codecov.io/bash)
+      - run: coverage report
+      - run: PDOC_TEST_PANDOC=1 time python -m unittest -v pdoc.test.CliTest.test_pdf_pandoc
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Pdoc Documentation.pdf
+          path: /tmp/pdoc.pdf
 
-      - name: Test w/ Coverage, Lint
-        if: matrix.test-type == 'lint'
-        run: |
-          find -name '*.md' | xargs .github/lint-markdown.sh
-          flake8
-          mypy -p pdoc
-          time coverage run -m unittest -v pdoc.test
-          PDOC_TEST_PANDOC=1 time catchsegv python -m unittest -v pdoc.test.CliTest.test_pdf_pandoc
-          bash <(curl -s https://codecov.io/bash)
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          python-version: 3.11
 
-      - name: Test
-        if: '! matrix.test-type'
-        run: time python -m unittest -v pdoc.test
+      - name: Fetch tags
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
-      - name: Test docs
-        if: matrix.test-type == 'docs'
-        run: time doc/build.sh
+      - run: pip install -U pip setuptools wheel && pip install -e .
+      - run: time doc/build.sh

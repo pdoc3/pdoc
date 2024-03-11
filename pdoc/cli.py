@@ -524,12 +524,13 @@ def main(_args=None):
             httpd.server_close()
             sys.exit(0)
 
-    docfilter = None
     if args.filter and args.filter.strip():
         def docfilter(obj, _filters=args.filter.strip().split(',')):
             return any(f in obj.refname or
                        isinstance(obj, pdoc.Class) and f in obj.doc
                        for f in _filters)
+    else:
+        docfilter = None
 
     modules = [pdoc.Module(module, docfilter=docfilter,
                            skip_errors=args.skip_errors)
@@ -592,7 +593,7 @@ _PANDOC_COMMAND = '''\
 pandoc --metadata=title:"MyProject Documentation"               \\
        --from=markdown+abbreviations+tex_math_single_backslash  \\
        --pdf-engine=xelatex --variable=mainfont:"DejaVu Sans"   \\
-       --toc --toc-depth=4 --output=pdf.pdf  pdf.md\
+       --toc --toc-depth=4 --output=/tmp/pdoc.pdf  pdf.md
 '''
 
 

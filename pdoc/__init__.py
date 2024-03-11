@@ -267,7 +267,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             # Maybe raise exceptions with appropriate message
             # before using cleaned doc_obj.source
             _ = inspect.findsource(doc_obj.obj)
-            tree = ast.parse(doc_obj.source)  # type: ignore
+            tree = ast.parse(doc_obj.source)
         except (OSError, TypeError, SyntaxError, UnicodeDecodeError) as exc:
             # Don't emit a warning for builtins that don't have source available
             is_builtin = getattr(doc_obj.obj, '__module__', None) == 'builtins'
@@ -316,14 +316,14 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
     for assign_node, str_node in _pairwise(ast.iter_child_nodes(tree)):
         if not (isinstance(assign_node, (ast.Assign, ast.AnnAssign)) and
                 isinstance(str_node, ast.Expr) and
-                isinstance(str_node.value, ast.Str)):
+                isinstance(str_node.value, ast.Constant)):
             continue
 
         name = get_name(assign_node)
         if not name:
             continue
 
-        docstring = inspect.cleandoc(str_node.value.s).strip()
+        docstring = inspect.cleandoc(str_node.value.value).strip()
         if not docstring:
             continue
 
@@ -345,7 +345,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
         def get_indent(line):
             return len(line) - len(line.lstrip())
 
-        source_lines = doc_obj.source.splitlines()  # type: ignore
+        source_lines = doc_obj.source.splitlines()
         assign_line = source_lines[assign_node.lineno - 1]
         assign_indent = get_indent(assign_line)
         comment_lines = []
@@ -451,7 +451,7 @@ def _toposort(graph: Mapping[T, Set[T]]) -> Generator[T, None, None]:
     assert not graph, f"A cyclic dependency exists amongst {graph!r}"
 
 
-def link_inheritance(context: Context = None):
+def link_inheritance(context: Optional[Context] = None):
     """
     Link inheritance relationsships between `pdoc.Class` objects
     (and between their members) of all `pdoc.Module` objects that
@@ -491,7 +491,7 @@ class Doc:
     """
     __slots__ = ('module', 'name', 'obj', 'docstring', 'inherits')
 
-    def __init__(self, name: str, module, obj, docstring: str = None):
+    def __init__(self, name: str, module, obj, docstring: str = ''):
         """
         Initializes a documentation object, where `name` is the public
         identifier name, `module` is a `pdoc.Module` object where raw
@@ -533,7 +533,7 @@ class Doc:
     def __repr__(self):
         return f'<{self.__class__.__name__} {self.refname!r}>'
 
-    @property  # type: ignore
+    @property
     @lru_cache()
     def source(self) -> str:
         """
@@ -566,7 +566,7 @@ class Doc:
         return getattr(self.obj, '__qualname__', self.name)
 
     @lru_cache()
-    def url(self, relative_to: 'Module' = None, *, link_prefix: str = '',
+    def url(self, relative_to: Optional['Module'] = None, *, link_prefix: str = '',
             top_ancestor: bool = False) -> str:
         """
         Canonical relative URL (including page fragment) for this
@@ -624,8 +624,10 @@ class Module(Doc):
     __slots__ = ('supermodule', 'doc', '_context', '_is_inheritance_linked',
                  '_skipped_submodules')
 
-    def __init__(self, module: Union[ModuleType, str], *, docfilter: Callable[[Doc], bool] = None,
-                 supermodule: 'Module' = None, context: Context = None,
+    def __init__(self, module: Union[ModuleType, str], *,
+                 docfilter: Optional[Callable[[Doc], bool]] = None,
+                 supermodule: Optional['Module'] = None,
+                 context: Optional[Context] = None,
                  skip_errors: bool = False):
         """
         Creates a `Module` documentation object given the actual
@@ -727,6 +729,9 @@ class Module(Doc):
                 """
                 from os.path import isdir, join
                 for pth in paths:
+                    if pth.startswith("__editable__."):
+                        # See https://github.com/pypa/pip/issues/11380
+                        continue
                     for file in os.listdir(pth):
                         if file.startswith(('.', '__pycache__', '__init__.py')):
                             continue
@@ -1007,7 +1012,7 @@ class Class(Doc):
     """
     __slots__ = ('doc', '_super_members')
 
-    def __init__(self, name: str, module: Module, obj, *, docstring: str = None):
+    def __init__(self, name: str, module: Module, obj, *, docstring: Optional[str] = None):
         assert inspect.isclass(obj)
 
         if docstring is None:
@@ -1272,7 +1277,7 @@ def _formatannotation(annot):
     `typing.Optional`, `nptyping.NDArray` and other types.
 
     >>> _formatannotation(NewType('MyType', str))
-    'MyType'
+    'pdoc.MyType'
     >>> _formatannotation(Optional[Tuple[Optional[int], None]])
     'Optional[Tuple[Optional[int], None]]'
     """
@@ -1314,7 +1319,7 @@ class Function(Doc):
     """
     __slots__ = ('cls',)
 
-    def __init__(self, name: str, module: Module, obj, *, cls: Class = None):
+    def __init__(self, name: str, module: Module, obj, *, cls: Optional[Class] = None):
         """
         Same as `pdoc.Doc`, except `obj` must be a
         Python function object. The docstring is gathered automatically.
@@ -1416,7 +1421,8 @@ class Function(Doc):
             s = re.sub(r'[\w\.]+', partial(_linkify, link=link, module=self.module), s)
         return s
 
-    def params(self, *, annotate: bool = False, link: Callable[[Doc], str] = None) -> List[str]:
+    def params(self, *, annotate: bool = False,
+               link: Optional[Callable[[Doc], str]] = None) -> List[str]:
         """
         Returns a list where each element is a nicely formatted
         parameter of this function. This includes argument lists,
@@ -1564,7 +1570,7 @@ class Function(Doc):
 
                 try:
                     exec(f'def {string}: pass', _globals, _locals)
-                except SyntaxError:
+                except Exception:
                     continue
                 signature = inspect.signature(_locals[self.name])
                 if cleanup_docstring and len(strings) == 1:
@@ -1586,7 +1592,7 @@ class Variable(Doc):
     __slots__ = ('cls', 'instance_var')
 
     def __init__(self, name: str, module: Module, docstring, *,
-                 obj=None, cls: Class = None, instance_var: bool = False):
+                 obj=None, cls: Optional[Class] = None, instance_var: bool = False):
         """
         Same as `pdoc.Doc`, except `cls` should be provided
         as a `pdoc.Class` object when this is a class or instance

@@ -70,10 +70,10 @@ def run(*args, **kwargs) -> int:
     params = list(filter(None, chain.from_iterable(params)))  # type: ignore
     _args = cli.parser.parse_args([*params, *args])           # type: ignore
     try:
-        returncode = cli.main(_args)
-        return returncode or 0
+        cli.main(_args)
+        return 0
     except SystemExit as e:
-        return e.code
+        return bool(e.code)
 
 
 @contextmanager
@@ -126,7 +126,8 @@ class CliTest(unittest.TestCase):
     def setUp(self):
         pdoc.reset()
 
-    @unittest.skipIf(sys.version_info < (3, 7), 'pdoc._formatannotation fails on Py3.6')
+    @unittest.skipIf(sys.version_info < (3, 10),
+                     'HACK: _formatannotation() changed return value in Py3.10')
     def test_project_doctests(self):
         doctests = doctest.testmod(pdoc)
         assert not doctests.failed and doctests.attempted, doctests
@@ -185,8 +186,12 @@ class CliTest(unittest.TestCase):
             '<object ',
             ' class="ident">_private',
             ' class="ident">_Private',
-            'non_callable_routine',
         ]
+        if sys.version_info >= (3, 10):
+            include_patterns.append('non_callable_routine')
+        else:
+            exclude_patterns.append('non_callable_routine')
+
         package_files = {
             '': self.PUBLIC_FILES,
             '.subpkg2': [f for f in self.PUBLIC_FILES
@@ -245,13 +250,13 @@ class CliTest(unittest.TestCase):
             )
 
     def test_docformat(self):
-        with self.assertWarns(UserWarning) as cm,\
+        with self.assertWarns(UserWarning) as cm, \
                 run_html(EXAMPLE_MODULE, config='docformat="restructuredtext"'):
             self._basic_html_assertions()
         self.assertIn('numpy', cm.warning.args[0])
 
     def test_html_no_source(self):
-        with self.assertWarns(DeprecationWarning),\
+        with self.assertWarns(DeprecationWarning), \
                 run_html(EXAMPLE_MODULE, html_no_source=None):
             self._basic_html_assertions()
             self._check_files(exclude_patterns=['class="source"', 'Hidden'])
@@ -296,7 +301,7 @@ class CliTest(unittest.TestCase):
             self._basic_html_assertions()
             self._check_files(exclude_patterns=['<a href="/sys.version.ext"'])
 
-        with self.assertWarns(DeprecationWarning),\
+        with self.assertWarns(DeprecationWarning), \
                 run_html(EXAMPLE_MODULE, external_links=None):
             self._basic_html_assertions()
             self._check_files(['<a title="sys.version" href="/sys.version.ext"'])
@@ -314,7 +319,7 @@ class CliTest(unittest.TestCase):
             pdoc.tpl_lookup._collection.clear()
 
     def test_link_prefix(self):
-        with self.assertWarns(DeprecationWarning),\
+        with self.assertWarns(DeprecationWarning), \
                 run_html(EXAMPLE_MODULE, link_prefix='/foobar/'):
             self._basic_html_assertions()
             self._check_files(['/foobar/' + EXAMPLE_MODULE])
@@ -356,8 +361,11 @@ class CliTest(unittest.TestCase):
             '_Private',
             'subprocess',
             'Hidden',
-            'non_callable_routine',
         ]
+        if sys.version_info >= (3, 10):
+            include_patterns.append('non_callable_routine')
+        else:
+            exclude_patterns.append('non_callable_routine')
 
         with self.subTest(package=EXAMPLE_MODULE):
             with redirect_streams() as (stdout, _):
@@ -409,7 +417,7 @@ class CliTest(unittest.TestCase):
             run('pdoc', pdf=None)
             f.write(stdout.getvalue())
             subprocess.run(pdoc.cli._PANDOC_COMMAND, shell=True, check=True)
-            self.assertTrue(os.path.exists('pdf.pdf'))
+            self.assertTrue(os.path.exists('/tmp/pdoc.pdf'))
 
     def test_config(self):
         with run_html(EXAMPLE_MODULE, config='link_prefix="/foobar/"'):
@@ -425,10 +433,10 @@ class CliTest(unittest.TestCase):
                                              for file in self.PUBLIC_FILES])
 
     def test_google_analytics(self):
-        expected = ['google-analytics.com']
+        expected = ['googletagmanager.com']
         with run_html(EXAMPLE_MODULE):
             self._check_files((), exclude_patterns=expected)
-        with run_html(EXAMPLE_MODULE, config='google_analytics="UA-xxxxxx-y"'):
+        with run_html(EXAMPLE_MODULE, config='google_analytics="G-xxxxxxxxxx"'):
             self._check_files(expected)
 
     def test_relative_dir_path(self):
@@ -437,8 +445,8 @@ class CliTest(unittest.TestCase):
                 self._check_files(())
 
     def test_skip_errors(self):
-        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_skip_errors')),\
-                redirect_streams(),\
+        with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_skip_errors')), \
+                redirect_streams(), \
                 self.assertWarns(pdoc.Module.ImportWarning) as cm:
             run('.', skip_errors=None)
         self.assertIn('ZeroDivision', cm.warning.args[0])
@@ -543,8 +551,9 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(doc.doc['vars_dont'].docstring, '')
         self.assertIn('integer', doc.doc['but_clss_have_doc'].docstring)
 
+    @unittest.skipIf(sys.version_info >= (3, 10), 'No builtin module "parser" in Py3.10')
     def test_builtin_methoddescriptors(self):
-        import parser
+        import parser  # TODO: replace with another public binary builtin
         with self.assertWarns(UserWarning):
             c = pdoc.Class('STType', pdoc.Module(parser), parser.STType)
         self.assertIsInstance(c.doc['compile'], pdoc.Function)
@@ -906,9 +915,13 @@ class ApiTest(unittest.TestCase):
         def bug253_newtype_annotation(a: CustomType):
             return
 
+        expected = CustomType.__name__
+        if sys.version_info > (3, 10):
+            expected = f'{__name__}.{CustomType.__name__}'
+
         self.assertEqual(
             pdoc.Function('bug253', mod, bug253_newtype_annotation).params(annotate=True),
-            ['a:\N{NBSP}CustomType'])
+            [f'a:\N{NBSP}{expected}'])
 
         # typing.Callable bug
         def f(a: typing.Callable):
@@ -940,7 +953,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(func.params(), ['a', '/'])
 
     def test_Function_return_annotation(self):
-        def f() -> typing.List[typing.Union[str, pdoc.Doc]]: pass
+        def f() -> typing.List[typing.Union[str, pdoc.Doc]]: return []
         func = pdoc.Function('f', DUMMY_PDOC_MODULE, f)
         self.assertEqual(func.return_annotation(), 'List[Union[str,\N{NBSP}pdoc.Doc]]')
 
