@@ -26,6 +26,7 @@ from typing import (  # noqa: F401
     cast, Any, Callable, Dict, Generator, Iterable, List, Mapping, NewType,
     Optional, Set, Tuple, Type, TypeVar, Union,
 )
+from unittest.mock import Mock
 from warnings import warn
 
 from mako.lookup import TemplateLookup
@@ -410,7 +411,7 @@ def _is_public(ident_name):
 
 
 def _is_function(obj):
-    return inspect.isroutine(obj) and callable(obj)
+    return inspect.isroutine(obj) and callable(obj) and not isinstance(obj, Mock)  # Mock: GH-350
 
 
 def _is_descriptor(obj):
