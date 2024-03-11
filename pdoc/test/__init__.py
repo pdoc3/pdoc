@@ -18,6 +18,7 @@ from functools import wraps
 from glob import glob
 from io import StringIO
 from itertools import chain
+from pathlib import Path
 from random import randint
 from tempfile import TemporaryDirectory
 from time import sleep
@@ -476,6 +477,15 @@ class CliTest(unittest.TestCase):
                 run('evaluated')
             out = out.getvalue()
             self.assertIn('Set[Bar]', out)
+
+    def test_md_extensions(self):
+        with temp_dir() as path, chdir(path):
+            Path('foo.py').write_text('"""secret: meta data\n\nOnly this comment expected."""')
+            with redirect_streams() as (stdout, _), \
+                    run_html('foo.py',
+                             config="md_extensions={'extensions': ['markdown.extensions.meta']}",):
+                self._check_files(include_patterns=['<p>Only this comment expected.</p>'],
+                                  exclude_patterns=['<p>secret: meta data</p>'])
 
 
 class ApiTest(unittest.TestCase):
