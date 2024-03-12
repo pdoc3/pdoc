@@ -1665,6 +1665,8 @@ text <code>x ` http://foo</code> <a href="http://bar">http://bar</a> <code>http:
         expected = r'''<p>Inline equation: <span><span class="MathJax_Preview"> v_t *\frac{1}{2}* j_i + [a] &lt; 3 </span><script type="math/tex"> v_t *\frac{1}{2}* j_i + [a] < 3 </script></span>.</p>
 <p>Block equation: <span><span class="MathJax_Preview"> v_t *\frac{1}{2}* j_i + [a] &lt; 3 </span><script type="math/tex; mode=display"> v_t *\frac{1}{2}* j_i + [a] < 3 </script></span></p>
 <p>Block equation: <span><span class="MathJax_Preview"> v_t *\frac{1}{2}* j_i + [a] &lt; 3 </span><script type="math/tex; mode=display"> v_t *\frac{1}{2}* j_i + [a] < 3 </script></span></p>
+<p>$\mathcal{O}(N)$</p>
+<p>Escaping \$ should work in math like $X = \$3.25$ once it is implemented.</p>
 <p><span><span class="MathJax_Preview"> v_t *\frac{1}{2}* j_i + [a] &lt; 3 </span><script type="math/tex; mode=display"> v_t *\frac{1}{2}* j_i + [a] < 3 </script></span></p>'''  # noqa: E501
         text = inspect.getdoc(self._docmodule.latex_math)
         html = to_html(text, module=self._module, link=self._link, latex_math=True)
