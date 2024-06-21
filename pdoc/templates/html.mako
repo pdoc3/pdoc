@@ -28,7 +28,9 @@
 <%def name="ident(name)"><span class="ident">${name}</span></%def>
 
 <%def name="show_source(d)">
-  % if (show_source_code or git_link_template) and d.source and d.obj is not getattr(d.inherits, 'obj', None):
+  % if (show_source_code or git_link_template) and \
+        not isinstance(d, pdoc.Module) and d.source and \
+        d.obj is not getattr(d.inherits, 'obj', None):
     <% git_link = format_git_link(git_link_template, d) %>
     % if show_source_code:
       <details class="source">
