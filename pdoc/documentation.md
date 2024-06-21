@@ -81,19 +81,21 @@ by introducing syntax for docstrings for variables.
 following the normal class inheritance patterns.
 Consider the following code example:
 
-    >>> class A:
-    ...     def test(self):
-    ...         """Docstring for A."""
-    ...         pass
-    ...
-    >>> class B(A):
-    ...     def test(self):
-    ...         pass
-    ...
-    >>> A.test.__doc__
-    'Docstring for A.'
-    >>> B.test.__doc__
-    None
+```python-repl
+>>> class A:
+...     def test(self):
+...         """Docstring for A."""
+...         pass
+...
+>>> class B(A):
+...     def test(self):
+...         pass
+...
+>>> A.test.__doc__
+'Docstring for A.'
+>>> B.test.__doc__
+None
+```
 
 In Python, the docstring for `B.test` doesn't exist, even though a
 docstring was defined for `A.test`.
@@ -115,18 +117,20 @@ For example:
 
 [PEP-224]: http://www.python.org/dev/peps/pep-0224
 
-    module_variable = 1
-    """PEP 224 docstring for module_variable."""
+```python
+module_variable = 1
+"""PEP 224 docstring for module_variable."""
 
-    class C:
-        #: Documentation comment for class_variable
-        #: spanning over three lines.
-        class_variable = 2  #: Assignment line is included.
+class C:
+    #: Documentation comment for class_variable
+    #: spanning over three lines.
+    class_variable = 2  #: Assignment line is included.
 
-        def __init__(self):
-            #: Instance variable's doc-comment
-            self.variable = 3
-            """But note, PEP 224 docstrings take precedence."""
+    def __init__(self):
+        #: Instance variable's doc-comment
+        self.variable = 3
+        """But note, PEP 224 docstrings take precedence."""
+```
 
 While the resulting variables have no `__doc__` attribute,
 `pdoc` compensates by reading the source code (when available)
@@ -162,12 +166,14 @@ This feature is useful when there's no feasible way of
 attaching a docstring to something. A good example is a
 [namedtuple](https://docs.python.org/3/library/collections.html#collections.namedtuple):
 
-    __pdoc__ = {}
+```python
+__pdoc__ = {}
 
-    Table = namedtuple('Table', ['types', 'names', 'rows'])
-    __pdoc__['Table.types'] = 'Types for each column in the table.'
-    __pdoc__['Table.names'] = 'The names of each column in the table.'
-    __pdoc__['Table.rows'] = 'Lists corresponding to each row in the table.'
+Table = namedtuple('Table', ['types', 'names', 'rows'])
+__pdoc__['Table.types'] = 'Types for each column in the table.'
+__pdoc__['Table.names'] = 'The names of each column in the table.'
+__pdoc__['Table.rows'] = 'Lists corresponding to each row in the table.'
+```
 
 `pdoc` will then show `Table` as a class with documentation for the
 `types`, `names` and `rows` members.
@@ -234,7 +240,7 @@ the identifier name must be fully qualified, for example
 `pdoc.Doc.docstring`) while <code>\`Doc.docstring\`</code>
 only works within `pdoc` module.
 
-[backticks]: https://en.wikipedia.org/wiki/Grave_accent#Use_in_programming
+[backticks]: https://en.wikipedia.org/wiki/Backtick
 
 
 Command-line interface
@@ -246,11 +252,15 @@ For example, to produce HTML documentation of your whole package
 in subdirectory 'build' of the current directory, using the default
 HTML template, run:
 
-    $ pdoc --html --output-dir build my_package
+```shell
+$ pdoc --html --output-dir build my_package
+```
 
 If you want to omit the source code preview, run:
 
-    $ pdoc --html --config show_source_code=False my_package
+```shell
+$ pdoc --html --config show_source_code=False my_package
+```
 
 Find additional template configuration tunables in [custom templates]
 section below.
@@ -258,20 +268,26 @@ section below.
 To run a local HTTP server while developing your package or writing
 docstrings for it, run:
 
-    $ pdoc --http : my_package
+```shell
+$ pdoc --http : my_package
+```
 
 To re-build documentation as part of your continuous integration (CI)
 best practice, i.e. ensuring all reference links are correct and
 up-to-date, make warnings error loudly by settings the environment
 variable [`PYTHONWARNINGS`][PYTHONWARNINGS] before running pdoc:
 
-    $ export PYTHONWARNINGS='error::UserWarning'
+```shell
+$ export PYTHONWARNINGS='error::UserWarning'
+```
 
 [PYTHONWARNINGS]: https://docs.python.org/3/using/cmdline.html#envvar-PYTHONWARNINGS
 
 For brief usage instructions, type:
 
-    $ pdoc --help
+```shell
+$ pdoc --help
+```
 
 Even more usage examples can be found in the [FAQ].
 
@@ -292,23 +308,25 @@ Afterwards, you can use `pdoc.Module.html` and `pdoc.Module.text`
 methods to output documentation in the desired format.
 For example:
 
-    import pdoc
+```python
+import pdoc
 
-    modules = ['a', 'b']  # Public submodules are auto-imported
-    context = pdoc.Context()
+modules = ['a', 'b']  # Public submodules are auto-imported
+context = pdoc.Context()
 
-    modules = [pdoc.Module(mod, context=context)
-               for mod in modules]
-    pdoc.link_inheritance(context)
+modules = [pdoc.Module(mod, context=context)
+           for mod in modules]
+pdoc.link_inheritance(context)
 
-    def recursive_htmls(mod):
-        yield mod.name, mod.html()
-        for submod in mod.submodules():
-            yield from recursive_htmls(submod)
+def recursive_htmls(mod):
+    yield mod.name, mod.html()
+    for submod in mod.submodules():
+        yield from recursive_htmls(submod)
 
-    for mod in modules:
-        for module_name, html in recursive_htmls(mod):
-            ...  # Process
+for mod in modules:
+    for module_name, html in recursive_htmls(mod):
+        ...  # Process
+```
 
 When documenting a single module, you might find
 functions `pdoc.html` and `pdoc.text` handy.
