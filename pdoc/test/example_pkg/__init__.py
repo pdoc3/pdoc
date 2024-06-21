@@ -370,11 +370,10 @@ class Location(namedtuple('Location', 'lat lon')):
     """Geo-location, GPS position."""
 
 
-def _func_spec(value: int) -> bool:
-    ...
+def _func_spec(value: int) -> bool: ...
 
-async def _coro_spec(value: int) -> bool:
-    ...
+
+async def _coro_spec(value: int) -> bool: ...
 
 
 class HasMockAttributes:
