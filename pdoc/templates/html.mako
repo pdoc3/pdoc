@@ -301,7 +301,6 @@
       <%include file="_lunr_search.inc.mako"/>
     % endif
 
-    <h1>Index</h1>
     ${extract_toc(module.docstring) if extract_module_toc_into_sidebar else ''}
     <ul id="index">
     % if supermodule:
@@ -367,8 +366,8 @@
 <html lang="${html_lang}">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-  <meta name="generator" content="pdoc ${pdoc.__version__}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  <meta name="generator" content="pdoc3 ${pdoc.__version__}">
 
 <%
     module_list = 'modules' in context.keys()  # Whether we're showing module list in server mode
@@ -376,10 +375,10 @@
 
   % if module_list:
     <title>Python module list</title>
-    <meta name="description" content="A list of documented Python modules." />
+    <meta name="description" content="A list of documented Python modules.">
   % else:
     <title>${module.name} API documentation</title>
-    <meta name="description" content="${module.docstring | glimpse, trim, h}" />
+    <meta name="description" content="${module.docstring | glimpse, trim, h}">
   % endif
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
