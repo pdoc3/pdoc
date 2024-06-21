@@ -11,6 +11,7 @@ import json
 import re
 import sys
 import warnings
+import urllib
 from contextlib import contextmanager
 from functools import lru_cache
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -298,7 +299,7 @@ class _WebDoc(BaseHTTPRequestHandler):
             if pth.endswith(suffix):
                 pth = pth[:-len(suffix)]
                 break
-        return pth.replace('/', '.')
+        return urllib.parse.unquote(pth).replace('/', '.')
 
 
 def module_path(m: pdoc.Module, ext: str):
