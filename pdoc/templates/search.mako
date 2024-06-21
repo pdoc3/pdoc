@@ -52,7 +52,10 @@
     }
 
     async function build_index() {
-        return lunr(function () {
+        try {
+            return lunr.Index.load(_expand(INDEX));  // Prebuilt index
+        } catch {
+            return lunr(function () {
             this.ref('i');
             this.field('name', {boost: 10});
             this.field('ref', {boost: 5});
@@ -67,6 +70,60 @@
                 this.add(doc);
             }, this);
         });
+        }
+    }
+
+    function _expand(compact) {
+        // https://john-millikin.com/compacting-lunr-search-indices
+        const fields = compact["fields"];
+        const fieldVectors = compact["fieldVectors"].map((item) => {
+            const id = item[0];
+            const vectors = item[1];
+            let prev = null;
+            const expanded = vectors.map((v, ii) => {
+                if (ii % 2 === 0) {
+                    if (v === null) {
+                        v = prev + 1;
+                    }
+                    prev = v;
+                }
+                return v;
+            });
+            return [id, expanded];
+        });
+        const invertedIndex = compact["invertedIndex"].map((item, itemIdx) => {
+            const token = item[0];
+            const fieldMap = {"_index": itemIdx};
+            fields.forEach((field, fieldIdx) => {
+                const matches = {};
+                let docRef = null;
+                item[fieldIdx + 1].forEach((v, ii) => {
+                    if (ii % 2 === 0) {
+                        docRef = fieldVectors[v][0].slice((field + '/').length);
+                    } else {
+                        matches[docRef] = v;
+                    }
+                });
+                fieldMap[field] = matches;
+            })
+            return [token, fieldMap];
+        });
+        invertedIndex.sort((a, b) => {
+            if (a[0] < b[0]) {
+                return -1;
+            }
+            if (a[0] > b[0]) {
+                return 1;
+            }
+            return 0;
+        });
+        return {
+            "version": compact["version"],
+            "fields": fields,
+            "fieldVectors": fieldVectors,
+            "invertedIndex": invertedIndex,
+            "pipeline": compact["pipeline"],
+        };
     }
 
     function search(query) {
