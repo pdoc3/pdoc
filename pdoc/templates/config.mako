@@ -36,7 +36,7 @@
     # Set the style keyword such as 'atom-one-light' or 'github-gist'
     #     Options: https://github.com/highlightjs/highlight.js/tree/master/src/styles
     #     Demo: https://highlightjs.org/static/demo/
-    hljs_style = 'github'
+    hljs_style = 'default'
 
     # If set, insert Google Analytics 4 tracking code. Value is GA
     # tracking id (G-XXXXXXXXXX).
