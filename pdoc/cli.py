@@ -9,11 +9,13 @@ import os
 import os.path as path
 import json
 import re
+import subprocess
 import sys
 import warnings
 from contextlib import contextmanager
 from functools import lru_cache
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
 from typing import Dict, List, Sequence
 from warnings import warn
 
@@ -397,6 +399,7 @@ def _generate_lunr_search(modules: List[pdoc.Module],
             info['doc'] = trim_docstring(dobj.docstring)
         if isinstance(dobj, pdoc.Function):
             info['func'] = 1
+        nonlocal index
         index.append(info)
         for member_dobj in getattr(dobj, 'doc', {}).values():
             recursive_add_to_index(member_dobj)
@@ -414,12 +417,27 @@ def _generate_lunr_search(modules: List[pdoc.Module],
         recursive_add_to_index(top_module)
     urls = sorted(url_cache.keys(), key=url_cache.__getitem__)
 
+    json_values = [dict(obj, url=urls[obj['url']]) for obj in index]
+    cmd = ['node', str(Path(__file__).with_name('build-index.js'))]
+    proc = subprocess.Popen(cmd, text=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     main_path = args.output_dir
-    with _open_write_file(path.join(main_path, 'index.js')) as f:
-        f.write("URLS=")
-        json.dump(urls, f, indent=0, separators=(',', ':'))
-        f.write(";\nINDEX=")
-        json.dump(index, f, indent=0, separators=(',', ':'))
+    if proc.poll() is None:
+        stdout, stderr = proc.communicate(json.dumps(json_values))
+        assert proc.poll() == 0, proc.poll()
+    if proc.returncode == 0:
+        stdout = 'INDEX=' + stdout
+    else:
+        warn(f'Prebuilding Lunr index with command `{" ".join(cmd)}` failed: '
+             f'{proc.stderr and proc.stderr.read() or ""!r}. '
+             f'The search feature will still work, '
+             f'but may be slower (with the index rebuilt just before use). '
+             f'To prebuild an index in advance, ensure `node` is executable in the '
+             f'pdoc environment.', category=RuntimeWarning)
+        stdout = ('URLS=' + json.dumps(urls, indent=0, separators=(',', ':')) +
+                  ';\nINDEX=' + json.dumps(index, indent=0, separators=(',', ':')))
+    index_path = Path(main_path).joinpath('index.js')
+    index_path.write_text(stdout)
+    print(str(index_path))
 
     # Generate search.html
     with _open_write_file(path.join(main_path, 'doc-search.html')) as f:

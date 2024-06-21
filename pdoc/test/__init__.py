@@ -272,8 +272,13 @@ class CliTest(unittest.TestCase):
             files = self.PUBLIC_FILES + ["doc-search.html", "index.js"]
             self._basic_html_assertions(expected_files=files)
             self._check_files(exclude_patterns=['class="gcse-search"'])
-            self._check_files(include_patterns=['URLS=[\n"example_pkg/index.html",\n"example_pkg/'],
-                              file_pattern='index.js')
+            if shutil.which('node'):
+                self._check_files(include_patterns=['INDEX={"version"'],
+                                  file_pattern='index.js')
+            else:
+                self._check_files(
+                    include_patterns=['URLS=[\n"example_pkg/index.html",\n"example_pkg/'],
+                    file_pattern='index.js')
             self._check_files(include_patterns=["'../doc-search.html#'"],
                               file_pattern='example_pkg/index.html')
             self._check_files(include_patterns=["'../doc-search.html#'"],
