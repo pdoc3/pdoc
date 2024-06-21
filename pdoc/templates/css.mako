@@ -19,7 +19,7 @@
   }
 
   #sidebar {
-    padding: 30px;
+    padding: 1.5em;
     overflow: hidden;
   }
     #sidebar > *:last-child {
@@ -63,11 +63,11 @@
   }
   h2 {
     font-size: 1.75em;
-    margin: 1em 0 .50em 0;
+    margin: 2em 0 .50em 0;
   }
   h3 {
     font-size: 1.4em;
-    margin: 25px 0 10px 0;
+    margin: 1.6em 0 .7em 0;
   }
   h4 {
     margin: 0;
@@ -86,11 +86,10 @@
   a {
     color: #058;
     text-decoration: none;
-    transition: color .3s ease-in-out;
+    transition: color .2s ease-in-out;
   }
-  a:hover {
-    color: #e82;
-  }
+  a:visited {color: #503}
+  a:hover {color: #b62}
 
   .title code {
     font-weight: bold;
@@ -100,27 +99,27 @@
   }
   .ident {
     color: #900;
+    font-weight: bold;
   }
 
   pre code {
-    background: #f8f8f8;
     font-size: .8em;
     line-height: 1.4em;
+    padding: 1em;
+    display: block;
   }
   code {
-    background: #f2f2f1;
+    background: #f3f3f3;
+    font-family: "DejaVu Sans Mono", monospace;
     padding: 1px 4px;
     overflow-wrap: break-word;
   }
   h1 code { background: transparent }
 
   pre {
-    background: #f8f8f8;
-    border: 0;
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
     margin: 1em 0;
-    padding: 1ex;
   }
 
   #http-server-module-list {
@@ -181,7 +180,6 @@
     }
     .name {
       background: #eee;
-      font-weight: bold;
       font-size: .85em;
       padding: 5px 10px;
       display: inline-block;
@@ -271,7 +269,7 @@
   }
 
   .admonition {
-    padding: .1em .5em;
+    padding: .1em 1em;
     margin-bottom: 1em;
   }
     .admonition-title {
@@ -318,7 +316,7 @@
     pre code {
       font-size: 1em;
     }
-    .item .name {
+    .name {
       font-size: 1em;
     }
     main {
@@ -327,8 +325,8 @@
       justify-content: flex-end;
     }
     .toc ul ul,
-    #index ul {
-      padding-left: 1.5em;
+    #index ul ul {
+      padding-left: 1em;
     }
     .toc > ul > li {
       margin-top: .5em;
