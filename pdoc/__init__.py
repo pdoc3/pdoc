@@ -888,6 +888,8 @@ class Module(Doc):
         if minify:
             from pdoc.html_helpers import minify_html
             html = minify_html(html)
+        if not html.endswith('\n'):
+            html = html + '\n'
         return html
 
     @property
