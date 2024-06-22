@@ -1,3 +1,18 @@
+0.11.0  (2024-06-22)
+======
+  - Handle import of distutils on Python 3.12
+  - Discern properties from regular variables (#277)
+  - Prebuild Lunr.js search index if Node is available.
+  - Templates: Update CDN resource links
+  - Support MathJax inline $dollar-pattern$
+  - Fix documenting classes that contain `unittest.mock.Mock` (#352)
+  - Strengthen signature detection for pybind-generated modules
+  - Bump pandoc integration to v3
+  - Support Google Analytics 4
+  - Fix deprecation warnings for PEP224 docstrings of class variables (#437)
+  - Skip `__editable__` paths during `iter_modules` (#408)
+  - Various bug fixes and tweaks
+
 0.10.0  (2021-08-03)
 ======
   - Python 3.6+ required.
