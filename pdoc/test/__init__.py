@@ -1457,6 +1457,8 @@ Nomatch:</p>
 <dd>Description of arg1</dd>
 <dt><strong><code>arg2</code></strong> :&ensp;<code>str</code> or <code>int</code></dt>
 <dd>Description of arg2</dd>
+<dt><strong><code>arg3</code></strong> :&ensp;<code>str | None</code></dt>
+<dd>Description of arg3</dd>
 <dt><strong><code>test_sequence</code></strong></dt>
 <dd>
 <p>2-dim numpy array of real numbers, size: N * D
@@ -1482,6 +1484,11 @@ which is the answer of everything.</p>
 <h2 id="returns_2">Returns</h2>
 <dl>
 <dt><code>Dict[int, <a>pdoc.Doc</a>]</code></dt>
+<dd>Description.</dd>
+</dl>
+<h2 id="returns_3">Returns</h2>
+<dl>
+<dt><code>int | str</code></dt>
 <dd>Description.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
