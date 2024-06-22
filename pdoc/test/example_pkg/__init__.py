@@ -223,6 +223,7 @@ class Docformats:
         Args:
           arg1 (int): Description of arg1
           arg2 (str or int): Description of arg2
+          arg3 (str | None): Description of arg3
           test_sequence: 2-dim numpy array of real numbers, size: N * D
             - the test observation sequence.
 
@@ -243,6 +244,9 @@ class Docformats:
 
         Returns:
             Dict[int, pdoc.Doc]: Description.
+
+        Returns:
+            int | str: Description.
 
         Raises:
             AttributeError: The ``Raises`` section is a list of all exceptions

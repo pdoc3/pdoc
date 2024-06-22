@@ -248,14 +248,14 @@ class _ToMarkdown:
             section = section.title()
             if section in ('Args', 'Attributes'):
                 body = re.compile(
-                    r'^([\w*]+)(?: \(([\w.,=\[\] -]+)\))?: '
+                    r'^([\w*]+)(?: \(([\w.,=|\[\] -]+)\))?: '
                     r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub(
                     lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups())),
                     inspect.cleandoc(f'\n{body}')
                 )
             elif section in ('Returns', 'Yields', 'Raises', 'Warns'):
                 body = re.compile(
-                    r'^()([\w.,\[\] ]+): '
+                    r'^()([\w.,|\[\] ]+): '
                     r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub(
                     lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups())),
                     inspect.cleandoc(f'\n{body}')
