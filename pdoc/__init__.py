@@ -993,23 +993,13 @@ class Class(Doc):
                 self.doc[name] = Function(
                     name, self.module, obj, cls=self)
             else:
-                if isinstance(obj, property):
-                    kind = "property"
-                    if obj.fget is not None:
-                        kind += "/get"
-                    if obj.fset is not None:
-                        kind += "/set"
-                    if obj.fdel is not None:
-                        kind += "/del"
-                else:
-                    kind = "var"
                 self.doc[name] = Variable(
                     name, self.module,
                     docstring=(
                         var_docstrings.get(name) or
                         (inspect.isclass(obj) or _is_descriptor(obj)) and inspect.getdoc(obj)),
                     cls=self,
-                    kind=kind,
+                    kind="prop" if isinstance(obj, property) else "var",
                     obj=_is_descriptor(obj) and obj or None,
                     instance_var=(_is_descriptor(obj) or
                                   name in getattr(self.obj, '__slots__', ())))
@@ -1511,8 +1501,8 @@ class Variable(Doc):
 
         self.kind = kind
         """
-        One of `var`, `property/get/set/del` with one or more of get, set, del,
-        e.g. property/get/set for a property that can be read and set. 
+        `prop` if variable is a dynamic property (has getter/setter or deleter),
+        or `var` otherwise.
         """
 
     @property
