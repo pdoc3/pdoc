@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.10.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.0">
 <title>pdoc.html_helpers API documentation</title>
-<meta name="description" content="Helper functions for HTML output." />
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
-<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<meta name="description" content="Helper functions for HTML output.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 <link rel="preconnect" href="https://www.google.com">
 <script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
@@ -18,12 +18,15 @@
 .gsc-control-cse {padding:0 !important;margin-top:1em}
 body.gsc-overflow-hidden #sidebar {overflow: visible;}
 </style>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
-<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
 <style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em}</style>
 <link rel="canonical" href="https://pdoc3.github.io/pdoc/doc/pdoc/html_helpers.html">
 <link rel="icon" href="https://pdoc3.github.io/pdoc/logo.png">
-<script data-ad-client="ca-pub-2900001379782823" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script></head>
+<script async src='https://www.googletagmanager.com/gtag/js?id=G-BKZPJPR558'></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-BKZPJPR558');</script><script data-ad-client="ca-pub-2900001379782823" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script></head>
 <body>
 <main>
 <article id="content">
@@ -32,656 +35,6 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 </header>
 <section id="section-intro">
 <p>Helper functions for HTML output.</p>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L1-L644" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">&#34;&#34;&#34;
-Helper functions for HTML output.
-&#34;&#34;&#34;
-import inspect
-import os
-import re
-import subprocess
-import textwrap
-import traceback
-from contextlib import contextmanager
-from functools import partial, lru_cache
-from typing import Callable, Match
-from warnings import warn
-import xml.etree.ElementTree as etree
-
-import markdown
-from markdown.inlinepatterns import InlineProcessor
-from markdown.util import AtomicString
-
-import pdoc
-
-
-@lru_cache()
-def minify_css(css: str,
-               _whitespace=partial(re.compile(r&#39;\s*([,{:;}])\s*&#39;).sub, r&#39;\1&#39;),
-               _comments=partial(re.compile(r&#39;/\*.*?\*/&#39;, flags=re.DOTALL).sub, &#39;&#39;),
-               _trailing_semicolon=partial(re.compile(r&#39;;\s*}&#39;).sub, &#39;}&#39;)):
-    &#34;&#34;&#34;
-    Minify CSS by removing extraneous whitespace, comments, and trailing semicolons.
-    &#34;&#34;&#34;
-    return _trailing_semicolon(_whitespace(_comments(css))).strip()
-
-
-def minify_html(html: str,
-                _minify=partial(
-                    re.compile(r&#39;(.*?)(&lt;pre\b.*?&lt;/pre\b\s*&gt;)|(.*)&#39;, re.IGNORECASE | re.DOTALL).sub,
-                    lambda m, _norm_space=partial(re.compile(r&#39;\s\s+&#39;).sub, &#39;\n&#39;): (
-                        _norm_space(m.group(1) or &#39;&#39;) +
-                        (m.group(2) or &#39;&#39;) +
-                        _norm_space(m.group(3) or &#39;&#39;)))):
-    &#34;&#34;&#34;
-    Minify HTML by replacing all consecutive whitespace with a single space
-    (or newline) character, except inside `&lt;pre&gt;` tags.
-    &#34;&#34;&#34;
-    return _minify(html)
-
-
-def glimpse(text: str, max_length=153, *, paragraph=True,
-            _split_paragraph=partial(re.compile(r&#39;\s*\n\s*\n\s*&#39;).split, maxsplit=1),
-            _trim_last_word=partial(re.compile(r&#39;\S+$&#39;).sub, &#39;&#39;),
-            _remove_titles=partial(re.compile(r&#39;^(#+|-{4,}|={4,})&#39;, re.MULTILINE).sub, &#39; &#39;)):
-    &#34;&#34;&#34;
-    Returns a short excerpt (e.g. first paragraph) of text.
-    If `paragraph` is True, the first paragraph will be returned,
-    but never longer than `max_length` characters.
-    &#34;&#34;&#34;
-    text = text.lstrip()
-    if paragraph:
-        text, *rest = _split_paragraph(text)
-        if rest:
-            text = text.rstrip(&#39;.&#39;)
-            text += &#39; …&#39;
-        text = _remove_titles(text).strip()
-
-    if len(text) &gt; max_length:
-        text = _trim_last_word(text[:max_length - 2])
-        if not text.endswith(&#39;.&#39;) or not paragraph:
-            text = text.rstrip(&#39;. &#39;) + &#39; …&#39;
-    return text
-
-
-_md = markdown.Markdown(
-    output_format=&#39;html5&#39;,    # type: ignore[arg-type]
-    extensions=[
-        &#34;markdown.extensions.abbr&#34;,
-        &#34;markdown.extensions.attr_list&#34;,
-        &#34;markdown.extensions.def_list&#34;,
-        &#34;markdown.extensions.fenced_code&#34;,
-        &#34;markdown.extensions.footnotes&#34;,
-        &#34;markdown.extensions.tables&#34;,
-        &#34;markdown.extensions.admonition&#34;,
-        &#34;markdown.extensions.smarty&#34;,
-        &#34;markdown.extensions.toc&#34;,
-    ],
-    extension_configs={
-        &#34;markdown.extensions.smarty&#34;: dict(
-            smart_dashes=True,
-            smart_ellipses=True,
-            smart_quotes=False,
-            smart_angled_quotes=False,
-        ),
-    },
-)
-
-
-@contextmanager
-def _fenced_code_blocks_hidden(text):
-    def hide(text):
-        def replace(match):
-            orig = match.group()
-            new = f&#39;@{hash(orig)}@&#39;
-            hidden[new] = orig
-            return new
-
-        text = re.compile(r&#39;^(?P&lt;fence&gt;```+|~~~+).*\n&#39;
-                          r&#39;(?:.*\n)*?&#39;
-                          r&#39;^(?P=fence)[ ]*(?!.)&#39;, re.MULTILINE).sub(replace, text)
-        return text
-
-    def unhide(text):
-        for k, v in hidden.items():
-            text = text.replace(k, v)
-        return text
-
-    hidden = {}
-    # Via a manager object (a list) so modifications can pass back and forth as result[0]
-    result = [hide(text)]
-    yield result
-    result[0] = unhide(result[0])
-
-
-class _ToMarkdown:
-    &#34;&#34;&#34;
-    This class serves as a namespace for methods converting common
-    documentation formats into markdown our Python-Markdown with
-    addons can ingest.
-
-    If debugging regexs (I can&#39;t imagine why that would be necessary
-    — they are all perfect!) an insta-preview tool such as RegEx101.com
-    will come in handy.
-    &#34;&#34;&#34;
-    @staticmethod
-    def _deflist(name, type, desc):
-        &#34;&#34;&#34;
-        Returns `name`, `type`, and `desc` formatted as a
-        Python-Markdown definition list entry. See also:
-        https://python-markdown.github.io/extensions/definition_lists/
-        &#34;&#34;&#34;
-        # Wrap any identifiers and string literals in parameter type spec
-        # in backticks while skipping common &#34;stopwords&#34; such as &#39;or&#39;, &#39;of&#39;,
-        # &#39;optional&#39; ... See §4 Parameters:
-        # https://numpydoc.readthedocs.io/en/latest/format.html#sections
-        type_parts = re.split(r&#39;( *(?: of | or |, *default(?:=|\b)|, *optional\b) *)&#39;, type or &#39;&#39;)
-        type_parts[::2] = [f&#39;`{s}`&#39; if s else s
-                           for s in type_parts[::2]]
-        type = &#39;&#39;.join(type_parts)
-
-        desc = desc or &#39;&amp;nbsp;&#39;
-        assert _ToMarkdown._is_indented_4_spaces(desc)
-        assert name or type
-        ret = &#34;&#34;
-        if name:
-            # NOTE: Triple-backtick argument names so we skip linkifying them
-            ret += f&#34;**```{name.replace(&#39;, &#39;, &#39;```**, **```&#39;)}```**&#34;
-        if type:
-            ret += f&#39; :&amp;ensp;{type}&#39; if ret else type
-        ret += f&#39;\n:   {desc}\n\n&#39;
-        return ret
-
-    @staticmethod
-    def _numpy_params(match):
-        &#34;&#34;&#34; Converts NumpyDoc parameter (etc.) sections into Markdown. &#34;&#34;&#34;
-        name, type, desc = match.group(&#34;name&#34;, &#34;type&#34;, &#34;desc&#34;)
-        type = type or match.groupdict().get(&#39;just_type&#39;, None)
-        desc = desc.strip()
-        return _ToMarkdown._deflist(name, type, desc)
-
-    @staticmethod
-    def _numpy_seealso(match):
-        &#34;&#34;&#34;
-        Converts NumpyDoc &#34;See Also&#34; section either into referenced code,
-        optionally within a definition list.
-        &#34;&#34;&#34;
-        spec_with_desc, simple_list = match.groups()
-        if spec_with_desc:
-            spec_desc_strings = []
-            for line in filter(None, spec_with_desc.split(&#39;\n&#39;)):
-                spec, desc = map(str.strip, line.split(&#39;:&#39;, 1))
-                spec_desc_strings.append(f&#39;`{spec}`\n:   {desc}&#39;)
-            return &#39;\n\n&#39;.join(spec_desc_strings)
-        return &#39;, &#39;.join(f&#39;`{i}`&#39; for i in simple_list.split(&#39;, &#39;))
-
-    @staticmethod
-    def _numpy_sections(match):
-        &#34;&#34;&#34;
-        Convert sections with parameter, return, and see also lists to Markdown
-        lists.
-        &#34;&#34;&#34;
-        section, body = match.groups()
-        section = section.title()
-        if section == &#39;See Also&#39;:
-            body = re.sub(r&#39;\n\s{4}\s*&#39;, &#39; &#39;, body)  # Handle line continuation
-            body = re.sub(r&#39;^((?:\n?[\w.]* ?: .*)+)|(.*\w.*)&#39;,
-                          _ToMarkdown._numpy_seealso, body)
-        elif section in (&#39;Returns&#39;, &#39;Yields&#39;, &#39;Raises&#39;, &#39;Warns&#39;):
-            body = re.sub(r&#39;^(?:(?P&lt;name&gt;\*{0,2}\w+(?:, \*{0,2}\w+)*)&#39;
-                          r&#39;(?: ?: (?P&lt;type&gt;.*))|&#39;
-                          r&#39;(?P&lt;just_type&gt;\w[^\n`*]*))(?&lt;!\.)$&#39;
-                          r&#39;(?P&lt;desc&gt;(?:\n(?: {4}.*|$))*)&#39;,
-                          _ToMarkdown._numpy_params, body, flags=re.MULTILINE)
-        elif section in (&#39;Parameters&#39;, &#39;Receives&#39;, &#39;Other Parameters&#39;,
-                         &#39;Arguments&#39;, &#39;Args&#39;, &#39;Attributes&#39;):
-            name = r&#39;(?:\w|\{\w+(?:,\w+)+\})+&#39;  # Support curly brace expansion
-            body = re.sub(r&#39;^(?P&lt;name&gt;\*{0,2}&#39; + name + r&#39;(?:, \*{0,2}&#39; + name + r&#39;)*)&#39;
-                          r&#39;(?: ?: (?P&lt;type&gt;.*))?(?&lt;!\.)$&#39;
-                          r&#39;(?P&lt;desc&gt;(?:\n(?: {4}.*|$))*)&#39;,
-                          _ToMarkdown._numpy_params, body, flags=re.MULTILINE)
-        return f&#39;{section}\n-----\n{body}&#39;
-
-    @staticmethod
-    def numpy(text):
-        &#34;&#34;&#34;
-        Convert `text` in numpydoc docstring format to Markdown
-        to be further converted later.
-        &#34;&#34;&#34;
-        return re.sub(r&#39;^(\w[\w ]+)\n-{3,}\n&#39;
-                      r&#39;((?:(?!.+\n-+).*$\n?)*)&#39;,
-                      _ToMarkdown._numpy_sections, text, flags=re.MULTILINE)
-
-    @staticmethod
-    def _is_indented_4_spaces(txt, _3_spaces_or_less=re.compile(r&#39;\n\s{0,3}\S&#39;).search):
-        return &#39;\n&#39; not in txt or not _3_spaces_or_less(txt)
-
-    @staticmethod
-    def _fix_indent(name, type, desc):
-        &#34;&#34;&#34;Maybe fix indent from 2 to 4 spaces.&#34;&#34;&#34;
-        if not _ToMarkdown._is_indented_4_spaces(desc):
-            desc = desc.replace(&#39;\n&#39;, &#39;\n  &#39;)
-        return name, type, desc
-
-    @staticmethod
-    def indent(indent, text, *, clean_first=False):
-        if clean_first:
-            text = inspect.cleandoc(text)
-        return re.sub(r&#39;\n&#39;, f&#39;\n{indent}&#39;, indent + text.rstrip())
-
-    @staticmethod
-    def google(text):
-        &#34;&#34;&#34;
-        Convert `text` in Google-style docstring format to Markdown
-        to be further converted later.
-        &#34;&#34;&#34;
-        def googledoc_sections(match):
-            section, body = match.groups(&#39;&#39;)
-            if not body:
-                return match.group()
-            body = textwrap.dedent(body)
-            section = section.title()
-            if section in (&#39;Args&#39;, &#39;Attributes&#39;):
-                body = re.compile(
-                    r&#39;^([\w*]+)(?: \(([\w.,=\[\] -]+)\))?: &#39;
-                    r&#39;((?:.*)(?:\n(?: {2,}.*|$))*)&#39;, re.MULTILINE).sub(
-                    lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups())),
-                    inspect.cleandoc(f&#39;\n{body}&#39;)
-                )
-            elif section in (&#39;Returns&#39;, &#39;Yields&#39;, &#39;Raises&#39;, &#39;Warns&#39;):
-                body = re.compile(
-                    r&#39;^()([\w.,\[\] ]+): &#39;
-                    r&#39;((?:.*)(?:\n(?: {2,}.*|$))*)&#39;, re.MULTILINE).sub(
-                    lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups())),
-                    inspect.cleandoc(f&#39;\n{body}&#39;)
-                )
-            # Convert into markdown sections. End underlines with &#39;=&#39;
-            # to avoid matching and re-processing as Numpy sections.
-            return f&#39;\n{section}\n-----=\n{body}&#39;
-
-        text = re.compile(r&#39;^([A-Z]\w+):$\n&#39;
-                          r&#39;((?:\n?(?: {2,}.*|$))+)&#39;, re.MULTILINE).sub(googledoc_sections, text)
-        return text
-
-    @staticmethod
-    def _admonition(match, module=None, limit_types=None):
-        indent, type, value, text = match.groups()
-
-        if limit_types and type not in limit_types:
-            return match.group(0)
-
-        if type == &#39;include&#39; and module:
-            try:
-                return _ToMarkdown._include_file(indent, value,
-                                                 _ToMarkdown._directive_opts(text), module)
-            except Exception as e:
-                raise RuntimeError(f&#39;`.. include:: {value}` error in module {module.name!r}: {e}&#39;)
-        if type in (&#39;image&#39;, &#39;figure&#39;):
-            alt_text = text.translate(str.maketrans({
-                &#39;\n&#39;: &#39; &#39;,
-                &#39;[&#39;: &#39;\\[&#39;,
-                &#39;]&#39;: &#39;\\]&#39;})).strip()
-            return f&#39;{indent}![{alt_text}]({value})\n&#39;
-        if type == &#39;math&#39;:
-            return _ToMarkdown.indent(indent,
-                                      f&#39;\\[ {text.strip()} \\]&#39;,
-                                      clean_first=True)
-
-        if type == &#39;versionchanged&#39;:
-            title = f&#39;Changed in version:&amp;ensp;{value}&#39;
-        elif type == &#39;versionadded&#39;:
-            title = f&#39;Added in version:&amp;ensp;{value}&#39;
-        elif type == &#39;deprecated&#39; and value:
-            title = f&#39;Deprecated since version:&amp;ensp;{value}&#39;
-        elif type == &#39;admonition&#39;:
-            title = value
-        elif type.lower() == &#39;todo&#39;:
-            title = &#39;TODO&#39;
-            text = f&#39;{value} {text}&#39;
-        else:
-            title = type.capitalize()
-            if value:
-                title += f&#39;:&amp;ensp;{value}&#39;
-
-        text = _ToMarkdown.indent(indent + &#39;    &#39;, text, clean_first=True)
-        return f&#39;{indent}!!! {type} &#34;{title}&#34;\n{text}\n&#39;
-
-    @staticmethod
-    def admonitions(text, module, limit_types=None):
-        &#34;&#34;&#34;
-        Process reStructuredText&#39;s block directives such as
-        `.. warning::`, `.. deprecated::`, `.. versionadded::`, etc.
-        and turn them into Python-M&gt;arkdown admonitions.
-
-        `limit_types` is optionally a set of directives to limit processing to.
-
-        See: https://python-markdown.github.io/extensions/admonition/
-        &#34;&#34;&#34;
-        substitute = partial(re.compile(r&#39;^(?P&lt;indent&gt; *)\.\. ?(\w+)::(?: *(.*))?&#39;
-                                        r&#39;((?:\n(?:(?P=indent) +.*| *$))*)&#39;, re.MULTILINE).sub,
-                             partial(_ToMarkdown._admonition, module=module,
-                                     limit_types=limit_types))
-        # Apply twice for nested (e.g. image inside warning)
-        return substitute(substitute(text))
-
-    @staticmethod
-    def _include_file(indent: str, path: str, options: dict, module: pdoc.Module) -&gt; str:
-        start_line = int(options.get(&#39;start-line&#39;, 0))
-        end_line = int(options.get(&#39;end-line&#39;, 0)) or None
-        start_after = options.get(&#39;start-after&#39;)
-        end_before = options.get(&#39;end-before&#39;)
-
-        with open(os.path.normpath(os.path.join(os.path.dirname(module.obj.__file__), path)),
-                  encoding=&#39;utf-8&#39;) as f:
-            text = &#39;&#39;.join(list(f)[start_line:end_line])
-
-        if start_after:
-            text = text[text.index(start_after) + len(start_after):]
-        if end_before:
-            text = text[:text.index(end_before)]
-
-        return _ToMarkdown.indent(indent, text)
-
-    @staticmethod
-    def _directive_opts(text: str) -&gt; dict:
-        return dict(re.findall(r&#39;^ *:([^:]+): *(.*)&#39;, text, re.MULTILINE))
-
-    DOCTESTS_RE = re.compile(r&#39;^(?:&gt;&gt;&gt; .*)(?:\n.+)*&#39;, re.MULTILINE)
-
-    @staticmethod
-    def doctests(text):
-        &#34;&#34;&#34;
-        Fence non-fenced (`~~~`) top-level (0-indented)
-        doctest blocks so they render as Python code.
-        &#34;&#34;&#34;
-        text = _ToMarkdown.DOCTESTS_RE.sub(
-            lambda match: f&#39;```python-repl\n{match.group()}\n```\n&#39;, text)
-        return text
-
-    @staticmethod
-    def raw_urls(text):
-        &#34;&#34;&#34;Wrap URLs in Python-Markdown-compatible &lt;angle brackets&gt;.&#34;&#34;&#34;
-        pattern = re.compile(r&#34;&#34;&#34;
-            (?P&lt;code_span&gt;                   # matches whole code span
-                (?&lt;!`)(?P&lt;fence&gt;`+)(?!`)     # a string of backticks
-                .*?
-                (?&lt;!`)(?P=fence)(?!`))
-            |
-            (?P&lt;markdown_link&gt;\[.*?\]\(.*\))  # matches whole inline link
-            |
-            (?&lt;![&lt;\&#34;\&#39;])                     # does not start with &lt;, &#34;, &#39;
-            (?P&lt;url&gt;(?:http|ftp)s?://        # url with protocol
-                [^&gt;\s()]+                    # url part before any (, )
-                (?:\([^&gt;\s)]*\))*            # optionally url part within parentheses
-                [^&gt;\s)]*                     # url part after any )
-            )&#34;&#34;&#34;, re.VERBOSE)
-
-        text = pattern.sub(
-            lambda m: (f&#39;&lt;{m.group(&#34;url&#34;)}&gt;&#39;) if m.group(&#39;url&#39;) else m.group(), text)
-        return text
-
-
-class _MathPattern(InlineProcessor):
-    NAME = &#39;pdoc-math&#39;
-    PATTERN = r&#39;(?&lt;!\S|\\)(?:\\\((.+?)\\\)|\\\[(.+?)\\\]|\$\$(.+?)\$\$)&#39;
-    PRIORITY = 181  # Larger than that of &#39;escape&#39; pattern
-
-    def handleMatch(self, m, data):
-        for value, is_block in zip(m.groups(), (False, True, True)):
-            if value:
-                break
-        script = etree.Element(&#39;script&#39;, type=f&#34;math/tex{&#39;; mode=display&#39; if is_block else &#39;&#39;}&#34;)
-        preview = etree.Element(&#39;span&#39;, {&#39;class&#39;: &#39;MathJax_Preview&#39;})
-        preview.text = script.text = AtomicString(value)
-        wrapper = etree.Element(&#39;span&#39;)
-        wrapper.extend([preview, script])
-        return wrapper, m.start(0), m.end(0)
-
-
-def to_html(text: str, *,
-            docformat: str = None,
-            module: pdoc.Module = None, link: Callable[..., str] = None,
-            latex_math: bool = False):
-    &#34;&#34;&#34;
-    Returns HTML of `text` interpreted as `docformat`. `__docformat__` is respected
-    if present, otherwise Numpydoc and Google-style docstrings are assumed,
-    as well as pure Markdown.
-
-    `module` should be the documented module (so the references can be
-    resolved) and `link` is the hyperlinking function like the one in the
-    example template.
-    &#34;&#34;&#34;
-    # Optionally register our math syntax processor
-    if not latex_math and _MathPattern.NAME in _md.inlinePatterns:
-        _md.inlinePatterns.deregister(_MathPattern.NAME)
-    elif latex_math and _MathPattern.NAME not in _md.inlinePatterns:
-        _md.inlinePatterns.register(_MathPattern(_MathPattern.PATTERN),
-                                    _MathPattern.NAME,
-                                    _MathPattern.PRIORITY)
-
-    md = to_markdown(text, docformat=docformat, module=module, link=link)
-    return _md.reset().convert(md)
-
-
-def to_markdown(text: str, *,
-                docformat: str = None,
-                module: pdoc.Module = None, link: Callable[..., str] = None):
-    &#34;&#34;&#34;
-    Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
-    `__docformat__` is respected
-    if present, otherwise Numpydoc and Google-style docstrings are assumed,
-    as well as pure Markdown.
-
-    `module` should be the documented module (so the references can be
-    resolved) and `link` is the hyperlinking function like the one in the
-    example template.
-    &#34;&#34;&#34;
-    if not docformat:
-        docformat = str(getattr(getattr(module, &#39;obj&#39;, None), &#39;__docformat__&#39;, &#39;numpy,google &#39;))
-        docformat, *_ = docformat.lower().split()
-    if not (set(docformat.split(&#39;,&#39;)) &amp; {&#39;&#39;, &#39;numpy&#39;, &#39;google&#39;}):
-        warn(f&#39;__docformat__ value {docformat!r} in module {module!r} not supported. &#39;
-             &#39;Supported values are: numpy, google.&#39;)
-        docformat = &#39;numpy,google&#39;
-
-    with _fenced_code_blocks_hidden(text) as result:
-        text = result[0]
-
-        text = _ToMarkdown.admonitions(text, module)
-
-        if &#39;google&#39; in docformat:
-            text = _ToMarkdown.google(text)
-
-        text = _ToMarkdown.doctests(text)
-        text = _ToMarkdown.raw_urls(text)
-
-        # If doing both, do numpy after google, otherwise google-style&#39;s
-        # headings are incorrectly interpreted as numpy params
-        if &#39;numpy&#39; in docformat:
-            text = _ToMarkdown.numpy(text)
-
-        if module and link:
-            # Hyperlink markdown code spans not within markdown hyperlinks.
-            # E.g. `code` yes, but not [`code`](...). RE adapted from:
-            # https://github.com/Python-Markdown/markdown/blob/ada40c66/markdown/inlinepatterns.py#L106
-            # Also avoid linking triple-backticked arg names in deflists.
-            linkify = partial(_linkify, link=link, module=module, wrap_code=True)
-            text = re.sub(r&#39;(?P&lt;inside_link&gt;\[[^\]]*?)?&#39;
-                          r&#39;(?:(?&lt;!\\)(?:\\{2})+(?=`)|(?&lt;!\\)(?P&lt;fence&gt;`+)&#39;
-                          r&#39;(?P&lt;code&gt;.+?)(?&lt;!`)&#39;
-                          r&#39;(?P=fence)(?!`))&#39;,
-                          lambda m: (m.group()
-                                     if m.group(&#39;inside_link&#39;) or len(m.group(&#39;fence&#39;)) &gt; 2
-                                     else linkify(m)), text)
-        result[0] = text
-    text = result[0]
-
-    return text
-
-
-class ReferenceWarning(UserWarning):
-    &#34;&#34;&#34;
-    This warning is raised in `to_html` when a object reference in markdown
-    doesn&#39;t match any documented objects.
-
-    Look for this warning to catch typos / references to obsolete symbols.
-    &#34;&#34;&#34;
-
-
-def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module, wrap_code=False):
-    try:
-        code_span = match.group(&#39;code&#39;)
-    except IndexError:
-        code_span = match.group()
-
-    is_type_annotation = re.match(r&#39;^[`\w\s.,\[\]()]+$&#39;, code_span)
-    if not is_type_annotation:
-        return match.group()
-
-    def handle_refname(match):
-        nonlocal link, module
-        refname = match.group()
-        dobj = module.find_ident(refname)
-        if isinstance(dobj, pdoc.External):
-            # If this is a single-word reference,
-            # most likely an argument name. Skip linking External.
-            if &#39;.&#39; not in refname:
-                return refname
-            # If refname in documentation has a typo or is obsolete, warn.
-            # XXX: Assume at least the first part of refname, i.e. the package, is correct.
-            module_part = module.find_ident(refname.split(&#39;.&#39;)[0])
-            if not isinstance(module_part, pdoc.External):
-                warn(f&#39;Code reference `{refname}` in module &#34;{module.refname}&#34; does not match any &#39;
-                     &#39;documented object.&#39;,
-                     ReferenceWarning, stacklevel=3)
-        return link(dobj)
-
-    if wrap_code:
-        code_span = code_span.replace(&#39;[&#39;, &#39;\\[&#39;)
-    linked = re.sub(r&#39;[a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)*(?:\(\))?&#39;, handle_refname, code_span)
-    if wrap_code:
-        # Wrapping in HTML &lt;code&gt; as opposed to backticks evaluates markdown */_ markers,
-        # so let&#39;s escape them in text (but not in HTML tag attributes).
-        # Backticks also cannot be used because html returned from `link()`
-        # would then become escaped.
-        # This finds overlapping matches, https://stackoverflow.com/a/5616910/1090455
-        cleaned = re.sub(r&#39;(_(?=[^&gt;]*?(?:&lt;|$)))&#39;, r&#39;\\\1&#39;, linked)
-        return f&#39;&lt;code&gt;{cleaned}&lt;/code&gt;&#39;
-    return linked
-
-
-def extract_toc(text: str):
-    &#34;&#34;&#34;
-    Returns HTML Table of Contents containing markdown titles in `text`.
-    &#34;&#34;&#34;
-    with _fenced_code_blocks_hidden(text) as result:
-        result[0] = _ToMarkdown.DOCTESTS_RE.sub(&#39;&#39;, result[0])
-    text = result[0]
-    toc, _ = _md.reset().convert(f&#39;[TOC]\n\n@CUT@\n\n{text}&#39;).split(&#39;@CUT@&#39;, 1)
-    if toc.endswith(&#39;&lt;p&gt;&#39;):  # CUT was put into its own paragraph
-        toc = toc[:-3].rstrip()
-    return toc
-
-
-def format_git_link(template: str, dobj: pdoc.Doc):
-    &#34;&#34;&#34;
-    Interpolate `template` as a formatted string literal using values extracted
-    from `dobj` and the working environment.
-    &#34;&#34;&#34;
-    if not template:
-        return None
-    try:
-        if &#39;commit&#39; in _str_template_fields(template):
-            commit = _git_head_commit()
-        abs_path = inspect.getfile(inspect.unwrap(dobj.obj))
-        path = _project_relative_path(abs_path)
-
-        # Urls should always use / instead of \\
-        if os.name == &#39;nt&#39;:
-            path = path.replace(&#39;\\&#39;, &#39;/&#39;)
-
-        lines, start_line = inspect.getsourcelines(dobj.obj)
-        start_line = start_line or 1  # GH-296
-        end_line = start_line + len(lines) - 1
-        url = template.format(**locals())
-        return url
-    except Exception:
-        warn(f&#39;format_git_link for {dobj.obj} failed:\n{traceback.format_exc()}&#39;)
-        return None
-
-
-@lru_cache()
-def _git_head_commit():
-    &#34;&#34;&#34;
-    If the working directory is part of a git repository, return the
-    head git commit hash. Otherwise, raise a CalledProcessError.
-    &#34;&#34;&#34;
-    process_args = [&#39;git&#39;, &#39;rev-parse&#39;, &#39;HEAD&#39;]
-    try:
-        commit = subprocess.check_output(process_args, universal_newlines=True).strip()
-        return commit
-    except OSError as error:
-        warn(f&#34;git executable not found on system:\n{error}&#34;)
-    except subprocess.CalledProcessError as error:
-        warn(
-            &#34;Ensure pdoc is run within a git repository.\n&#34;
-            f&#34;`{&#39; &#39;.join(process_args)}` failed with output:\n{error.output}&#34;
-        )
-    return None
-
-
-@lru_cache()
-def _git_project_root():
-    &#34;&#34;&#34;
-    Return the path to project root directory or None if indeterminate.
-    &#34;&#34;&#34;
-    for cmd in ([&#39;git&#39;, &#39;rev-parse&#39;, &#39;--show-superproject-working-tree&#39;],
-                [&#39;git&#39;, &#39;rev-parse&#39;, &#39;--show-toplevel&#39;]):
-        try:
-            path = subprocess.check_output(cmd, universal_newlines=True).rstrip(&#39;\r\n&#39;)
-            if path:
-                return os.path.normpath(path)
-        except (subprocess.CalledProcessError, OSError):
-            pass
-    return None
-
-
-@lru_cache()
-def _project_relative_path(absolute_path):
-    &#34;&#34;&#34;
-    Convert an absolute path of a python source file to a project-relative path.
-    Assumes the project&#39;s path is either the current working directory or
-    Python library installation.
-    &#34;&#34;&#34;
-    from distutils.sysconfig import get_python_lib
-    for prefix_path in (_git_project_root() or os.getcwd(),
-                        get_python_lib()):
-        common_path = os.path.commonpath([prefix_path, absolute_path])
-        if os.path.samefile(common_path, prefix_path):
-            # absolute_path is a descendant of prefix_path
-            return os.path.relpath(absolute_path, prefix_path)
-    raise RuntimeError(
-        f&#34;absolute path {absolute_path!r} is not a descendant of the current working directory &#34;
-        &#34;or of the system&#39;s python library.&#34;
-    )
-
-
-@lru_cache()
-def _str_template_fields(template):
-    &#34;&#34;&#34;
-    Return a list of `str.format` field names in a template string.
-    &#34;&#34;&#34;
-    from string import Formatter
-    return [
-        field_name
-        for _, field_name, _, _ in Formatter().parse(template)
-        if field_name is not None
-    ]</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -695,23 +48,6 @@ def _str_template_fields(template):
 </code></dt>
 <dd>
 <div class="desc"><p>Returns HTML Table of Contents containing markdown titles in <code>text</code>.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L538-L548" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def extract_toc(text: str):
-    &#34;&#34;&#34;
-    Returns HTML Table of Contents containing markdown titles in `text`.
-    &#34;&#34;&#34;
-    with _fenced_code_blocks_hidden(text) as result:
-        result[0] = _ToMarkdown.DOCTESTS_RE.sub(&#39;&#39;, result[0])
-    text = result[0]
-    toc, _ = _md.reset().convert(f&#39;[TOC]\n\n@CUT@\n\n{text}&#39;).split(&#39;@CUT@&#39;, 1)
-    if toc.endswith(&#39;&lt;p&gt;&#39;):  # CUT was put into its own paragraph
-        toc = toc[:-3].rstrip()
-    return toc</code></pre>
-</details>
 </dd>
 <dt id="pdoc.html_helpers.format_git_link"><code class="name flex">
 <span>def <span class="ident">format_git_link</span></span>(<span>template: str, dobj: <a title="pdoc.Doc" href="index.html#pdoc.Doc">Doc</a>)</span>
@@ -719,37 +55,6 @@ def _str_template_fields(template):
 <dd>
 <div class="desc"><p>Interpolate <code>template</code> as a formatted string literal using values extracted
 from <code>dobj</code> and the working environment.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L551-L575" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def format_git_link(template: str, dobj: pdoc.Doc):
-    &#34;&#34;&#34;
-    Interpolate `template` as a formatted string literal using values extracted
-    from `dobj` and the working environment.
-    &#34;&#34;&#34;
-    if not template:
-        return None
-    try:
-        if &#39;commit&#39; in _str_template_fields(template):
-            commit = _git_head_commit()
-        abs_path = inspect.getfile(inspect.unwrap(dobj.obj))
-        path = _project_relative_path(abs_path)
-
-        # Urls should always use / instead of \\
-        if os.name == &#39;nt&#39;:
-            path = path.replace(&#39;\\&#39;, &#39;/&#39;)
-
-        lines, start_line = inspect.getsourcelines(dobj.obj)
-        start_line = start_line or 1  # GH-296
-        end_line = start_line + len(lines) - 1
-        url = template.format(**locals())
-        return url
-    except Exception:
-        warn(f&#39;format_git_link for {dobj.obj} failed:\n{traceback.format_exc()}&#39;)
-        return None</code></pre>
-</details>
 </dd>
 <dt id="pdoc.html_helpers.glimpse"><code class="name flex">
 <span>def <span class="ident">glimpse</span></span>(<span>text: str, max_length=153, *, paragraph=True)</span>
@@ -758,55 +63,12 @@ from <code>dobj</code> and the working environment.</p></div>
 <div class="desc"><p>Returns a short excerpt (e.g. first paragraph) of text.
 If <code>paragraph</code> is True, the first paragraph will be returned,
 but never longer than <code>max_length</code> characters.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L48-L69" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def glimpse(text: str, max_length=153, *, paragraph=True,
-            _split_paragraph=partial(re.compile(r&#39;\s*\n\s*\n\s*&#39;).split, maxsplit=1),
-            _trim_last_word=partial(re.compile(r&#39;\S+$&#39;).sub, &#39;&#39;),
-            _remove_titles=partial(re.compile(r&#39;^(#+|-{4,}|={4,})&#39;, re.MULTILINE).sub, &#39; &#39;)):
-    &#34;&#34;&#34;
-    Returns a short excerpt (e.g. first paragraph) of text.
-    If `paragraph` is True, the first paragraph will be returned,
-    but never longer than `max_length` characters.
-    &#34;&#34;&#34;
-    text = text.lstrip()
-    if paragraph:
-        text, *rest = _split_paragraph(text)
-        if rest:
-            text = text.rstrip(&#39;.&#39;)
-            text += &#39; …&#39;
-        text = _remove_titles(text).strip()
-
-    if len(text) &gt; max_length:
-        text = _trim_last_word(text[:max_length - 2])
-        if not text.endswith(&#39;.&#39;) or not paragraph:
-            text = text.rstrip(&#39;. &#39;) + &#39; …&#39;
-    return text</code></pre>
-</details>
 </dd>
 <dt id="pdoc.html_helpers.minify_css"><code class="name flex">
 <span>def <span class="ident">minify_css</span></span>(<span>css: str)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Minify CSS by removing extraneous whitespace, comments, and trailing semicolons.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L23-L31" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">@lru_cache()
-def minify_css(css: str,
-               _whitespace=partial(re.compile(r&#39;\s*([,{:;}])\s*&#39;).sub, r&#39;\1&#39;),
-               _comments=partial(re.compile(r&#39;/\*.*?\*/&#39;, flags=re.DOTALL).sub, &#39;&#39;),
-               _trailing_semicolon=partial(re.compile(r&#39;;\s*}&#39;).sub, &#39;}&#39;)):
-    &#34;&#34;&#34;
-    Minify CSS by removing extraneous whitespace, comments, and trailing semicolons.
-    &#34;&#34;&#34;
-    return _trailing_semicolon(_whitespace(_comments(css))).strip()</code></pre>
-</details>
 </dd>
 <dt id="pdoc.html_helpers.minify_html"><code class="name flex">
 <span>def <span class="ident">minify_html</span></span>(<span>html: str)</span>
@@ -814,27 +76,9 @@ def minify_css(css: str,
 <dd>
 <div class="desc"><p>Minify HTML by replacing all consecutive whitespace with a single space
 (or newline) character, except inside <code>&lt;pre&gt;</code> tags.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L34-L45" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def minify_html(html: str,
-                _minify=partial(
-                    re.compile(r&#39;(.*?)(&lt;pre\b.*?&lt;/pre\b\s*&gt;)|(.*)&#39;, re.IGNORECASE | re.DOTALL).sub,
-                    lambda m, _norm_space=partial(re.compile(r&#39;\s\s+&#39;).sub, &#39;\n&#39;): (
-                        _norm_space(m.group(1) or &#39;&#39;) +
-                        (m.group(2) or &#39;&#39;) +
-                        _norm_space(m.group(3) or &#39;&#39;)))):
-    &#34;&#34;&#34;
-    Minify HTML by replacing all consecutive whitespace with a single space
-    (or newline) character, except inside `&lt;pre&gt;` tags.
-    &#34;&#34;&#34;
-    return _minify(html)</code></pre>
-</details>
 </dd>
 <dt id="pdoc.html_helpers.to_html"><code class="name flex">
-<span>def <span class="ident">to_html</span></span>(<span>text: str, *, docformat: str = None, module: <a title="pdoc.Module" href="index.html#pdoc.Module">Module</a> = None, link: Callable[..., str] = None, latex_math: bool = False)</span>
+<span>def <span class="ident">to_html</span></span>(<span>text: str, *, docformat: Optional[str] = None, module: Optional[<a title="pdoc.Module" href="index.html#pdoc.Module">Module</a>] = None, link: Optional[Callable[..., str]] = None, latex_math: bool = False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns HTML of <code>text</code> interpreted as <code>docformat</code>. <code>__docformat__</code> is respected
@@ -843,38 +87,9 @@ as well as pure Markdown.</p>
 <p><code>module</code> should be the documented module (so the references can be
 resolved) and <code>link</code> is the hyperlinking function like the one in the
 example template.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L406-L428" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def to_html(text: str, *,
-            docformat: str = None,
-            module: pdoc.Module = None, link: Callable[..., str] = None,
-            latex_math: bool = False):
-    &#34;&#34;&#34;
-    Returns HTML of `text` interpreted as `docformat`. `__docformat__` is respected
-    if present, otherwise Numpydoc and Google-style docstrings are assumed,
-    as well as pure Markdown.
-
-    `module` should be the documented module (so the references can be
-    resolved) and `link` is the hyperlinking function like the one in the
-    example template.
-    &#34;&#34;&#34;
-    # Optionally register our math syntax processor
-    if not latex_math and _MathPattern.NAME in _md.inlinePatterns:
-        _md.inlinePatterns.deregister(_MathPattern.NAME)
-    elif latex_math and _MathPattern.NAME not in _md.inlinePatterns:
-        _md.inlinePatterns.register(_MathPattern(_MathPattern.PATTERN),
-                                    _MathPattern.NAME,
-                                    _MathPattern.PRIORITY)
-
-    md = to_markdown(text, docformat=docformat, module=module, link=link)
-    return _md.reset().convert(md)</code></pre>
-</details>
 </dd>
 <dt id="pdoc.html_helpers.to_markdown"><code class="name flex">
-<span>def <span class="ident">to_markdown</span></span>(<span>text: str, *, docformat: str = None, module: <a title="pdoc.Module" href="index.html#pdoc.Module">Module</a> = None, link: Callable[..., str] = None)</span>
+<span>def <span class="ident">to_markdown</span></span>(<span>text: str, *, docformat: Optional[str] = None, module: Optional[<a title="pdoc.Module" href="index.html#pdoc.Module">Module</a>] = None, link: Optional[Callable[..., str]] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns <code>text</code>, assumed to be a docstring in <code>docformat</code>, converted to markdown.
@@ -884,66 +99,6 @@ as well as pure Markdown.</p>
 <p><code>module</code> should be the documented module (so the references can be
 resolved) and <code>link</code> is the hyperlinking function like the one in the
 example template.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L431-L484" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def to_markdown(text: str, *,
-                docformat: str = None,
-                module: pdoc.Module = None, link: Callable[..., str] = None):
-    &#34;&#34;&#34;
-    Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
-    `__docformat__` is respected
-    if present, otherwise Numpydoc and Google-style docstrings are assumed,
-    as well as pure Markdown.
-
-    `module` should be the documented module (so the references can be
-    resolved) and `link` is the hyperlinking function like the one in the
-    example template.
-    &#34;&#34;&#34;
-    if not docformat:
-        docformat = str(getattr(getattr(module, &#39;obj&#39;, None), &#39;__docformat__&#39;, &#39;numpy,google &#39;))
-        docformat, *_ = docformat.lower().split()
-    if not (set(docformat.split(&#39;,&#39;)) &amp; {&#39;&#39;, &#39;numpy&#39;, &#39;google&#39;}):
-        warn(f&#39;__docformat__ value {docformat!r} in module {module!r} not supported. &#39;
-             &#39;Supported values are: numpy, google.&#39;)
-        docformat = &#39;numpy,google&#39;
-
-    with _fenced_code_blocks_hidden(text) as result:
-        text = result[0]
-
-        text = _ToMarkdown.admonitions(text, module)
-
-        if &#39;google&#39; in docformat:
-            text = _ToMarkdown.google(text)
-
-        text = _ToMarkdown.doctests(text)
-        text = _ToMarkdown.raw_urls(text)
-
-        # If doing both, do numpy after google, otherwise google-style&#39;s
-        # headings are incorrectly interpreted as numpy params
-        if &#39;numpy&#39; in docformat:
-            text = _ToMarkdown.numpy(text)
-
-        if module and link:
-            # Hyperlink markdown code spans not within markdown hyperlinks.
-            # E.g. `code` yes, but not [`code`](...). RE adapted from:
-            # https://github.com/Python-Markdown/markdown/blob/ada40c66/markdown/inlinepatterns.py#L106
-            # Also avoid linking triple-backticked arg names in deflists.
-            linkify = partial(_linkify, link=link, module=module, wrap_code=True)
-            text = re.sub(r&#39;(?P&lt;inside_link&gt;\[[^\]]*?)?&#39;
-                          r&#39;(?:(?&lt;!\\)(?:\\{2})+(?=`)|(?&lt;!\\)(?P&lt;fence&gt;`+)&#39;
-                          r&#39;(?P&lt;code&gt;.+?)(?&lt;!`)&#39;
-                          r&#39;(?P=fence)(?!`))&#39;,
-                          lambda m: (m.group()
-                                     if m.group(&#39;inside_link&#39;) or len(m.group(&#39;fence&#39;)) &gt; 2
-                                     else linkify(m)), text)
-        result[0] = text
-    text = result[0]
-
-    return text</code></pre>
-</details>
 </dd>
 </dl>
 </section>
@@ -961,7 +116,7 @@ doesn't match any documented objects.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/f358893e4fcfd7f29857a7ff5491b606ff146d39/pdoc/html_helpers.py#L487-L493" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/84ee28b60f6aebdfe28f2a6a352991370fb5b81a/pdoc/html_helpers.py#L493-L499" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class ReferenceWarning(UserWarning):
     &#34;&#34;&#34;
@@ -992,7 +147,6 @@ doesn't match any documented objects.</p>
 data-as_oq="site:pdoc3.github.io inurl:github.com/pdoc3"
 data-gaCategoryParameter="pdoc.html_helpers">
 </div>
-<h1>Index</h1>
 <div class="toc">
 <ul></ul>
 </div>
@@ -1025,7 +179,7 @@ data-gaCategoryParameter="pdoc.html_helpers">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.0</a>.</p>
 </footer>
-<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-43663477-5','auto');ga('require','cleanUrlTracker',{indexFilename:'index.html',trailingSlash:'add'});ga('require','outboundLinkTracker',{events:['click','auxclick','contextmenu']});ga('require','maxScrollTracker');ga('require','pageVisibilityTracker');ga('send','pageview');setTimeout(function(){ga('send','event','pageview','view')},15000);</script><script async src='https://www.google-analytics.com/analytics.js'></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js'></script></body>
+</body>
 </html>
