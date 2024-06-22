@@ -236,7 +236,7 @@
           <dl>
           % for v in inst_vars:
               <% return_type = get_annotation(v.type_annotation) %>
-              <dt id="${v.refname}"><code class="name">var ${ident(v.name)}${return_type}</code></dt>
+              <dt id="${v.refname}"><code class="name">${v.kind} ${ident(v.name)}${return_type}</code></dt>
               <dd>${show_desc(v)}</dd>
           % endfor
           </dl>

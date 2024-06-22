@@ -23,7 +23,7 @@ from functools import lru_cache, reduce, partial, wraps
 from itertools import tee, groupby
 from types import ModuleType
 from typing import (  # noqa: F401
-    cast, Any, Callable, Dict, Generator, Iterable, List, Mapping, NewType,
+    cast, Any, Callable, Dict, Generator, Iterable, List, Literal, Mapping, NewType,
     Optional, Set, Tuple, Type, TypeVar, Union,
 )
 from unittest.mock import Mock
@@ -421,6 +421,14 @@ def _is_descriptor(obj):
             inspect.ismemberdescriptor(obj))
 
 
+def _unwrap_descriptor(obj):
+    if isinstance(obj, property):
+        return (getattr(obj, 'fget', False) or
+                getattr(obj, 'fset', False) or
+                getattr(obj, 'fdel', obj))
+    return getattr(obj, '__get__', obj)
+
+
 def _filter_type(type: Type[T],
                  values: Union[Iterable['Doc'], Mapping[str, 'Doc']]) -> List[T]:
     """
@@ -542,7 +550,7 @@ class Doc:
         available, an empty string.
         """
         try:
-            lines, _ = inspect.getsourcelines(self.obj)
+            lines, _ = inspect.getsourcelines(_unwrap_descriptor(self.obj))
         except (ValueError, TypeError, OSError):
             return ''
         return inspect.cleandoc(''.join(['\n'] + lines))
@@ -1079,7 +1087,8 @@ class Class(Doc):
                         var_docstrings.get(name) or
                         (inspect.isclass(obj) or _is_descriptor(obj)) and inspect.getdoc(obj)),
                     cls=self,
-                    obj=getattr(obj, 'fget', getattr(obj, '__get__', None)),
+                    kind="prop" if isinstance(obj, property) else "var",
+                    obj=_is_descriptor(obj) and obj or None,
                     instance_var=(_is_descriptor(obj) or
                                   name in getattr(self.obj, '__slots__', ())))
 
@@ -1392,7 +1401,8 @@ class Function(Doc):
                 lambda: _get_type_hints(cast(Class, self.cls).obj)[self.name],
                 # global variables
                 lambda: _get_type_hints(not self.cls and self.module.obj)[self.name],
-                lambda: inspect.signature(self.obj).return_annotation,
+                # properties
+                lambda: inspect.signature(_unwrap_descriptor(self.obj)).return_annotation,
                 # Use raw annotation strings in unmatched forward declarations
                 lambda: cast(Class, self.cls).obj.__annotations__[self.name],
                 # Extract annotation from the docstring for C builtin function
@@ -1593,10 +1603,11 @@ class Variable(Doc):
     Representation of a variable's documentation. This includes
     module, class, and instance variables.
     """
-    __slots__ = ('cls', 'instance_var')
+    __slots__ = ('cls', 'instance_var', 'kind')
 
     def __init__(self, name: str, module: Module, docstring, *,
-                 obj=None, cls: Optional[Class] = None, instance_var: bool = False):
+                 obj=None, cls: Optional[Class] = None, instance_var: bool = False,
+                 kind: Literal["prop", "var"] = 'var'):
         """
         Same as `pdoc.Doc`, except `cls` should be provided
         as a `pdoc.Class` object when this is a class or instance
@@ -1614,6 +1625,12 @@ class Variable(Doc):
         """
         True if variable is some class' instance variable (as
         opposed to class variable).
+        """
+
+        self.kind = kind
+        """
+        `prop` if variable is a dynamic property (has getter/setter or deleter),
+        or `var` otherwise.
         """
 
     @property
