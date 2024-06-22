@@ -500,17 +500,13 @@ def main(_args=None):
 
     # Virtual environment handling for pdoc script run from system site
     try:
-        venv_dir = os.environ['VIRTUAL_ENV']
+        os.environ['VIRTUAL_ENV']
     except KeyError:
         pass  # pdoc was not invoked while in a virtual environment
     else:
         from glob import glob
-        if sys.version_info >= (3, 11):
-            from sysconfig import get_path
-            libdir = get_path("platlib")
-        else:
-            from distutils.sysconfig import get_python_lib
-            libdir = get_python_lib(prefix=venv_dir)
+        from sysconfig import get_path
+        libdir = get_path("platlib")
         sys.path.append(libdir)
         # Resolve egg-links from `setup.py develop` or `pip install -e`
         # XXX: Welcome a more canonical approach
