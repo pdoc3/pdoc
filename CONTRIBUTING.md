@@ -3,15 +3,13 @@ Contributing guidelines
 
 Issues
 ------
-**Only report issues for _pdoc3_ package on PyPI.**
-If your issue pertains to older _pdoc_ package (on PyPI),
-report the issue [here] or ... just stop using it.
+Only report issues for **PyPI package _pdoc3_**.
+If your issue pertains to the other PyPI package _pdoc_,
+report its issue [here](https://github.com/mitmproxy/pdoc).
 
-[here]: https://github.com/mitmproxy/pdoc
-
-Before reporting an issue, see if a similar issue is already open.
-Also check if a similar issue was recently closed — your bug might
-have been fixed already.
+Before reporting an issue, please see if a similar issue is already open.
+If applicable, also check if a similar issue has recently been closed
+— your bug might have been just fixed.
 
 To have your issue dealt with promptly, it's best to construct a
 [minimal working example] that exposes the issue in a clear and
@@ -27,7 +25,7 @@ first [fork the project]. Then:
 
     git clone git@github.com:YOUR_USERNAME/pdoc
     cd pdoc
-    pip3 install -e .   # Mind the dot
+    pip install -e .   # Mind the dot
 
 [fork the project]: https://help.github.com/articles/fork-a-repo/
 
@@ -38,11 +36,11 @@ Please write reasonable unit tests for any new / changed functionality.
 See _pdoc/test_ directory for existing tests.
 Before submitting a PR, ensure the tests pass:
 
-    python setup.py test
+    python -m unittest -v pdoc.test
 
 Also ensure that idiomatic code style is respected by running:
 
-    flake8 --max-line-length 100  
+    flake8
 
 
 Documentation

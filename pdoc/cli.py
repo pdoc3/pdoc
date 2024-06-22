@@ -9,11 +9,13 @@ import os
 import os.path as path
 import json
 import re
+import subprocess
 import sys
 import warnings
 from contextlib import contextmanager
 from functools import lru_cache
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
 from typing import Dict, List, Sequence
 from warnings import warn
 
@@ -27,7 +29,7 @@ aa = parser.add_argument
 mode_aa = parser.add_mutually_exclusive_group().add_argument
 
 aa(
-    '--version', action='version', version='%(prog)s ' + pdoc.__version__)
+    '--version', action='version', version=f'%(prog)s {pdoc.__version__}')
 aa(
     "modules",
     type=str,
@@ -129,8 +131,8 @@ DEFAULT_HOST, DEFAULT_PORT = 'localhost', 8080
 def _check_host_port(s):
     if s and ':' not in s:
         raise argparse.ArgumentTypeError(
-            "'{}' doesn't match '[HOST]:[PORT]'. "
-            "Specify `--http :` to use default hostname and port.".format(s))
+            f"'{s}' doesn't match '[HOST]:[PORT]'. "
+            "Specify `--http :` to use default hostname and port.")
     return s
 
 
@@ -141,7 +143,7 @@ aa(
     metavar='HOST:PORT',
     help="When set, pdoc will run as an HTTP server providing documentation "
          "for specified modules. If you just want to use the default hostname "
-         "and port ({}:{}), set the parameter to :.".format(DEFAULT_HOST, DEFAULT_PORT),
+         f"and port ({DEFAULT_HOST}:{DEFAULT_PORT}), set the parameter to :.",
 )
 aa(
     "--skip-errors",
@@ -212,14 +214,14 @@ class _WebDoc(BaseHTTPRequestHandler):
             import_path = self.path[:-4].lstrip("/")
             resolved = self.resolve_ext(import_path)
             if resolved is None:  # Try to generate the HTML...
-                print("Generating HTML for %s on the fly..." % import_path, file=sys.stderr)
+                print(f"Generating HTML for {import_path} on the fly...", file=sys.stderr)
                 try:
                     out = pdoc.html(import_path.split(".")[0], **self.template_config)
                 except Exception as e:
-                    print('Error generating docs: {}'.format(e), file=sys.stderr)
+                    print(f'Error generating docs: {e}', file=sys.stderr)
                     # All hope is lost.
                     code = 404
-                    out = "External identifier <code>%s</code> not found." % import_path
+                    out = f"External identifier <code>{import_path}</code> not found."
             else:
                 return self.redirect(resolved)
         # Redirect '/pdoc' to '/pdoc/' so that relative links work
@@ -236,8 +238,11 @@ class _WebDoc(BaseHTTPRequestHandler):
                 import traceback
                 from html import escape
                 code = 404
-                out = "Error importing module <code>{}</code>:\n\n<pre>{}</pre>".format(
-                    self.import_path_from_req_url, escape(traceback.format_exc()))
+                out = (
+                    "Error importing module "
+                    f"<code>{self.import_path_from_req_url}</code>:\n\n"
+                    f"<pre>{escape(traceback.format_exc())}</pre>"
+                )
                 out = out.replace('\n', '<br>')
 
         self.send_response(code)
@@ -262,7 +267,7 @@ class _WebDoc(BaseHTTPRequestHandler):
         """
         return pdoc.html(self.import_path_from_req_url,
                          reload=True, http_server=True, external_links=True,
-                         skip_errors=args.skip_errors,
+                         skip_errors=self.args.skip_errors,
                          **self.template_config)
 
     def resolve_ext(self, import_path):
@@ -282,7 +287,7 @@ class _WebDoc(BaseHTTPRequestHandler):
             p = path.join(*parts[0:i])
             realp = exists(p)
             if realp is not None:
-                return "/%s#%s" % (realp.lstrip("/"), import_path)
+                return f"/{realp.lstrip('/')}#{import_path}"
         return None
 
     @property
@@ -312,8 +317,7 @@ def _quit_if_exists(m: pdoc.Module, ext: str):
 
     for pth in paths:
         if path.lexists(pth):
-            print("File '%s' already exists. Delete it, or run with --force" % pth,
-                  file=sys.stderr)
+            print(f"File '{pth}' already exists. Delete it, or run with --force", file=sys.stderr)
             sys.exit(1)
 
 
@@ -362,16 +366,16 @@ def _print_pdf(modules, **kwargs):
 
 
 def _warn_deprecated(option, alternative='', use_config_mako=False):
-    msg = 'Program option `{}` is deprecated.'.format(option)
+    msg = f'Program option `{option}` is deprecated.'
     if alternative:
-        msg += ' Use `' + alternative + '`'
+        msg += f' Use `{alternative}`'
         if use_config_mako:
             msg += ' or override config.mako template'
         msg += '.'
     warn(msg, DeprecationWarning, stacklevel=2)
 
 
-def _generate_lunr_search(top_module: pdoc.Module,
+def _generate_lunr_search(modules: List[pdoc.Module],
                           index_docstrings: bool,
                           template_config: dict):
     """Generate index.js for search"""
@@ -395,6 +399,7 @@ def _generate_lunr_search(top_module: pdoc.Module,
             info['doc'] = trim_docstring(dobj.docstring)
         if isinstance(dobj, pdoc.Function):
             info['func'] = 1
+        nonlocal index
         index.append(info)
         for member_dobj in getattr(dobj, 'doc', {}).values():
             recursive_add_to_index(member_dobj)
@@ -402,31 +407,41 @@ def _generate_lunr_search(top_module: pdoc.Module,
     @lru_cache()
     def to_url_id(module):
         url = module.url()
-        if top_module.is_package:  # Reference from subfolder if its a package
-            _, url = url.split('/', maxsplit=1)
         if url not in url_cache:
             url_cache[url] = len(url_cache)
         return url_cache[url]
 
-    index = []  # type: List[Dict]
-    url_cache = {}  # type: Dict[str, int]
-    recursive_add_to_index(top_module)
-    urls = [i[0] for i in sorted(url_cache.items(), key=lambda i: i[1])]
+    index: List[Dict] = []
+    url_cache: Dict[str, int] = {}
+    for top_module in modules:
+        recursive_add_to_index(top_module)
+    urls = sorted(url_cache.keys(), key=url_cache.__getitem__)
 
-    # If top module is a package, output the index in its subfolder, else, in the output dir
-    main_path = path.join(args.output_dir,
-                          *top_module.name.split('.') if top_module.is_package else '')
-    with _open_write_file(path.join(main_path, 'index.js')) as f:
-        f.write("URLS=")
-        json.dump(urls, f, indent=0, separators=(',', ':'))
-        f.write(";\nINDEX=")
-        json.dump(index, f, indent=0, separators=(',', ':'))
+    json_values = [dict(obj, url=urls[obj['url']]) for obj in index]
+    cmd = ['node', str(Path(__file__).with_name('build-index.js'))]
+    proc = subprocess.Popen(cmd, text=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    main_path = args.output_dir
+    if proc.poll() is None:
+        stdout, stderr = proc.communicate(json.dumps(json_values))
+        assert proc.poll() == 0, proc.poll()
+    if proc.returncode == 0:
+        stdout = 'INDEX=' + stdout
+    else:
+        warn(f'Prebuilding Lunr index with command `{" ".join(cmd)}` failed: '
+             f'{proc.stderr and proc.stderr.read() or ""!r}. '
+             f'The search feature will still work, '
+             f'but may be slower (with the index rebuilt just before use). '
+             f'To prebuild an index in advance, ensure `node` is executable in the '
+             f'pdoc environment.', category=RuntimeWarning)
+        stdout = ('URLS=' + json.dumps(urls, indent=0, separators=(',', ':')) +
+                  ';\nINDEX=' + json.dumps(index, indent=0, separators=(',', ':')))
+    index_path = Path(main_path).joinpath('index.js')
+    index_path.write_text(stdout)
+    print(str(index_path))
 
     # Generate search.html
-    with _open_write_file(path.join(main_path, 'search.html')) as f:
-        rendered_template = pdoc._render_template(
-            '/search.mako', module=top_module, **template_config
-        )
+    with _open_write_file(path.join(main_path, 'doc-search.html')) as f:
+        rendered_template = pdoc._render_template('/search.mako', **template_config)
         f.write(rendered_template)
 
 
@@ -435,7 +450,9 @@ def main(_args=None):
     global args
     args = _args or parser.parse_args()
 
-    warnings.simplefilter("once", DeprecationWarning)
+    # If warnings not externally managed, show deprecation warnings
+    if not sys.warnoptions:
+        warnings.simplefilter("once", DeprecationWarning)
 
     if args.close_stdin:
         sys.stdin.close()
@@ -458,9 +475,8 @@ def main(_args=None):
             template_config[key] = value
         except Exception:
             raise ValueError(
-                'Error evaluating --config statement "{}". '
+                f'Error evaluating --config statement "{config_str}". '
                 'Make sure string values are quoted?'
-                .format(config_str)
             )
 
     if args.html_no_source:
@@ -475,8 +491,7 @@ def main(_args=None):
 
     if args.template_dir is not None:
         if not path.isdir(args.template_dir):
-            print('Error: Template dir {!r} is not a directory'.format(args.template_dir),
-                  file=sys.stderr)
+            print(f'Error: Template dir {args.template_dir!r} is not a directory', file=sys.stderr)
             sys.exit(1)
         pdoc.tpl_lookup.directories.insert(0, args.template_dir)
 
@@ -500,7 +515,7 @@ def main(_args=None):
                 with open(pth) as f:
                     sys.path.append(path.join(libdir, f.readline().rstrip()))
             except IOError:
-                warn('Invalid egg-link in venv: {!r}'.format(pth))
+                warn(f'Invalid egg-link in venv: {pth!r}')
 
     if args.http:
         template_config['link_prefix'] = "/"
@@ -513,9 +528,9 @@ def main(_args=None):
         host = host or DEFAULT_HOST
         port = int(port or DEFAULT_PORT)
 
-        print('Starting pdoc server on {}:{}'.format(host, port), file=sys.stderr)
+        print(f'Starting pdoc server on {host}:{port}', file=sys.stderr)
         httpd = HTTPServer((host, port), _WebDoc)
-        print("pdoc server ready at http://%s:%d" % (host, port), file=sys.stderr)
+        print(f"pdoc server ready at http://{host}:{port}", file=sys.stderr)
 
         # Allow tests to perform `pdoc.cli._httpd.shutdown()`
         global _httpd
@@ -527,12 +542,13 @@ def main(_args=None):
             httpd.server_close()
             sys.exit(0)
 
-    docfilter = None
     if args.filter and args.filter.strip():
         def docfilter(obj, _filters=args.filter.strip().split(',')):
             return any(f in obj.refname or
                        isinstance(obj, pdoc.Class) and f in obj.doc
                        for f in _filters)
+    else:
+        docfilter = None
 
     modules = [pdoc.Module(module, docfilter=docfilter,
                            skip_errors=args.skip_errors)
@@ -542,7 +558,8 @@ def main(_args=None):
     if args.pdf:
         _print_pdf(modules, **template_config)
         import textwrap
-        print("""
+        PANDOC_CMD = textwrap.indent(_PANDOC_COMMAND, '    ')
+        print(f"""
 PDF-ready markdown written to standard output.
                               ^^^^^^^^^^^^^^^
 Convert this file to PDF using e.g. Pandoc:
@@ -567,21 +584,14 @@ or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
 
     wkhtmltopdf --encoding utf8 -s A4 --print-media-type pdf.html pdf.pdf
 
-or similar, at your own discretion.""".format(PANDOC_CMD=textwrap.indent(_PANDOC_COMMAND, '    ')),
+or similar, at your own discretion.""",
               file=sys.stderr)
         sys.exit(0)
-
-    lunr_config = pdoc._get_config(**template_config).get('lunr_search')
 
     for module in modules:
         if args.html:
             _quit_if_exists(module, ext='.html')
             recursive_write_files(module, ext='.html', **template_config)
-
-            if lunr_config is not None:
-                _generate_lunr_search(
-                    module, lunr_config.get("index_docstrings", True), template_config)
-
         elif args.output_dir:  # Generate text files
             _quit_if_exists(module, ext='.md')
             recursive_write_files(module, ext='.md', **template_config)
@@ -590,12 +600,18 @@ or similar, at your own discretion.""".format(PANDOC_CMD=textwrap.indent(_PANDOC
             # Two blank lines between two modules' texts
             sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
 
+    if args.html:
+        lunr_config = pdoc._get_config(**template_config).get('lunr_search')
+        if lunr_config is not None:
+            _generate_lunr_search(
+                modules, lunr_config.get("index_docstrings", True), template_config)
+
 
 _PANDOC_COMMAND = '''\
 pandoc --metadata=title:"MyProject Documentation"               \\
        --from=markdown+abbreviations+tex_math_single_backslash  \\
        --pdf-engine=xelatex --variable=mainfont:"DejaVu Sans"   \\
-       --toc --toc-depth=4 --output=pdf.pdf  pdf.md\
+       --toc --toc-depth=4 --output=/tmp/pdoc.pdf  pdf.md
 '''
 
 

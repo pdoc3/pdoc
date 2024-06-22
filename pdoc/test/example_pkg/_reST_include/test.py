@@ -8,4 +8,8 @@
 .. include:: foo/../_include_me.py
     :start-after: =
     :end-before: 4
+
+.. include:: table.md
+
+Remaining.
 """

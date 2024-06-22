@@ -9,7 +9,7 @@ import textwrap
 import traceback
 from contextlib import contextmanager
 from functools import partial, lru_cache
-from typing import Callable, Match
+from typing import Callable, Match, Optional
 from warnings import warn
 import xml.etree.ElementTree as etree
 
@@ -84,10 +84,10 @@ _md = markdown.Markdown(
     ],
     extension_configs={
         "markdown.extensions.smarty": dict(
-            smart_dashes=True,          # type: ignore[dict-item]
-            smart_ellipses=True,        # type: ignore[dict-item]
-            smart_quotes=False,         # type: ignore[dict-item]
-            smart_angled_quotes=False,  # type: ignore[dict-item]
+            smart_dashes=True,
+            smart_ellipses=True,
+            smart_quotes=False,
+            smart_angled_quotes=False,
         ),
     },
 )
@@ -98,7 +98,7 @@ def _fenced_code_blocks_hidden(text):
     def hide(text):
         def replace(match):
             orig = match.group()
-            new = '@' + str(hash(orig)) + '@'
+            new = f'@{hash(orig)}@'
             hidden[new] = orig
             return new
 
@@ -141,7 +141,7 @@ class _ToMarkdown:
         # 'optional' ... See §4 Parameters:
         # https://numpydoc.readthedocs.io/en/latest/format.html#sections
         type_parts = re.split(r'( *(?: of | or |, *default(?:=|\b)|, *optional\b) *)', type or '')
-        type_parts[::2] = ['`{}`'.format(s) if s else s
+        type_parts[::2] = [f'`{s}`' if s else s
                            for s in type_parts[::2]]
         type = ''.join(type_parts)
 
@@ -151,10 +151,10 @@ class _ToMarkdown:
         ret = ""
         if name:
             # NOTE: Triple-backtick argument names so we skip linkifying them
-            ret += '**```{}```**'.format(name.replace(', ', '```**, **```'))
+            ret += f"**```{name.replace(', ', '```**, **```')}```**"
         if type:
-            ret += ' :&ensp;{}'.format(type) if ret else type
-        ret += '\n:   {}\n\n'.format(desc)
+            ret += f' :&ensp;{type}' if ret else type
+        ret += f'\n:   {desc}\n\n'
         return ret
 
     @staticmethod
@@ -173,9 +173,12 @@ class _ToMarkdown:
         """
         spec_with_desc, simple_list = match.groups()
         if spec_with_desc:
-            return '\n\n'.join('`{}`\n:   {}'.format(*map(str.strip, line.split(':', 1)))
-                               for line in filter(None, spec_with_desc.split('\n')))
-        return ', '.join('`{}`'.format(i) for i in simple_list.split(', '))
+            spec_desc_strings = []
+            for line in filter(None, spec_with_desc.split('\n')):
+                spec, desc = map(str.strip, line.split(':', 1))
+                spec_desc_strings.append(f'`{spec}`\n:   {desc}')
+            return '\n\n'.join(spec_desc_strings)
+        return ', '.join(f'`{i}`' for i in simple_list.split(', '))
 
     @staticmethod
     def _numpy_sections(match):
@@ -202,7 +205,7 @@ class _ToMarkdown:
                           r'(?: ?: (?P<type>.*))?(?<!\.)$'
                           r'(?P<desc>(?:\n(?: {4}.*|$))*)',
                           _ToMarkdown._numpy_params, body, flags=re.MULTILINE)
-        return section + '\n-----\n' + body
+        return f'{section}\n-----\n{body}'
 
     @staticmethod
     def numpy(text):
@@ -229,7 +232,7 @@ class _ToMarkdown:
     def indent(indent, text, *, clean_first=False):
         if clean_first:
             text = inspect.cleandoc(text)
-        return re.sub(r'\n', '\n' + indent, indent + text.rstrip())
+        return re.sub(r'\n', f'\n{indent}', indent + text.rstrip())
 
     @staticmethod
     def google(text):
@@ -248,18 +251,18 @@ class _ToMarkdown:
                     r'^([\w*]+)(?: \(([\w.,=\[\] -]+)\))?: '
                     r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub(
                     lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups())),
-                    inspect.cleandoc('\n' + body)
+                    inspect.cleandoc(f'\n{body}')
                 )
             elif section in ('Returns', 'Yields', 'Raises', 'Warns'):
                 body = re.compile(
                     r'^()([\w.,\[\] ]+): '
                     r'((?:.*)(?:\n(?: {2,}.*|$))*)', re.MULTILINE).sub(
                     lambda m: _ToMarkdown._deflist(*_ToMarkdown._fix_indent(*m.groups())),
-                    inspect.cleandoc('\n' + body)
+                    inspect.cleandoc(f'\n{body}')
                 )
             # Convert into markdown sections. End underlines with '='
             # to avoid matching and re-processing as Numpy sections.
-            return '\n{}\n-----=\n{}'.format(section, body)
+            return f'\n{section}\n-----=\n{body}'
 
         text = re.compile(r'^([A-Z]\w+):$\n'
                           r'((?:\n?(?: {2,}.*|$))+)', re.MULTILINE).sub(googledoc_sections, text)
@@ -272,41 +275,44 @@ class _ToMarkdown:
         if limit_types and type not in limit_types:
             return match.group(0)
 
+        if text is None:
+            text = ""
+
         if type == 'include' and module:
             try:
                 return _ToMarkdown._include_file(indent, value,
                                                  _ToMarkdown._directive_opts(text), module)
             except Exception as e:
-                raise RuntimeError('`.. include:: {}` error in module {!r}: {}'
-                                   .format(value, module.name, e))
+                raise RuntimeError(f'`.. include:: {value}` error in module {module.name!r}: {e}')
         if type in ('image', 'figure'):
-            return '{}![{}]({})\n'.format(
-                indent, text.translate(str.maketrans({'\n': ' ',
-                                                      '[': '\\[',
-                                                      ']': '\\]'})).strip(), value)
+            alt_text = text.translate(str.maketrans({
+                '\n': ' ',
+                '[': '\\[',
+                ']': '\\]'})).strip()
+            return f'{indent}![{alt_text}]({value})\n'
         if type == 'math':
             return _ToMarkdown.indent(indent,
-                                      '\\[ ' + text.strip() + ' \\]',
+                                      f'\\[ {text.strip()} \\]',
                                       clean_first=True)
 
         if type == 'versionchanged':
-            title = 'Changed in version:&ensp;' + value
+            title = f'Changed in version:&ensp;{value}'
         elif type == 'versionadded':
-            title = 'Added in version:&ensp;' + value
+            title = f'Added in version:&ensp;{value}'
         elif type == 'deprecated' and value:
-            title = 'Deprecated since version:&ensp;' + value
+            title = f'Deprecated since version:&ensp;{value}'
         elif type == 'admonition':
             title = value
         elif type.lower() == 'todo':
             title = 'TODO'
-            text = value + ' ' + text
+            text = f'{value} {text}'
         else:
             title = type.capitalize()
             if value:
-                title += ':&ensp;' + value
+                title += f':&ensp;{value}'
 
         text = _ToMarkdown.indent(indent + '    ', text, clean_first=True)
-        return '{}!!! {} "{}"\n{}\n'.format(indent, type, title, text)
+        return f'{indent}!!! {type} "{title}"\n{text}\n'
 
     @staticmethod
     def admonitions(text, module, limit_types=None):
@@ -320,7 +326,8 @@ class _ToMarkdown:
         See: https://python-markdown.github.io/extensions/admonition/
         """
         substitute = partial(re.compile(r'^(?P<indent> *)\.\. ?(\w+)::(?: *(.*))?'
-                                        r'((?:\n(?:(?P=indent) +.*| *$))*)', re.MULTILINE).sub,
+                                        r'((?:\n(?:(?P=indent) +.*| *$))*[^\r\n])*',
+                                        re.MULTILINE).sub,
                              partial(_ToMarkdown._admonition, module=module,
                                      limit_types=limit_types))
         # Apply twice for nested (e.g. image inside warning)
@@ -357,7 +364,7 @@ class _ToMarkdown:
         doctest blocks so they render as Python code.
         """
         text = _ToMarkdown.DOCTESTS_RE.sub(
-            lambda match: '```python-repl\n' + match.group() + '\n```\n', text)
+            lambda match: f'```python-repl\n{match.group()}\n```\n', text)
         return text
 
     @staticmethod
@@ -379,7 +386,7 @@ class _ToMarkdown:
             )""", re.VERBOSE)
 
         text = pattern.sub(
-            lambda m: ('<' + m.group('url') + '>') if m.group('url') else m.group(), text)
+            lambda m: (f'<{m.group("url")}>') if m.group('url') else m.group(), text)
         return text
 
 
@@ -392,7 +399,7 @@ class _MathPattern(InlineProcessor):
         for value, is_block in zip(m.groups(), (False, True, True)):
             if value:
                 break
-        script = etree.Element('script', type='math/tex' + ('; mode=display' if is_block else ''))
+        script = etree.Element('script', type=f"math/tex{'; mode=display' if is_block else ''}")
         preview = etree.Element('span', {'class': 'MathJax_Preview'})
         preview.text = script.text = AtomicString(value)
         wrapper = etree.Element('span')
@@ -401,8 +408,9 @@ class _MathPattern(InlineProcessor):
 
 
 def to_html(text: str, *,
-            docformat: str = None,
-            module: pdoc.Module = None, link: Callable[..., str] = None,
+            docformat: Optional[str] = None,
+            module: Optional[pdoc.Module] = None,
+            link: Optional[Callable[..., str]] = None,
             latex_math: bool = False):
     """
     Returns HTML of `text` interpreted as `docformat`. `__docformat__` is respected
@@ -414,10 +422,10 @@ def to_html(text: str, *,
     example template.
     """
     # Optionally register our math syntax processor
-    if not latex_math and _MathPattern.NAME in _md.inlinePatterns:         # type: ignore
-        _md.inlinePatterns.deregister(_MathPattern.NAME)                   # type: ignore
-    elif latex_math and _MathPattern.NAME not in _md.inlinePatterns:       # type: ignore
-        _md.inlinePatterns.register(_MathPattern(_MathPattern.PATTERN),    # type: ignore
+    if not latex_math and _MathPattern.NAME in _md.inlinePatterns:
+        _md.inlinePatterns.deregister(_MathPattern.NAME)
+    elif latex_math and _MathPattern.NAME not in _md.inlinePatterns:
+        _md.inlinePatterns.register(_MathPattern(_MathPattern.PATTERN),
                                     _MathPattern.NAME,
                                     _MathPattern.PRIORITY)
 
@@ -426,8 +434,9 @@ def to_html(text: str, *,
 
 
 def to_markdown(text: str, *,
-                docformat: str = None,
-                module: pdoc.Module = None, link: Callable[..., str] = None):
+                docformat: Optional[str] = None,
+                module: Optional[pdoc.Module] = None,
+                link: Optional[Callable[..., str]] = None):
     """
     Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
     `__docformat__` is respected
@@ -442,8 +451,8 @@ def to_markdown(text: str, *,
         docformat = str(getattr(getattr(module, 'obj', None), '__docformat__', 'numpy,google '))
         docformat, *_ = docformat.lower().split()
     if not (set(docformat.split(',')) & {'', 'numpy', 'google'}):
-        warn('__docformat__ value {!r} in module {!r} not supported. '
-             'Supported values are: numpy, google.'.format(docformat, module))
+        warn(f'__docformat__ value {docformat!r} in module {module!r} not supported. '
+             'Supported values are: numpy, google.')
         docformat = 'numpy,google'
 
     with _fenced_code_blocks_hidden(text) as result:
@@ -513,8 +522,8 @@ def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module, wra
             # XXX: Assume at least the first part of refname, i.e. the package, is correct.
             module_part = module.find_ident(refname.split('.')[0])
             if not isinstance(module_part, pdoc.External):
-                warn('Code reference `{}` in module "{}" does not match any '
-                     'documented object.'.format(refname, module.refname),
+                warn(f'Code reference `{refname}` in module "{module.refname}" does not match any '
+                     'documented object.',
                      ReferenceWarning, stacklevel=3)
         return link(dobj)
 
@@ -528,7 +537,7 @@ def _linkify(match: Match, *, link: Callable[..., str], module: pdoc.Module, wra
         # would then become escaped.
         # This finds overlapping matches, https://stackoverflow.com/a/5616910/1090455
         cleaned = re.sub(r'(_(?=[^>]*?(?:<|$)))', r'\\\1', linked)
-        return '<code>{}</code>'.format(cleaned)
+        return f'<code>{cleaned}</code>'
     return linked
 
 
@@ -539,7 +548,7 @@ def extract_toc(text: str):
     with _fenced_code_blocks_hidden(text) as result:
         result[0] = _ToMarkdown.DOCTESTS_RE.sub('', result[0])
     text = result[0]
-    toc, _ = _md.reset().convert('[TOC]\n\n@CUT@\n\n' + text).split('@CUT@', 1)
+    toc, _ = _md.reset().convert(f'[TOC]\n\n@CUT@\n\n{text}').split('@CUT@', 1)
     if toc.endswith('<p>'):  # CUT was put into its own paragraph
         toc = toc[:-3].rstrip()
     return toc
@@ -557,12 +566,18 @@ def format_git_link(template: str, dobj: pdoc.Doc):
             commit = _git_head_commit()
         abs_path = inspect.getfile(inspect.unwrap(dobj.obj))
         path = _project_relative_path(abs_path)
+
+        # Urls should always use / instead of \\
+        if os.name == 'nt':
+            path = path.replace('\\', '/')
+
         lines, start_line = inspect.getsourcelines(dobj.obj)
+        start_line = start_line or 1  # GH-296
         end_line = start_line + len(lines) - 1
         url = template.format(**locals())
         return url
     except Exception:
-        warn('format_git_link for {} failed:\n{}'.format(dobj.obj, traceback.format_exc()))
+        warn(f'format_git_link for {dobj.obj} failed:\n{traceback.format_exc()}')
         return None
 
 
@@ -577,12 +592,11 @@ def _git_head_commit():
         commit = subprocess.check_output(process_args, universal_newlines=True).strip()
         return commit
     except OSError as error:
-        warn("git executable not found on system:\n{}".format(error))
+        warn(f"git executable not found on system:\n{error}")
     except subprocess.CalledProcessError as error:
         warn(
             "Ensure pdoc is run within a git repository.\n"
-            "`{}` failed with output:\n{}"
-            .format(' '.join(process_args), error.output)
+            f"`{' '.join(process_args)}` failed with output:\n{error.output}"
         )
     return None
 
@@ -592,17 +606,15 @@ def _git_project_root():
     """
     Return the path to project root directory or None if indeterminate.
     """
-    path = None
     for cmd in (['git', 'rev-parse', '--show-superproject-working-tree'],
                 ['git', 'rev-parse', '--show-toplevel']):
         try:
             path = subprocess.check_output(cmd, universal_newlines=True).rstrip('\r\n')
             if path:
-                break
+                return os.path.normpath(path)
         except (subprocess.CalledProcessError, OSError):
             pass
-    path = os.path.normpath(path)
-    return path
+    return None
 
 
 @lru_cache()
@@ -620,9 +632,8 @@ def _project_relative_path(absolute_path):
             # absolute_path is a descendant of prefix_path
             return os.path.relpath(absolute_path, prefix_path)
     raise RuntimeError(
-        "absolute path {!r} is not a descendant of the current working directory "
+        f"absolute path {absolute_path!r} is not a descendant of the current working directory "
         "or of the system's python library."
-        .format(absolute_path)
     )
 
 

@@ -19,13 +19,14 @@ import sys
 import typing
 from contextlib import contextmanager
 from copy import copy
-from functools import lru_cache, reduce, partial
+from functools import lru_cache, reduce, partial, wraps
 from itertools import tee, groupby
 from types import ModuleType
-from typing import (
-    cast, Any, Callable, Dict, Generator, Iterable, List, Mapping, Optional, Set, Tuple,
-    Type, TypeVar, Union,
+from typing import (  # noqa: F401
+    cast, Any, Callable, Dict, Generator, Iterable, List, Literal, Mapping, NewType,
+    Optional, Set, Tuple, Type, TypeVar, Union,
 )
+from unittest.mock import Mock
 from warnings import warn
 
 from mako.lookup import TemplateLookup
@@ -49,7 +50,7 @@ _UNKNOWN_MODULE = '?'
 
 T = TypeVar('T', 'Module', 'Class', 'Function', 'Variable')
 
-__pdoc__ = {}  # type: Dict[str, Union[bool, str]]
+__pdoc__: Dict[str, Union[bool, str]] = {}
 
 tpl_lookup = TemplateLookup(
     cache_args=dict(cached=True,
@@ -80,6 +81,13 @@ class Context(dict):
     """
     __pdoc__['Context.__init__'] = False
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # A surrogate so that the check in Module._link_inheritance()
+        # "__pdoc__-overriden key {!r} does not exist" can see the object
+        # (and not warn).
+        self.blacklisted = getattr(args[0], 'blacklisted', set()) if args else set()
+
 
 _global_context = Context()
 
@@ -90,7 +98,9 @@ def reset():
     _global_context.clear()
 
     # Clear LRU caches
-    for func in (_get_type_hints,):
+    for func in (_get_type_hints,
+                 _is_blacklisted,
+                 _is_whitelisted):
         func.cache_clear()
     for cls in (Doc, Module, Class, Function, Variable, External):
         for _, method in inspect.getmembers(cls):
@@ -117,11 +127,11 @@ def _get_config(**kwargs):
                   | {'module', 'modules', 'http_server', 'external_links', 'search_query'})
     invalid_keys = {k: v for k, v in kwargs.items() if k not in known_keys}
     if invalid_keys:
-        warn('Unknown configuration variables (not in config.mako): {}'.format(invalid_keys))
+        warn(f'Unknown configuration variables (not in config.mako): {invalid_keys}')
     config.update(kwargs)
 
     if 'search_query' in config:
-        warn('Option `search_query` has been depricated, use `google_search_query` instead',
+        warn('Option `search_query` has been deprecated. Use `google_search_query` instead',
              DeprecationWarning, stacklevel=2)
         config['google_search_query'] = config['search_query']
         del config['search_query']
@@ -139,10 +149,9 @@ def _render_template(template_name, **kwargs):
     try:
         t = tpl_lookup.get_template(template_name)
     except TopLevelLookupException:
-        raise OSError(
-            "No template found at any of: {}".format(
-                ', '.join(path.join(p, template_name.lstrip("/"))
-                          for p in tpl_lookup.directories)))
+        paths = [path.join(p, template_name.lstrip('/')) for p in tpl_lookup.directories]
+        raise OSError(f"No template found at any of: {', '.join(paths)}")
+
     try:
         return t.render(**config).strip()
     except Exception:
@@ -213,14 +222,17 @@ def import_module(module: Union[str, ModuleType],
             try:
                 module = importlib.import_module(module_path)
             except Exception as e:
-                raise ImportError('Error importing {!r}: {}: {}'
-                                  .format(module, e.__class__.__name__, e))
+                raise ImportError(f'Error importing {module!r}: {e.__class__.__name__}: {e}')
 
     assert inspect.ismodule(module)
     # If this is pdoc itself, return without reloading. Otherwise later
     # `isinstance(..., pdoc.Doc)` calls won't work correctly.
     if reload and not module.__name__.startswith(__name__):
         module = importlib.reload(module)
+        # We recursively reload all submodules, in case __all_ is used - cf. issue #264
+        for mod_key, mod in list(sys.modules.items()):
+            if mod_key.startswith(module.__name__):
+                importlib.reload(mod)
     return module
 
 
@@ -235,7 +247,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
                        _init_tree=None) -> Tuple[Dict[str, str],
                                                  Dict[str, str]]:
     """
-    Extracts PEP-224 docstrings for variables of `doc_obj`
+    Extracts PEP-224 docstrings and doc-comments (`#: ...`) for variables of `doc_obj`
     (either a `pdoc.Module` or `pdoc.Class`).
 
     Returns a tuple of two dicts mapping variable names to their docstrings.
@@ -246,8 +258,8 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
     if isinstance(doc_obj, Module) and doc_obj.is_namespace:
         return {}, {}
 
-    vars = {}  # type: Dict[str, str]
-    instance_vars = {}  # type: Dict[str, str]
+    vars: Dict[str, str] = {}
+    instance_vars: Dict[str, str] = {}
 
     if _init_tree:
         tree = _init_tree
@@ -256,12 +268,13 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
             # Maybe raise exceptions with appropriate message
             # before using cleaned doc_obj.source
             _ = inspect.findsource(doc_obj.obj)
-            tree = ast.parse(doc_obj.source)  # type: ignore
-        except (OSError, TypeError, SyntaxError) as exc:
+            tree = ast.parse(doc_obj.source)
+        except (OSError, TypeError, SyntaxError, UnicodeDecodeError) as exc:
             # Don't emit a warning for builtins that don't have source available
             is_builtin = getattr(doc_obj.obj, '__module__', None) == 'builtins'
             if not is_builtin:
-                warn("Couldn't read PEP-224 variable docstrings from {!r}: {}".format(doc_obj, exc))
+                warn(f"Couldn't read PEP-224 variable docstrings from {doc_obj!r}: {exc}",
+                     stacklevel=3 + int(isinstance(doc_obj, Class)))
             return {}, {}
 
         if isinstance(doc_obj, Class):
@@ -274,27 +287,16 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
                     instance_vars, _ = _pep224_docstrings(doc_obj, _init_tree=node)
                     break
 
-    try:
-        ast_AnnAssign = ast.AnnAssign   # type: Type
-    except AttributeError:  # Python < 3.6
-        ast_AnnAssign = type(None)
-    ast_Assignments = (ast.Assign, ast_AnnAssign)
-
-    for assign_node, str_node in _pairwise(ast.iter_child_nodes(tree)):
-        if not (isinstance(assign_node, ast_Assignments) and
-                isinstance(str_node, ast.Expr) and
-                isinstance(str_node.value, ast.Str)):
-            continue
-
+    def get_name(assign_node):
         if isinstance(assign_node, ast.Assign) and len(assign_node.targets) == 1:
             target = assign_node.targets[0]
-        elif isinstance(assign_node, ast_AnnAssign):
+        elif isinstance(assign_node, ast.AnnAssign):
             target = assign_node.target
             # Skip the annotation. PEP 526 says:
             # > Putting the instance variable annotations together in the class
             # > makes it easier to find them, and helps a first-time reader of the code.
         else:
-            continue
+            return None
 
         if not _init_tree and isinstance(target, ast.Name):
             name = target.id
@@ -304,27 +306,78 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
               target.value.id == 'self'):
             name = target.attr
         else:
-            continue
+            return None
 
         if not _is_public(name) and not _is_whitelisted(name, doc_obj):
+            return None
+
+        return name
+
+    # For handling PEP-224 docstrings for variables
+    for assign_node, str_node in _pairwise(ast.iter_child_nodes(tree)):
+        if not (isinstance(assign_node, (ast.Assign, ast.AnnAssign)) and
+                isinstance(str_node, ast.Expr) and
+                isinstance(str_node.value, ast.Constant)):
             continue
 
-        docstring = inspect.cleandoc(str_node.value.s).strip()
+        name = get_name(assign_node)
+        if not name:
+            continue
+
+        docstring = inspect.cleandoc(str_node.value.value).strip()
         if not docstring:
             continue
 
         vars[name] = docstring
 
+    # For handling '#:' docstrings for variables
+    for assign_node in ast.iter_child_nodes(tree):
+        if not isinstance(assign_node, (ast.Assign, ast.AnnAssign)):
+            continue
+
+        name = get_name(assign_node)
+        if not name:
+            continue
+
+        # Already documented. PEP-224 method above takes precedence.
+        if name in vars:
+            continue
+
+        def get_indent(line):
+            return len(line) - len(line.lstrip())
+
+        source_lines = doc_obj.source.splitlines()
+        assign_line = source_lines[assign_node.lineno - 1]
+        assign_indent = get_indent(assign_line)
+        comment_lines = []
+        MARKER = '#: '
+        for line in reversed(source_lines[:assign_node.lineno - 1]):
+            if get_indent(line) == assign_indent and line.lstrip().startswith(MARKER):
+                comment_lines.append(line.split(MARKER, maxsplit=1)[1])
+            else:
+                break
+
+        # Since we went 'up' need to reverse lines to be in correct order
+        comment_lines = comment_lines[::-1]
+
+        # Finally: check for a '#: ' comment at the end of the assignment line itself.
+        if MARKER in assign_line:
+            comment_lines.append(assign_line.rsplit(MARKER, maxsplit=1)[1])
+
+        if comment_lines:
+            vars[name] = '\n'.join(comment_lines)
+
     return vars, instance_vars
 
 
+@lru_cache()
 def _is_whitelisted(name: str, doc_obj: Union['Module', 'Class']):
     """
     Returns `True` if `name` (relative or absolute refname) is
     contained in some module's __pdoc__ with a truish value.
     """
-    refname = doc_obj.refname + '.' + name
-    module = doc_obj.module
+    refname = f'{doc_obj.refname}.{name}'
+    module: Optional[Module] = doc_obj.module
     while module:
         qualname = refname[len(module.refname) + 1:]
         if module.__pdoc__.get(qualname) or module.__pdoc__.get(refname):
@@ -333,13 +386,14 @@ def _is_whitelisted(name: str, doc_obj: Union['Module', 'Class']):
     return False
 
 
+@lru_cache()
 def _is_blacklisted(name: str, doc_obj: Union['Module', 'Class']):
     """
     Returns `True` if `name` (relative or absolute refname) is
     contained in some module's __pdoc__ with value False.
     """
-    refname = doc_obj.refname + '.' + name
-    module = doc_obj.module
+    refname = f'{doc_obj.refname}.{name}'
+    module: Optional[Module] = doc_obj.module
     while module:
         qualname = refname[len(module.refname) + 1:]
         if module.__pdoc__.get(qualname) is False or module.__pdoc__.get(refname) is False:
@@ -357,7 +411,7 @@ def _is_public(ident_name):
 
 
 def _is_function(obj):
-    return inspect.isroutine(obj) and callable(obj)
+    return inspect.isroutine(obj) and callable(obj) and not isinstance(obj, Mock)  # Mock: GH-350
 
 
 def _is_descriptor(obj):
@@ -403,10 +457,10 @@ def _toposort(graph: Mapping[T, Set[T]]) -> Generator[T, None, None]:
         yield from ordered
         if not ordered:
             break
-    assert not graph, "A cyclic dependency exists amongst %r" % graph
+    assert not graph, f"A cyclic dependency exists amongst {graph!r}"
 
 
-def link_inheritance(context: Context = None):
+def link_inheritance(context: Optional[Context] = None):
     """
     Link inheritance relationsships between `pdoc.Class` objects
     (and between their members) of all `pdoc.Module` objects that
@@ -446,7 +500,7 @@ class Doc:
     """
     __slots__ = ('module', 'name', 'obj', 'docstring', 'inherits')
 
-    def __init__(self, name, module, obj, docstring=None):
+    def __init__(self, name: str, module, obj, docstring: str = ''):
         """
         Initializes a documentation object, where `name` is the public
         identifier name, `module` is a `pdoc.Module` object where raw
@@ -479,16 +533,16 @@ class Doc:
         directives resolved (i.e. content included).
         """
 
-        self.inherits = None  # type: Optional[Union[Class, Function, Variable]]
+        self.inherits: Optional[Union[Class, Function, Variable]] = None
         """
         The Doc object (Class, Function, or Variable) this object inherits from,
         if any.
         """
 
     def __repr__(self):
-        return '<{} {!r}>'.format(self.__class__.__name__, self.refname)
+        return f'<{self.__class__.__name__} {self.refname!r}>'
 
-    @property  # type: ignore
+    @property
     @lru_cache()
     def source(self) -> str:
         """
@@ -521,7 +575,7 @@ class Doc:
         return getattr(self.obj, '__qualname__', self.name)
 
     @lru_cache()
-    def url(self, relative_to: 'Module' = None, *, link_prefix: str = '',
+    def url(self, relative_to: Optional['Module'] = None, *, link_prefix: str = '',
             top_ancestor: bool = False) -> str:
         """
         Canonical relative URL (including page fragment) for this
@@ -542,7 +596,7 @@ class Doc:
             return link_prefix + self._url()
 
         if self.module.name == relative_to.name:
-            return '#' + self.refname
+            return f'#{self.refname}'
 
         # Otherwise, compute relative path from current module to link target
         url = os.path.relpath(self._url(), relative_to.url()).replace(path.sep, '/')
@@ -552,7 +606,7 @@ class Doc:
         return url
 
     def _url(self):
-        return self.module._url() + '#' + self.refname
+        return f'{self.module._url()}#{self.refname}'
 
     def _inherits_top(self):
         """
@@ -579,8 +633,10 @@ class Module(Doc):
     __slots__ = ('supermodule', 'doc', '_context', '_is_inheritance_linked',
                  '_skipped_submodules')
 
-    def __init__(self, module: Union[ModuleType, str], *, docfilter: Callable[[Doc], bool] = None,
-                 supermodule: 'Module' = None, context: Context = None,
+    def __init__(self, module: Union[ModuleType, str], *,
+                 docfilter: Optional[Callable[[Doc], bool]] = None,
+                 supermodule: Optional['Module'] = None,
+                 context: Optional[Context] = None,
                  skip_errors: bool = False):
         """
         Creates a `Module` documentation object given the actual
@@ -611,13 +667,15 @@ class Module(Doc):
         A lookup table for ALL doc objects of all modules that share this context,
         mainly used in `Module.find_ident()`.
         """
+        assert isinstance(self._context, Context), \
+            'pdoc.Module(context=) should be a pdoc.Context instance'
 
         self.supermodule = supermodule
         """
         The parent `pdoc.Module` this module is a submodule of, or `None`.
         """
 
-        self.doc = {}  # type: Dict[str, Union[Module, Class, Function, Variable]]
+        self.doc: Dict[str, Union[Module, Class, Function, Variable]] = {}
         """A mapping from identifier name to a documentation object."""
 
         self._is_inheritance_linked = False
@@ -628,23 +686,37 @@ class Module(Doc):
         var_docstrings, _ = _pep224_docstrings(self)
 
         # Populate self.doc with this module's public members
+        public_objs = []
         if hasattr(self.obj, '__all__'):
-            public_objs = []
             for name in self.obj.__all__:
                 try:
-                    public_objs.append((name, getattr(self.obj, name)))
+                    obj = getattr(self.obj, name)
                 except AttributeError:
-                    warn("Module {!r} doesn't contain identifier `{}` "
-                         "exported in `__all__`".format(self.module, name))
+                    warn(f"Module {self.module!r} doesn't contain identifier `{name}` "
+                         "exported in `__all__`")
+                else:
+                    if not _is_blacklisted(name, self):
+                        obj = inspect.unwrap(obj)
+                    public_objs.append((name, obj))
         else:
             def is_from_this_module(obj):
                 mod = inspect.getmodule(inspect.unwrap(obj))
                 return mod is None or mod.__name__ == self.obj.__name__
 
-            public_objs = [(name, inspect.unwrap(obj))
-                           for name, obj in inspect.getmembers(self.obj)
-                           if ((_is_public(name) or _is_whitelisted(name, self)) and
-                               (is_from_this_module(obj) or name in var_docstrings))]
+            for name, obj in inspect.getmembers(self.obj):
+                if ((_is_public(name) or
+                     _is_whitelisted(name, self)) and
+                        (_is_blacklisted(name, self) or  # skips unwrapping that follows
+                         is_from_this_module(obj) or
+                         name in var_docstrings)):
+
+                    if _is_blacklisted(name, self):
+                        self._context.blacklisted.add(f'{self.refname}.{name}')
+                        continue
+
+                    obj = inspect.unwrap(obj)
+                    public_objs.append((name, obj))
+
             index = list(self.obj.__dict__).index
             public_objs.sort(key=lambda i: index(i[0]))
 
@@ -667,6 +739,9 @@ class Module(Doc):
                 """
                 from os.path import isdir, join
                 for pth in paths:
+                    if pth.startswith("__editable__."):
+                        # See https://github.com/pypa/pip/issues/11380
+                        continue
                     for file in os.listdir(pth):
                         if file.startswith(('.', '__pycache__', '__init__.py')):
                             continue
@@ -689,7 +764,7 @@ class Module(Doc):
                     continue
 
                 assert self.refname == self.name
-                fullname = "%s.%s" % (self.name, root)
+                fullname = f"{self.name}.{root}"
                 try:
                     m = Module(import_module(fullname),
                                docfilter=docfilter, supermodule=self,
@@ -731,7 +806,7 @@ class Module(Doc):
     __pdoc__['Module.ImportWarning'] = False
 
     @property
-    def __pdoc__(self):
+    def __pdoc__(self) -> dict:
         """This module's __pdoc__ dict, or an empty dict if none."""
         return getattr(self.obj, '__pdoc__', {})
 
@@ -753,20 +828,22 @@ class Module(Doc):
             if docstring is True:
                 continue
 
-            refname = "%s.%s" % (self.refname, name)
+            refname = f"{self.refname}.{name}"
             if docstring in (False, None):
                 if docstring is None:
                     warn('Setting `__pdoc__[key] = None` is deprecated; '
                          'use `__pdoc__[key] = False` '
-                         '(key: {!r}, module: {!r}).'.format(name, self.name))
+                         f'(key: {name!r}, module: {self.name!r}).')
 
                 if name in self._skipped_submodules:
                     continue
 
                 if (not name.endswith('.__init__') and
-                        name not in self.doc and refname not in self._context):
-                    warn('__pdoc__-overriden key {!r} does not exist '
-                         'in module {!r}'.format(name, self.name))
+                        name not in self.doc and
+                        refname not in self._context and
+                        refname not in self._context.blacklisted):
+                    warn(f'__pdoc__-overriden key {name!r} does not exist '
+                         f'in module {self.name!r}')
 
                 obj = self.find_ident(name)
                 cls = getattr(obj, 'cls', None)
@@ -786,8 +863,8 @@ class Module(Doc):
             if isinstance(dobj, External):
                 continue
             if not isinstance(docstring, str):
-                raise ValueError('__pdoc__ dict values must be strings;'
-                                 '__pdoc__[{!r}] is of type {}'.format(name, type(docstring)))
+                raise ValueError('__pdoc__ dict values must be strings; '
+                                 f'__pdoc__[{name!r}] is of type {type(docstring)}')
             dobj.docstring = inspect.cleandoc(docstring)
 
         # Now after docstrings are set correctly, continue the
@@ -819,6 +896,8 @@ class Module(Doc):
         if minify:
             from pdoc.html_helpers import minify_html
             html = minify_html(html)
+        if not html.endswith('\n'):
+            html = html + '\n'
         return html
 
     @property
@@ -848,7 +927,7 @@ class Module(Doc):
         # XXX: Is this corrent? Does it always match
         # `Class.module.name + Class.qualname`?. Especially now?
         # If not, see what was here before.
-        return self.find_ident((cls.__module__ or _UNKNOWN_MODULE) + '.' + cls.__qualname__)
+        return self.find_ident(f'{cls.__module__ or _UNKNOWN_MODULE}.{cls.__qualname__}')
 
     def find_ident(self, name: str) -> Doc:
         """
@@ -867,7 +946,7 @@ class Module(Doc):
 
         return (self.doc.get(_name) or
                 self._context.get(_name) or
-                self._context.get(self.name + '.' + _name) or
+                self._context.get(f'{self.name}.{_name}') or
                 External(name))
 
     def _filter_doc_objs(self, type: Type[T], sort=True) -> List[T]:
@@ -945,30 +1024,39 @@ class Class(Doc):
     """
     __slots__ = ('doc', '_super_members')
 
-    def __init__(self, name, module, obj, *, docstring=None):
+    def __init__(self, name: str, module: Module, obj, *, docstring: Optional[str] = None):
         assert inspect.isclass(obj)
 
         if docstring is None:
             init_doc = inspect.getdoc(obj.__init__) or ''
             if init_doc == object.__init__.__doc__:
                 init_doc = ''
-            docstring = ((inspect.getdoc(obj) or '') + '\n\n' + init_doc).strip()
+            docstring = f'{inspect.getdoc(obj) or ""}\n\n{init_doc}'.strip()
 
         super().__init__(name, module, obj, docstring=docstring)
 
-        self.doc = {}  # type: Dict[str, Union[Function, Variable]]
+        self.doc: Dict[str, Union[Function, Variable]] = {}
         """A mapping from identifier name to a `pdoc.Doc` objects."""
 
         # Annotations for filtering.
         # Use only own, non-inherited annotations (the rest will be inherited)
         annotations = getattr(self.obj, '__annotations__', {})
 
-        public_objs = [(_name, inspect.unwrap(obj))
-                       for _name, obj in _getmembers_all(self.obj)
-                       # Filter only *own* members. The rest are inherited
-                       # in Class._fill_inheritance()
-                       if (_name in self.obj.__dict__ or _name in annotations)
-                       and (_is_public(_name) or _is_whitelisted(_name, self))]
+        public_objs = []
+        for _name, obj in _getmembers_all(self.obj):
+            # Filter only *own* members. The rest are inherited
+            # in Class._fill_inheritance()
+            if ((_name in self.obj.__dict__ or
+                 _name in annotations) and
+                    (_is_public(_name) or
+                     _is_whitelisted(_name, self))):
+
+                if _is_blacklisted(_name, self):
+                    self.module._context.blacklisted.add(f'{self.refname}.{_name}')
+                    continue
+
+                obj = inspect.unwrap(obj)
+                public_objs.append((_name, obj))
 
         def definition_order_index(
                 name,
@@ -1027,11 +1115,11 @@ class Class(Doc):
                 if isinstance(c.__dict__[name], staticmethod):
                     return staticmethod
                 return None
-        raise RuntimeError("{}.{} not found".format(cls, name))
+        raise RuntimeError(f"{cls}.{name} not found")
 
     @property
     def refname(self) -> str:
-        return self.module.name + '.' + self.qualname
+        return f'{self.module.name}.{self.qualname}'
 
     def mro(self, only_documented=False) -> List['Class']:
         """
@@ -1041,7 +1129,7 @@ class Class(Doc):
         The list will contain objects of type `pdoc.Class`
         if the types are documented, and `pdoc.External` otherwise.
         """
-        classes = [self.module.find_class(c)
+        classes = [cast(Class, self.module.find_class(c))
                    for c in inspect.getmro(self.obj)
                    if c not in (self.obj, object)]
         if self in classes:
@@ -1064,7 +1152,7 @@ class Class(Doc):
         The objects in the list are of type `pdoc.Class` if available,
         and `pdoc.External` otherwise.
         """
-        return sorted(self.module.find_class(c)
+        return sorted(cast(Class, self.module.find_class(c))
                       for c in type.__subclasses__(self.obj))
 
     def params(self, *, annotate=False, link=None) -> List[str]:
@@ -1182,22 +1270,60 @@ class Class(Doc):
         del self._super_members
 
 
+def maybe_lru_cache(func):
+    cached_func = lru_cache()(func)
+
+    @wraps(func)
+    def wrapper(*args):
+        try:
+            return cached_func(*args)
+        except TypeError:
+            return func(*args)
+
+    return wrapper
+
+
+@maybe_lru_cache
 def _formatannotation(annot):
     """
-    Format annotation, properly handling NewType types
+    Format typing annotation with better handling of `typing.NewType`,
+    `typing.Optional`, `nptyping.NDArray` and other types.
 
-    >>> import typing
-    >>> _formatannotation(typing.NewType('MyType', str))
-    'MyType'
+    >>> _formatannotation(NewType('MyType', str))
+    'pdoc.MyType'
+    >>> _formatannotation(Optional[Tuple[Optional[int], None]])
+    'Optional[Tuple[Optional[int], None]]'
     """
-    module = getattr(annot, '__module__', '')
-    is_newtype = (getattr(annot, '__qualname__', '').startswith('NewType.') and
-                  module == 'typing')
-    if is_newtype:
-        return annot.__name__
-    if module.startswith('nptyping'):  # GH-231
-        return repr(annot)
-    return inspect.formatannotation(annot)
+    class force_repr(str):
+        __repr__ = str.__str__
+
+    def maybe_replace_reprs(a):
+        # NoneType -> None
+        if a is type(None):  # noqa: E721
+            return force_repr('None')
+        # Union[T, None] -> Optional[T]
+        if (getattr(a, '__origin__', None) is typing.Union and
+                len(a.__args__) == 2 and
+                type(None) in a.__args__):
+            t = inspect.formatannotation(
+                maybe_replace_reprs(next(filter(None, a.__args__))))
+            return force_repr(f'Optional[{t}]')
+        # typing.NewType('T', foo) -> T
+        module = getattr(a, '__module__', '')
+        if module == 'typing' and getattr(a, '__qualname__', '').startswith('NewType.'):
+            return force_repr(a.__name__)
+        # nptyping.types._ndarray.NDArray -> NDArray[(Any,), Int[64]]  # GH-231
+        if module.startswith('nptyping.'):
+            return force_repr(repr(a))
+        # Recurse into typing.Callable/etc. args
+        if hasattr(a, 'copy_with') and hasattr(a, '__args__'):
+            if a is typing.Callable:
+                # Bug on Python < 3.9, https://bugs.python.org/issue42195
+                return a
+            a = a.copy_with(tuple([maybe_replace_reprs(arg) for arg in a.__args__]))
+        return a
+
+    return str(inspect.formatannotation(maybe_replace_reprs(annot)))
 
 
 class Function(Doc):
@@ -1206,7 +1332,7 @@ class Function(Doc):
     """
     __slots__ = ('cls',)
 
-    def __init__(self, name, module, obj, *, cls: Class = None):
+    def __init__(self, name: str, module: Module, obj, *, cls: Optional[Class] = None):
         """
         Same as `pdoc.Doc`, except `obj` must be a
         Python function object. The docstring is gathered automatically.
@@ -1291,7 +1417,7 @@ class Function(Doc):
         else:
             # Don't warn on variables. The annotation just isn't available.
             if not isinstance(self, Variable):
-                warn("Error handling return annotation for {!r}".format(self), stacklevel=3)
+                warn(f"Error handling return annotation for {self!r}", stacklevel=3)
 
         if annot is inspect.Parameter.empty or not annot:
             return ''
@@ -1300,7 +1426,7 @@ class Function(Doc):
             s = annot
         else:
             s = _formatannotation(annot)
-            s = re.sub(r'\b(typing\.)?ForwardRef\((?P<quot>[\"\'])(?P<str>.*?)(?P=quot)\)',
+            s = re.sub(r'\bForwardRef\((?P<quot>[\"\'])(?P<str>.*?)(?P=quot)\)',
                        r'\g<str>', s)
         s = s.replace(' ', '\N{NBSP}')  # Better line breaks in html signatures
 
@@ -1309,7 +1435,8 @@ class Function(Doc):
             s = re.sub(r'[\w\.]+', partial(_linkify, link=link, module=self.module), s)
         return s
 
-    def params(self, *, annotate: bool = False, link: Callable[[Doc], str] = None) -> List[str]:
+    def params(self, *, annotate: bool = False,
+               link: Optional[Callable[[Doc], str]] = None) -> List[str]:
         """
         Returns a list where each element is a nicely formatted
         parameter of this function. This includes argument lists,
@@ -1357,7 +1484,7 @@ class Function(Doc):
                 if isinstance(value, enum.Enum):
                     replacement = str(value)
                 elif inspect.isclass(value):
-                    replacement = (value.__module__ or _UNKNOWN_MODULE) + '.' + value.__qualname__
+                    replacement = f'{value.__module__ or _UNKNOWN_MODULE}.{value.__qualname__}'
                 elif ' at 0x' in repr(value):
                     replacement = re.sub(r' at 0x\w+', '', repr(value))
 
@@ -1411,16 +1538,16 @@ class Function(Doc):
                     annotation = annotation.strip("'")
                 if link:
                     annotation = re.sub(r'[\w\.]+', _linkify, annotation)
-                formatted += ':\N{NBSP}' + annotation
+                formatted += f':\N{NBSP}{annotation}'
             if p.default is not EMPTY:
                 if p.annotation is not EMPTY:
-                    formatted += '\N{NBSP}=\N{NBSP}' + repr(p.default)
+                    formatted += f'\N{NBSP}=\N{NBSP}{repr(p.default)}'
                 else:
-                    formatted += '=' + repr(p.default)
+                    formatted += f'={repr(p.default)}'
             if p.kind == p.VAR_POSITIONAL:
-                formatted = '*' + formatted
+                formatted = f'*{formatted}'
             elif p.kind == p.VAR_KEYWORD:
-                formatted = '**' + formatted
+                formatted = f'**{formatted}'
 
             params.append(formatted)
 
@@ -1453,11 +1580,11 @@ class Function(Doc):
                 # See: https://github.com/pdoc3/pdoc/pull/148#discussion_r407114141
                 module_basename = self.module.name.rsplit('.', maxsplit=1)[-1]
                 if module_basename in string and module_basename not in _globals:
-                    string = re.sub(r'(?<!\.)\b{}\.\b'.format(module_basename), '', string)
+                    string = re.sub(fr'(?<!\.)\b{module_basename}\.\b', '', string)
 
                 try:
-                    exec('def {}: pass'.format(string), _globals, _locals)
-                except SyntaxError:
+                    exec(f'def {string}: pass', _globals, _locals)
+                except Exception:
                     continue
                 signature = inspect.signature(_locals[self.name])
                 if cleanup_docstring and len(strings) == 1:
@@ -1468,7 +1595,7 @@ class Function(Doc):
 
     @property
     def refname(self) -> str:
-        return (self.cls.refname if self.cls else self.module.refname) + '.' + self.name
+        return f'{self.cls.refname if self.cls else self.module.refname}.{self.name}'
 
 
 class Variable(Doc):
@@ -1478,8 +1605,9 @@ class Variable(Doc):
     """
     __slots__ = ('cls', 'instance_var', 'kind')
 
-    def __init__(self, name, module, docstring, *,
-                 obj=None, cls: Class = None, instance_var=False, kind=None):
+    def __init__(self, name: str, module: Module, docstring, *,
+                 obj=None, cls: Optional[Class] = None, instance_var: bool = False,
+                 kind: Literal["prop", "var"] = 'var'):
         """
         Same as `pdoc.Doc`, except `cls` should be provided
         as a `pdoc.Class` object when this is a class or instance
@@ -1508,12 +1636,12 @@ class Variable(Doc):
     @property
     def qualname(self) -> str:
         if self.cls:
-            return self.cls.qualname + '.' + self.name
+            return f'{self.cls.qualname}.{self.name}'
         return self.name
 
     @property
     def refname(self) -> str:
-        return (self.cls.refname if self.cls else self.module.refname) + '.' + self.name
+        return f'{self.cls.refname if self.cls else self.module.refname}.{self.name}'
 
     def type_annotation(self, *, link=None) -> str:
         """Formatted variable type annotation or empty string if none."""
@@ -1544,7 +1672,7 @@ class External(Doc):
         form.
         """
 
-    def __init__(self, name):
+    def __init__(self, name: str):
         """
         Initializes an external identifier with `name`, where `name`
         should be a fully qualified name.
@@ -1555,4 +1683,4 @@ class External(Doc):
         """
         `External` objects return absolute urls matching `/{name}.ext`.
         """
-        return '/%s.ext' % self.name
+        return f'/{self.name}.ext'

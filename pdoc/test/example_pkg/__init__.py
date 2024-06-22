@@ -2,6 +2,7 @@
 from collections import namedtuple
 import subprocess
 import os
+from unittest.mock import AsyncMock, Mock
 
 CONST = 'const'
 """CONST docstring"""
@@ -356,6 +357,10 @@ def latex_math():
 
     Block equation: $$ v_t *\\frac{1}{2}* j_i + [a] < 3 $$
 
+    $\\mathcal{O}(N)$
+
+    Escaping \\$ should work in math like $X = \\$3.25$ once it is implemented.
+
     ..math::
         v_t *\\frac{1}{2}* j_i + [a] < 3
     """
@@ -363,3 +368,18 @@ def latex_math():
 
 class Location(namedtuple('Location', 'lat lon')):
     """Geo-location, GPS position."""
+
+
+def _func_spec(value: int) -> bool: ...
+
+
+async def _coro_spec(value: int) -> bool: ...
+
+
+class HasMockAttributes:
+    """
+    Test class containing instances of `unittest.mock.Mock`.
+    """
+
+    function_mock = Mock(spec=_func_spec)
+    coroutine_mock = AsyncMock(spec=_coro_spec)

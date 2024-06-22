@@ -11,7 +11,7 @@
         return name
     url = dobj.url(relative_to=module, link_prefix=link_prefix,
                    top_ancestor=not show_inherited_members)
-    return '<a title="{}" href="{}">{}</a>'.format(dobj.refname, url, name)
+    return f'<a title="{dobj.refname}" href="{url}">{name}</a>'
 
 
   def to_html(text):
@@ -28,7 +28,9 @@
 <%def name="ident(name)"><span class="ident">${name}</span></%def>
 
 <%def name="show_source(d)">
-  % if (show_source_code or git_link_template) and d.source and d.obj is not getattr(d.inherits, 'obj', None):
+  % if (show_source_code or git_link_template) and \
+        not isinstance(d, pdoc.Module) and d.source and \
+        d.obj is not getattr(d.inherits, 'obj', None):
     <% git_link = format_git_link(git_link_template, d) %>
     % if show_source_code:
       <details class="source">
@@ -299,7 +301,6 @@
       <%include file="_lunr_search.inc.mako"/>
     % endif
 
-    <h1>Index</h1>
     ${extract_toc(module.docstring) if extract_module_toc_into_sidebar else ''}
     <ul id="index">
     % if supermodule:
@@ -365,8 +366,8 @@
 <html lang="${html_lang}">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-  <meta name="generator" content="pdoc ${pdoc.__version__}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  <meta name="generator" content="pdoc3 ${pdoc.__version__}">
 
 <%
     module_list = 'modules' in context.keys()  # Whether we're showing module list in server mode
@@ -374,16 +375,16 @@
 
   % if module_list:
     <title>Python module list</title>
-    <meta name="description" content="A list of documented Python modules." />
+    <meta name="description" content="A list of documented Python modules.">
   % else:
     <title>${module.name} API documentation</title>
-    <meta name="description" content="${module.docstring | glimpse, trim, h}" />
+    <meta name="description" content="${module.docstring | glimpse, trim, h}">
   % endif
 
-  <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
-  <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
   % if syntax_highlighting:
-    <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/${hljs_style}.min.css" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/${hljs_style}.min.css" crossorigin>
   %endif
 
   <%namespace name="css" file="css.mako" />
@@ -392,10 +393,13 @@
   <style media="print">${css.print()}</style>
 
   % if google_analytics:
+    <script async src="https://www.googletagmanager.com/gtag/js?id=${google_analytics}"></script>
     <script>
-    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-    ga('create', '${google_analytics}', 'auto'); ga('send', 'pageview');
-    </script><script async src='https://www.google-analytics.com/analytics.js'></script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '${google_analytics}');
+    </script>
   % endif
 
   % if google_search_query:
@@ -408,12 +412,16 @@
   % endif
 
   % if latex_math:
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({ tex2jax: { inlineMath: [ ['$','$'], ["\\(","\\)"] ], processEscapes: true } });</script>
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
   % endif
 
   % if syntax_highlighting:
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
-    <script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+    <script>window.addEventListener('DOMContentLoaded', () => {
+        hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+        hljs.highlightAll();
+    })</script>
   % endif
 
   <%include file="head.mako"/>
@@ -434,7 +442,7 @@
 
 <footer id="footer">
     <%include file="credits.mako"/>
-    <p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> ${pdoc.__version__}</a>.</p>
+    <p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> ${pdoc.__version__}</a>.</p>
 </footer>
 
 % if http_server and module:  ## Auto-reload on file change in dev mode

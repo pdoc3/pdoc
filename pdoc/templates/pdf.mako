@@ -7,26 +7,27 @@
         name = dobj.qualname + ('()' if isinstance(dobj, pdoc.Function) else '')
         if isinstance(dobj, pdoc.External):
             return name
-        return '[{0}](#{1} "{1}")'.format(name, dobj.refname)
+        return f'[{name}](#{dobj.refname} "{dobj.refname}")'
 
     def _to_md(text, module):
         text = to_markdown(text, docformat=docformat, module=module, link=link)
         # Setext H2 headings to atx H2 headings
         text = re.sub(r'\n(.+)\n-{3,}\n', r'\n## \1\n\n', text)
         # Convert admonitions into simpler paragraphs, dedent contents
+        def paragraph_fmt(m):
+            sub = re.sub('\n {,4}', '\n', m.group(4))
+            return f'{m.group(2)}**{m.group(3)}:** {sub}'
         text = re.sub(r'^(?P<indent>( *))!!! \w+ \"([^\"]*)\"(.*(?:\n(?P=indent) +.*)*)',
-                      lambda m: '{}**{}:** {}'.format(m.group(2), m.group(3),
-                                                      re.sub('\n {,4}', '\n', m.group(4))),
-                      text, flags=re.MULTILINE)
+                      paragraph_fmt, text, flags=re.MULTILINE)
         return text
 
     def subh(text, level=2):
         # Deepen heading levels so H2 becomes H4 etc.
-        return re.sub(r'\n(#+) +(.+)\n', r'\n%s\1 \2\n' % ('#' * level), text)
+        return re.sub(r'\n(#+) +(.+)\n', fr'\n{"#" * level}\1 \2\n', text)
 %>
 
 <%def name="title(level, string, id=None)">
-    <% id = ' {#%s}' % id if id is not None else '' %>
+    <% id = f' {{#id}}' if id is not None else '' %>
 ${('#' * level) + ' ' + string + id}
 </%def>
 
@@ -87,7 +88,7 @@ links-as-notes: true
     def to_md(text):
         return _to_md(text, module)
 %>
-${title(1, ('Namespace' if module.is_namespace else 'Module') + ' `%s`' % module.name, module.refname)}
+${title(1, ('Namespace' if module.is_namespace else 'Module') + f' `{module.name}`', module.refname)}
 ${module.docstring | to_md}
 
 % if submodules:
@@ -100,7 +101,7 @@ ${title(2, 'Sub-modules')}
 % if variables:
 ${title(2, 'Variables')}
     % for v in variables:
-${title(3, 'Variable `%s`' % v.name, v.refname)}
+${title(3, f'Variable `{v.name}`', v.refname)}
 ${vartype(v)}
 ${v.docstring | to_md, subh, subh}
     % endfor
@@ -109,7 +110,7 @@ ${v.docstring | to_md, subh, subh}
 % if functions:
 ${title(2, 'Functions')}
     % for f in functions:
-${title(3, 'Function `%s`' % f.name, f.refname)}
+${title(3, f'Function `{f.name}`', f.refname)}
 
 ${funcdef(f)}
 
@@ -120,7 +121,7 @@ ${f.docstring | to_md, subh, subh}
 % if classes:
 ${title(2, 'Classes')}
     % for cls in classes:
-${title(3, 'Class `%s`' % cls.name, cls.refname)}
+${title(3, f'Class `{cls.name}`', cls.refname)}
 
 ${classdef(cls)}
 
@@ -150,7 +151,7 @@ ${title(4, 'Descendants')}
         % if class_vars:
 ${title(4, 'Class variables')}
             % for v in class_vars:
-${title(5, 'Variable `%s`' % v.name, v.refname)}
+${title(5, f'Variable `{v.name}`', v.refname)}
 ${vartype(v)}
 ${v.docstring | to_md, subh, subh}
             % endfor
@@ -159,7 +160,7 @@ ${v.docstring | to_md, subh, subh}
         % if inst_vars:
 ${title(4, 'Instance variables')}
             % for v in inst_vars:
-${title(5, 'Variable `%s`' % v.name, v.refname)}
+${title(5, f'Variable `{v.name}`', v.refname)}
 ${vartype(v)}
 ${v.docstring | to_md, subh, subh}
             % endfor
@@ -168,7 +169,7 @@ ${v.docstring | to_md, subh, subh}
         % if static_methods:
 ${title(4, 'Static methods')}
             % for f in static_methods:
-${title(5, '`Method %s`' % f.name, f.refname)}
+${title(5, f'`Method {f.name}`', f.refname)}
 
 ${funcdef(f)}
 
@@ -179,7 +180,7 @@ ${f.docstring | to_md, subh, subh}
         % if methods:
 ${title(4, 'Methods')}
             % for f in methods:
-${title(5, 'Method `%s`' % f.name, f.refname)}
+${title(5, f'Method `{f.name}`', f.refname)}
 
 ${funcdef(f)}
 
