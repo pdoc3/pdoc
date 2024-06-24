@@ -7,11 +7,14 @@ on:
 jobs:
   test-matrix:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '>=3']
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
         with:
-          python-version: '>=3'
+          python-version: ${{ matrix.python-version }}
 
       - run: pip install -U pip setuptools wheel && pip install -U .
       - run: time python -m unittest -v pdoc.test
