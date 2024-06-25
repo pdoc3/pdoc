@@ -419,22 +419,24 @@ def _generate_lunr_search(modules: List[pdoc.Module],
 
     json_values = [dict(obj, url=urls[obj['url']]) for obj in index]
     cmd = ['node', str(Path(__file__).with_name('build-index.js'))]
-    proc = subprocess.Popen(cmd, text=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    main_path = args.output_dir
-    if proc.poll() is None:
+    proc = None
+    try:
+        proc = subprocess.Popen(cmd, text=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         stdout, stderr = proc.communicate(json.dumps(json_values))
         assert proc.poll() == 0, proc.poll()
-    if proc.returncode == 0:
-        stdout = 'INDEX=' + stdout
-    else:
-        warn(f'Prebuilding Lunr index with command `{" ".join(cmd)}` failed: '
-             f'{proc.stderr and proc.stderr.read() or ""!r}. '
-             f'The search feature will still work, '
+    except Exception as ex:
+        stderr = proc and proc.stderr and proc.stderr.read()  # type: ignore
+        warn(f'Prebuilding Lunr index with command `{" ".join(cmd)}` failed with '
+             f'"{ex.__class__.__name__}: {ex}". Stderr: {stderr or ""!r}. '
+             f'Note, the search feature will still work, '
              f'but may be slower (with the index rebuilt just before use). '
              f'To prebuild an index in advance, ensure `node` is executable in the '
              f'pdoc environment.', category=RuntimeWarning)
         stdout = ('URLS=' + json.dumps(urls, indent=0, separators=(',', ':')) +
                   ';\nINDEX=' + json.dumps(index, indent=0, separators=(',', ':')))
+    else:
+        stdout = 'INDEX=' + stdout
+    main_path = args.output_dir
     index_path = Path(main_path).joinpath('index.js')
     index_path.write_text(stdout)
     print(str(index_path))
