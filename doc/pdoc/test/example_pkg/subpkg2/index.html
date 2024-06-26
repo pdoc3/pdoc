@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-<meta name="generator" content="pdoc3 0.11.0">
+<meta name="generator" content="pdoc3 0.11.1">
 <title>pdoc.test.example_pkg.subpkg2 API documentation</title>
 <meta name="description" content="Module docstring">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
@@ -124,6 +124,8 @@ Nomatch:</p>
 <dd>Description of arg1</dd>
 <dt><strong><code>arg2</code></strong> :&ensp;<code>str</code> or <code>int</code></dt>
 <dd>Description of arg2</dd>
+<dt><strong><code>arg3</code></strong> :&ensp;<code>str | None</code></dt>
+<dd>Description of arg3</dd>
 <dt><strong><code>test_sequence</code></strong></dt>
 <dd>
 <p>2-dim numpy array of real numbers, size: N * D
@@ -149,6 +151,11 @@ which is the answer of everything.</p>
 <h2 id="returns_2">Returns</h2>
 <dl>
 <dt><code>Dict[int, <a title="pdoc.Doc" href="../../../index.html#pdoc.Doc">Doc</a>]</code></dt>
+<dd>Description.</dd>
+</dl>
+<h2 id="returns_3">Returns</h2>
+<dl>
+<dt><code>int | str</code></dt>
 <dd>Description.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
@@ -187,6 +194,12 @@ that are relevant to the interface.</p>
 <p>$\mathcal{O}(N)$</p>
 <p>Escaping \$ should work in math like $X = \$3.25$ once it is implemented.</p>
 <p>[ v_t <em>\frac{1}{2}</em> j_i + [a] &lt; 3 ]</p></div>
+</dd>
+<dt id="pdoc.test.example_pkg.subpkg2.non_callable_routine"><code class="name flex">
+<span>def <span class="ident">non_callable_routine</span></span>(<span>x)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
 </dd>
 <dt id="pdoc.test.example_pkg.subpkg2.numpy"><code class="name flex">
 <span>def <span class="ident">numpy</span></span>(<span>self)</span>
@@ -319,7 +332,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/84ee28b60f6aebdfe28f2a6a352991370fb5b81a/pdoc/test/example_pkg/subpkg2/__init__.py#L32-L44" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/2a66eb2c882cabd195a61f44a921bfdc39eddf2e/pdoc/test/example_pkg/subpkg2/__init__.py#L32-L44" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class A:
     &#34;&#34;&#34;`A` is base class for `example_pkg.B`.&#34;&#34;&#34;  # Test refname link
@@ -372,7 +385,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/84ee28b60f6aebdfe28f2a6a352991370fb5b81a/pdoc/test/example_pkg/subpkg2/__init__.py#L59-L129" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/2a66eb2c882cabd195a61f44a921bfdc39eddf2e/pdoc/test/example_pkg/subpkg2/__init__.py#L59-L129" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class B(A, int):
     &#34;&#34;&#34;
@@ -567,7 +580,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/84ee28b60f6aebdfe28f2a6a352991370fb5b81a/pdoc/test/example_pkg/subpkg2/__init__.py#L132-L132" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/2a66eb2c882cabd195a61f44a921bfdc39eddf2e/pdoc/test/example_pkg/subpkg2/__init__.py#L132-L132" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class C(B): pass  # noqa: E701, E302</code></pre>
 </details>
@@ -613,7 +626,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/84ee28b60f6aebdfe28f2a6a352991370fb5b81a/pdoc/test/example_pkg/subpkg2/__init__.py#L133-L133" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/2a66eb2c882cabd195a61f44a921bfdc39eddf2e/pdoc/test/example_pkg/subpkg2/__init__.py#L133-L133" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class D(C): pass  # noqa: E701, E302</code></pre>
 </details>
@@ -653,7 +666,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/84ee28b60f6aebdfe28f2a6a352991370fb5b81a/pdoc/test/example_pkg/subpkg2/__init__.py#L140-L337" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/2a66eb2c882cabd195a61f44a921bfdc39eddf2e/pdoc/test/example_pkg/subpkg2/__init__.py#L140-L341" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Docformats:
     def numpy(self):
@@ -741,6 +754,7 @@ def p(self):
         Args:
           arg1 (int): Description of arg1
           arg2 (str or int): Description of arg2
+          arg3 (str | None): Description of arg3
           test_sequence: 2-dim numpy array of real numbers, size: N * D
             - the test observation sequence.
 
@@ -761,6 +775,9 @@ def p(self):
 
         Returns:
             Dict[int, pdoc.Doc]: Description.
+
+        Returns:
+            int | str: Description.
 
         Raises:
             AttributeError: The ``Raises`` section is a list of all exceptions
@@ -909,6 +926,8 @@ Nomatch:</p>
 <dd>Description of arg1</dd>
 <dt><strong><code>arg2</code></strong> :&ensp;<code>str</code> or <code>int</code></dt>
 <dd>Description of arg2</dd>
+<dt><strong><code>arg3</code></strong> :&ensp;<code>str | None</code></dt>
+<dd>Description of arg3</dd>
 <dt><strong><code>test_sequence</code></strong></dt>
 <dd>
 <p>2-dim numpy array of real numbers, size: N * D
@@ -934,6 +953,11 @@ which is the answer of everything.</p>
 <h2 id="returns_2">Returns</h2>
 <dl>
 <dt><code>Dict[int, <a title="pdoc.Doc" href="../../../index.html#pdoc.Doc">Doc</a>]</code></dt>
+<dd>Description.</dd>
+</dl>
+<h2 id="returns_3">Returns</h2>
+<dl>
+<dt><code>int | str</code></dt>
 <dd>Description.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
@@ -1084,7 +1108,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/84ee28b60f6aebdfe28f2a6a352991370fb5b81a/pdoc/test/example_pkg/subpkg2/__init__.py#L379-L385" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/2a66eb2c882cabd195a61f44a921bfdc39eddf2e/pdoc/test/example_pkg/subpkg2/__init__.py#L383-L389" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class HasMockAttributes:
     &#34;&#34;&#34;
@@ -1115,7 +1139,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/84ee28b60f6aebdfe28f2a6a352991370fb5b81a/pdoc/test/example_pkg/subpkg2/__init__.py#L369-L370" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/2a66eb2c882cabd195a61f44a921bfdc39eddf2e/pdoc/test/example_pkg/subpkg2/__init__.py#L373-L374" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Location(namedtuple(&#39;Location&#39;, &#39;lat lon&#39;)):
     &#34;&#34;&#34;Geo-location, GPS position.&#34;&#34;&#34;</code></pre>
@@ -1133,7 +1157,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/84ee28b60f6aebdfe28f2a6a352991370fb5b81a/pdoc/test/example_pkg/subpkg2/__init__.py#L50-L56" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/2a66eb2c882cabd195a61f44a921bfdc39eddf2e/pdoc/test/example_pkg/subpkg2/__init__.py#L50-L56" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def __get__(self, instance, instance_type=None):
     if instance is not None:
@@ -1181,6 +1205,7 @@ data-gaCategoryParameter="pdoc.test.example_pkg.subpkg2">
 <li><code><a title="pdoc.test.example_pkg.subpkg2.foo" href="#pdoc.test.example_pkg.subpkg2.foo">foo</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.subpkg2.google" href="#pdoc.test.example_pkg.subpkg2.google">google</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.subpkg2.latex_math" href="#pdoc.test.example_pkg.subpkg2.latex_math">latex_math</a></code></li>
+<li><code><a title="pdoc.test.example_pkg.subpkg2.non_callable_routine" href="#pdoc.test.example_pkg.subpkg2.non_callable_routine">non_callable_routine</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.subpkg2.numpy" href="#pdoc.test.example_pkg.subpkg2.numpy">numpy</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.subpkg2.object_as_arg_default" href="#pdoc.test.example_pkg.subpkg2.object_as_arg_default">object_as_arg_default</a></code></li>
 <li><code><a title="pdoc.test.example_pkg.subpkg2.reST_directives" href="#pdoc.test.example_pkg.subpkg2.reST_directives">reST_directives</a></code></li>
@@ -1247,7 +1272,7 @@ data-gaCategoryParameter="pdoc.test.example_pkg.subpkg2">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
 </footer>
 </body>
 </html>
