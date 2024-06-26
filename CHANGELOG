@@ -1,3 +1,8 @@
+0.11.1  (2024-06-26)
+======
+  - Handle union type expressions (|) for Google style docstrings (#443)
+  - Fix bug with Lunr.js search when `node` in not available (#446)
+
 0.11.0  (2024-06-22)
 ======
   - Handle import of distutils on Python 3.12
