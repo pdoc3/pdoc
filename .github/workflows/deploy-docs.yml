@@ -9,23 +9,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-
-      - uses: actions/cache@v2
-        name: Set up caches
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}
-
       - name: Checkout repo
         uses: actions/checkout@v2
         with:
           fetch-depth: 3
       - name: Fetch tags
         run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+      - uses: ./.github/actions/setup
+        with:
+          python-version: 3.11
 
       - name: Install dependencies
         run: |
