@@ -45,7 +45,7 @@ jobs:
       - run: bash <(curl -s https://codecov.io/bash)
       - run: coverage report
       - run: PDOC_TEST_PANDOC=1 time python -m unittest -v pdoc.test.CliTest.test_pdf_pandoc
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: Pdoc Documentation.pdf
           path: /tmp/pdoc.pdf
