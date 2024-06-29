@@ -73,12 +73,12 @@ _md = markdown.Markdown(
     output_format='html5',    # type: ignore[arg-type]
     extensions=[
         "markdown.extensions.abbr",
+        "markdown.extensions.admonition",
         "markdown.extensions.attr_list",
         "markdown.extensions.def_list",
         "markdown.extensions.fenced_code",
         "markdown.extensions.footnotes",
         "markdown.extensions.tables",
-        "markdown.extensions.admonition",
         "markdown.extensions.smarty",
         "markdown.extensions.toc",
     ],

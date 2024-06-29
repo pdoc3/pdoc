@@ -557,6 +557,18 @@ def main(_args=None):
                for module in args.modules]
     pdoc.link_inheritance()
 
+    # Loading is done. Output stage ...
+    config = pdoc._get_config(**template_config)
+
+    # Load configured global markdown extensions
+    # XXX: This is hereby enabled only for CLI usage as for
+    #  API use I couldn't figure out where reliably to put it.
+    if config.get('md_extensions'):
+        from .html_helpers import _md
+        _kwargs = {'extensions': [], 'configs': {}}
+        _kwargs.update(config.get('md_extensions', {}))
+        _md.registerExtensions(**_kwargs)
+
     if args.pdf:
         _print_pdf(modules, **template_config)
         import textwrap
@@ -603,7 +615,7 @@ or similar, at your own discretion.""",
             sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
 
     if args.html:
-        lunr_config = pdoc._get_config(**template_config).get('lunr_search')
+        lunr_config = config.get('lunr_search')
         if lunr_config is not None:
             _generate_lunr_search(
                 modules, lunr_config.get("index_docstrings", True), template_config)
