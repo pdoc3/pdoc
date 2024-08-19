@@ -571,8 +571,10 @@ def format_git_link(template: str, dobj: pdoc.Doc):
             obj = obj.fget
         elif isinstance(obj, cached_property):
             obj = obj.func
-        elif hasattr(obj, '__class__') and obj.__class__.__name__ == '_tuplegetter':
-            # This is a NamedTuple field
+        elif (
+            (hasattr(obj, '__class__') and obj.__class__.__name__ == '_tuplegetter')
+            or inspect.ismemberdescriptor(obj)
+        ):
             class_name = dobj.qualname.rsplit('.', 1)[0]
             obj = getattr(dobj.module.obj, class_name)
 
