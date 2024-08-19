@@ -566,11 +566,15 @@ def format_git_link(template: str, dobj: pdoc.Doc):
             commit = _git_head_commit()
         obj = dobj.obj
 
-        # special handlers for properties and cached_properties
+        # special handlers for properties, cached_properties, and tuples
         if isinstance(obj, property):
             obj = obj.fget
         elif isinstance(obj, cached_property):
             obj = obj.func
+        elif hasattr(obj, '__class__') and obj.__class__.__name__ == '_tuplegetter':
+            # This is a NamedTuple field
+            class_name = dobj.qualname.rsplit('.', 1)[0]
+            obj = getattr(dobj.module.obj, class_name)
 
         abs_path = inspect.getfile(inspect.unwrap(obj))
         path = _project_relative_path(abs_path)
