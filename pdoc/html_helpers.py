@@ -571,7 +571,7 @@ def format_git_link(template: str, dobj: pdoc.Doc):
             obj = obj.fget
         elif isinstance(obj, cached_property):
             obj = obj.func
-        
+
         abs_path = inspect.getfile(inspect.unwrap(obj))
         path = _project_relative_path(abs_path)
 
