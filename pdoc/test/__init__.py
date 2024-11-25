@@ -1723,6 +1723,9 @@ class HttpTest(unittest.TestCase):
                 t.start()
                 sleep(.1)
 
+                assert sys.__stderr__ and sys.__stdout__, \
+                    'https://docs.python.org/3/library/sys.html#sys.__stdout__'
+
                 if not t.is_alive():
                     sys.__stderr__.write(stderr.getvalue())
                     raise AssertionError
