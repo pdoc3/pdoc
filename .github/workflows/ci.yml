@@ -23,8 +23,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2  # For codecov
       - uses: ./.github/actions/setup
         with:
           python-version: 3.11
@@ -42,7 +40,6 @@ jobs:
       - run: flake8 pdoc setup.py
       - run: mypy -p pdoc
       - run: time coverage run -m unittest -v pdoc.test
-      - run: bash <(curl -s https://codecov.io/bash)
       - run: coverage report
       - run: PDOC_TEST_PANDOC=1 time python -m unittest -v pdoc.test.CliTest.test_pdf_pandoc
       - uses: actions/upload-artifact@v4
