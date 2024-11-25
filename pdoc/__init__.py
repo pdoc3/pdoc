@@ -1293,6 +1293,16 @@ def _formatannotation(annot):
     'pdoc.MyType'
     >>> _formatannotation(Optional[Tuple[Optional[int], None]])
     'Optional[Tuple[Optional[int], None]]'
+    >>> _formatannotation(Optional[Union[int, float, None]])
+    'Optional[int | float]'
+    >>> _formatannotation(Union[int, float])
+    'int | float'
+    >>> from typing import Callable
+    >>> _formatannotation(Callable[[Optional[int]], float])
+    'Callable[[Optional[int]], float]'
+    >>> from collections.abc import Callable
+    >>> _formatannotation(Callable[[Optional[int]], float])
+    'Callable[[Optional[int]], float]'
     """
     class force_repr(str):
         __repr__ = str.__str__
@@ -1302,12 +1312,16 @@ def _formatannotation(annot):
         if a is type(None):  # noqa: E721
             return force_repr('None')
         # Union[T, None] -> Optional[T]
-        if (getattr(a, '__origin__', None) is typing.Union and
-                len(a.__args__) == 2 and
-                type(None) in a.__args__):
-            t = inspect.formatannotation(
-                maybe_replace_reprs(next(filter(None, a.__args__))))
-            return force_repr(f'Optional[{t}]')
+        if getattr(a, '__origin__', None) is typing.Union:
+            union_args = a.__args__
+            is_optional = type(None) in union_args
+            if is_optional:
+                union_args = (x for x in union_args if x is not type(None))
+            t = ' | '.join(inspect.formatannotation(maybe_replace_reprs(x))
+                           for x in union_args)
+            if is_optional:
+                t = f'Optional[{t}]'
+            return force_repr(t)
         # typing.NewType('T', foo) -> T
         module = getattr(a, '__module__', '')
         if module == 'typing' and getattr(a, '__qualname__', '').startswith('NewType.'):
@@ -1316,11 +1330,25 @@ def _formatannotation(annot):
         if module.startswith('nptyping.'):
             return force_repr(repr(a))
         # Recurse into typing.Callable/etc. args
-        if hasattr(a, 'copy_with') and hasattr(a, '__args__'):
-            if a is typing.Callable:
-                # Bug on Python < 3.9, https://bugs.python.org/issue42195
-                return a
-            a = a.copy_with(tuple([maybe_replace_reprs(arg) for arg in a.__args__]))
+        if hasattr(a, '__args__'):
+            if hasattr(a, 'copy_with'):
+                if a is typing.Callable:
+                    # Bug on Python < 3.9, https://bugs.python.org/issue42195
+                    return a
+                a = a.copy_with(tuple([maybe_replace_reprs(arg) for arg in a.__args__]))
+            elif hasattr(a, '__origin__'):
+                args = tuple(map(maybe_replace_reprs, a.__args__))
+                try:
+                    a = a.__origin__[args]
+                except TypeError:
+                    # collections.abc.Callable takes "([in], out)"
+                    a = a.__origin__[(args[:-1], args[-1])]
+        # Recurse into lists
+        if isinstance(a, (list, tuple)):
+            return type(a)(map(maybe_replace_reprs, a))
+        # Shorten standard collections: collections.abc.Callable -> Callable
+        if module == 'collections.abc':
+            return force_repr(repr(a).removeprefix('collections.abc.'))
         return a
 
     return str(inspect.formatannotation(maybe_replace_reprs(annot)))

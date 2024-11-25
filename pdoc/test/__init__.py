@@ -963,7 +963,7 @@ class ApiTest(unittest.TestCase):
     def test_Function_return_annotation(self):
         def f() -> typing.List[typing.Union[str, pdoc.Doc]]: return []
         func = pdoc.Function('f', DUMMY_PDOC_MODULE, f)
-        self.assertEqual(func.return_annotation(), 'List[Union[str,\N{NBSP}pdoc.Doc]]')
+        self.assertEqual(func.return_annotation(), 'List[str\N{NBSP}|\N{NBSP}pdoc.Doc]')
 
     @ignore_warnings
     def test_Variable_type_annotation(self):
