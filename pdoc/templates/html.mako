@@ -108,7 +108,9 @@
   <%def name="show_func(f)">
     <dt id="${f.refname}"><code class="name flex">
         <%
-            params = ', '.join(f.params(annotate=show_type_annotations, link=link))
+            params = f.params(annotate=show_type_annotations, link=link)
+            sep = ',<br>' if sum(map(len, params)) > 75 else ', '
+            params = sep.join(params)
             return_type = get_annotation(f.return_annotation, '\N{non-breaking hyphen}>')
         %>
         <span>${f.funcdef()} ${ident(f.name)}</span>(<span>${params})${return_type}</span>
@@ -185,7 +187,9 @@
       methods = c.methods(show_inherited_members, sort=sort_identifiers)
       mro = c.mro()
       subclasses = c.subclasses()
-      params = ', '.join(c.params(annotate=show_type_annotations, link=link))
+      params = c.params(annotate=show_type_annotations, link=link)
+      sep = ',<br>' if sum(map(len, params)) > 75 else ', '
+      params = sep.join(params)
       %>
       <dt id="${c.refname}"><code class="flex name class">
           <span>class ${ident(c.name)}</span>
