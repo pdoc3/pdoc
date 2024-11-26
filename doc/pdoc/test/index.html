@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-<meta name="generator" content="pdoc3 0.11.2">
+<meta name="generator" content="pdoc3 0.11.3">
 <title>pdoc.test API documentation</title>
 <meta name="description" content="Unit tests for pdoc package.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
@@ -103,7 +103,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/78e771b0132de0fb181bc412d0fcae0dd5fd0505/pdoc/test/__init__.py#L481-L1189" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/test/__init__.py#L491-L1199" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class ApiTest(unittest.TestCase):
     &#34;&#34;&#34;
@@ -602,7 +602,7 @@ not have a method with the specified name.</p></div>
 
         mod = DUMMY_PDOC_MODULE
         cls = pdoc.Class(&#39;Foobar&#39;, mod, Foobar)
-        self.assertEqual(cls.doc[&#39;prop&#39;].type_annotation(), &#39;Optional[int]&#39;)
+        self.assertEqual(cls.doc[&#39;prop&#39;].type_annotation(), &#39;int\N{NBSP}|\N{NBSP}None&#39;)
 
     @ignore_warnings
     def test_Variable_type_annotation_py36plus(self):
@@ -1057,7 +1057,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/78e771b0132de0fb181bc412d0fcae0dd5fd0505/pdoc/test/__init__.py#L105-L478" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/test/__init__.py#L106-L488" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class CliTest(unittest.TestCase):
     &#34;&#34;&#34;
@@ -1432,7 +1432,16 @@ not have a method with the specified name.</p></div>
             with redirect_streams() as (out, _err):
                 run(&#39;evaluated&#39;)
             out = out.getvalue()
-            self.assertIn(&#39;Set[Bar]&#39;, out)</code></pre>
+            self.assertIn(&#39;Set[Bar]&#39;, out)
+
+    def test_md_extensions(self):
+        with temp_dir() as path, chdir(path):
+            Path(&#39;foo.py&#39;).write_text(&#39;&#34;&#34;&#34;secret: meta data\n\nOnly this comment expected.&#34;&#34;&#34;&#39;)
+            with redirect_streams() as (stdout, _), \
+                    run_html(&#39;foo.py&#39;,
+                             config=&#34;md_extensions={&#39;extensions&#39;: [&#39;markdown.extensions.meta&#39;]}&#34;,):
+                self._check_files(include_patterns=[&#39;&lt;p&gt;Only this comment expected.&lt;/p&gt;&#39;],
+                                  exclude_patterns=[&#39;&lt;p&gt;secret: meta data&lt;/p&gt;&#39;])</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -1535,6 +1544,12 @@ not have a method with the specified name.</p></div>
 <dd>
 <div class="desc"></div>
 </dd>
+<dt id="pdoc.test.CliTest.test_md_extensions"><code class="name flex">
+<span>def <span class="ident">test_md_extensions</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="pdoc.test.CliTest.test_output_text"><code class="name flex">
 <span>def <span class="ident">test_output_text</span></span>(<span>self)</span>
 </code></dt>
@@ -1633,7 +1648,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/78e771b0132de0fb181bc412d0fcae0dd5fd0505/pdoc/test/__init__.py#L1348-L1697" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/test/__init__.py#L1358-L1707" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Docformats(unittest.TestCase):
     @classmethod
@@ -2069,7 +2084,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/78e771b0132de0fb181bc412d0fcae0dd5fd0505/pdoc/test/__init__.py#L1192-L1345" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/test/__init__.py#L1202-L1355" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class HtmlHelpersTest(unittest.TestCase):
     &#34;&#34;&#34;
@@ -2294,7 +2309,7 @@ not have a method with the specified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/78e771b0132de0fb181bc412d0fcae0dd5fd0505/pdoc/test/__init__.py#L1700-L1777" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/test/__init__.py#L1710-L1787" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@unittest.skipIf(&#39;win&#39; in sys.platform, &#34;signal.SIGALRM doesn&#39;t work on Windos&#34;)
 class HttpTest(unittest.TestCase):
@@ -2501,6 +2516,7 @@ data-gaCategoryParameter="pdoc.test">
 <li><code><a title="pdoc.test.CliTest.test_html_ref_links" href="#pdoc.test.CliTest.test_html_ref_links">test_html_ref_links</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_link_prefix" href="#pdoc.test.CliTest.test_link_prefix">test_link_prefix</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_lunr_search" href="#pdoc.test.CliTest.test_lunr_search">test_lunr_search</a></code></li>
+<li><code><a title="pdoc.test.CliTest.test_md_extensions" href="#pdoc.test.CliTest.test_md_extensions">test_md_extensions</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_output_text" href="#pdoc.test.CliTest.test_output_text">test_output_text</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_pdf" href="#pdoc.test.CliTest.test_pdf">test_pdf</a></code></li>
 <li><code><a title="pdoc.test.CliTest.test_pdf_pandoc" href="#pdoc.test.CliTest.test_pdf_pandoc">test_pdf_pandoc</a></code></li>
@@ -2556,7 +2572,7 @@ data-gaCategoryParameter="pdoc.test">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.3</a>.</p>
 </footer>
 </body>
 </html>

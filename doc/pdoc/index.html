@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-<meta name="generator" content="pdoc3 0.11.2">
+<meta name="generator" content="pdoc3 0.11.3">
 <title>pdoc API documentation</title>
 <meta name="description" content="Python package `pdoc` provides types, functions, and a command-line
 interface for accessing public documentation of Python modules, and
@@ -363,7 +363,7 @@ that takes a single argument (a documentation object) and returns
 module path or a filesystem path to file/directory).</p></div>
 </dd>
 <dt id="pdoc.link_inheritance"><code class="name flex">
-<span>def <span class="ident">link_inheritance</span></span>(<span>context: Optional[<a title="pdoc.Context" href="#pdoc.Context">Context</a>] = None)</span>
+<span>def <span class="ident">link_inheritance</span></span>(<span>context: <a title="pdoc.Context" href="#pdoc.Context">Context</a> | None = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Link inheritance relationsships between <code><a title="pdoc.Class" href="#pdoc.Class">Class</a></code> objects
@@ -403,7 +403,7 @@ that takes a single argument (a documentation object) and returns
 <dl>
 <dt id="pdoc.Class"><code class="flex name class">
 <span>class <span class="ident">Class</span></span>
-<span>(</span><span>name: str,<br>module: <a title="pdoc.Module" href="#pdoc.Module">Module</a>,<br>obj,<br>*,<br>docstring: Optional[str] = None)</span>
+<span>(</span><span>name: str,<br>module: <a title="pdoc.Module" href="#pdoc.Module">Module</a>,<br>obj,<br>*,<br>docstring: str | None = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Representation of a class' documentation.</p>
@@ -415,7 +415,7 @@ read with <code>inspect.getdoc()</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/78e771b0132de0fb181bc412d0fcae0dd5fd0505/pdoc/__init__.py#L1023-L1272" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/__init__.py#L1023-L1272" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Class(Doc):
     &#34;&#34;&#34;
@@ -775,7 +775,7 @@ a global context object will be used.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/78e771b0132de0fb181bc412d0fcae0dd5fd0505/pdoc/__init__.py#L70-L89" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/__init__.py#L70-L89" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Context(dict):
     &#34;&#34;&#34;
@@ -827,7 +827,7 @@ read with <code>inspect.getdoc()</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/78e771b0132de0fb181bc412d0fcae0dd5fd0505/pdoc/__init__.py#L493-L629" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/__init__.py#L493-L629" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Doc:
     &#34;&#34;&#34;
@@ -1064,7 +1064,7 @@ def source(self) -&gt; str:
 <h3>Methods</h3>
 <dl>
 <dt id="pdoc.Doc.url"><code class="name flex">
-<span>def <span class="ident">url</span></span>(<span>self,<br>relative_to: Optional[ForwardRef('<a title="pdoc.Module" href="#pdoc.Module">Module</a>')] = None,<br>*,<br>link_prefix: str = '',<br>top_ancestor: bool = False) ‑> str</span>
+<span>def <span class="ident">url</span></span>(<span>self,<br>relative_to: ForwardRef('<a title="pdoc.Module" href="#pdoc.Module">Module</a>') | None = None,<br>*,<br>link_prefix: str = '',<br>top_ancestor: bool = False) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Canonical relative URL (including page fragment) for this
@@ -1092,7 +1092,7 @@ should be a fully qualified name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/78e771b0132de0fb181bc412d0fcae0dd5fd0505/pdoc/__init__.py#L1681-L1716" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/__init__.py#L1681-L1716" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class External(Doc):
     &#34;&#34;&#34;
@@ -1162,7 +1162,7 @@ should be a fully qualified name.</p></div>
 </dd>
 <dt id="pdoc.Function"><code class="flex name class">
 <span>class <span class="ident">Function</span></span>
-<span>(</span><span>name: str,<br>module: <a title="pdoc.Module" href="#pdoc.Module">Module</a>,<br>obj,<br>*,<br>cls: Optional[<a title="pdoc.Class" href="#pdoc.Class">Class</a>] = None)</span>
+<span>(</span><span>name: str,<br>module: <a title="pdoc.Module" href="#pdoc.Module">Module</a>,<br>obj,<br>*,<br>cls: <a title="pdoc.Class" href="#pdoc.Class">Class</a> | None = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Representation of documentation for a function or method.</p>
@@ -1175,7 +1175,7 @@ all other cases, it should be <code>False</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/78e771b0132de0fb181bc412d0fcae0dd5fd0505/pdoc/__init__.py#L1359-L1628" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/__init__.py#L1359-L1628" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Function(Doc):
     &#34;&#34;&#34;
@@ -1489,7 +1489,7 @@ def is_method(self) -&gt; bool:
 for example <code>def</code> or <code>async def</code>.</p></div>
 </dd>
 <dt id="pdoc.Function.params"><code class="name flex">
-<span>def <span class="ident">params</span></span>(<span>self,<br>*,<br>annotate: bool = False,<br>link: Optional[Callable[[<a title="pdoc.Doc" href="#pdoc.Doc">Doc</a>], str]] = None) ‑> List[str]</span>
+<span>def <span class="ident">params</span></span>(<span>self,<br>*,<br>annotate: bool = False,<br>link: Callable[[<a title="pdoc.Doc" href="#pdoc.Doc">Doc</a>], str] | None = None) ‑> List[str]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns a list where each element is a nicely formatted
@@ -1525,7 +1525,7 @@ type hint annotations.</p></div>
 </dd>
 <dt id="pdoc.Module"><code class="flex name class">
 <span>class <span class="ident">Module</span></span>
-<span>(</span><span>module: str | module,<br>*,<br>docfilter: Optional[Callable[[<a title="pdoc.Doc" href="#pdoc.Doc">Doc</a>], bool]] = None,<br>supermodule: Optional[ForwardRef('<a title="pdoc.Module" href="#pdoc.Module">Module</a>')] = None,<br>context: Optional[<a title="pdoc.Context" href="#pdoc.Context">Context</a>] = None,<br>skip_errors: bool = False)</span>
+<span>(</span><span>module: str | module,<br>*,<br>docfilter: Callable[[<a title="pdoc.Doc" href="#pdoc.Doc">Doc</a>], bool] | None = None,<br>supermodule: ForwardRef('<a title="pdoc.Module" href="#pdoc.Module">Module</a>') | None = None,<br>context: <a title="pdoc.Context" href="#pdoc.Context">Context</a> | None = None,<br>skip_errors: bool = False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Representation of a module's documentation.</p>
@@ -1543,7 +1543,7 @@ of raising an exception.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/78e771b0132de0fb181bc412d0fcae0dd5fd0505/pdoc/__init__.py#L632-L992" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/__init__.py#L632-L992" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Module(Doc):
     &#34;&#34;&#34;
@@ -2042,7 +2042,7 @@ optionally sorted alphabetically, as a list of <code><a title="pdoc.Variable" hr
 </dd>
 <dt id="pdoc.Variable"><code class="flex name class">
 <span>class <span class="ident">Variable</span></span>
-<span>(</span><span>name: str,<br>module: <a title="pdoc.Module" href="#pdoc.Module">Module</a>,<br>docstring,<br>*,<br>obj=None,<br>cls: Optional[<a title="pdoc.Class" href="#pdoc.Class">Class</a>] = None,<br>instance_var: bool = False,<br>kind: Literal['prop', 'var'] = 'var')</span>
+<span>(</span><span>name: str,<br>module: <a title="pdoc.Module" href="#pdoc.Module">Module</a>,<br>docstring,<br>*,<br>obj=None,<br>cls: <a title="pdoc.Class" href="#pdoc.Class">Class</a> | None = None,<br>instance_var: bool = False,<br>kind: Literal['prop', 'var'] = 'var')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Representation of a variable's documentation. This includes
@@ -2053,7 +2053,7 @@ variable.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/78e771b0132de0fb181bc412d0fcae0dd5fd0505/pdoc/__init__.py#L1631-L1678" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/__init__.py#L1631-L1678" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class Variable(Doc):
     &#34;&#34;&#34;
@@ -2292,7 +2292,7 @@ data-gaCategoryParameter="pdoc">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.3</a>.</p>
 </footer>
 </body>
 </html>
