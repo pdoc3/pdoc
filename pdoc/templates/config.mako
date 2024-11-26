@@ -61,4 +61,9 @@
     # Note: in Python docstrings, either all backslashes need to be escaped (\\)
     # or you need to use raw r-strings.
     latex_math = False
+
+    # If 'static_content' is not empty, each Mardown document will be included
+    # by its key value.
+    # static_content = {'tutorial': 'docs/tutorial.md', 'gallery': 'docs/gallery.md'}
+    static_content = {}
 %>
