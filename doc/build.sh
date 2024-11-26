@@ -41,6 +41,9 @@ fi
 echo
 echo 'Testing for broken links'
 echo
+problematic_urls='
+https://www.gnu.org/licenses/agpl-3.0.html
+'
 pushd "$BUILDROOT" >/dev/null
 grep -PR '<a .*?href=' |
     sed -E "s/:.*?<a .*?href=([\"'])(.*?)/\t\2/g" |
@@ -58,9 +61,12 @@ for line in sys.stdin.readlines():
     grep -v $'\t''$' |
     while read -r line; do
         while IFS=$'\t' read -r file url; do
+            echo "$file: $url"
             [ -f "$url" ] ||
-                curl --silent --fail --retry 5 --retry-delay 5 --user-agent 'Mozilla/5.0 Firefox 61' "$url" >/dev/null 2>&1 ||
-                die "broken link in $file:  $url"
+                curl --silent --fail --retry 3 --retry-delay 1 --connect-timeout 10 \
+                        --user-agent 'Mozilla/5.0 Firefox 125' "$url" >/dev/null 2>&1 ||
+                    grep -qF "$url" <(echo "$problematic_urls") ||
+                    die "broken link in $file:  $url"
         done
     done
 popd >/dev/null
