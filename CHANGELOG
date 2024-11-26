@@ -1,3 +1,9 @@
+0.11.2  (2024-11-25)
+======
+  - Improve formatting of Optional, Union and `collection.abc` types (#395)
+  - In HTML, format long function params on multiple lines
+  - Fix issue with `--skip-errors` (#421)
+
 0.11.1  (2024-06-26)
 ======
   - Handle union type expressions (|) for Google style docstrings (#443)
