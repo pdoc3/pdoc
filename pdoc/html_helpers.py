@@ -8,7 +8,7 @@ import subprocess
 import textwrap
 import traceback
 from contextlib import contextmanager
-from functools import partial, lru_cache
+from functools import partial, lru_cache, cached_property
 from typing import Callable, Match, Optional
 from warnings import warn
 import xml.etree.ElementTree as etree
@@ -564,20 +564,34 @@ def format_git_link(template: str, dobj: pdoc.Doc):
     try:
         if 'commit' in _str_template_fields(template):
             commit = _git_head_commit()
-        abs_path = inspect.getfile(inspect.unwrap(dobj.obj))
+        obj = dobj.obj
+
+        # special handlers for properties, cached_properties, and tuples
+        if isinstance(obj, property):
+            obj = obj.fget
+        elif isinstance(obj, cached_property):
+            obj = obj.func
+        elif (
+            (hasattr(obj, '__class__') and obj.__class__.__name__ == '_tuplegetter')
+            or inspect.ismemberdescriptor(obj)
+        ):
+            class_name = dobj.qualname.rsplit('.', 1)[0]
+            obj = getattr(dobj.module.obj, class_name)
+
+        abs_path = inspect.getfile(inspect.unwrap(obj))
         path = _project_relative_path(abs_path)
 
         # Urls should always use / instead of \\
         if os.name == 'nt':
             path = path.replace('\\', '/')
 
-        lines, start_line = inspect.getsourcelines(dobj.obj)
+        lines, start_line = inspect.getsourcelines(obj)
         start_line = start_line or 1  # GH-296
         end_line = start_line + len(lines) - 1
         url = template.format(**locals())
         return url
     except Exception:
-        warn(f'format_git_link for {dobj.obj} failed:\n{traceback.format_exc()}')
+        warn(f'format_git_link for {obj} failed:\n{traceback.format_exc()}')
         return None
 
 
