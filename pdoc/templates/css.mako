@@ -270,7 +270,7 @@
 
   .admonition {
     padding: .1em 1em;
-    margin-bottom: 1em;
+    margin: 1em 0;
   }
     .admonition-title {
       font-weight: bold;
