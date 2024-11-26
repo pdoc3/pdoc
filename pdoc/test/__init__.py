@@ -457,7 +457,8 @@ class CliTest(unittest.TestCase):
                 redirect_streams(), \
                 self.assertWarns(pdoc.Module.ImportWarning) as cm:
             run('.', skip_errors=None)
-        self.assertIn('ZeroDivision', cm.warning.args[0])
+            run('unimportable', skip_errors=None)
+        self.assertEqual(2, sum(1 for w in cm.warnings if 'ZeroDivision' in str(w.message)))
 
     @unittest.skipIf(sys.version_info < (3, 7), '__future__.annotations unsupported in <Py3.7')
     def test_resolve_typing_forwardrefs(self):

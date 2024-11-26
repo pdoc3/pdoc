@@ -171,7 +171,7 @@ def html(module_name, docfilter=None, reload=False, skip_errors=False, **kwargs)
     that takes a single argument (a documentation object) and returns
     `True` or `False`. If `False`, that object will not be documented.
     """
-    mod = Module(import_module(module_name, reload=reload),
+    mod = Module(import_module(module_name, reload=reload, skip_errors=False),
                  docfilter=docfilter, skip_errors=skip_errors)
     link_inheritance()
     return mod.html(**kwargs)
@@ -188,14 +188,18 @@ def text(module_name, docfilter=None, reload=False, skip_errors=False, **kwargs)
     that takes a single argument (a documentation object) and returns
     `True` or `False`. If `False`, that object will not be documented.
     """
-    mod = Module(import_module(module_name, reload=reload),
+    mod = Module(import_module(module_name, reload=reload, skip_errors=False),
                  docfilter=docfilter, skip_errors=skip_errors)
     link_inheritance()
     return mod.text(**kwargs)
 
 
-def import_module(module: Union[str, ModuleType],
-                  *, reload: bool = False) -> ModuleType:
+def import_module(
+        module: Union[str, ModuleType],
+        *,
+        reload: bool = False,
+        skip_errors: bool = False,
+) -> ModuleType:
     """
     Return module object matching `module` specification (either a python
     module path or a filesystem path to file/directory).
@@ -222,7 +226,11 @@ def import_module(module: Union[str, ModuleType],
             try:
                 module = importlib.import_module(module_path)
             except Exception as e:
-                raise ImportError(f'Error importing {module!r}: {e.__class__.__name__}: {e}')
+                msg = f'Error importing {module!r}: {e.__class__.__name__}: {e}'
+                if not skip_errors:
+                    raise ImportError(msg)
+                warn(msg, category=Module.ImportWarning, stacklevel=2)
+                module = ModuleType(module_path)
 
     assert inspect.ismodule(module)
     # If this is pdoc itself, return without reloading. Otherwise later
@@ -656,7 +664,7 @@ class Module(Doc):
         of raising an exception.
         """
         if isinstance(module, str):
-            module = import_module(module)
+            module = import_module(module, skip_errors=skip_errors)
 
         super().__init__(module.__name__, self, module)
         if self.name.endswith('.__init__') and not self.is_package:
@@ -765,15 +773,9 @@ class Module(Doc):
 
                 assert self.refname == self.name
                 fullname = f"{self.name}.{root}"
-                try:
-                    m = Module(import_module(fullname),
-                               docfilter=docfilter, supermodule=self,
-                               context=self._context, skip_errors=skip_errors)
-                except Exception as ex:
-                    if skip_errors:
-                        warn(str(ex), Module.ImportWarning)
-                        continue
-                    raise
+                m = Module(import_module(fullname, skip_errors=skip_errors),
+                           docfilter=docfilter, supermodule=self,
+                           context=self._context, skip_errors=skip_errors)
 
                 self.doc[root] = m
                 # Skip empty namespace packages because they may
