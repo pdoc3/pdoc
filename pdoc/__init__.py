@@ -1294,17 +1294,17 @@ def _formatannotation(annot):
     >>> _formatannotation(NewType('MyType', str))
     'pdoc.MyType'
     >>> _formatannotation(Optional[Tuple[Optional[int], None]])
-    'Optional[Tuple[Optional[int], None]]'
+    'Tuple[int | None, None] | None'
     >>> _formatannotation(Optional[Union[int, float, None]])
-    'Optional[int | float]'
+    'int | float | None'
     >>> _formatannotation(Union[int, float])
     'int | float'
     >>> from typing import Callable
     >>> _formatannotation(Callable[[Optional[int]], float])
-    'Callable[[Optional[int]], float]'
+    'Callable[[int | None], float]'
     >>> from collections.abc import Callable
     >>> _formatannotation(Callable[[Optional[int]], float])
-    'Callable[[Optional[int]], float]'
+    'Callable[[int | None], float]'
     """
     class force_repr(str):
         __repr__ = str.__str__
@@ -1322,7 +1322,7 @@ def _formatannotation(annot):
             t = ' | '.join(inspect.formatannotation(maybe_replace_reprs(x))
                            for x in union_args)
             if is_optional:
-                t = f'Optional[{t}]'
+                t += ' | None'
             return force_repr(t)
         # typing.NewType('T', foo) -> T
         module = getattr(a, '__module__', '')

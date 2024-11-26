@@ -975,7 +975,7 @@ class ApiTest(unittest.TestCase):
 
         mod = DUMMY_PDOC_MODULE
         cls = pdoc.Class('Foobar', mod, Foobar)
-        self.assertEqual(cls.doc['prop'].type_annotation(), 'Optional[int]')
+        self.assertEqual(cls.doc['prop'].type_annotation(), 'int\N{NBSP}|\N{NBSP}None')
 
     @ignore_warnings
     def test_Variable_type_annotation_py36plus(self):
