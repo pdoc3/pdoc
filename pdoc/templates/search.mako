@@ -55,6 +55,7 @@
         try {
             return lunr.Index.load(_expand(INDEX));  // Prebuilt index
         } catch {
+            window.DOCS = INDEX;
             return lunr(function () {
             this.ref('i');
             this.field('name', {boost: 10});
@@ -152,11 +153,11 @@
         }
 
         set_status(
-            'Search for "' + encodeURIComponent(query) + '" yielded ' + results.length + ' ' +
+            'Search for "' + encodeURIComponent(query).replace('%20', ' ') + '" yielded ' + results.length + ' ' +
             (results.length === 1 ? 'result' : 'results') + ':');
 
         results.forEach(function (result) {
-            const dobj = INDEX[parseInt(result.ref)];
+            const dobj = DOCS[parseInt(result.ref)];
             const docstring = dobj.doc;
             const url = URLS[dobj.url] + '#' + dobj.ref;
             const pretty_name = dobj.ref + (dobj.func ? '()' : '');

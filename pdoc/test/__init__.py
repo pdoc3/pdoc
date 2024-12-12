@@ -274,7 +274,7 @@ class CliTest(unittest.TestCase):
             self._basic_html_assertions(expected_files=files)
             self._check_files(exclude_patterns=['class="gcse-search"'])
             if shutil.which('node'):
-                self._check_files(include_patterns=['INDEX={"version"'],
+                self._check_files(include_patterns=['{"version"', 'pdoc.Doc'],
                                   file_pattern='index.js')
             else:
                 self._check_files(

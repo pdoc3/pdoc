@@ -417,12 +417,12 @@ def _generate_lunr_search(modules: List[pdoc.Module],
         recursive_add_to_index(top_module)
     urls = sorted(url_cache.keys(), key=url_cache.__getitem__)
 
-    json_values = [dict(obj, url=urls[obj['url']]) for obj in index]
     cmd = ['node', str(Path(__file__).with_name('build-index.js'))]
     proc = None
     try:
-        proc = subprocess.Popen(cmd, text=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        stdout, stderr = proc.communicate(json.dumps(json_values))
+        proc = subprocess.Popen(cmd, text=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate(json.dumps(index))
         assert proc.poll() == 0, proc.poll()
     except Exception as ex:
         stderr = proc and proc.stderr and proc.stderr.read()  # type: ignore
@@ -435,7 +435,8 @@ def _generate_lunr_search(modules: List[pdoc.Module],
         stdout = ('URLS=' + json.dumps(urls, indent=0, separators=(',', ':')) +
                   ';\nINDEX=' + json.dumps(index, indent=0, separators=(',', ':')))
     else:
-        stdout = 'INDEX=' + stdout
+        stdout = (f'let [INDEX, DOCS] = {stdout}; '
+                  f'let URLS={json.dumps(urls, indent=0, separators=(",", ":"))}')
     main_path = args.output_dir
     index_path = Path(main_path).joinpath('index.js')
     index_path.write_text(stdout)

@@ -90,5 +90,5 @@ stdin.on('end', function () {
 
     let out = idx.toJSON();
     compact(out);
-    stdout.write(JSON.stringify(out));
+    stdout.write(JSON.stringify([out, documents]));
 })
