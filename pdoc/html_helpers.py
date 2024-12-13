@@ -564,20 +564,21 @@ def format_git_link(template: str, dobj: pdoc.Doc):
     try:
         if 'commit' in _str_template_fields(template):
             commit = _git_head_commit()
-        abs_path = inspect.getfile(inspect.unwrap(dobj.obj))
+        obj = pdoc._unwrap_descriptor(dobj)
+        abs_path = inspect.getfile(inspect.unwrap(obj))
         path = _project_relative_path(abs_path)
 
         # Urls should always use / instead of \\
         if os.name == 'nt':
             path = path.replace('\\', '/')
 
-        lines, start_line = inspect.getsourcelines(dobj.obj)
+        lines, start_line = inspect.getsourcelines(obj)
         start_line = start_line or 1  # GH-296
         end_line = start_line + len(lines) - 1
         url = template.format(**locals())
         return url
     except Exception:
-        warn(f'format_git_link for {dobj.obj} failed:\n{traceback.format_exc()}')
+        warn(f'format_git_link for {obj} failed:\n{traceback.format_exc()}')
         return None
 
 

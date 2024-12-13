@@ -19,9 +19,9 @@ import sys
 import typing
 from contextlib import contextmanager
 from copy import copy
-from functools import lru_cache, reduce, partial, wraps
+from functools import cached_property, lru_cache, reduce, partial, wraps
 from itertools import tee, groupby
-from types import ModuleType
+from types import FunctionType, ModuleType
 from typing import (  # noqa: F401
     cast, Any, Callable, Dict, Generator, Iterable, List, Literal, Mapping, NewType,
     Optional, Set, Tuple, Type, TypeVar, Union,
@@ -429,11 +429,22 @@ def _is_descriptor(obj):
             inspect.ismemberdescriptor(obj))
 
 
-def _unwrap_descriptor(obj):
+def _unwrap_descriptor(dobj):
+    obj = dobj.obj
     if isinstance(obj, property):
         return (getattr(obj, 'fget', False) or
                 getattr(obj, 'fset', False) or
                 getattr(obj, 'fdel', obj))
+    if isinstance(obj, cached_property):
+        return obj.func
+    if isinstance(obj, FunctionType):
+        return obj
+    if (inspect.ismemberdescriptor(obj) or
+            getattr(getattr(obj, '__class__', 0), '__name__', 0) == '_tuplegetter'):
+        class_name = dobj.qualname.rsplit('.', 1)[0]
+        obj = getattr(dobj.module.obj, class_name)
+        return obj
+    # XXX: Follow descriptor protocol? Already proved buggy in conditions above
     return getattr(obj, '__get__', obj)
 
 
@@ -558,7 +569,7 @@ class Doc:
         available, an empty string.
         """
         try:
-            lines, _ = inspect.getsourcelines(_unwrap_descriptor(self.obj))
+            lines, _ = inspect.getsourcelines(_unwrap_descriptor(self))
         except (ValueError, TypeError, OSError):
             return ''
         return inspect.cleandoc(''.join(['\n'] + lines))
@@ -1432,7 +1443,7 @@ class Function(Doc):
                 # global variables
                 lambda: _get_type_hints(not self.cls and self.module.obj)[self.name],
                 # properties
-                lambda: inspect.signature(_unwrap_descriptor(self.obj)).return_annotation,
+                lambda: inspect.signature(_unwrap_descriptor(self)).return_annotation,
                 # Use raw annotation strings in unmatched forward declarations
                 lambda: cast(Class, self.cls).obj.__annotations__[self.name],
                 # Extract annotation from the docstring for C builtin function
