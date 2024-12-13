@@ -219,7 +219,7 @@
       background: inherit;  /* Don't grey-back parameters */
     }
 
-    .source summary,
+    .source > summary,
     .git-link-div {
       color: #666;
       text-align: right;
@@ -243,6 +243,7 @@
     .source pre code {
       font-size: 12px;
       overflow: visible;
+      min-width: max-content;
     }
   .hlist {
     list-style: none;
