@@ -63,10 +63,10 @@
           % endif
       </p>
   % endif
-  <div class="desc${inherits}">${docstring | to_html}</div>
   % if not isinstance(d, pdoc.Module):
   ${show_source(d)}
   % endif
+  <div class="desc${inherits}">${docstring | to_html}</div>
 </%def>
 
 <%def name="show_module_list(modules)">
@@ -136,7 +136,6 @@
 
   <section id="section-intro">
   ${module.docstring | to_html}
-  ${show_source(module)}
   </section>
 
   <section>
