@@ -1,3 +1,7 @@
+0.11.5  (2024-12-13)
+======
+  - A few default HTML template improvements
+
 0.11.4  (2024-12-13)
 ======
   - Fix Lunr.js prebuilt index introduced in v0.11.0
