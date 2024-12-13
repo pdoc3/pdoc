@@ -289,7 +289,7 @@ class _ToMarkdown:
                 '\n': ' ',
                 '[': '\\[',
                 ']': '\\]'})).strip()
-            return f'{indent}![{alt_text}]({value})\n'
+            return f'{indent}![{alt_text}]({value}){{: loading=lazy}}\n'
         if type == 'math':
             return _ToMarkdown.indent(indent,
                                       f'\\[ {text.strip()} \\]',

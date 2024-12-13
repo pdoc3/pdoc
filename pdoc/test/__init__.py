@@ -1571,13 +1571,13 @@ Exception: something went wrong
 <div class="admonition admonition">
 <p class="admonition-title">Example</p>
 <p>Image shows something.</p>
-<p><img alt="" src="https://www.debian.org/logos/openlogo-nd-100.png"></p>
+<p><img alt="" loading="lazy" src="https://www.debian.org/logos/openlogo-nd-100.png"></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Can only nest admonitions two levels.</p>
 </div>
 </div>
-<p><img alt="" src="https://www.debian.org/logos/openlogo-nd-100.png"></p>
+<p><img alt="" loading="lazy" src="https://www.debian.org/logos/openlogo-nd-100.png"></p>
 <p>Now you know.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
