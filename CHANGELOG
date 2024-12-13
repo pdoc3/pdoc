@@ -1,3 +1,9 @@
+0.11.4  (2024-12-13)
+======
+  - Fix Lunr.js prebuilt index introduced in v0.11.0
+  - Fix showing Git link (git_link_template) for property, cached_property,
+    namedtuple, and member_descriptor types
+
 0.11.3  (2024-11-26)
 ======
   - Format Optional as `X | None` (#395)
