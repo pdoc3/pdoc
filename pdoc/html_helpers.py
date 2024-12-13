@@ -8,7 +8,7 @@ import subprocess
 import textwrap
 import traceback
 from contextlib import contextmanager
-from functools import partial, lru_cache, cached_property
+from functools import partial, lru_cache
 from typing import Callable, Match, Optional
 from warnings import warn
 import xml.etree.ElementTree as etree
@@ -564,20 +564,7 @@ def format_git_link(template: str, dobj: pdoc.Doc):
     try:
         if 'commit' in _str_template_fields(template):
             commit = _git_head_commit()
-        obj = dobj.obj
-
-        # special handlers for properties, cached_properties, and tuples
-        if isinstance(obj, property):
-            obj = obj.fget
-        elif isinstance(obj, cached_property):
-            obj = obj.func
-        elif (
-            (hasattr(obj, '__class__') and obj.__class__.__name__ == '_tuplegetter')
-            or inspect.ismemberdescriptor(obj)
-        ):
-            class_name = dobj.qualname.rsplit('.', 1)[0]
-            obj = getattr(dobj.module.obj, class_name)
-
+        obj = pdoc._unwrap_descriptor(dobj)
         abs_path = inspect.getfile(inspect.unwrap(obj))
         path = _project_relative_path(abs_path)
 
