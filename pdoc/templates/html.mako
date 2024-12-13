@@ -37,7 +37,7 @@
         <summary>
             <span>Expand source code</span>
             % if git_link:
-              <a href="${git_link}" class="git-link">Browse git</a>
+              <a href="${git_link}" class="git-link" target="_blank">Browse git</a>
             %endif
         </summary>
         <pre><code class="python">${d.source | h}</code></pre>
