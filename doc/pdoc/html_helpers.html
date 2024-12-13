@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-<meta name="generator" content="pdoc3 0.11.3">
+<meta name="generator" content="pdoc3 0.11.4">
 <title>pdoc.html_helpers API documentation</title>
 <meta name="description" content="Helper functions for HTML output.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
@@ -48,6 +48,23 @@ hljs.highlightAll();
 </code></dt>
 <dd>
 <div class="desc"><p>Returns HTML Table of Contents containing markdown titles in <code>text</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/html_helpers.py#L544-L554" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def extract_toc(text: str):
+    &#34;&#34;&#34;
+    Returns HTML Table of Contents containing markdown titles in `text`.
+    &#34;&#34;&#34;
+    with _fenced_code_blocks_hidden(text) as result:
+        result[0] = _ToMarkdown.DOCTESTS_RE.sub(&#39;&#39;, result[0])
+    text = result[0]
+    toc, _ = _md.reset().convert(f&#39;[TOC]\n\n@CUT@\n\n{text}&#39;).split(&#39;@CUT@&#39;, 1)
+    if toc.endswith(&#39;&lt;p&gt;&#39;):  # CUT was put into its own paragraph
+        toc = toc[:-3].rstrip()
+    return toc</code></pre>
+</details>
 </dd>
 <dt id="pdoc.html_helpers.format_git_link"><code class="name flex">
 <span>def <span class="ident">format_git_link</span></span>(<span>template: str, dobj: <a title="pdoc.Doc" href="index.html#pdoc.Doc">Doc</a>)</span>
@@ -55,6 +72,38 @@ hljs.highlightAll();
 <dd>
 <div class="desc"><p>Interpolate <code>template</code> as a formatted string literal using values extracted
 from <code>dobj</code> and the working environment.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/html_helpers.py#L557-L582" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def format_git_link(template: str, dobj: pdoc.Doc):
+    &#34;&#34;&#34;
+    Interpolate `template` as a formatted string literal using values extracted
+    from `dobj` and the working environment.
+    &#34;&#34;&#34;
+    if not template:
+        return None
+    try:
+        if &#39;commit&#39; in _str_template_fields(template):
+            commit = _git_head_commit()
+        obj = pdoc._unwrap_descriptor(dobj)
+        abs_path = inspect.getfile(inspect.unwrap(obj))
+        path = _project_relative_path(abs_path)
+
+        # Urls should always use / instead of \\
+        if os.name == &#39;nt&#39;:
+            path = path.replace(&#39;\\&#39;, &#39;/&#39;)
+
+        lines, start_line = inspect.getsourcelines(obj)
+        start_line = start_line or 1  # GH-296
+        end_line = start_line + len(lines) - 1
+        url = template.format(**locals())
+        return url
+    except Exception:
+        warn(f&#39;format_git_link for {obj} failed:\n{traceback.format_exc()}&#39;)
+        return None</code></pre>
+</details>
 </dd>
 <dt id="pdoc.html_helpers.glimpse"><code class="name flex">
 <span>def <span class="ident">glimpse</span></span>(<span>text: str, max_length=153, *, paragraph=True)</span>
@@ -63,12 +112,55 @@ from <code>dobj</code> and the working environment.</p></div>
 <div class="desc"><p>Returns a short excerpt (e.g. first paragraph) of text.
 If <code>paragraph</code> is True, the first paragraph will be returned,
 but never longer than <code>max_length</code> characters.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/html_helpers.py#L48-L69" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def glimpse(text: str, max_length=153, *, paragraph=True,
+            _split_paragraph=partial(re.compile(r&#39;\s*\n\s*\n\s*&#39;).split, maxsplit=1),
+            _trim_last_word=partial(re.compile(r&#39;\S+$&#39;).sub, &#39;&#39;),
+            _remove_titles=partial(re.compile(r&#39;^(#+|-{4,}|={4,})&#39;, re.MULTILINE).sub, &#39; &#39;)):
+    &#34;&#34;&#34;
+    Returns a short excerpt (e.g. first paragraph) of text.
+    If `paragraph` is True, the first paragraph will be returned,
+    but never longer than `max_length` characters.
+    &#34;&#34;&#34;
+    text = text.lstrip()
+    if paragraph:
+        text, *rest = _split_paragraph(text)
+        if rest:
+            text = text.rstrip(&#39;.&#39;)
+            text += &#39; …&#39;
+        text = _remove_titles(text).strip()
+
+    if len(text) &gt; max_length:
+        text = _trim_last_word(text[:max_length - 2])
+        if not text.endswith(&#39;.&#39;) or not paragraph:
+            text = text.rstrip(&#39;. &#39;) + &#39; …&#39;
+    return text</code></pre>
+</details>
 </dd>
 <dt id="pdoc.html_helpers.minify_css"><code class="name flex">
 <span>def <span class="ident">minify_css</span></span>(<span>css: str)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Minify CSS by removing extraneous whitespace, comments, and trailing semicolons.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/html_helpers.py#L23-L31" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">@lru_cache()
+def minify_css(css: str,
+               _whitespace=partial(re.compile(r&#39;\s*([,{:;}])\s*&#39;).sub, r&#39;\1&#39;),
+               _comments=partial(re.compile(r&#39;/\*.*?\*/&#39;, flags=re.DOTALL).sub, &#39;&#39;),
+               _trailing_semicolon=partial(re.compile(r&#39;;\s*}&#39;).sub, &#39;}&#39;)):
+    &#34;&#34;&#34;
+    Minify CSS by removing extraneous whitespace, comments, and trailing semicolons.
+    &#34;&#34;&#34;
+    return _trailing_semicolon(_whitespace(_comments(css))).strip()</code></pre>
+</details>
 </dd>
 <dt id="pdoc.html_helpers.minify_html"><code class="name flex">
 <span>def <span class="ident">minify_html</span></span>(<span>html: str)</span>
@@ -76,6 +168,24 @@ but never longer than <code>max_length</code> characters.</p></div>
 <dd>
 <div class="desc"><p>Minify HTML by replacing all consecutive whitespace with a single space
 (or newline) character, except inside <code>&lt;pre&gt;</code> tags.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/html_helpers.py#L34-L45" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def minify_html(html: str,
+                _minify=partial(
+                    re.compile(r&#39;(.*?)(&lt;pre\b.*?&lt;/pre\b\s*&gt;)|(.*)&#39;, re.IGNORECASE | re.DOTALL).sub,
+                    lambda m, _norm_space=partial(re.compile(r&#39;\s\s+&#39;).sub, &#39;\n&#39;): (
+                        _norm_space(m.group(1) or &#39;&#39;) +
+                        (m.group(2) or &#39;&#39;) +
+                        _norm_space(m.group(3) or &#39;&#39;)))):
+    &#34;&#34;&#34;
+    Minify HTML by replacing all consecutive whitespace with a single space
+    (or newline) character, except inside `&lt;pre&gt;` tags.
+    &#34;&#34;&#34;
+    return _minify(html)</code></pre>
+</details>
 </dd>
 <dt id="pdoc.html_helpers.to_html"><code class="name flex">
 <span>def <span class="ident">to_html</span></span>(<span>text: str,<br>*,<br>docformat: str | None = None,<br>module: <a title="pdoc.Module" href="index.html#pdoc.Module">Module</a> | None = None,<br>link: Callable[..., str] | None = None,<br>latex_math: bool = False)</span>
@@ -87,6 +197,36 @@ as well as pure Markdown.</p>
 <p><code>module</code> should be the documented module (so the references can be
 resolved) and <code>link</code> is the hyperlinking function like the one in the
 example template.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/html_helpers.py#L410-L433" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def to_html(text: str, *,
+            docformat: Optional[str] = None,
+            module: Optional[pdoc.Module] = None,
+            link: Optional[Callable[..., str]] = None,
+            latex_math: bool = False):
+    &#34;&#34;&#34;
+    Returns HTML of `text` interpreted as `docformat`. `__docformat__` is respected
+    if present, otherwise Numpydoc and Google-style docstrings are assumed,
+    as well as pure Markdown.
+
+    `module` should be the documented module (so the references can be
+    resolved) and `link` is the hyperlinking function like the one in the
+    example template.
+    &#34;&#34;&#34;
+    # Optionally register our math syntax processor
+    if not latex_math and _MathPattern.NAME in _md.inlinePatterns:
+        _md.inlinePatterns.deregister(_MathPattern.NAME)
+    elif latex_math and _MathPattern.NAME not in _md.inlinePatterns:
+        _md.inlinePatterns.register(_MathPattern(_MathPattern.PATTERN),
+                                    _MathPattern.NAME,
+                                    _MathPattern.PRIORITY)
+
+    md = to_markdown(text, docformat=docformat, module=module, link=link)
+    return _md.reset().convert(md)</code></pre>
+</details>
 </dd>
 <dt id="pdoc.html_helpers.to_markdown"><code class="name flex">
 <span>def <span class="ident">to_markdown</span></span>(<span>text: str,<br>*,<br>docformat: str | None = None,<br>module: <a title="pdoc.Module" href="index.html#pdoc.Module">Module</a> | None = None,<br>link: Callable[..., str] | None = None)</span>
@@ -99,6 +239,67 @@ as well as pure Markdown.</p>
 <p><code>module</code> should be the documented module (so the references can be
 resolved) and <code>link</code> is the hyperlinking function like the one in the
 example template.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/html_helpers.py#L436-L490" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def to_markdown(text: str, *,
+                docformat: Optional[str] = None,
+                module: Optional[pdoc.Module] = None,
+                link: Optional[Callable[..., str]] = None):
+    &#34;&#34;&#34;
+    Returns `text`, assumed to be a docstring in `docformat`, converted to markdown.
+    `__docformat__` is respected
+    if present, otherwise Numpydoc and Google-style docstrings are assumed,
+    as well as pure Markdown.
+
+    `module` should be the documented module (so the references can be
+    resolved) and `link` is the hyperlinking function like the one in the
+    example template.
+    &#34;&#34;&#34;
+    if not docformat:
+        docformat = str(getattr(getattr(module, &#39;obj&#39;, None), &#39;__docformat__&#39;, &#39;numpy,google &#39;))
+        docformat, *_ = docformat.lower().split()
+    if not (set(docformat.split(&#39;,&#39;)) &amp; {&#39;&#39;, &#39;numpy&#39;, &#39;google&#39;}):
+        warn(f&#39;__docformat__ value {docformat!r} in module {module!r} not supported. &#39;
+             &#39;Supported values are: numpy, google.&#39;)
+        docformat = &#39;numpy,google&#39;
+
+    with _fenced_code_blocks_hidden(text) as result:
+        text = result[0]
+
+        text = _ToMarkdown.admonitions(text, module)
+
+        if &#39;google&#39; in docformat:
+            text = _ToMarkdown.google(text)
+
+        text = _ToMarkdown.doctests(text)
+        text = _ToMarkdown.raw_urls(text)
+
+        # If doing both, do numpy after google, otherwise google-style&#39;s
+        # headings are incorrectly interpreted as numpy params
+        if &#39;numpy&#39; in docformat:
+            text = _ToMarkdown.numpy(text)
+
+        if module and link:
+            # Hyperlink markdown code spans not within markdown hyperlinks.
+            # E.g. `code` yes, but not [`code`](...). RE adapted from:
+            # https://github.com/Python-Markdown/markdown/blob/ada40c66/markdown/inlinepatterns.py#L106
+            # Also avoid linking triple-backticked arg names in deflists.
+            linkify = partial(_linkify, link=link, module=module, wrap_code=True)
+            text = re.sub(r&#39;(?P&lt;inside_link&gt;\[[^\]]*?)?&#39;
+                          r&#39;(?:(?&lt;!\\)(?:\\{2})+(?=`)|(?&lt;!\\)(?P&lt;fence&gt;`+)&#39;
+                          r&#39;(?P&lt;code&gt;.+?)(?&lt;!`)&#39;
+                          r&#39;(?P=fence)(?!`))&#39;,
+                          lambda m: (m.group()
+                                     if m.group(&#39;inside_link&#39;) or len(m.group(&#39;fence&#39;)) &gt; 2
+                                     else linkify(m)), text)
+        result[0] = text
+    text = result[0]
+
+    return text</code></pre>
+</details>
 </dd>
 </dl>
 </section>
@@ -116,7 +317,7 @@ doesn't match any documented objects.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/html_helpers.py#L493-L499" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/html_helpers.py#L493-L499" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">class ReferenceWarning(UserWarning):
     &#34;&#34;&#34;
@@ -179,7 +380,7 @@ data-gaCategoryParameter="pdoc.html_helpers">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.4</a>.</p>
 </footer>
 </body>
 </html>

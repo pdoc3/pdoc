@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-<meta name="generator" content="pdoc3 0.11.3">
+<meta name="generator" content="pdoc3 0.11.4">
 <title>pdoc.test.example_pkg API documentation</title>
 <meta name="description" content="Module docstring">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
@@ -108,12 +108,60 @@ Traceback (most recent call last):
     ...
 Exception: something went wrong
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L271-L304" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def doctests(self):
+    &#34;&#34;&#34;
+    Need an intro paragrapgh.
+
+        &gt;&gt;&gt; Then code is indented one level
+        line1
+        line2
+
+    Alternatively
+    ```
+    &gt;&gt;&gt; doctest
+    fenced code works
+    always
+    ```
+
+    Examples:
+        &gt;&gt;&gt; nbytes(100)
+        &#39;100.0 bytes&#39;
+        line2
+
+        some text
+
+    some text
+
+    &gt;&gt;&gt; another doctest
+    line1
+    line2
+
+    Example:
+        &gt;&gt;&gt; f()
+        Traceback (most recent call last):
+            ...
+        Exception: something went wrong
+    &#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 <dt id="pdoc.test.example_pkg.foo"><code class="name flex">
 <span>def <span class="ident">foo</span></span>(<span>env=os.environ)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Doesn't leak environ</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L20-L21" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def foo(env=os.environ):
+    &#34;&#34;&#34;Doesn&#39;t leak environ&#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 <dt id="pdoc.test.example_pkg.google"><code class="name flex">
 <span>def <span class="ident">google</span></span>(<span>self)</span>
@@ -195,6 +243,69 @@ that are relevant to the interface.</p>
 <ul>
 <li>For module TODOs</li>
 </ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L213-L269" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def google(self):
+    &#34;&#34;&#34;
+    Summary line.
+    Nomatch:
+
+    Args:
+        arg1 (str, optional): Text1
+        arg2 (List[str], optional, default=10): Text2
+        data (array-like object): foo
+
+    Args:
+      arg1 (int): Description of arg1
+      arg2 (str or int): Description of arg2
+      arg3 (str | None): Description of arg3
+      test_sequence: 2-dim numpy array of real numbers, size: N * D
+        - the test observation sequence.
+
+            test_sequence =
+            code
+
+        Continue.
+      *args: passed around
+
+    Returns:
+        issue_10: description didn&#39;t work across multiple lines
+            if only a single item was listed. `inspect.cleandoc()`
+            somehow stripped the required extra indentation.
+
+    Returns:
+        A very special number
+        which is the answer of everything.
+
+    Returns:
+        Dict[int, pdoc.Doc]: Description.
+
+    Returns:
+        int | str: Description.
+
+    Raises:
+        AttributeError: The ``Raises`` section is a list of all exceptions
+            that are relevant to the interface.
+
+            and a third line.
+        ValueError: If `arg2` is equal to `arg1`.
+
+    Test a title without a blank line before it.
+    Args:
+        A: a
+
+    Examples:
+      Examples in doctest format.
+
+      &gt;&gt;&gt; a = [1,2,3]
+
+    Todos:
+        * For module TODOs
+    &#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 <dt id="pdoc.test.example_pkg.latex_math"><code class="name flex">
 <span>def <span class="ident">latex_math</span></span>(<span>)</span>
@@ -206,12 +317,40 @@ that are relevant to the interface.</p>
 <p>$\mathcal{O}(N)$</p>
 <p>Escaping \$ should work in math like $X = \$3.25$ once it is implemented.</p>
 <p>[ v_t <em>\frac{1}{2}</em> j_i + [a] &lt; 3 ]</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L356-L370" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def latex_math():
+    &#34;&#34;&#34;
+    Inline equation: \\( v_t *\\frac{1}{2}* j_i + [a] &lt; 3 \\).
+
+    Block equation: \\[ v_t *\\frac{1}{2}* j_i + [a] &lt; 3 \\]
+
+    Block equation: $$ v_t *\\frac{1}{2}* j_i + [a] &lt; 3 $$
+
+    $\\mathcal{O}(N)$
+
+    Escaping \\$ should work in math like $X = \\$3.25$ once it is implemented.
+
+    ..math::
+        v_t *\\frac{1}{2}* j_i + [a] &lt; 3
+    &#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 <dt id="pdoc.test.example_pkg.non_callable_routine"><code class="name flex">
 <span>def <span class="ident">non_callable_routine</span></span>(<span>x)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L47-L47" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">non_callable_routine = staticmethod(lambda x: 2)  # Not interpreted as Function; skipped</code></pre>
+</details>
 </dd>
 <dt id="pdoc.test.example_pkg.numpy"><code class="name flex">
 <span>def <span class="ident">numpy</span></span>(<span>self)</span>
@@ -281,12 +420,97 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <p>Foo bar.</p>
 <h3 id="h3-title">H3 Title</h3>
 <p>Foo bar.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L141-L211" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def numpy(self):
+    &#34;&#34;&#34;
+    Summary line.
+
+    **Documentation**: https://pdoc3.github.io/pdoc/doc/pdoc/
+    **Source Code**: https://github.com/pdoc3/
+
+    Parameters
+    ----------
+    x1, x2 : array_like
+        Input arrays,
+        description of `x1`, `x2`.
+
+        .. versionadded:: 1.5.0
+    x : { NoneType, &#39;B&#39;, &#39;C&#39; }, optional
+    n : int or list of int
+        Description of num
+    *args, **kwargs
+        Passed on.
+    complex : Union[Set[pdoc.Doc, Function], pdoc]
+        The `List[Doc]`s of the new signal.
+
+    Returns
+    -------
+    output : pdoc.Doc
+        The output array
+    List[pdoc.Doc]
+        The output array
+    foo
+
+    Raises
+    ------
+    TypeError
+        When something.
+
+    Raises
+    ------
+    TypeError
+
+    Returns
+    -------
+    None.
+
+    Invalid
+    -------
+    no match
+
+    See Also
+    --------
+    fromstring, loadtxt
+
+    See Also
+    --------
+    pdoc.text : Function a with its description.
+    scipy.random.norm : Random variates, PDFs, etc.
+    pdoc.Doc : A class description that
+               spans several lines.
+
+    Examples
+    --------
+    &gt;&gt;&gt; doctest
+    ...
+
+    Notes
+    -----
+    Foo bar.
+
+    ### H3 Title
+
+    Foo bar.
+    &#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 <dt id="pdoc.test.example_pkg.object_as_arg_default"><code class="name flex">
 <span>def <span class="ident">object_as_arg_default</span></span>(<span>*args, a=&lt;object object&gt;, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Html-encodes angle brackets in params</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L24-L25" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def object_as_arg_default(*args, a=object(), **kwargs):
+    &#34;&#34;&#34;Html-encodes angle brackets in params&#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 <dt id="pdoc.test.example_pkg.reST_directives"><code class="name flex">
 <span>def <span class="ident">reST_directives</span></span>(<span>self)</span>
@@ -330,6 +554,48 @@ across multiple lines:</p>
 <p class="admonition-title">Caution</p>
 <p>Don't touch this!</p>
 </div></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L306-L341" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def reST_directives(self):
+    &#34;&#34;&#34;
+    .. todo::
+
+       Create something.
+
+    .. admonition:: Example
+
+       Image shows something.
+
+       .. image:: https://www.debian.org/logos/openlogo-nd-100.png
+
+       .. note::
+          Can only nest admonitions two levels.
+
+    .. image:: https://www.debian.org/logos/openlogo-nd-100.png
+
+    Now you know.
+
+    .. warning::
+
+        Some warning
+        lines.
+
+    * Describe some func in a list
+      across multiple lines:
+
+        .. deprecated:: 3.1
+          Use `spam` instead.
+
+        .. versionadded:: 2.5
+         The *spam* parameter.
+
+    .. caution::
+        Don&#39;t touch this!
+    &#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 </dl>
 </section>
@@ -344,7 +610,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/test/example_pkg/__init__.py#L32-L44" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L32-L44" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">class A:
     &#34;&#34;&#34;`A` is base class for `example_pkg.B`.&#34;&#34;&#34;  # Test refname link
@@ -371,18 +637,42 @@ across multiple lines:</p>
 </code></dt>
 <dd>
 <div class="desc"><p>A.inherited docstring</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L40-L41" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def inherited(self):  # Inherited in B
+    &#34;&#34;&#34;A.inherited docstring&#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 <dt id="pdoc.test.example_pkg.A.overridden"><code class="name flex">
 <span>def <span class="ident">overridden</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A.overridden docstring</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L34-L35" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def overridden(self):
+    &#34;&#34;&#34;A.overridden docstring&#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 <dt id="pdoc.test.example_pkg.A.overridden_same_docstring"><code class="name flex">
 <span>def <span class="ident">overridden_same_docstring</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A.overridden_same_docstring docstring</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L37-L38" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def overridden_same_docstring(self):
+    &#34;&#34;&#34;A.overridden_same_docstring docstring&#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 </dl>
 </dd>
@@ -397,7 +687,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/test/example_pkg/__init__.py#L59-L129" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L59-L129" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">class B(A, int):
     &#34;&#34;&#34;
@@ -508,6 +798,15 @@ across multiple lines:</p>
 </code></dt>
 <dd>
 <div class="desc"><p>B.static docstring</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L88-L90" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">@staticmethod
+def static(x):
+    &#34;&#34;&#34;B.static docstring&#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 </dl>
 <h3>Instance variables</h3>
@@ -522,6 +821,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L107-L110" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def p(self):
@@ -535,6 +835,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L53-L56" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">def __get__(self, instance, instance_type=None):
     if instance is not None:
@@ -548,6 +849,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L53-L56" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">def __get__(self, instance, instance_type=None):
     if instance is not None:
@@ -563,12 +865,28 @@ def p(self):
 </code></dt>
 <dd>
 <div class="desc"><p>B.f docstring</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L85-L86" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def f(self, a: int, b: int = 1, *args, c: str = &#39;c&#39;, **kwargs):
+    &#34;&#34;&#34;B.f docstring&#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 <dt id="pdoc.test.example_pkg.B.overridden"><code class="name flex">
 <span>def <span class="ident">overridden</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>B.overridden docstring</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L122-L123" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def overridden(self):
+    pass</code></pre>
+</details>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -592,7 +910,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/test/example_pkg/__init__.py#L132-L132" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L132-L132" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">class C(B): pass  # noqa: E701, E302</code></pre>
 </details>
@@ -638,7 +956,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/test/example_pkg/__init__.py#L133-L133" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L133-L133" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">class D(C): pass  # noqa: E701, E302</code></pre>
 </details>
@@ -678,7 +996,7 @@ def p(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/test/example_pkg/__init__.py#L140-L341" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L140-L341" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">class Docformats:
     def numpy(self):
@@ -916,6 +1234,46 @@ Traceback (most recent call last):
     ...
 Exception: something went wrong
 </code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L271-L304" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def doctests(self):
+    &#34;&#34;&#34;
+    Need an intro paragrapgh.
+
+        &gt;&gt;&gt; Then code is indented one level
+        line1
+        line2
+
+    Alternatively
+    ```
+    &gt;&gt;&gt; doctest
+    fenced code works
+    always
+    ```
+
+    Examples:
+        &gt;&gt;&gt; nbytes(100)
+        &#39;100.0 bytes&#39;
+        line2
+
+        some text
+
+    some text
+
+    &gt;&gt;&gt; another doctest
+    line1
+    line2
+
+    Example:
+        &gt;&gt;&gt; f()
+        Traceback (most recent call last):
+            ...
+        Exception: something went wrong
+    &#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 <dt id="pdoc.test.example_pkg.Docformats.google"><code class="name flex">
 <span>def <span class="ident">google</span></span>(<span>self)</span>
@@ -997,6 +1355,69 @@ that are relevant to the interface.</p>
 <ul>
 <li>For module TODOs</li>
 </ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L213-L269" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def google(self):
+    &#34;&#34;&#34;
+    Summary line.
+    Nomatch:
+
+    Args:
+        arg1 (str, optional): Text1
+        arg2 (List[str], optional, default=10): Text2
+        data (array-like object): foo
+
+    Args:
+      arg1 (int): Description of arg1
+      arg2 (str or int): Description of arg2
+      arg3 (str | None): Description of arg3
+      test_sequence: 2-dim numpy array of real numbers, size: N * D
+        - the test observation sequence.
+
+            test_sequence =
+            code
+
+        Continue.
+      *args: passed around
+
+    Returns:
+        issue_10: description didn&#39;t work across multiple lines
+            if only a single item was listed. `inspect.cleandoc()`
+            somehow stripped the required extra indentation.
+
+    Returns:
+        A very special number
+        which is the answer of everything.
+
+    Returns:
+        Dict[int, pdoc.Doc]: Description.
+
+    Returns:
+        int | str: Description.
+
+    Raises:
+        AttributeError: The ``Raises`` section is a list of all exceptions
+            that are relevant to the interface.
+
+            and a third line.
+        ValueError: If `arg2` is equal to `arg1`.
+
+    Test a title without a blank line before it.
+    Args:
+        A: a
+
+    Examples:
+      Examples in doctest format.
+
+      &gt;&gt;&gt; a = [1,2,3]
+
+    Todos:
+        * For module TODOs
+    &#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 <dt id="pdoc.test.example_pkg.Docformats.numpy"><code class="name flex">
 <span>def <span class="ident">numpy</span></span>(<span>self)</span>
@@ -1066,6 +1487,83 @@ description of <code>x1</code>, <code>x2</code>.</p>
 <p>Foo bar.</p>
 <h3 id="h3-title">H3 Title</h3>
 <p>Foo bar.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L141-L211" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def numpy(self):
+    &#34;&#34;&#34;
+    Summary line.
+
+    **Documentation**: https://pdoc3.github.io/pdoc/doc/pdoc/
+    **Source Code**: https://github.com/pdoc3/
+
+    Parameters
+    ----------
+    x1, x2 : array_like
+        Input arrays,
+        description of `x1`, `x2`.
+
+        .. versionadded:: 1.5.0
+    x : { NoneType, &#39;B&#39;, &#39;C&#39; }, optional
+    n : int or list of int
+        Description of num
+    *args, **kwargs
+        Passed on.
+    complex : Union[Set[pdoc.Doc, Function], pdoc]
+        The `List[Doc]`s of the new signal.
+
+    Returns
+    -------
+    output : pdoc.Doc
+        The output array
+    List[pdoc.Doc]
+        The output array
+    foo
+
+    Raises
+    ------
+    TypeError
+        When something.
+
+    Raises
+    ------
+    TypeError
+
+    Returns
+    -------
+    None.
+
+    Invalid
+    -------
+    no match
+
+    See Also
+    --------
+    fromstring, loadtxt
+
+    See Also
+    --------
+    pdoc.text : Function a with its description.
+    scipy.random.norm : Random variates, PDFs, etc.
+    pdoc.Doc : A class description that
+               spans several lines.
+
+    Examples
+    --------
+    &gt;&gt;&gt; doctest
+    ...
+
+    Notes
+    -----
+    Foo bar.
+
+    ### H3 Title
+
+    Foo bar.
+    &#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 <dt id="pdoc.test.example_pkg.Docformats.reST_directives"><code class="name flex">
 <span>def <span class="ident">reST_directives</span></span>(<span>self)</span>
@@ -1109,6 +1607,48 @@ across multiple lines:</p>
 <p class="admonition-title">Caution</p>
 <p>Don't touch this!</p>
 </div></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L306-L341" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def reST_directives(self):
+    &#34;&#34;&#34;
+    .. todo::
+
+       Create something.
+
+    .. admonition:: Example
+
+       Image shows something.
+
+       .. image:: https://www.debian.org/logos/openlogo-nd-100.png
+
+       .. note::
+          Can only nest admonitions two levels.
+
+    .. image:: https://www.debian.org/logos/openlogo-nd-100.png
+
+    Now you know.
+
+    .. warning::
+
+        Some warning
+        lines.
+
+    * Describe some func in a list
+      across multiple lines:
+
+        .. deprecated:: 3.1
+          Use `spam` instead.
+
+        .. versionadded:: 2.5
+         The *spam* parameter.
+
+    .. caution::
+        Don&#39;t touch this!
+    &#34;&#34;&#34;</code></pre>
+</details>
 </dd>
 </dl>
 </dd>
@@ -1120,7 +1660,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/test/example_pkg/__init__.py#L383-L389" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L383-L389" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">class HasMockAttributes:
     &#34;&#34;&#34;
@@ -1151,7 +1691,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/test/example_pkg/__init__.py#L373-L374" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L373-L374" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">class Location(namedtuple(&#39;Location&#39;, &#39;lat lon&#39;)):
     &#34;&#34;&#34;Geo-location, GPS position.&#34;&#34;&#34;</code></pre>
@@ -1169,7 +1709,7 @@ across multiple lines:</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/aab629ce3daac7cef088bd7439f4884790a8003f/pdoc/test/example_pkg/__init__.py#L50-L56" class="git-link">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/test/example_pkg/__init__.py#L53-L56" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">def __get__(self, instance, instance_type=None):
     if instance is not None:
@@ -1287,7 +1827,7 @@ data-gaCategoryParameter="pdoc.test.example_pkg">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.4</a>.</p>
 </footer>
 </body>
 </html>

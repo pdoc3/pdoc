@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-<meta name="generator" content="pdoc3 0.11.3">
+<meta name="generator" content="pdoc3 0.11.4">
 <title>pdoc.cli API documentation</title>
 <meta name="description" content="pdoc&#39;s CLI interface and helper functions.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
@@ -48,18 +48,226 @@ hljs.highlightAll();
 </code></dt>
 <dd>
 <div class="desc"><p>Command-line entry point</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/cli.py#L451-L622" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def main(_args=None):
+    &#34;&#34;&#34; Command-line entry point &#34;&#34;&#34;
+    global args
+    args = _args or parser.parse_args()
+
+    # If warnings not externally managed, show deprecation warnings
+    if not sys.warnoptions:
+        warnings.simplefilter(&#34;once&#34;, DeprecationWarning)
+
+    if args.close_stdin:
+        sys.stdin.close()
+
+    if (args.html or args.http) and not args.output_dir:
+        args.output_dir = &#39;html&#39;
+
+    if args.html_dir:
+        _warn_deprecated(&#39;--html-dir&#39;, &#39;--output-dir&#39;)
+        args.output_dir = args.html_dir
+    if args.overwrite:
+        _warn_deprecated(&#39;--overwrite&#39;, &#39;--force&#39;)
+        args.force = args.overwrite
+
+    template_config = {}
+    for config_str in args.config:
+        try:
+            key, value = config_str.split(&#39;=&#39;, 1)
+            value = ast.literal_eval(value)
+            template_config[key] = value
+        except Exception:
+            raise ValueError(
+                f&#39;Error evaluating --config statement &#34;{config_str}&#34;. &#39;
+                &#39;Make sure string values are quoted?&#39;
+            )
+
+    if args.html_no_source:
+        _warn_deprecated(&#39;--html-no-source&#39;, &#39;-c show_source_code=False&#39;, True)
+        template_config[&#39;show_source_code&#39;] = False
+    if args.link_prefix:
+        _warn_deprecated(&#39;--link-prefix&#39;, &#39;-c link_prefix=&#34;foo&#34;&#39;, True)
+        template_config[&#39;link_prefix&#39;] = args.link_prefix
+    if args.external_links:
+        _warn_deprecated(&#39;--external-links&#39;)
+        template_config[&#39;external_links&#39;] = True
+
+    if args.template_dir is not None:
+        if not path.isdir(args.template_dir):
+            print(f&#39;Error: Template dir {args.template_dir!r} is not a directory&#39;, file=sys.stderr)
+            sys.exit(1)
+        pdoc.tpl_lookup.directories.insert(0, args.template_dir)
+
+    # Support loading modules specified as python paths relative to cwd
+    sys.path.append(os.getcwd())
+
+    # Virtual environment handling for pdoc script run from system site
+    try:
+        os.environ[&#39;VIRTUAL_ENV&#39;]
+    except KeyError:
+        pass  # pdoc was not invoked while in a virtual environment
+    else:
+        from glob import glob
+        from sysconfig import get_path
+        libdir = get_path(&#34;platlib&#34;)
+        sys.path.append(libdir)
+        # Resolve egg-links from `setup.py develop` or `pip install -e`
+        # XXX: Welcome a more canonical approach
+        for pth in glob(path.join(libdir, &#39;*.egg-link&#39;)):
+            try:
+                with open(pth) as f:
+                    sys.path.append(path.join(libdir, f.readline().rstrip()))
+            except IOError:
+                warn(f&#39;Invalid egg-link in venv: {pth!r}&#39;)
+
+    if args.http:
+        template_config[&#39;link_prefix&#39;] = &#34;/&#34;
+
+        # Run the HTTP server.
+        _WebDoc.args = args  # Pass params to HTTPServer xP
+        _WebDoc.template_config = template_config
+
+        host, _, port = args.http.partition(&#39;:&#39;)
+        host = host or DEFAULT_HOST
+        port = int(port or DEFAULT_PORT)
+
+        print(f&#39;Starting pdoc server on {host}:{port}&#39;, file=sys.stderr)
+        httpd = HTTPServer((host, port), _WebDoc)
+        print(f&#34;pdoc server ready at http://{host}:{port}&#34;, file=sys.stderr)
+
+        # Allow tests to perform `pdoc.cli._httpd.shutdown()`
+        global _httpd
+        _httpd = httpd
+
+        try:
+            httpd.serve_forever()
+        finally:
+            httpd.server_close()
+            sys.exit(0)
+
+    if args.filter and args.filter.strip():
+        def docfilter(obj, _filters=args.filter.strip().split(&#39;,&#39;)):
+            return any(f in obj.refname or
+                       isinstance(obj, pdoc.Class) and f in obj.doc
+                       for f in _filters)
+    else:
+        docfilter = None
+
+    modules = [pdoc.Module(module, docfilter=docfilter,
+                           skip_errors=args.skip_errors)
+               for module in args.modules]
+    pdoc.link_inheritance()
+
+    # Loading is done. Output stage ...
+    config = pdoc._get_config(**template_config)
+
+    # Load configured global markdown extensions
+    # XXX: This is hereby enabled only for CLI usage as for
+    #  API use I couldn&#39;t figure out where reliably to put it.
+    if config.get(&#39;md_extensions&#39;):
+        from .html_helpers import _md
+        _kwargs = {&#39;extensions&#39;: [], &#39;configs&#39;: {}}
+        _kwargs.update(config.get(&#39;md_extensions&#39;, {}))
+        _md.registerExtensions(**_kwargs)
+
+    if args.pdf:
+        _print_pdf(modules, **template_config)
+        import textwrap
+        PANDOC_CMD = textwrap.indent(_PANDOC_COMMAND, &#39;    &#39;)
+        print(f&#34;&#34;&#34;
+PDF-ready markdown written to standard output.
+                              ^^^^^^^^^^^^^^^
+Convert this file to PDF using e.g. Pandoc:
+
+{PANDOC_CMD}
+
+or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
+
+    markdown_py --extension=meta         \\
+                --extension=abbr         \\
+                --extension=attr_list    \\
+                --extension=def_list     \\
+                --extension=fenced_code  \\
+                --extension=footnotes    \\
+                --extension=tables       \\
+                --extension=admonition   \\
+                --extension=smarty       \\
+                --extension=toc          \\
+                pdf.md &gt; pdf.html
+
+    chromium --headless --disable-gpu --print-to-pdf=pdf.pdf pdf.html
+
+    wkhtmltopdf --encoding utf8 -s A4 --print-media-type pdf.html pdf.pdf
+
+or similar, at your own discretion.&#34;&#34;&#34;,
+              file=sys.stderr)
+        sys.exit(0)
+
+    for module in modules:
+        if args.html:
+            _quit_if_exists(module, ext=&#39;.html&#39;)
+            recursive_write_files(module, ext=&#39;.html&#39;, **template_config)
+        elif args.output_dir:  # Generate text files
+            _quit_if_exists(module, ext=&#39;.md&#39;)
+            recursive_write_files(module, ext=&#39;.md&#39;, **template_config)
+        else:
+            sys.stdout.write(module.text(**template_config))
+            # Two blank lines between two modules&#39; texts
+            sys.stdout.write(os.linesep * (1 + 2 * int(module != modules[-1])))
+
+    if args.html:
+        lunr_config = config.get(&#39;lunr_search&#39;)
+        if lunr_config is not None:
+            _generate_lunr_search(
+                modules, lunr_config.get(&#34;index_docstrings&#34;, True), template_config)</code></pre>
+</details>
 </dd>
 <dt id="pdoc.cli.module_path"><code class="name flex">
 <span>def <span class="ident">module_path</span></span>(<span>m: <a title="pdoc.Module" href="index.html#pdoc.Module">Module</a>, ext: str)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/cli.py#L306-L307" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def module_path(m: pdoc.Module, ext: str):
+    return path.join(args.output_dir, *re.sub(r&#39;\.html$&#39;, ext, m.url()).split(&#39;/&#39;))</code></pre>
+</details>
 </dd>
 <dt id="pdoc.cli.recursive_write_files"><code class="name flex">
 <span>def <span class="ident">recursive_write_files</span></span>(<span>m: <a title="pdoc.Module" href="index.html#pdoc.Module">Module</a>,<br>ext: str,<br>**kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/pdoc3/pdoc/blob/c606654aa3ae60b0fb2744ed70558f633decf981/pdoc/cli.py#L338-L353" class="git-link" target="_blank">Browse git</a>
+</summary>
+<pre><code class="python">def recursive_write_files(m: pdoc.Module, ext: str, **kwargs):
+    assert ext in (&#39;.html&#39;, &#39;.md&#39;)
+    filepath = module_path(m, ext=ext)
+
+    dirpath = path.dirname(filepath)
+    if not os.access(dirpath, os.R_OK):
+        os.makedirs(dirpath)
+
+    with _open_write_file(filepath) as f:
+        if ext == &#39;.html&#39;:
+            f.write(m.html(**kwargs))
+        elif ext == &#39;.md&#39;:
+            f.write(m.text(**kwargs))
+
+    for submodule in m.submodules():
+        recursive_write_files(submodule, ext=ext, **kwargs)</code></pre>
+</details>
 </dd>
 </dl>
 </section>
@@ -97,7 +305,7 @@ data-gaCategoryParameter="pdoc.cli">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.4</a>.</p>
 </footer>
 </body>
 </html>
