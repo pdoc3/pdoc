@@ -1355,7 +1355,7 @@ def _formatannotation(annot):
                     a = a.__origin__[args]
                 except TypeError:
                     # collections.abc.Callable takes "([in], out)"
-                    a = a.__origin__[(args[:-1], args[-1])]
+                    a = a.__origin__[(list(args[:-1]), args[-1])]
         # Recurse into lists
         if isinstance(a, (list, tuple)):
             return type(a)(map(maybe_replace_reprs, a))
