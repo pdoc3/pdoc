@@ -1354,7 +1354,7 @@ def _formatannotation(annot):
                 try:
                     a = a.__origin__[args]
                 except TypeError:
-                    # XXX: Python 3.10-only: Need to convert to list since _CallableGenericAlias.__new__
+                    # XXX: Python 3.10-only: Convert to list since _CallableGenericAlias.__new__
                     #                        currently cannot have tuples as arguments.
                     args_in = list(args[:-1])
                     arg_out = args[-1]
