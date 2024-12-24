@@ -1354,8 +1354,12 @@ def _formatannotation(annot):
                 try:
                     a = a.__origin__[args]
                 except TypeError:
+                    # XXX: Python 3.10-only: Need to convert to list since _CallableGenericAlias.__new__
+                    #                        currently cannot have tuples as arguments.
+                    args_in = list(args[:-1])
+                    arg_out = args[-1]
                     # collections.abc.Callable takes "([in], out)"
-                    a = a.__origin__[(list(args[:-1]), args[-1])]
+                    a = a.__origin__[(args_in, arg_out)]
         # Recurse into lists
         if isinstance(a, (list, tuple)):
             return type(a)(map(maybe_replace_reprs, a))
