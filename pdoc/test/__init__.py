@@ -567,7 +567,8 @@ class ApiTest(unittest.TestCase):
             but_clss_have_doc = int
 
         doc = pdoc.Class('C', DUMMY_PDOC_MODULE, C)
-        self.assertEqual(doc.doc['vars_dont'].docstring, '')
+        expected = 'The type of the None singleton.' if sys.version_info > (3, 13) else ''
+        self.assertEqual(doc.doc['vars_dont'].docstring, expected)
         self.assertIn('integer', doc.doc['but_clss_have_doc'].docstring)
 
     @unittest.skipIf(sys.version_info >= (3, 10), 'No builtin module "parser" in Py3.10')
