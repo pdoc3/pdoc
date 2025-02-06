@@ -517,7 +517,6 @@ class Doc:
     also correspond to unexported members of the module, particularly in
     a class's ancestor list.)
     """
-    __slots__ = ('module', 'name', 'obj', 'docstring', 'inherits')
 
     def __init__(self, name: str, module, obj, docstring: str = ''):
         """
@@ -648,9 +647,6 @@ class Module(Doc):
         The name of this module with respect to the context/path in which
         it was imported from. It is always an absolute import path.
         """
-
-    __slots__ = ('supermodule', 'doc', '_context', '_is_inheritance_linked',
-                 '_skipped_submodules')
 
     def __init__(self, module: Union[ModuleType, str], *,
                  docfilter: Optional[Callable[[Doc], bool]] = None,
@@ -1035,8 +1031,6 @@ class Class(Doc):
     """
     Representation of a class' documentation.
     """
-    __slots__ = ('doc', '_super_members')
-
     def __init__(self, name: str, module: Module, obj, *, docstring: Optional[str] = None):
         assert inspect.isclass(obj)
 
@@ -1375,8 +1369,6 @@ class Function(Doc):
     """
     Representation of documentation for a function or method.
     """
-    __slots__ = ('cls',)
-
     def __init__(self, name: str, module: Module, obj, *, cls: Optional[Class] = None):
         """
         Same as `pdoc.Doc`, except `obj` must be a
@@ -1648,8 +1640,6 @@ class Variable(Doc):
     Representation of a variable's documentation. This includes
     module, class, and instance variables.
     """
-    __slots__ = ('cls', 'instance_var', 'kind')
-
     def __init__(self, name: str, module: Module, docstring, *,
                  obj=None, cls: Optional[Class] = None, instance_var: bool = False,
                  kind: Literal["prop", "var"] = 'var'):
