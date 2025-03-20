@@ -19,6 +19,7 @@ import sys
 import typing
 from contextlib import contextmanager
 from copy import copy
+from dataclasses import is_dataclass
 from functools import cached_property, lru_cache, reduce, partial, wraps
 from itertools import tee, groupby
 from types import FunctionType, ModuleType
@@ -1097,7 +1098,8 @@ class Class(Doc):
                     kind="prop" if isinstance(obj, property) else "var",
                     obj=_is_descriptor(obj) and obj or None,
                     instance_var=(_is_descriptor(obj) or
-                                  name in getattr(self.obj, '__slots__', ())))
+                                  name in getattr(self.obj, '__slots__', ()) or
+                                  (is_dataclass(self.obj) and name in annotations)))
 
         for name, docstring in instance_var_docstrings.items():
             self.doc[name] = Variable(

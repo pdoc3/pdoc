@@ -14,6 +14,7 @@ import threading
 import unittest
 import warnings
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
+from dataclasses import dataclass
 from functools import wraps
 from glob import glob
 from io import StringIO
@@ -1786,6 +1787,17 @@ class HttpTest(unittest.TestCase):
                                 method='HEAD',
                                 headers={'If-None-Match': str(os.stat(pdoc.__file__).st_mtime)}))
             self.assertEqual(cm.exception.code, 304)
+
+
+class RegressionsTest(unittest.TestCase):
+    def test_dataclass_has_instance_vars(self):
+        @dataclass
+        class Foo:
+            bar: int  #: baz
+
+        obj = pdoc.Class(Foo.__name__, pdoc.Module(EMPTY_MODULE), Foo)
+        self.assertTrue(obj.doc['bar'].instance_var)
+        self.assertEqual(obj.doc['bar'].docstring, 'baz')
 
 
 if __name__ == '__main__':
