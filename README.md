@@ -3,7 +3,8 @@
 pdoc
 ====
 [![Build Status](https://img.shields.io/github/actions/workflow/status/pdoc3/pdoc/ci.yml?branch=master&style=for-the-badge)](https://github.com/pdoc3/pdoc/actions)
-[![Code Coverage](https://img.shields.io/codecov/c/gh/pdoc3/pdoc.svg?style=for-the-badge)](https://codecov.io/gh/pdoc3/pdoc)
+[![Code Coverage](https://img.shields.io/codecov/c/gh/pdoc3/pdoc.svg?style=for-the-badge&label=Covr)](https://codecov.io/gh/pdoc3/pdoc)
+[![Source lines of code](https://img.shields.io/endpoint?url=https%3A%2F%2Fghloc.vercel.app%2Fapi%2Fpdoc3%2Fpdoc%2Fbadge?filter=.py%26format=human&style=for-the-badge&label=SLOC&color=green)](https://ghloc.vercel.app/pdoc3/pdoc)
 [![pdoc3 on PyPI](https://img.shields.io/pypi/v/pdoc3.svg?color=blue&style=for-the-badge)](https://pypi.org/project/pdoc3)
 [![package downloads](https://img.shields.io/pypi/dm/pdoc3.svg?color=skyblue&style=for-the-badge)](https://pypistats.org/packages/pdoc3)
 [![total downloads](https://img.shields.io/pepy/dt/pdoc3?style=for-the-badge&label=%E2%88%91&color=skyblue)](https://pypistats.org/packages/pdoc3)
