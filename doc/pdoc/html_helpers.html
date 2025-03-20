@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-<meta name="generator" content="pdoc3 0.11.5">
+<meta name="generator" content="pdoc3 0.11.6">
 <title>pdoc.html_helpers API documentation</title>
 <meta name="description" content="Helper functions for HTML output.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
@@ -61,7 +61,7 @@ el.replaceWith(d);
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/65342aecd782326b4c98492bbf9102c3534a735a/pdoc/html_helpers.py#L544-L554" class="git-link" target="_blank">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/5570f9a425d7cac7f7071c4c4d17a9edae20dc3d/pdoc/html_helpers.py#L544-L554" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">def extract_toc(text: str):
     &#34;&#34;&#34;
@@ -84,7 +84,7 @@ el.replaceWith(d);
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/65342aecd782326b4c98492bbf9102c3534a735a/pdoc/html_helpers.py#L557-L582" class="git-link" target="_blank">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/5570f9a425d7cac7f7071c4c4d17a9edae20dc3d/pdoc/html_helpers.py#L557-L582" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">def format_git_link(template: str, dobj: pdoc.Doc):
     &#34;&#34;&#34;
@@ -123,7 +123,7 @@ from <code>dobj</code> and the working environment.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/65342aecd782326b4c98492bbf9102c3534a735a/pdoc/html_helpers.py#L48-L69" class="git-link" target="_blank">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/5570f9a425d7cac7f7071c4c4d17a9edae20dc3d/pdoc/html_helpers.py#L48-L69" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">def glimpse(text: str, max_length=153, *, paragraph=True,
             _split_paragraph=partial(re.compile(r&#39;\s*\n\s*\n\s*&#39;).split, maxsplit=1),
@@ -159,7 +159,7 @@ but never longer than <code>max_length</code> characters.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/65342aecd782326b4c98492bbf9102c3534a735a/pdoc/html_helpers.py#L23-L31" class="git-link" target="_blank">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/5570f9a425d7cac7f7071c4c4d17a9edae20dc3d/pdoc/html_helpers.py#L23-L31" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">@lru_cache()
 def minify_css(css: str,
@@ -180,7 +180,7 @@ def minify_css(css: str,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/65342aecd782326b4c98492bbf9102c3534a735a/pdoc/html_helpers.py#L34-L45" class="git-link" target="_blank">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/5570f9a425d7cac7f7071c4c4d17a9edae20dc3d/pdoc/html_helpers.py#L34-L45" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">def minify_html(html: str,
                 _minify=partial(
@@ -205,7 +205,7 @@ def minify_css(css: str,
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/65342aecd782326b4c98492bbf9102c3534a735a/pdoc/html_helpers.py#L410-L433" class="git-link" target="_blank">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/5570f9a425d7cac7f7071c4c4d17a9edae20dc3d/pdoc/html_helpers.py#L410-L433" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">def to_html(text: str, *,
             docformat: Optional[str] = None,
@@ -246,7 +246,7 @@ example template.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/65342aecd782326b4c98492bbf9102c3534a735a/pdoc/html_helpers.py#L436-L490" class="git-link" target="_blank">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/5570f9a425d7cac7f7071c4c4d17a9edae20dc3d/pdoc/html_helpers.py#L436-L490" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">def to_markdown(text: str, *,
                 docformat: Optional[str] = None,
@@ -325,7 +325,7 @@ example template.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/pdoc3/pdoc/blob/65342aecd782326b4c98492bbf9102c3534a735a/pdoc/html_helpers.py#L493-L499" class="git-link" target="_blank">Browse git</a>
+<a href="https://github.com/pdoc3/pdoc/blob/5570f9a425d7cac7f7071c4c4d17a9edae20dc3d/pdoc/html_helpers.py#L493-L499" class="git-link" target="_blank">Browse git</a>
 </summary>
 <pre><code class="python">class ReferenceWarning(UserWarning):
     &#34;&#34;&#34;
@@ -391,7 +391,7 @@ data-gaCategoryParameter="pdoc.html_helpers">
 </main>
 <footer id="footer">
 <p><span style="color:#ddd">&#21328;</span></p>
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.5</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
 </footer>
 </body>
 </html>
