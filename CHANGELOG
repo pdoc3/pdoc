@@ -1,3 +1,11 @@
+0.11.6  (2025-03-20)
+======
+  - Fix `TypeError: Expected a list of types, an ellipsis, ParamSpec, or Concatenate.`
+    with `collections.abc.Callable` on Python 3.10. (#454)
+  - Remove use of `pdoc.Doc.__slots__`.
+  - Fix broken anchor tags in --pdf mode (#455)
+  - Fix dataclass attributes shown as class variables instead of instance variables.
+
 0.11.5  (2024-12-13)
 ======
   - A few default HTML template improvements
