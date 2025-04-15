@@ -289,7 +289,7 @@ class CliTest(unittest.TestCase):
                               file_pattern='example_pkg/subpkg/index.html')
         # Only build lunr search when --html
         with redirect_streams() as (_, stderr):
-            run(EXAMPLE_MODULE,  config='lunr_search={"fuzziness": 1}')
+            run(EXAMPLE_MODULE, config='lunr_search={"fuzziness": 1}')
             self.assertFalse(stderr.read())
 
     def test_force(self):
@@ -898,7 +898,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(func.params(link=lambda x: ''), ['a=&lt;object object&gt;'])
 
         # typed
-        def f(a: int, *b, c: typing.List[pdoc.Doc] = []): pass
+        def f(a: int, *b, c: typing.List[pdoc.Doc] = []): pass  # noqa: E704
         func = pdoc.Function('f', mod, f)
         self.assertEqual(func.params(), ['a', '*b', "c=[]"])
         self.assertEqual(func.params(annotate=True),
@@ -913,14 +913,14 @@ class ApiTest(unittest.TestCase):
                           "c:\N{NBSP}List[<a href=\"#pdoc.Doc\">Doc</a>]\N{NBSP}=\N{NBSP}[]"])
 
         # typed, linked, GH-311
-        def f(a: typing.Dict[str, pdoc.Doc]): pass
+        def f(a: typing.Dict[str, pdoc.Doc]): pass  # noqa: E704
 
         func = pdoc.Function('f', mod, f)
         self.assertEqual(func.params(annotate=True, link=link),
                          ["a:\N{NBSP}Dict[str,\N{NBSP}<a href=\"#pdoc.Doc\">Doc</a>]"])
 
         # shadowed name
-        def f(pdoc: int): pass
+        def f(pdoc: int): pass  # noqa: E704
         func = pdoc.Function('f', mod, f)
         self.assertEqual(func.params(annotate=True, link=link), ['pdoc:\N{NBSP}int'])
 
@@ -974,7 +974,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(func.params(), ['a', '/'])
 
     def test_Function_return_annotation(self):
-        def f() -> typing.List[typing.Union[str, pdoc.Doc]]: return []
+        def f() -> typing.List[typing.Union[str, pdoc.Doc]]: return []  # noqa: E704
         func = pdoc.Function('f', DUMMY_PDOC_MODULE, f)
         self.assertEqual(func.return_annotation(), 'List[str\N{NBSP}|\N{NBSP}pdoc.Doc]')
 
