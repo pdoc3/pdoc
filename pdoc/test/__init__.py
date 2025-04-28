@@ -510,6 +510,35 @@ class ApiTest(unittest.TestCase):
                     self.assertEqual(sorted(m.name for m in m.submodules()),
                                      [EXAMPLE_MODULE + '.' + m for m in submodules])
 
+    @ignore_warnings
+    def test_module_without_path(self):
+        # GH-319: https://github.com/pdoc3/pdoc/issues/319
+        parent_module = ModuleType('parent_module')
+        child_module1 = ModuleType('child_module1')
+        child_module2 = ModuleType('child_module2')
+        grandchild_module = ModuleType('grandchild_module')
+
+        child_module1.grandchild_module = grandchild_module
+        child_module1.__all__ = ['grandchild_module']
+
+        parent_module.child_module1 = child_module1
+        parent_module.child_module2 = child_module2
+        parent_module.__all__ = ['child_module1', 'child_module2']
+
+        assert not hasattr(parent_module, '__path__')
+        assert not hasattr(child_module1, '__path__')
+        assert not hasattr(child_module2, '__path__')
+        assert not hasattr(grandchild_module, '__path__')
+
+        parent_module_pdoc = pdoc.Module(parent_module)
+
+        children_modules_pdoc = sorted(parent_module_pdoc.submodules(), key=lambda m: m.name)
+        self.assertEqual(
+            [m.name for m in children_modules_pdoc], ['child_module1', 'child_module2'])
+        self.assertEqual(
+            [m.name for m in children_modules_pdoc[0].submodules()], ['grandchild_module'])
+        self.assertEqual(children_modules_pdoc[1].submodules(), [])
+
     def test_Module_find_class(self):
         class A:
             pass
