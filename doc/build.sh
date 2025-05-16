@@ -43,6 +43,7 @@ echo 'Testing for broken links'
 echo
 problematic_urls='
 https://www.gnu.org/licenses/agpl-3.0.html
+https://stackoverflow.com/questions/19578308/what-is-the-benefit-of-using-main-method-in-python/19578335
 '
 pushd "$BUILDROOT" >/dev/null
 grep -PR '<a .*?href=' |
