@@ -1200,6 +1200,10 @@ class C:
         # GH-350 -- throws `TypeError: 'Mock' object is not subscriptable`:
         self.assertIsInstance(inspect.signature(Mock(spec=lambda x: x)), inspect.Signature)
 
+    def test_ends_with_newline(self):
+        self.assertEqual('\n', DUMMY_PDOC_MODULE.text()[-1])
+        self.assertEqual('\n', DUMMY_PDOC_MODULE.html()[-1])
+
 
 class HtmlHelpersTest(unittest.TestCase):
     """

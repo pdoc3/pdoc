@@ -889,7 +889,10 @@ class Module(Doc):
         Returns the documentation for this module as plain text.
         """
         txt = _render_template('/text.mako', module=self, **kwargs)
-        return re.sub("\n\n\n+", "\n\n", txt)
+        txt = re.sub("\n\n\n+", "\n\n", txt)
+        if not txt.endswith('\n'):
+            txt += '\n'
+        return txt
 
     def html(self, minify=True, **kwargs) -> str:
         """
