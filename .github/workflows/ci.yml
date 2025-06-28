@@ -29,12 +29,29 @@ jobs:
 
       - run: pip install -U pip setuptools wheel && pip install -U .
 
-      - name: Install lint dependencies
-        run: |
-          pip install flake8 coverage mypy types-Markdown
-          sudo apt update && sudo apt-get install \
-            texlive-xetex lmodern texlive-fonts-recommended  # test_pdf_pandoc
-          wget -O/tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/3.1.12.2/pandoc-3.1.12.2-1-amd64.deb && sudo dpkg -i /tmp/pandoc.deb
+      - uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2
+        with:
+          path: /tmp/pandoc.deb
+          key: pandoc
+
+      - uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2
+        with:
+          path: |
+            /usr/bin/xelatex*
+            /usr/share/texlive/
+            /usr/share/doc/texlive*
+            /usr/share/texmf/
+            /var/lib/tex*
+            /usr/share/fonts/X11/Type1/lm*
+            /etc/X11/fonts/Type1/lmodern.scale
+          key: latex-${{ runner.os }}
+
+      - run: pip install flake8 coverage mypy types-Markdown
+
+      # test_pdf_pandoc
+      - run: command -v xelatex || sudo apt-get update && sudo apt-get install texlive-xetex lmodern texlive-fonts-recommended
+      - run: wget --no-clobber -O/tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/3.1.12.2/pandoc-3.1.12.2-1-amd64.deb || true
+      - run: sudo dpkg -i /tmp/pandoc.deb
 
       - run: find -name '*.md' | xargs .github/lint-markdown.sh
       - run: flake8 pdoc setup.py
