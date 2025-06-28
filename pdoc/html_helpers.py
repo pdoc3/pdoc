@@ -70,7 +70,7 @@ def glimpse(text: str, max_length=153, *, paragraph=True,
 
 
 _md = markdown.Markdown(
-    output_format='html5',    # type: ignore[arg-type]
+    output_format='html',
     extensions=[
         "markdown.extensions.abbr",
         "markdown.extensions.admonition",

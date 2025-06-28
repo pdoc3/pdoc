@@ -291,7 +291,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
 
             # For classes, maybe add instance variables defined in __init__
             # Get the *last* __init__ node in case it is preceded by @overloads.
-            for node in reversed(tree.body):
+            for node in reversed(tree.body):  # type: ignore
                 if isinstance(node, ast.FunctionDef) and node.name == '__init__':
                     instance_vars, _ = _pep224_docstrings(doc_obj, _init_tree=node)
                     break
