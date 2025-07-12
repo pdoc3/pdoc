@@ -11,7 +11,6 @@ import json
 import re
 import subprocess
 import sys
-import typing
 import warnings
 from contextlib import contextmanager
 from functools import lru_cache
@@ -453,8 +452,6 @@ def main(_args=None):
     """ Command-line entry point """
     global args
     args = _args or parser.parse_args()
-
-    typing.TYPE_CHECKING = True  # type: ignore  # Set this for subsequent module imports
 
     # If warnings not externally managed, show deprecation warnings
     if not sys.warnoptions:
