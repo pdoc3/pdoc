@@ -626,15 +626,19 @@ def _project_relative_path(absolute_path):
     Python library installation.
     """
     from sysconfig import get_path
-    libdir = get_path("platlib")
-    for prefix_path in (_git_project_root() or os.getcwd(), libdir):
+    paths = filter(None, (
+        _git_project_root() or os.getcwd(),
+        get_path("stdlib"),
+        get_path("platlib"),
+    ))
+    for prefix_path in map(os.path.realpath, paths):
         common_path = os.path.commonpath([prefix_path, absolute_path])
         if os.path.samefile(common_path, prefix_path):
             # absolute_path is a descendant of prefix_path
             return os.path.relpath(absolute_path, prefix_path)
     raise RuntimeError(
         f"absolute path {absolute_path!r} is not a descendant of the current working directory "
-        "or of the system's python library."
+        f"or of the system's python library {paths}."
     )
 
 
