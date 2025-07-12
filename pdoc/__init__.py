@@ -566,11 +566,11 @@ class Doc:
     def source(self) -> str:
         """
         Cleaned (dedented) source code of the Python object. If not
-        available, an empty string.
+        available for whatever reason, an empty string.
         """
         try:
             lines, _ = inspect.getsourcelines(_unwrap_descriptor(self))
-        except (ValueError, TypeError, OSError):
+        except (ValueError, TypeError, OSError, AttributeError):
             return ''
         return inspect.cleandoc(''.join(['\n'] + lines))
 
