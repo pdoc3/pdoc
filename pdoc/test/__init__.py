@@ -659,6 +659,47 @@ class ApiTest(unittest.TestCase):
             self.assertEqual(cm, [])
             self.assertNotIn('downloaded_modules', mod.doc)
 
+    # flake8: noqa: E501 line too long
+    def test_class_wrappers(self):
+        """
+        Check that decorated classes are unwrapped properly.
+        Details: https://github.com/pdoc3/pdoc/issues/463
+        """
+
+        module_name = f'{EXAMPLE_MODULE}._test_classwrap'
+
+        root_module = pdoc.Module(module_name, context=pdoc.Context())
+        root_wrapped_cls_parent = root_module.doc['DecoratedClassParent']
+        root_wrapped_cls_child = root_module.doc['DecoratedClassChild']
+
+        module_classdef = root_module.doc['class_definition']
+        module_classdef_cls_parent = module_classdef.doc['DecoratedClassParent']
+        module_classdef_cls_child = module_classdef.doc['DecoratedClassChild']
+
+        module_util = root_module.doc['util']
+        module_util_decorator = module_util.doc['decorate_class']
+
+        self.assertEqual(root_module.qualname, module_name)
+        self.assertEqual(root_wrapped_cls_parent.qualname, 'DecoratedClassParent')
+        self.assertEqual(root_wrapped_cls_parent.docstring,
+                         """This is `DecoratedClassParent` class.""")
+        self.assertEqual(root_wrapped_cls_child.qualname, 'DecoratedClassChild')
+        self.assertEqual(root_wrapped_cls_child.docstring,
+                         """This is an `DecoratedClassParent`'s implementation that always returns 1.""")
+
+        self.assertEqual(module_classdef.qualname, f'{module_name}.class_definition')
+        self.assertEqual(module_classdef_cls_parent.qualname, 'DecoratedClassParent')
+        self.assertEqual(module_classdef_cls_parent.docstring,
+                         """This is `DecoratedClassParent` class.""")
+        self.assertEqual(module_classdef_cls_child.qualname, 'DecoratedClassChild')
+        self.assertEqual(module_classdef_cls_child.docstring,
+                         """This is an `DecoratedClassParent`'s implementation that always returns 1.""")
+
+        self.assertEqual(module_util.qualname, f'{module_name}.util')
+        self.assertEqual(module_util_decorator.qualname, 'decorate_class')
+
+        pdoc.link_inheritance(root_module._context)
+
     @ignore_warnings
     def test_dont_touch__pdoc__blacklisted(self):
         class Bomb:

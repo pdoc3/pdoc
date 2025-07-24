@@ -449,6 +449,43 @@ def _unwrap_descriptor(dobj):
     return getattr(obj, '__get__', obj)
 
 
+def _unwrap_object(obj: T, *, stop: Optional[Callable[[T], bool]] = None) -> T:
+    """
+    This is a modified version of `inspect.unwrap()` that properly handles classes.
+
+    Follows the chains of `__wrapped__` attributes, until either:
+    1. `obj.__wrapped__` is missing or None
+    2. `obj` is a class and `obj.__wrapped__` has a different name or module
+    3. `stop` is given and `stop(obj)` is True
+    """
+
+    orig = obj  # remember the original func for error reporting
+    # Memoise by id to tolerate non-hashable objects, but store objects to
+    # ensure they aren't destroyed, which would allow their IDs to be reused.
+    memo = {id(orig): orig}
+    recursion_limit = sys.getrecursionlimit()
+    while hasattr(obj, '__wrapped__'):
+        if stop is not None and stop(obj):
+            break
+
+        candidate = obj.__wrapped__
+        if candidate is None:
+            break
+
+        if isinstance(candidate, type) and isinstance(orig, type):
+            if not (candidate.__name__ == orig.__name__
+                    and candidate.__module__ == orig.__module__):
+                break
+
+        obj = candidate
+        id_func = id(obj)
+        if (id_func in memo) or (len(memo) >= recursion_limit):
+            raise ValueError('wrapper loop when unwrapping {!r}'.format(orig))
+        memo[id_func] = obj
+
+    return obj
+
+
 def _filter_type(type: Type[T],
                  values: Union[Iterable['Doc'], Mapping[str, 'Doc']]) -> List[T]:
     """
@@ -712,11 +749,11 @@ class Module(Doc):
                          "exported in `__all__`")
                 else:
                     if not _is_blacklisted(name, self):
-                        obj = inspect.unwrap(obj)
+                        obj = _unwrap_object(obj)
                     public_objs.append((name, obj))
         else:
             def is_from_this_module(obj):
-                mod = inspect.getmodule(inspect.unwrap(obj))
+                mod = inspect.getmodule(_unwrap_object(obj))
                 return mod is None or mod.__name__ == self.obj.__name__
 
             for name, obj in inspect.getmembers(self.obj):
@@ -730,7 +767,7 @@ class Module(Doc):
                         self._context.blacklisted.add(f'{self.refname}.{name}')
                         continue
 
-                    obj = inspect.unwrap(obj)
+                    obj = _unwrap_object(obj)
                     public_objs.append((name, obj))
 
             index = list(self.obj.__dict__).index
@@ -1066,7 +1103,7 @@ class Class(Doc):
                     self.module._context.blacklisted.add(f'{self.refname}.{_name}')
                     continue
 
-                obj = inspect.unwrap(obj)
+                obj = _unwrap_object(obj)
                 public_objs.append((_name, obj))
 
         def definition_order_index(
@@ -1428,7 +1465,7 @@ class Function(Doc):
         try:
             # Both of these are required because coroutines aren't classified as async
             # generators and vice versa.
-            obj = inspect.unwrap(self.obj)
+            obj = _unwrap_object(self.obj)
             return (inspect.iscoroutinefunction(obj) or
                     inspect.isasyncgenfunction(obj))
         except AttributeError:

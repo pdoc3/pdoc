@@ -565,7 +565,7 @@ def format_git_link(template: str, dobj: pdoc.Doc):
         if 'commit' in _str_template_fields(template):
             commit = _git_head_commit()
         obj = pdoc._unwrap_descriptor(dobj)
-        abs_path = inspect.getfile(inspect.unwrap(obj))
+        abs_path = inspect.getfile(pdoc._unwrap_object(obj))
         path = _project_relative_path(abs_path)
 
         # Urls should always use / instead of \\
