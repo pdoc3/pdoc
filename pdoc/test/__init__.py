@@ -659,7 +659,6 @@ class ApiTest(unittest.TestCase):
             self.assertEqual(cm, [])
             self.assertNotIn('downloaded_modules', mod.doc)
 
-    # flake8: noqa: E501 line too long
     def test_class_wrappers(self):
         """
         Check that decorated classes are unwrapped properly.
@@ -685,7 +684,7 @@ class ApiTest(unittest.TestCase):
                          """This is `DecoratedClassParent` class.""")
         self.assertEqual(root_wrapped_cls_child.qualname, 'DecoratedClassChild')
         self.assertEqual(root_wrapped_cls_child.docstring,
-                         """This is an `DecoratedClassParent`'s implementation that always returns 1.""")
+                         """This is an `DecoratedClassParent`'s implementation that always returns 1.""")  # noqa: E501 [LineTooLong]
 
         self.assertEqual(module_classdef.qualname, f'{module_name}.class_definition')
         self.assertEqual(module_classdef_cls_parent.qualname, 'DecoratedClassParent')
@@ -693,7 +692,7 @@ class ApiTest(unittest.TestCase):
                          """This is `DecoratedClassParent` class.""")
         self.assertEqual(module_classdef_cls_child.qualname, 'DecoratedClassChild')
         self.assertEqual(module_classdef_cls_child.docstring,
-                         """This is an `DecoratedClassParent`'s implementation that always returns 1.""")
+                         """This is an `DecoratedClassParent`'s implementation that always returns 1.""")  # noqa: E501 [LineTooLong]
 
         self.assertEqual(module_util.qualname, f'{module_name}.util')
         self.assertEqual(module_util_decorator.qualname, 'decorate_class')

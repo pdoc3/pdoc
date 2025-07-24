@@ -574,7 +574,7 @@ def main(_args=None):
         _print_pdf(modules, **template_config)
         import textwrap
         PANDOC_CMD = textwrap.indent(_PANDOC_COMMAND, '    ')
-        print(f"""
+        help_msg = f"""
 PDF-ready markdown written to standard output.
                               ^^^^^^^^^^^^^^^
 Convert this file to PDF using e.g. Pandoc:
@@ -600,7 +600,7 @@ or using Python-Markdown and Chrome/Chromium/WkHtmlToPDF:
     wkhtmltopdf --encoding utf8 -s A4 --print-media-type pdf.html pdf.pdf
 
 or similar, at your own discretion.""",
-              file=sys.stderr)
+        print(help_msg, file=sys.stderr)
         sys.exit(0)
 
     for module in modules:
