@@ -37,6 +37,7 @@ jobs:
       - run: pip install flake8 coverage mypy types-Markdown
 
       # test_pdf_pandoc
+      - run: sudo apt-get remove man-db  # speed-up CI
       - run: |
           sudo apt-get update && sudo apt-get install --no-install-recommends \
             texlive-xetex lmodern texlive-fonts-recommended
