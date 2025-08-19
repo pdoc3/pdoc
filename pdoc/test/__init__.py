@@ -116,6 +116,8 @@ class CliTest(unittest.TestCase):
         os.path.join('example_pkg', '_private'),
         os.path.join('example_pkg', '_private', 'index.html'),
         os.path.join('example_pkg', '_private', 'module.html'),
+        os.path.join('example_pkg', 'non_äšçii'),
+        os.path.join('example_pkg', 'non_äšçii', 'index.html'),
         os.path.join('example_pkg', 'subpkg'),
         os.path.join('example_pkg', 'subpkg', '_private.html'),
         os.path.join('example_pkg', 'subpkg', 'index.html'),
@@ -498,7 +500,7 @@ class ApiTest(unittest.TestCase):
 
     def test_module(self):
         modules = {
-            EXAMPLE_MODULE: ('', ('index', 'module', 'subpkg', 'subpkg2')),
+            EXAMPLE_MODULE: ('', ('index', 'module', 'non_äšçii', 'subpkg', 'subpkg2')),
             EXAMPLE_MODULE + '.subpkg2': ('.subpkg2', ('subpkg2.module',)),
         }
         with chdir(TESTS_BASEDIR):
@@ -1772,6 +1774,15 @@ class HttpTest(unittest.TestCase):
                 with urlopen(url + 'csv.ext', timeout=3) as resp:
                     html = resp.read()
                     self.assertIn(b'DictReader', html)
+
+    def test_non_ascii_url(self):
+        from urllib.parse import quote
+        with self._http([os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)]) as url:
+            quoted = f'{url}{EXAMPLE_MODULE}/' + quote('non_äšçii')
+            with urlopen(quoted, timeout=3) as resp:
+                self.assertEqual(resp.status, 200)
+                html = resp.read()
+                self.assertIn('ünicøđe_ftw'.encode('utf-8'), html)
 
     def test_file(self):
         with chdir(os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE)):
