@@ -333,7 +333,7 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
         if not name:
             continue
 
-        docstring = inspect.cleandoc(str_node.value.value).strip()
+        docstring = inspect.cleandoc(cast(str, str_node.value.value)).strip()
         if not docstring:
             continue
 
