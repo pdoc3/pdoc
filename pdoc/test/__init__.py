@@ -3,6 +3,7 @@ Unit tests for pdoc package.
 """
 import doctest
 import enum
+import importlib.util
 import inspect
 import os
 import shutil
@@ -102,6 +103,13 @@ def ignore_warnings(func):
             warnings.simplefilter('ignore')
             func(*args, **kwargs)
     return wrapper
+
+
+def has_typing_extensions_capsule_type():
+    if importlib.util.find_spec('typing_extensions') is None:
+        return False
+    import typing_extensions
+    return hasattr(typing_extensions, 'CapsuleType')
 
 
 class CliTest(unittest.TestCase):
@@ -1017,6 +1025,94 @@ class ApiTest(unittest.TestCase):
         def f() -> typing.List[typing.Union[str, pdoc.Doc]]: return []  # noqa: E704
         func = pdoc.Function('f', DUMMY_PDOC_MODULE, f)
         self.assertEqual(func.return_annotation(), 'List[str\N{NBSP}|\N{NBSP}pdoc.Doc]')
+
+    def test_Function_signature_from_string(self):
+        fake_module = ModuleType('fake_pybind11_module')
+        # sanity check the isolation itself
+        assert 'typing' not in fake_module.__dict__
+        mod = pdoc.Module(fake_module)
+
+        # Union types with `|` operator where introduces with Python 3.10
+        if sys.version_info >= (3, 10):
+            class pybind11_int:
+                """
+                pybind11_int(self: str, pos: typing.SupportsInt | typing.SupportsIndex) -> \
+                    tuple[int, float]
+                """
+            func = pdoc.Function('pybind11_int', mod, pybind11_int)
+            sig = pdoc.Function._signature_from_string(func)
+
+            def expected_pybind11_int(
+                    self: str, pos: typing.SupportsInt | typing.SupportsIndex) \
+                    -> tuple[int, float]:
+                raise NotImplementedError
+            self.assertEqual(sig, inspect.signature(expected_pybind11_int))
+
+            class pybind11_float:
+                """
+                pybind11_float(self: str, pos: typing.SupportsFloat | typing.SupportsIndex) -> \
+                    tuple[int, float]
+                """
+            func = pdoc.Function('pybind11_float', mod, pybind11_float)
+            sig = pdoc.Function._signature_from_string(func)
+
+            def expected_pybind11_float(
+                    self: str, pos: typing.SupportsFloat | typing.SupportsIndex) \
+                    -> tuple[int, float]:
+                raise NotImplementedError
+            self.assertEqual(sig, inspect.signature(expected_pybind11_float))
+        else:
+            class pybind11_int:
+                """
+                pybind11_int(self: str, pos: typing.SupportsInt) -> tuple[int, float]
+                """
+            func = pdoc.Function('pybind11_int', mod, pybind11_int)
+            sig = pdoc.Function._signature_from_string(func)
+
+            def expected_pybind11_int(self: str, pos: typing.SupportsInt) -> tuple[int, float]:
+                raise NotImplementedError
+            self.assertEqual(sig, inspect.signature(expected_pybind11_int))
+
+            class pybind11_float:
+                """
+                pybind11_float(self: str, pos: typing.SupportsFloat) -> tuple[int, float]
+                """
+            func = pdoc.Function('pybind11_float', mod, pybind11_float)
+            sig = pdoc.Function._signature_from_string(func)
+
+            def expected_pybind11_float(self: str, pos: typing.SupportsFloat) -> tuple[int, float]:
+                raise NotImplementedError
+            self.assertEqual(sig, inspect.signature(expected_pybind11_float))
+
+        if sys.version_info >= (3, 13):
+            import types
+
+            class pybind11_capsule:
+                """
+                pybind11_capsule(self: str, pointer: types.CapsuleType) -> tuple[int, float]
+                """
+            func = pdoc.Function('pybind11_capsule', mod, pybind11_capsule)
+            sig = pdoc.Function._signature_from_string(func)
+
+            def expected_pybind11_capsule(
+                    self: str, pointer: types.CapsuleType) -> tuple[int, float]:
+                raise NotImplementedError
+            self.assertEqual(sig, inspect.signature(expected_pybind11_capsule))
+        elif has_typing_extensions_capsule_type():
+            import typing_extensions
+
+            class pybind11_capsule:
+                """
+                pybind11_capsule(self: str, pointer: typing_extensions.CapsuleType) -> \
+                    tuple[int, float]
+                """
+            func = pdoc.Function('pybind11_capsule', mod, pybind11_capsule)
+            sig = pdoc.Function._signature_from_string(func)
+
+            def expected_pybind11_capsule(
+                    self: str, pointer: typing_extensions.CapsuleType) -> tuple[int, float]:
+                raise NotImplementedError
+            self.assertEqual(sig, inspect.signature(expected_pybind11_capsule))
 
     @ignore_warnings
     def test_Variable_type_annotation(self):

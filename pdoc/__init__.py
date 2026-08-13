@@ -1403,6 +1403,19 @@ def _formatannotation(annot):
     return str(inspect.formatannotation(maybe_replace_reprs(annot)))
 
 
+class _PermissiveFallback:
+    """
+    Returns `Any` for missing attributes (used for annotation-only
+    modules where the installed version is missingm newer names, e.g.
+    `typing_extensions.CapsuleType` on Python < 3.13).
+    """
+    def __init__(self, mod):
+        self._mod = mod
+
+    def __getattr__(self, name):
+        return getattr(self._mod, name, Any)
+
+
 class Function(Doc):
     """
     Representation of documentation for a function or method.
@@ -1648,9 +1661,30 @@ class Function(Doc):
             if strings:
                 string = filter(strings[0])
                 _locals, _globals = {}, {}
-                _globals.update({'capsule': None})  # pybind11 capsule data type
+                _globals.update({'capsule': Any})  # pybind11 capsule data type
+
+                # pybind11 >= 3.0.0 uses typing.SupportsInt, etc.
+                _globals['typing'] = typing
                 _globals.update(typing.__dict__)
+
+                # types is optional and may lack newer names
+                # (e.g. types.CapsuleType) depending on installed version
+                try:
+                    import types
+                    _globals['types'] = _PermissiveFallback(types)
+                except ImportError:
+                    pass
+
+                # typing_extensions is optional and may lack newer names
+                # (e.g. typing_extensions.CapsuleType) depending on installed version
+                try:
+                    import typing_extensions
+                    _globals['typing_extensions'] = _PermissiveFallback(typing_extensions)
+                except ImportError:
+                    pass
+
                 _globals.update(self.module.obj.__dict__)
+
                 # Trim binding module basename from type annotations
                 # See: https://github.com/pdoc3/pdoc/pull/148#discussion_r407114141
                 module_basename = self.module.name.rsplit('.', maxsplit=1)[-1]
