@@ -1487,12 +1487,9 @@ class Function(Doc):
                 annot = method()
             except Exception:
                 continue
-            else:
+
+            if annot is not inspect.Parameter.empty:
                 break
-        else:
-            # Don't warn on variables. The annotation just isn't available.
-            if not isinstance(self, Variable):
-                warn(f"Error handling return annotation for {self!r}", stacklevel=3)
 
         if annot is inspect.Parameter.empty or not annot:
             return ''
