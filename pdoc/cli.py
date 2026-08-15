@@ -476,11 +476,11 @@ def main(_args=None):
             key, value = config_str.split('=', 1)
             value = ast.literal_eval(value)
             template_config[key] = value
-        except Exception:
+        except Exception as exc:
             raise ValueError(
                 f'Error evaluating --config statement "{config_str}". '
                 'Make sure string values are quoted?'
-            )
+            ) from exc
 
     if args.html_no_source:
         _warn_deprecated('--html-no-source', '-c show_source_code=False', True)

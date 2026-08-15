@@ -149,9 +149,9 @@ def _render_template(template_name, **kwargs):
 
     try:
         t = tpl_lookup.get_template(template_name)
-    except TopLevelLookupException:
+    except TopLevelLookupException as exc:
         paths = [path.join(p, template_name.lstrip('/')) for p in tpl_lookup.directories]
-        raise OSError(f"No template found at any of: {', '.join(paths)}")
+        raise OSError(f"No template found at any of: {', '.join(paths)}") from exc
 
     try:
         return t.render(**config).strip()
@@ -229,7 +229,7 @@ def import_module(
             except Exception as e:
                 msg = f'Error importing {module!r}: {e.__class__.__name__}: {e}'
                 if not skip_errors:
-                    raise ImportError(msg)
+                    raise ImportError(msg) from e
                 warn(msg, category=Module.ImportWarning, stacklevel=2)
                 module = ModuleType(module_path)
 

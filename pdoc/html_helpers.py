@@ -283,7 +283,7 @@ class _ToMarkdown:
                 return _ToMarkdown._include_file(indent, value,
                                                  _ToMarkdown._directive_opts(text), module)
             except Exception as e:
-                raise RuntimeError(f'`.. include:: {value}` error in module {module.name!r}: {e}')
+                raise RuntimeError(f'`.. include:: {value}` error in module {module.name!r}: {e}') from e  # noqa: E501
         if type in ('image', 'figure'):
             alt_text = text.translate(str.maketrans({
                 '\n': ' ',
