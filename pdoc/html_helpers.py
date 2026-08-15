@@ -262,7 +262,7 @@ class _ToMarkdown:
                 )
             # Convert into markdown sections. End underlines with '='
             # to avoid matching and re-processing as Numpy sections.
-            return f'\n{section}\n-----=\n{body}'
+            return f'\n## {section}\n\n{body}'
 
         text = re.compile(r'^([A-Z]\w+):$\n'
                           r'((?:\n?(?: {2,}.*|$))+)', re.MULTILINE).sub(googledoc_sections, text)
