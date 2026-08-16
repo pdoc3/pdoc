@@ -1004,6 +1004,13 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(pdoc.Function('get_sample', mod, get_sample).return_annotation(),
                          'Tuple[int,\xa0float]')
 
+        # builtin-like callable, where inspect.signature() succeeds, but parameters/return
+        # annotation are empty, so the signature in the doc string will be used
+        class get_sample_2():
+            """ get_sample_2(self: int, pos: int) -> Tuple[int, float] """
+        self.assertEqual(pdoc.Function('get_sample_2', mod, get_sample_2).return_annotation(),
+                         'Tuple[int,\xa0float]')
+
     @unittest.skipIf(sys.version_info < (3, 8), "positional-only arguments unsupported in < py3.8")
     def test_test_Function_params_python38_specific(self):
         mod = DUMMY_PDOC_MODULE
