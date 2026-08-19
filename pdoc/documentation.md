@@ -161,6 +161,14 @@ Conversely, if `__pdoc__[key] = True`, then `key` (and its public members) will 
 include documentation of [private objects][public-private],
 including special functions such as `__call__`, which are ignored by default.
 
+A `key` that contains any of the wildcard characters `*`, `?`, or `[` is
+treated as an [fnmatch] pattern and matched against member reference names.
+This is handy for excluding members contributed by a base class from every
+subclass at once, e.g. `__pdoc__ = {'*.model_fields': False}` to hide a
+Pydantic field from all models in the module.
+
+[fnmatch]: https://docs.python.org/3/library/fnmatch.html
+
 Alternatively, the _values_ of `__pdoc__` can be the **overriding docstrings**.
 This feature is useful when there's no feasible way of
 attaching a docstring to something. A good example is a

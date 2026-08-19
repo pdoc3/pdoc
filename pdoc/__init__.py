@@ -20,6 +20,7 @@ import typing
 from contextlib import contextmanager
 from copy import copy
 from dataclasses import is_dataclass
+from fnmatch import fnmatchcase
 from functools import cached_property, lru_cache, reduce, partial, wraps
 from itertools import tee, groupby
 from types import FunctionType, ModuleType
@@ -379,18 +380,40 @@ def _pep224_docstrings(doc_obj: Union['Module', 'Class'], *,
     return vars, instance_vars
 
 
+# Characters that turn a `__pdoc__` key into an fnmatch wildcard pattern.
+_PDOC_WILDCARD_CHARS = ('*', '?', '[')
+
+
+def _is_pdoc_wildcard(key: str) -> bool:
+    """Returns `True` if `key` is a wildcard `__pdoc__` pattern (e.g. `*.foo`)."""
+    return any(char in key for char in _PDOC_WILDCARD_CHARS)
+
+
+def _pdoc_matches(pattern: str, *names: str) -> bool:
+    """Returns `True` if any of `names` matches the fnmatch `pattern`."""
+    return any(fnmatchcase(name, pattern) for name in names)
+
+
 @lru_cache()
 def _is_whitelisted(name: str, doc_obj: Union['Module', 'Class']):
     """
     Returns `True` if `name` (relative or absolute refname) is
     contained in some module's __pdoc__ with a truish value.
+
+    A `__pdoc__` key containing wildcard characters (`*?[`) is matched
+    against the refname with `fnmatch`.
     """
     refname = f'{doc_obj.refname}.{name}'
     module: Optional[Module] = doc_obj.module
     while module:
         qualname = refname[len(module.refname) + 1:]
-        if module.__pdoc__.get(qualname) or module.__pdoc__.get(refname):
-            return True
+        for key, value in module.__pdoc__.items():
+            if not value:
+                continue
+            if key in (qualname, refname):
+                return True
+            if _is_pdoc_wildcard(key) and _pdoc_matches(key, qualname, refname):
+                return True
         module = module.supermodule
     return False
 
@@ -400,13 +423,21 @@ def _is_blacklisted(name: str, doc_obj: Union['Module', 'Class']):
     """
     Returns `True` if `name` (relative or absolute refname) is
     contained in some module's __pdoc__ with value False.
+
+    A `__pdoc__` key containing wildcard characters (`*?[`) is matched
+    against the refname with `fnmatch`.
     """
     refname = f'{doc_obj.refname}.{name}'
     module: Optional[Module] = doc_obj.module
     while module:
         qualname = refname[len(module.refname) + 1:]
-        if module.__pdoc__.get(qualname) is False or module.__pdoc__.get(refname) is False:
-            return True
+        for key, value in module.__pdoc__.items():
+            if value is not False:
+                continue
+            if key in (qualname, refname):
+                return True
+            if _is_pdoc_wildcard(key) and _pdoc_matches(key, qualname, refname):
+                return True
         module = module.supermodule
     return False
 
@@ -871,6 +902,18 @@ class Module(Doc):
             if docstring is True:
                 continue
 
+            # Wildcard keys (e.g. `'*.model_fields': False`) are matched
+            # against member refnames by fnmatch in _is_whitelisted() /
+            # _is_blacklisted(), so a class' *own* matching members are
+            # already filtered out at construction time. Here we only need
+            # to drop matching members that were pulled in via inheritance,
+            # and, unlike exact keys, a pattern is never expected to name an
+            # existing member, so we don't warn that it "does not exist".
+            if _is_pdoc_wildcard(name):
+                if docstring in (False, None):
+                    self._blacklist_matching(name)
+                continue
+
             refname = f"{self.refname}.{name}"
             if docstring in (False, None):
                 if docstring is None:
@@ -916,6 +959,25 @@ class Module(Doc):
             c._link_inheritance()
 
         self._is_inheritance_linked = True
+
+    def _blacklist_matching(self, pattern: str):
+        """
+        Drop class members whose refname matches the fnmatch `pattern`.
+
+        This handles members pulled into subclasses via inheritance, which
+        aren't filtered by `_is_blacklisted()` at construction time. A class'
+        own members matching the pattern are already excluded by then.
+        """
+        modprefix = self.refname + '.'
+        for cls in _filter_type(Class, self.doc):
+            for name in list(cls.doc):
+                refname = cls.doc[name].refname
+                qualname = (refname[len(modprefix):]
+                            if refname.startswith(modprefix) else refname)
+                if _pdoc_matches(pattern, qualname, refname):
+                    del cls.doc[name]
+                    self._context.pop(refname, None)
+                    self._context.blacklisted.add(refname)
 
     def text(self, **kwargs) -> str:
         """
