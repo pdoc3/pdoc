@@ -659,6 +659,45 @@ class ApiTest(unittest.TestCase):
             self.assertEqual(cm, [])
             self.assertNotIn('downloaded_modules', mod.doc)
 
+    def test__pdoc__wildcard(self):
+        # GH-449: https://github.com/pdoc3/pdoc/issues/449
+        module = pdoc.import_module(EXAMPLE_MODULE)
+
+        # A wildcard key blacklists every matching member, including the
+        # ones subclasses only have through inheritance.
+        with patch.object(module, '__pdoc__', {'*.inherited': False}):
+            pdoc.reset()
+            mod = pdoc.Module(module)
+            with warnings.catch_warnings(record=True) as cm:
+                warnings.simplefilter('always')
+                pdoc.link_inheritance()
+            # A pattern is not expected to name an existing member, so it
+            # must not raise the "key does not exist" warning.
+            self.assertEqual(
+                [str(w.message) for w in cm if 'does not exist' in str(w.message)], [])
+            self.assertNotIn('inherited', mod.doc['A'].doc)
+            self.assertNotIn('inherited', mod.doc['B'].doc)
+            self.assertNotIn('inherited', mod.doc['C'].doc)
+            # Non-matching members are left untouched.
+            self.assertIn('overridden', mod.doc['B'].doc)
+
+        # A trailing wildcard blacklists a whole class' members.
+        with patch.object(module, '__pdoc__', {'B.*': False}):
+            pdoc.reset()
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn('B', mod.doc)
+            self.assertNotIn('f', mod.doc['B'].doc)
+            self.assertNotIn('inherited', mod.doc['B'].doc)
+
+        # A wildcard with a truish value whitelists matching members,
+        # here the otherwise-hidden dunder inherited from `A`.
+        with patch.object(module, '__pdoc__', {'*.__call__': True}):
+            pdoc.reset()
+            mod = pdoc.Module(module)
+            pdoc.link_inheritance()
+            self.assertIn('__call__', mod.doc['A'].doc)
+
     def test_class_wrappers(self):
         """
         Check that decorated classes are unwrapped properly.
