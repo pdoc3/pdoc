@@ -537,6 +537,17 @@ class ApiTest(unittest.TestCase):
                 mod = pdoc.Module('a.main')
                 self.assertIn('D', mod.doc)
 
+    def test_namespace_html_http_server(self):
+        # Namespace packages have __file__ == None; rendering their HTML in
+        # http_server mode used to crash trying to os.stat(None) for the
+        # auto-reload script's ETag.
+        path = os.path.join(TESTS_BASEDIR, EXAMPLE_MODULE, '_namespace', '1')
+        with patch.object(sys, 'path', [os.path.join(path, 'a'),
+                                        os.path.join(path, 'b')]):
+            mod = pdoc.Module('a')
+            self.assertIsNone(mod.obj.__file__)
+            mod.html(http_server=True)
+
     def test_module_allsubmodules(self):
         m = pdoc.Module(EXAMPLE_MODULE + '._private')
         self.assertEqual(sorted(m.name for m in m.submodules()),
