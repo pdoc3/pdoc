@@ -170,9 +170,15 @@ class _WebDoc(BaseHTTPRequestHandler):
     def check_modified(self):
         try:
             module = pdoc.import_module(self.import_path_from_req_url)
-            new_etag = str(os.stat(module.__file__).st_mtime)
         except ImportError:
             return 404
+
+        if module.__file__ is None:
+            # Namespace packages have no __file__ to stat(); treat as
+            # always-modified rather than crashing.
+            return 205
+
+        new_etag = str(os.stat(module.__file__).st_mtime)
 
         old_etag = self.headers.get('If-None-Match', new_etag)
         if old_etag == new_etag:
