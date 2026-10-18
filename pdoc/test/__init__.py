@@ -11,6 +11,7 @@ import subprocess
 import sys
 import typing
 import threading
+import textwrap
 import unittest
 import warnings
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
@@ -571,6 +572,41 @@ class ApiTest(unittest.TestCase):
         expected = 'The type of the None singleton.' if sys.version_info > (3, 13) else ''
         self.assertEqual(doc.doc['vars_dont'].docstring, expected)
         self.assertIn('integer', doc.doc['but_clss_have_doc'].docstring)
+
+    def test_pep224_docstring_overrides_callable_alias(self):
+        # https://github.com/pdoc3/pdoc/issues/418
+        source = textwrap.dedent('''\
+            from typing import Callable
+
+            def _impl(*args, **initial_values) -> str:
+                """Implementation docstring."""
+                return "x"
+
+            __all__ = ["get_logger", "Box"]
+
+            get_logger: Callable[..., str] = _impl
+            """Custom docstring"""
+
+            class Box:
+                alias: Callable[..., str] = _impl
+                """Alias docstring"""
+            ''')
+        with temp_dir() as path:
+            filename = os.path.join(path, 'pep224_callable_alias.py')
+            with open(filename, 'w', encoding='utf-8') as handle:
+                handle.write(source)
+            sys.path.insert(0, path)
+            try:
+                text = pdoc.text('pep224_callable_alias')
+            finally:
+                sys.path.remove(path)
+                sys.modules.pop('pep224_callable_alias', None)
+                pdoc.reset()
+        self.assertIn('Custom docstring', text)
+        self.assertIn('Alias docstring', text)
+        self.assertNotIn('Implementation docstring', text)
+        self.assertIn('get_logger(*args, **initial_values)', text)
+        self.assertIn('alias(*args, **initial_values)', text)
 
     @unittest.skipIf(sys.version_info >= (3, 10), 'No builtin module "parser" in Py3.10')
     def test_builtin_methoddescriptors(self):
