@@ -771,7 +771,8 @@ class Module(Doc):
 
         for name, obj in public_objs:
             if _is_function(obj):
-                self.doc[name] = Function(name, self, obj)
+                self.doc[name] = Function(
+                    name, self, obj, docstring=var_docstrings.get(name))
             elif inspect.isclass(obj):
                 self.doc[name] = Class(name, self, obj)
             elif name in var_docstrings:
@@ -1123,7 +1124,8 @@ class Class(Doc):
         for name, obj in public_objs:
             if _is_function(obj):
                 self.doc[name] = Function(
-                    name, self.module, obj, cls=self)
+                    name, self.module, obj, cls=self,
+                    docstring=var_docstrings.get(name))
             else:
                 self.doc[name] = Variable(
                     name, self.module,
@@ -1407,10 +1409,12 @@ class Function(Doc):
     """
     Representation of documentation for a function or method.
     """
-    def __init__(self, name: str, module: Module, obj, *, cls: Optional[Class] = None):
+    def __init__(self, name: str, module: Module, obj, *,
+                 cls: Optional[Class] = None, docstring: Optional[str] = None):
         """
         Same as `pdoc.Doc`, except `obj` must be a
-        Python function object. The docstring is gathered automatically.
+        Python function object. Pass `docstring` to override
+        `inspect.getdoc()`, for example a PEP-224 string on an alias.
 
         `cls` should be set when this is a method or a static function
         beloing to a class. `cls` should be a `pdoc.Class` object.
@@ -1419,7 +1423,7 @@ class Function(Doc):
         all other cases, it should be `False`.
         """
         assert callable(obj), (name, module, obj)
-        super().__init__(name, module, obj)
+        super().__init__(name, module, obj, docstring=docstring or '')
 
         self.cls = cls
         """
