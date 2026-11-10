@@ -488,6 +488,12 @@ class CliTest(unittest.TestCase):
                 self._check_files(include_patterns=['<p>Only this comment expected.</p>'],
                                   exclude_patterns=['<p>secret: meta data</p>'])
 
+    def test_invalid_config(self):
+        with redirect_streams() as (_, stderr):
+            returncode = run(EXAMPLE_MODULE, config='not-an-assignment')
+            self.assertNotEqual(returncode, 0)
+            self.assertIn('Error evaluating --config statement', stderr.getvalue())
+
 
 class ApiTest(unittest.TestCase):
     """
