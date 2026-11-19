@@ -377,7 +377,7 @@ def _warn_deprecated(option, alternative='', use_config_mako=False):
 
 def _generate_lunr_search(modules: List[pdoc.Module],
                           index_docstrings: bool,
-                          template_config: dict):
+                          template_config: dict, *, show_inherited_members: bool):
     """Generate index.js for search"""
 
     def trim_docstring(docstring):
@@ -390,11 +390,16 @@ def _generate_lunr_search(modules: List[pdoc.Module],
             \s*</?\w*[^>]*>\s*     # simple HTML tags
         ''', ' ', docstring, flags=re.VERBOSE | re.MULTILINE)
 
-    def recursive_add_to_index(dobj):
+    def recursive_add_to_index(dobj, module):
+        if isinstance(dobj, pdoc.Module):
+            module = dobj
+        target = dobj if show_inherited_members else dobj._inherits_top()
         info = {
             'ref': dobj.refname,
-            'url': to_url_id(dobj.module),
+            'url': to_url_id(module if target is dobj else target.module),
         }
+        if target is not dobj:
+            info['anchor'] = target.refname
         if index_docstrings:
             info['doc'] = trim_docstring(dobj.docstring)
         if isinstance(dobj, pdoc.Function):
@@ -402,7 +407,7 @@ def _generate_lunr_search(modules: List[pdoc.Module],
         nonlocal index
         index.append(info)
         for member_dobj in getattr(dobj, 'doc', {}).values():
-            recursive_add_to_index(member_dobj)
+            recursive_add_to_index(member_dobj, module)
 
     @lru_cache()
     def to_url_id(module):
@@ -414,7 +419,7 @@ def _generate_lunr_search(modules: List[pdoc.Module],
     index: List[Dict] = []
     url_cache: Dict[str, int] = {}
     for top_module in modules:
-        recursive_add_to_index(top_module)
+        recursive_add_to_index(top_module, top_module)
     urls = sorted(url_cache.keys(), key=url_cache.__getitem__)
 
     cmd = ['node', str(Path(__file__).with_name('build-index.js'))]
@@ -619,7 +624,8 @@ or similar, at your own discretion.""",
         lunr_config = config.get('lunr_search')
         if lunr_config is not None:
             _generate_lunr_search(
-                modules, lunr_config.get("index_docstrings", True), template_config)
+                modules, lunr_config.get("index_docstrings", True), template_config,
+                show_inherited_members=config['show_inherited_members'])
 
 
 _PANDOC_COMMAND = '''\

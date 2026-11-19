@@ -4,6 +4,7 @@ Unit tests for pdoc package.
 import doctest
 import enum
 import inspect
+import json
 import os
 import shutil
 import signal
@@ -291,6 +292,60 @@ class CliTest(unittest.TestCase):
         with redirect_streams() as (_, stderr):
             run(EXAMPLE_MODULE, config='lunr_search={"fuzziness": 1}')
             self.assertFalse(stderr.read())
+
+    def test_lunr_search_inherited_links(self):
+        with temp_dir() as path:
+            package = Path(path, 'search_inheritance')
+            package.mkdir()
+            (package / '__init__.py').write_text('')
+            (package / 'base.py').write_text('''
+class Base:
+    def method(self):
+        """Base method documentation."""
+
+    @property
+    def value(self):
+        """Base property documentation."""
+''')
+            (package / 'child.py').write_text('''
+from .base import Base
+
+class Child(Base):
+    """Child documentation."""
+
+class GrandChild(Child):
+    """Grandchild documentation."""
+
+class Override(Child):
+    def method(self):
+        """Overridden method documentation."""
+''')
+            for show_inherited in (False, True):
+                pdoc.reset()
+                # Exercise the browser-built index without requiring Node or a CDN.
+                with patch.object(sys, 'path', [path, *sys.path]), \
+                        patch('pdoc.cli.subprocess.Popen', side_effect=FileNotFoundError), \
+                        self.assertWarns(RuntimeWarning), \
+                        run_html('search_inheritance', '-c', 'lunr_search={}', '-c',
+                                 f'show_inherited_members={show_inherited}'):
+                    urls, index = Path('index.js').read_text().split(';\nINDEX=')
+                    urls = json.loads(urls.removeprefix('URLS='))
+                    index = {doc['ref']: doc for doc in json.loads(index)}
+
+                    for cls in ('Child', 'GrandChild', 'Override'):
+                        for member in ('method', 'value'):
+                            ref = f'search_inheritance.child.{cls}.{member}'
+                            with self.subTest(ref=ref, show_inherited_members=show_inherited):
+                                doc = index[ref]
+                                local = show_inherited or (cls == 'Override' and member == 'method')
+                                expected = (ref if local else
+                                            f'search_inheritance.base.Base.{member}')
+                                anchor = doc.get('anchor', doc['ref'])
+                                target = urls[doc['url']]
+                                self.assertEqual(anchor, expected)
+                                self.assertEqual(target, 'search_inheritance/' +
+                                                 ('child.html' if local else 'base.html'))
+                                self.assertIn(f'id="{anchor}"', Path(target).read_text())
 
     def test_force(self):
         with run_html(EXAMPLE_MODULE):
