@@ -159,7 +159,7 @@
         results.forEach(function (result) {
             const dobj = DOCS[parseInt(result.ref)];
             const docstring = dobj.doc;
-            const url = URLS[dobj.url] + '#' + dobj.ref;
+            const url = URLS[dobj.url] + '#' + (dobj.anchor || dobj.ref);
             const pretty_name = dobj.ref + (dobj.func ? '()' : '');
             let text = '';
             if (docstring) {
